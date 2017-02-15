@@ -4,9 +4,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- Tool bar -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@color/creamWhite">
+
+    </RelativeLayout>
+
     <com.google.android.gms.maps.MapView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:id="@+id/map_view"/>
 
 </LinearLayout>
