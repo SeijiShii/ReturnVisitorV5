@@ -7,10 +7,14 @@
     <color name="creamWhite">#EAF8BF</color>
     <color name="seaBlue">#006992</color>
 
+    <color name="rvRed">#bc0000</color>
+
     <color name="adFrameGray">#444</color>
 
     <color name="textColorGray">#333</color>
 
+    <color name="blueFog">#8027476E</color>
     <color name="orangeFog">#80ECA400</color>
+    <color name="redFog">#80bc0000</color>
 
 </resources>

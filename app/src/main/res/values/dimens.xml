@@ -4,6 +4,9 @@
     <dimen name="frame_title_text_size">15sp</dimen>
     <dimen name="in_frame_text_size">12sp</dimen>
 
+    <dimen name="ui_height_large">60dp</dimen>
+    <dimen name="ui_height_small">40dp</dimen>
+
     <dimen name="padding_normal">10dp</dimen>
     <dimen name="ui_margin_normal">5dp</dimen>
 </resources>

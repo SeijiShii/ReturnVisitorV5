@@ -1,4 +1,4 @@
-package net.c_kogyo.returnvisitorv5.activities;
+package net.c_kogyo.returnvisitorv5.activity;
 
 //import net.c_kogyo.returnvisitor.R;
 

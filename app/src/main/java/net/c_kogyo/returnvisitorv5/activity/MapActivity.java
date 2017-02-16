@@ -1,4 +1,4 @@
-package net.c_kogyo.returnvisitorv5.activities;
+package net.c_kogyo.returnvisitorv5.activity;
 
 import android.Manifest;
 import android.content.Intent;
@@ -16,16 +16,15 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import net.c_kogyo.returnvisitorv5.R;
 
-import static net.c_kogyo.returnvisitorv5.activities.Constants.RecordVisitActions.NEW_PLACE_ACTION;
-import static net.c_kogyo.returnvisitorv5.activities.Constants.RecordVisitActions.NEW_VISIT_REQUEST_CODE;
-import static net.c_kogyo.returnvisitorv5.activities.Constants.SharedPrefTags.LATITUDE;
-import static net.c_kogyo.returnvisitorv5.activities.Constants.SharedPrefTags.LONGITUDE;
-import static net.c_kogyo.returnvisitorv5.activities.Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS;
-import static net.c_kogyo.returnvisitorv5.activities.Constants.SharedPrefTags.ZOOM_LEVEL;
+import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_PLACE_ACTION;
+import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_VISIT_REQUEST_CODE;
+import static net.c_kogyo.returnvisitorv5.activity.Constants.SharedPrefTags.LATITUDE;
+import static net.c_kogyo.returnvisitorv5.activity.Constants.SharedPrefTags.LONGITUDE;
+import static net.c_kogyo.returnvisitorv5.activity.Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS;
+import static net.c_kogyo.returnvisitorv5.activity.Constants.SharedPrefTags.ZOOM_LEVEL;
 
 public class MapActivity extends AppCompatActivity
                             implements OnMapReadyCallback,

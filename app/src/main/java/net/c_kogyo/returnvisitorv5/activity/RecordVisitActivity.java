@@ -1,4 +1,4 @@
-package net.c_kogyo.returnvisitorv5.activities;
+package net.c_kogyo.returnvisitorv5.activity;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
