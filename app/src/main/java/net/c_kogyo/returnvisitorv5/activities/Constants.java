@@ -68,25 +68,23 @@ public class Constants {
 //
 //
 //    }
-//
-//    public class RecordVisitActions {
-//
-//        public static final String NEW_PLACE_ACTION             = "new_place_action";
-//        public static final String NEW_VISIT_ACTION_WITH_PLACE  = "new_visit_action_with_place";
-//        public static final String EDIT_VISIT_ACTION            = "edit_visit_action";
-//        public static final String NEW_VISIT_ACTION_NO_PLACE    = "new_visit_action_no_place";
-//
-//        public static final int EDIT_VISIT_REQUEST_CODE = 4000;
-//        public static final int NEW_VISIT_REQUEST_CODE = 4001;
-//
-//        public static final int DELETE_VISIT_RESULT_CODE = 4010;
-//        public static final int VISIT_CHANGED_RESULT_CODE = 4020;
-//        public static final int VISIT_ADDED_RESULT_CODE = 4030;
-//
-//
-//
-//    }
-//
+
+    public class RecordVisitActions {
+
+        public static final String NEW_PLACE_ACTION             = "new_place_action";
+        public static final String NEW_VISIT_ACTION_WITH_PLACE  = "new_visit_action_with_place";
+        public static final String EDIT_VISIT_ACTION            = "edit_visit_action";
+        public static final String NEW_VISIT_ACTION_NO_PLACE    = "new_visit_action_no_place";
+
+        public static final int EDIT_VISIT_REQUEST_CODE = 4000;
+        public static final int NEW_VISIT_REQUEST_CODE = 4001;
+
+        public static final int DELETE_VISIT_RESULT_CODE = 4010;
+        public static final int VISIT_CHANGED_RESULT_CODE = 4020;
+        public static final int VISIT_ADDED_RESULT_CODE = 4030;
+
+    }
+
 //    public class CalendarActions {
 //
 //        public static final String START_CALENDAR_FROM_WORK_ACTION = "start_calendar_from_work_action";

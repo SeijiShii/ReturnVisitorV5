@@ -1,6 +1,7 @@
 package net.c_kogyo.returnvisitorv5.activities;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -19,12 +20,16 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import net.c_kogyo.returnvisitorv5.R;
 
+import static net.c_kogyo.returnvisitorv5.activities.Constants.RecordVisitActions.NEW_PLACE_ACTION;
+import static net.c_kogyo.returnvisitorv5.activities.Constants.RecordVisitActions.NEW_VISIT_REQUEST_CODE;
 import static net.c_kogyo.returnvisitorv5.activities.Constants.SharedPrefTags.LATITUDE;
 import static net.c_kogyo.returnvisitorv5.activities.Constants.SharedPrefTags.LONGITUDE;
 import static net.c_kogyo.returnvisitorv5.activities.Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS;
 import static net.c_kogyo.returnvisitorv5.activities.Constants.SharedPrefTags.ZOOM_LEVEL;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback{
+public class MapActivity extends AppCompatActivity
+                            implements OnMapReadyCallback,
+                                        GoogleMap.OnMapLongClickListener{
 
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
 
@@ -96,6 +101,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.setPadding(0, 40, 0, 0);
 
         loadCameraPosition();
+
+        mMap.setOnMapLongClickListener(this);
 
     }
 
@@ -237,5 +244,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             // other 'case' lines to check for other
             // permissions this app might request
         }
+    }
+
+    @Override
+    public void onMapLongClick(LatLng latLng) {
+        Intent recordVisitIntent = new Intent(this, RecordVisitActivity.class);
+        recordVisitIntent.setAction(NEW_PLACE_ACTION);
+        startActivityForResult(recordVisitIntent, NEW_VISIT_REQUEST_CODE);
+
     }
 }
