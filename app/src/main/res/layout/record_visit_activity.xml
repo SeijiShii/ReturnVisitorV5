@@ -6,9 +6,10 @@
     android:background="#FFF"
     android:padding="@dimen/padding_normal">
 
+    <!-- Record Visit Title -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="50dp"
         android:orientation="horizontal">
 
         <RelativeLayout
@@ -34,6 +35,68 @@
 
     </LinearLayout>
 
+    <!-- Place -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/textColorGray"
+        android:textSize="@dimen/frame_title_text_size"
+        android:text="@string/place"
+        android:layout_gravity="left"/>
 
+    <!-- Place Address Text -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:textSize="@dimen/in_frame_text_size"
+        android:hint="@string/address"
+        android:id="@+id/address_text_view"
+        android:background="@drawable/gray_trans_circle"
+        android:layout_margin="@dimen/ui_margin_normal"/>
+
+    <!-- Place Name Text -->
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:textSize="@dimen/in_frame_text_size"
+        android:hint="@string/place_name"
+        android:id="@+id/place_name_text_view"
+        android:background="@drawable/gray_trans_circle"
+        android:layout_margin="@dimen/ui_margin_normal"/>
+
+    <!-- Record person or placement button -->
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:id="@+id/record_person_button"
+        android:background="@drawable/sea_blue_circle"
+        android:layout_margin="@dimen/ui_margin_normal"
+        android:textColor="#FFF"
+        android:textSize="@dimen/in_frame_text_size"
+        android:gravity="center"
+        android:text="@string/record_person_placement"/>
+
+    <!-- Record Not home button -->
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:id="@+id/record_not_home_button"
+        android:background="@drawable/primary_blue_circle"
+        android:layout_margin="@dimen/ui_margin_normal"
+        android:textColor="#FFF"
+        android:textSize="@dimen/in_frame_text_size"
+        android:gravity="center"
+        android:text="@string/record_not_home"/>
+
+    <!-- Cancel -->
+    <Button
+        android:layout_width="150dp"
+        android:layout_height="60dp"
+        android:text="@string/cancel"
+        android:background="@drawable/orange_trans_selector"
+        android:textColor="@color/colorAccent"
+        android:textSize="@dimen/in_frame_text_size"
+        android:gravity="center"
+        android:layout_gravity="right"/>
 
 </LinearLayout>
