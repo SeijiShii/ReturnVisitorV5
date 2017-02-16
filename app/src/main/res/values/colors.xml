@@ -6,4 +6,6 @@
 
     <color name="creamWhite">#EAF8BF</color>
     <color name="seeBlue">#006992</color>
+
+    <color name="adFrameGray">#444</color>
 </resources>
