@@ -59,13 +59,10 @@
             android:layout_margin="@dimen/ui_margin_normal"/>
 
         <!-- Place Name Text -->
-        <EditText
+        <net.c_kogyo.returnvisitorv5.view.ClearEditText
             android:layout_width="match_parent"
             android:layout_height="@dimen/ui_height_small"
-            android:textSize="@dimen/in_frame_text_size"
-            android:hint="@string/place_name"
             android:id="@+id/place_name_text_view"
-            android:background="@drawable/gray_trans_circle"
             android:layout_margin="@dimen/ui_margin_normal"/>
 
         <!-- Date time -->
