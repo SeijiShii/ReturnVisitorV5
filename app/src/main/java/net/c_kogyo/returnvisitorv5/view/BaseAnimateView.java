@@ -85,7 +85,7 @@ public class BaseAnimateView extends FrameLayout {
 
         view = LayoutInflater.from(getContext()).inflate(mResId, this);
 
-        setHeightPostDrawn();
+//        setHeightPostDrawn();
 
     }
 
@@ -176,6 +176,6 @@ public class BaseAnimateView extends FrameLayout {
     }
 
     public interface HeightUpdateListener {
-        public abstract void onUpdate();
+        void onUpdate();
     }
 }
