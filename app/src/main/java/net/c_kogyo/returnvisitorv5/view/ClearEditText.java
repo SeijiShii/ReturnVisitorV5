@@ -19,35 +19,25 @@ import net.c_kogyo.returnvisitorv5.R;
  * Created by SeijiShii on 2017/02/16.
  */
 
-public class ClearEditText extends RelativeLayout{
-
-    private View view;
+public class ClearEditText extends BaseAnimateView{
 
     public ClearEditText(Context context) {
-        super(context);
-        initCommon();
+        this(context, null);
     }
 
     public ClearEditText(Context context, AttributeSet attrs) {
-        super(context,attrs);
+        super(context,attrs, R.layout.clear_edit_text);
         initCommon();
     }
 
-//    public ClearEditText(Context context, AttributeSet attrs, int defStyleAttr) {
-//        super(context, attrs, defStyleAttr);
-//
-//
-//    }
-
     private void initCommon(){
-        view = LayoutInflater.from(getContext()).inflate(R.layout.clear_edit_text, this);
         initEditText();
         initXButton();
     }
 
     private EditText editText;
     private void initEditText(){
-        editText = (EditText) view.findViewById(R.id.edit_text);
+        editText = (EditText) getViewById(R.id.edit_text);
 
         editText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -69,7 +59,7 @@ public class ClearEditText extends RelativeLayout{
 
     private Button xButton;
     private void initXButton(){
-        xButton = (Button)view.findViewById(R.id.x_button);
+        xButton = (Button) getViewById(R.id.x_button);
         xButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -83,6 +73,4 @@ public class ClearEditText extends RelativeLayout{
         super.dispatchDraw(canvas);
     }
 
-
-    //    public abstract void onTextChanged(CharSequence charSequence);
 }

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="BaseAnimateView">
+        <attr name="exHeight" format="dimension"/>
+        <attr name="initialHeightCondition" format="enum">
+            <enum name="zero" value="0"/>
+            <enum name="exHeight" value="1"/>
+        </attr>
+    </declare-styleable>
+</resources>
