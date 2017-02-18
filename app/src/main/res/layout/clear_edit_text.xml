@@ -3,14 +3,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/gray_trans_circle"
-    android:padding="5dp">
+    android:padding="5dp"
+    android:layout_margin="5dp">
 
     <EditText
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/edit_text"
         android:gravity="left|center_horizontal"
-        android:background="@null"/>
+        android:background="@null"
+        android:textColor="@color/textColorGray"/>
 
     <Button
         android:layout_width="20dp"

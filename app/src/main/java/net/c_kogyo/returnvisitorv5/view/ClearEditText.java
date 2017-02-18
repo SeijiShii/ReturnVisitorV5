@@ -38,23 +38,6 @@ public class ClearEditText extends BaseAnimateView{
     private EditText editText;
     private void initEditText(){
         editText = (EditText) getViewById(R.id.edit_text);
-
-        editText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-//                ClearableEditText.this.onTextChanged(charSequence);
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
     }
 
     private Button xButton;
@@ -64,6 +47,7 @@ public class ClearEditText extends BaseAnimateView{
             @Override
             public void onClick(View view) {
                 editText.setText("");
+                ClearEditText.this.changeViewHeight(AnimateCondition.FROM_EX_HEIGHT_TO_ZERO, true, null, null);
             }
         });
     }
@@ -71,6 +55,10 @@ public class ClearEditText extends BaseAnimateView{
     @Override
     protected void dispatchDraw(Canvas canvas) {
         super.dispatchDraw(canvas);
+    }
+
+    public void addTextChangeListener(TextWatcher textWatcher) {
+        editText.addTextChangedListener(textWatcher);
     }
 
 }

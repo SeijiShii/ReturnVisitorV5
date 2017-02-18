@@ -1,5 +1,7 @@
 package net.c_kogyo.returnvisitorv5.view;
 
+import android.animation.Animator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -44,6 +46,12 @@ public class BaseAnimateView extends FrameLayout {
         public int num() {
             return num;
         }
+    }
+
+    public enum AnimateCondition {
+        FROM_0_TO_EX_HEIGHT,
+        FROM_EX_HEIGHT_TO_ZERO,
+        TO_EX_HEIGHT
     }
 
     public BaseAnimateView(Context context, int exHeight, InitialHeightCondition initCondition, int resId) {
@@ -118,5 +126,56 @@ public class BaseAnimateView extends FrameLayout {
                 });
             }
         }).start();
+    }
+
+    public void changeViewHeight(AnimateCondition condition,
+                                 boolean toAnimate,
+                                 final HeightUpdateListener heightUpdateListener,
+                                 Animator.AnimatorListener animatorListener) {
+        int originHeight = 0;
+        int targetHeight = 0;
+
+        switch (condition) {
+            case FROM_0_TO_EX_HEIGHT:
+                originHeight = 0;
+                targetHeight = mExHeight;
+                break;
+            case FROM_EX_HEIGHT_TO_ZERO:
+                originHeight = mExHeight;
+                targetHeight = 0;
+                break;
+            case TO_EX_HEIGHT:
+                originHeight = getMeasuredHeight();
+                targetHeight = mExHeight;
+                break;
+        }
+
+        if (!toAnimate) {
+            BaseAnimateView.this.getLayoutParams().height = targetHeight;
+            BaseAnimateView.this.requestLayout();
+        } else {
+
+            ValueAnimator animator = ValueAnimator.ofInt(originHeight, targetHeight);
+            animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    BaseAnimateView.this.getLayoutParams().height = (int) animation.getAnimatedValue();
+                    BaseAnimateView.this.requestLayout();
+
+                    if (heightUpdateListener != null) heightUpdateListener.onUpdate();
+                }
+            });
+
+            int duration = Math.abs(targetHeight - originHeight) * 3;
+            animator.setDuration(duration);
+
+            if (animatorListener != null) animator.addListener(animatorListener);
+
+            animator.start();
+        }
+    }
+
+    public interface HeightUpdateListener {
+        public abstract void onUpdate();
     }
 }
