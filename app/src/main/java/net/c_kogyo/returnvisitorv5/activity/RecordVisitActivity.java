@@ -1,20 +1,18 @@
 package net.c_kogyo.returnvisitorv5.activity;
 
 import android.animation.Animator;
-import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.view.animation.AnimationSet;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import net.c_kogyo.returnvisitorv5.R;
+import net.c_kogyo.returnvisitorv5.dialogcontents.PersonDialog;
 import net.c_kogyo.returnvisitorv5.view.BaseAnimateView;
 import net.c_kogyo.returnvisitorv5.view.ClearEditText;
 
@@ -33,6 +31,8 @@ public class RecordVisitActivity extends AppCompatActivity {
         initAddressText();
         initPlaceNameText();
         initTwoButtonsFrame();
+        initAddPersonButton();
+        initDialogOverlay();
         initCancelButton();
     }
 
@@ -104,13 +104,64 @@ public class RecordVisitActivity extends AppCompatActivity {
         animator.start();
     }
 
+    private Button addPersonButton;
+    private void initAddPersonButton() {
+        addPersonButton = (Button) findViewById(R.id.add_person_button);
+        addPersonButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showPersonDialog();
+            }
+        });
+    }
+
+    private void showPersonDialog() {
+        PersonDialog personDialog = new PersonDialog(this);
+        dialogFrame.addView(personDialog);
+        fadeDialogOverlay(true);
+    }
+
+    private RelativeLayout dialogOverlay;
+    private void initDialogOverlay() {
+        dialogOverlay = (RelativeLayout) findViewById(R.id.dialog_overlay);
+
+        initDialogFrame();
+    }
+
+    private FrameLayout dialogFrame;
+    private void initDialogFrame() {
+        dialogFrame = (FrameLayout) findViewById(R.id.dialog_frame);
+    }
+
+    private void fadeDialogOverlay(boolean isFadeIn) {
+
+        if (isFadeIn) {
+            dialogOverlay.setVisibility(View.VISIBLE);
+
+            ValueAnimator fadeinAnimator = ValueAnimator.ofFloat(0f, 1f);
+            fadeinAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                    dialogOverlay.setAlpha((float) valueAnimator.getAnimatedValue());
+                    dialogOverlay.requestLayout();
+                }
+            });
+            fadeinAnimator.setDuration(500);
+            fadeinAnimator.start();
+
+        } else {
+
+        }
+
+    }
+
     private Button cancelButton;
     private void initCancelButton(){
         cancelButton = (Button) findViewById(R.id.cancel_button);
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "CANCEL", Toast.LENGTH_SHORT).show();
+
             }
         });
     }

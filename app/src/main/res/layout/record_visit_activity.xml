@@ -232,12 +232,10 @@
 
             </FrameLayout>
 
-
-
             <!-- OK -->
             <Button
                 android:layout_width="150dp"
-                android:layout_height="60dp"
+                android:layout_height="@dimen/ui_height_small"
                 android:text="@string/ok"
                 android:background="@drawable/trans_blue_selector"
                 android:textColor="@color/colorPrimary"
@@ -249,7 +247,7 @@
             <!-- Cancel -->
             <Button
                 android:layout_width="150dp"
-                android:layout_height="60dp"
+                android:layout_height="@dimen/ui_height_small"
                 android:text="@string/cancel"
                 android:background="@drawable/trans_orange_selector"
                 android:textColor="@color/colorAccent"
@@ -261,7 +259,7 @@
             <!-- Delete -->
             <Button
                 android:layout_width="150dp"
-                android:layout_height="60dp"
+                android:layout_height="@dimen/ui_height_small"
                 android:text="@string/delete"
                 android:background="@drawable/trans_red_selector"
                 android:textColor="@color/rvRed"
@@ -284,11 +282,12 @@
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="wrap_content"
             android:background="@drawable/gray_white_circle"
             android:layout_margin="10dp"
             android:layout_centerInParent="true"
-            android:id="@+id/dialog_frame"/>
+            android:id="@+id/dialog_frame"
+            android:padding="@dimen/padding_normal"/>
 
     </RelativeLayout>
 

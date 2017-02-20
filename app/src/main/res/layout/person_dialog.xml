@@ -2,8 +2,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="#FFF">
+
+    <!-- Dialog title -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_height_small"
+        android:textColor="@color/textColorGray"
+        android:textSize="15sp"
+        android:gravity="center"
+        android:text="@string/person"/>
 
     <!-- Name Text -->
     <EditText
@@ -13,6 +22,7 @@
         android:background="@drawable/gray_trans_circle"
         android:padding="5dp"
         android:hint="@string/name"
+        android:textColorHint="@color/textHintGray"
         android:inputType="textFilter"/>
 
     <!-- Sex Radio Button -->
@@ -74,5 +84,55 @@
             android:layout_alignParentRight="true"/>
 
     </RelativeLayout>
+
+    <!-- Note -->
+    <AutoCompleteTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/note_text"
+        android:background="@drawable/gray_trans_circle"
+        android:padding="5dp"
+        android:hint="@string/note"
+        android:inputType="textMultiLine"
+        android:minHeight="@dimen/ui_height_large"
+        android:gravity="left|top"
+        android:textColorHint="@color/textHintGray"
+        android:textSize="12sp"/>
+
+    <!-- OK -->
+    <Button
+        android:layout_width="150dp"
+        android:layout_height="@dimen/ui_height_small"
+        android:text="@string/ok"
+        android:background="@drawable/trans_blue_selector"
+        android:textColor="@color/colorPrimary"
+        android:textSize="@dimen/in_frame_text_size"
+        android:gravity="center"
+        android:layout_gravity="right"
+        android:id="@+id/ok_button"/>
+
+    <!-- Cancel -->
+    <Button
+        android:layout_width="150dp"
+        android:layout_height="@dimen/ui_height_small"
+        android:text="@string/cancel"
+        android:background="@drawable/trans_orange_selector"
+        android:textColor="@color/colorAccent"
+        android:textSize="@dimen/in_frame_text_size"
+        android:gravity="center"
+        android:layout_gravity="right"
+        android:id="@+id/cancel_button"/>
+
+    <!-- Delete -->
+    <Button
+        android:layout_width="150dp"
+        android:layout_height="@dimen/ui_height_small"
+        android:text="@string/delete"
+        android:background="@drawable/trans_red_selector"
+        android:textColor="@color/rvRed"
+        android:textSize="@dimen/in_frame_text_size"
+        android:gravity="center"
+        android:layout_gravity="right"
+        android:id="@+id/delete_button"/>
 
 </LinearLayout>

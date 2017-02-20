@@ -12,6 +12,7 @@
     <color name="adFrameGray">#444</color>
 
     <color name="textColorGray">#333</color>
+    <color name="textHintGray">#888</color>
 
     <color name="blueFog">#8027476E</color>
     <color name="orangeFog">#80ECA400</color>
