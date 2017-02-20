@@ -1,278 +1,297 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:custom="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
-        android:orientation="vertical"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#FFF"
-        android:padding="@dimen/padding_normal">
+        android:layout_height="match_parent">
 
-        <!-- Record Visit Title -->
         <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/ui_height_large"
-            android:orientation="horizontal">
+            android:layout_height="match_parent"
+            android:background="#FFF"
+            android:padding="@dimen/padding_normal">
 
-            <RelativeLayout
-                android:layout_width="50dp"
-                android:layout_height="match_parent">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/v5_logo_036"
-                    android:layout_centerInParent="true"/>
-
-            </RelativeLayout>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:textSize="@dimen/activity_title_text_size"
-                android:textColor="@color/textColorGray"
-                android:text="@string/record_visit"
-                android:gravity="left|center_vertical"/>
-
-        </LinearLayout>
-
-        <!-- Place -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/textColorGray"
-            android:textSize="@dimen/frame_title_text_size"
-            android:text="@string/place"
-            android:layout_gravity="left"/>
-
-        <!-- Place Address Text -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/ui_height_large"
-            android:textSize="@dimen/in_frame_text_size"
-            android:hint="@string/address"
-            android:id="@+id/address_text_view"
-            android:background="@drawable/gray_trans_circle"
-            android:layout_margin="@dimen/ui_margin_normal"/>
-
-        <!-- Place Name Text -->
-        <net.c_kogyo.returnvisitorv5.view.ClearEditText
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            custom:exHeight="50dp"
-            custom:initialHeightCondition="zero"
-            android:id="@+id/place_name_text_view"
-            android:layout_margin="@dimen/ui_margin_normal"/>
-
-        <!-- Date time -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/ui_height_small"
-            android:orientation="horizontal"
-            android:layout_margin="@dimen/ui_margin_normal"
-            android:background="@drawable/gray_trans_circle">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:id="@+id/date_text_view"
-                android:textSize="@dimen/in_frame_text_size"
-                android:textColor="@color/textColorGray"
-                android:layout_margin="@dimen/ui_margin_normal"
-                android:gravity="center"
-                android:text="2017/2/16"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:id="@+id/time_text_view"
-                android:textSize="@dimen/in_frame_text_size"
-                android:textColor="@color/textColorGray"
-                android:layout_margin="@dimen/ui_margin_normal"
-                android:gravity="center"
-                android:text="13:45"/>
-
-        </LinearLayout>
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/gray_white_circle"
-            android:layout_margin="@dimen/ui_margin_normal">
-
-            <!-- Visit Detail Frame -->
+            <!-- Record Visit Title -->
             <LinearLayout
                 android:layout_width="match_parent"
-<<<<<<< HEAD
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_height="@dimen/ui_height_large"
+                android:orientation="horizontal">
 
                 <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/ui_height_small">
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent">
 
-                    <TextView
+                    <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/visit_details"
-                        android:textColor="@color/textColorGray"
-                        android:textSize="15sp"
+                        android:background="@drawable/v5_logo_036"
                         android:layout_centerInParent="true"/>
 
                 </RelativeLayout>
-=======
-                android:layout_height="0dp"
-                android:orientation="vertical"
-                android:alpha="0"
-                android:id="@+id/person_frame">
->>>>>>> b91ea7e7d113c1ad449f81b102a9a97b7e70dc62
 
-                <!-- Historical persons -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:id="@+id/historical_person_linear"
-                    android:layout_margin="@dimen/ui_margin_normal"/>
-
-                <!-- Add new person button -->
-                <Button
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/ui_height_small"
-                    android:id="@+id/add_person_button"
-                    android:background="@drawable/primary_blue_selector"
-                    android:layout_margin="@dimen/ui_margin_normal"
-                    android:textColor="#FFF"
-                    android:textSize="@dimen/in_frame_text_size"
-                    android:gravity="center"
-                    android:text="@string/add_person"/>
-
-                <!-- Add person from other place button -->
-                <Button
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/ui_height_small"
-                    android:id="@+id/other_place_person_button"
-                    android:background="@drawable/primary_blue_selector"
-                    android:layout_margin="@dimen/ui_margin_normal"
-                    android:textColor="#FFF"
-                    android:textSize="@dimen/in_frame_text_size"
-                    android:gravity="center"
-                    android:text="@string/person_from_other_place"/>
-
-                <!-- Record Placement -->
-                <Button
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/ui_height_small"
-                    android:id="@+id/record_placement_button"
-                    android:background="@drawable/primary_blue_selector"
-                    android:layout_margin="@dimen/ui_margin_normal"
-                    android:textColor="#FFF"
-                    android:textSize="@dimen/in_frame_text_size"
-                    android:gravity="center"
-                    android:text="@string/record_placement_button"/>
-
-                <!-- Record Not home button 2-->
-                <Button
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/ui_height_small"
-                    android:id="@+id/record_not_home_button2"
-                    android:background="@drawable/sea_blue_selector"
-                    android:layout_margin="@dimen/ui_margin_normal"
-                    android:textColor="#FFF"
-                    android:textSize="@dimen/in_frame_text_size"
-                    android:gravity="center"
-                    android:text="@string/record_not_home2"/>
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:textSize="@dimen/activity_title_text_size"
+                    android:textColor="@color/textColorGray"
+                    android:text="@string/record_visit"
+                    android:gravity="left|center_vertical"/>
 
             </LinearLayout>
 
-            <!-- Frame for Visit Detail Button and NH Button -->
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#CFFF"
-                android:id="@+id/two_buttons_frame">
+            <!-- Place -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/textColorGray"
+                android:textSize="@dimen/frame_title_text_size"
+                android:text="@string/place"
+                android:layout_gravity="left"/>
 
+            <!-- Place Address Text -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/ui_height_large"
+                android:textSize="@dimen/in_frame_text_size"
+                android:hint="@string/address"
+                android:id="@+id/address_text_view"
+                android:background="@drawable/gray_trans_circle"
+                android:layout_margin="@dimen/ui_margin_normal"/>
+
+            <!-- Place Name Text -->
+            <net.c_kogyo.returnvisitorv5.view.ClearEditText
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                custom:exHeight="50dp"
+                custom:initialHeightCondition="zero"
+                android:id="@+id/place_name_text_view"
+                android:layout_margin="@dimen/ui_margin_normal"/>
+
+            <!-- Date time -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/ui_height_small"
+                android:orientation="horizontal"
+                android:layout_margin="@dimen/ui_margin_normal"
+                android:background="@drawable/gray_trans_circle">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:id="@+id/date_text_view"
+                    android:textSize="@dimen/in_frame_text_size"
+                    android:textColor="@color/textColorGray"
+                    android:layout_margin="@dimen/ui_margin_normal"
+                    android:gravity="center"
+                    android:text="2017/2/16"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:id="@+id/time_text_view"
+                    android:textSize="@dimen/in_frame_text_size"
+                    android:textColor="@color/textColorGray"
+                    android:layout_margin="@dimen/ui_margin_normal"
+                    android:gravity="center"
+                    android:text="13:45"/>
+
+            </LinearLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/gray_white_circle"
+                android:layout_margin="@dimen/ui_margin_normal">
+
+                <!-- Visit Detail Frame -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_centerInParent="true">
+                    android:orientation="vertical">
 
-                    <!-- Record Visit Detail Button -->
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/ui_height_small">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/visit_details"
+                            android:textColor="@color/textColorGray"
+                            android:textSize="15sp"
+                            android:layout_centerInParent="true"/>
+
+                    </RelativeLayout>
+
+                    <!-- Historical persons -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:id="@+id/historical_person_linear"
+                        android:layout_margin="@dimen/ui_margin_normal"/>
+
+                    <!-- Add new person button -->
                     <Button
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/ui_height_small"
-                        android:id="@+id/visit_detail_button"
+                        android:id="@+id/add_person_button"
                         android:background="@drawable/primary_blue_selector"
                         android:layout_margin="@dimen/ui_margin_normal"
                         android:textColor="#FFF"
                         android:textSize="@dimen/in_frame_text_size"
                         android:gravity="center"
-                        android:text="@string/record_visit_detail" />
+                        android:text="@string/add_person"/>
 
-                    <!-- Record Not home button -->
+                    <!-- Add person from other place button -->
                     <Button
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/ui_height_small"
-                        android:id="@+id/record_not_home_button"
+                        android:id="@+id/other_place_person_button"
+                        android:background="@drawable/primary_blue_selector"
+                        android:layout_margin="@dimen/ui_margin_normal"
+                        android:textColor="#FFF"
+                        android:textSize="@dimen/in_frame_text_size"
+                        android:gravity="center"
+                        android:text="@string/person_from_other_place"/>
+
+                    <!-- Record Placement -->
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/ui_height_small"
+                        android:id="@+id/record_placement_button"
+                        android:background="@drawable/primary_blue_selector"
+                        android:layout_margin="@dimen/ui_margin_normal"
+                        android:textColor="#FFF"
+                        android:textSize="@dimen/in_frame_text_size"
+                        android:gravity="center"
+                        android:text="@string/record_placement_button"/>
+
+                    <!-- Record Not home button 2-->
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/ui_height_small"
+                        android:id="@+id/record_not_home_button2"
                         android:background="@drawable/sea_blue_selector"
                         android:layout_margin="@dimen/ui_margin_normal"
                         android:textColor="#FFF"
                         android:textSize="@dimen/in_frame_text_size"
                         android:gravity="center"
-                        android:text="@string/record_not_home"/>
+                        android:text="@string/record_not_home2"/>
 
                 </LinearLayout>
 
-            </RelativeLayout>
+                <!-- Frame for Visit Detail Button and NH Button -->
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#CFFF"
+                    android:id="@+id/two_buttons_frame">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_centerInParent="true">
+
+                        <!-- Record Visit Detail Button -->
+                        <Button
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/ui_height_small"
+                            android:id="@+id/visit_detail_button"
+                            android:background="@drawable/primary_blue_selector"
+                            android:layout_margin="@dimen/ui_margin_normal"
+                            android:textColor="#FFF"
+                            android:textSize="@dimen/in_frame_text_size"
+                            android:gravity="center"
+                            android:text="@string/record_visit_detail" />
+
+                        <!-- Record Not home button -->
+                        <Button
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/ui_height_small"
+                            android:id="@+id/record_not_home_button"
+                            android:background="@drawable/sea_blue_selector"
+                            android:layout_margin="@dimen/ui_margin_normal"
+                            android:textColor="#FFF"
+                            android:textSize="@dimen/in_frame_text_size"
+                            android:gravity="center"
+                            android:text="@string/record_not_home"/>
+
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+            </FrameLayout>
+
+
+
+            <!-- OK -->
+            <Button
+                android:layout_width="150dp"
+                android:layout_height="60dp"
+                android:text="@string/ok"
+                android:background="@drawable/trans_blue_selector"
+                android:textColor="@color/colorPrimary"
+                android:textSize="@dimen/in_frame_text_size"
+                android:gravity="center"
+                android:layout_gravity="right"
+                android:id="@+id/ok_button"/>
+
+            <!-- Cancel -->
+            <Button
+                android:layout_width="150dp"
+                android:layout_height="60dp"
+                android:text="@string/cancel"
+                android:background="@drawable/trans_orange_selector"
+                android:textColor="@color/colorAccent"
+                android:textSize="@dimen/in_frame_text_size"
+                android:gravity="center"
+                android:layout_gravity="right"
+                android:id="@+id/cancel_button"/>
+
+            <!-- Delete -->
+            <Button
+                android:layout_width="150dp"
+                android:layout_height="60dp"
+                android:text="@string/delete"
+                android:background="@drawable/trans_red_selector"
+                android:textColor="@color/rvRed"
+                android:textSize="@dimen/in_frame_text_size"
+                android:gravity="center"
+                android:layout_gravity="right"
+                android:id="@+id/delete_button"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <!-- Dialog overlay -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#B000">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:background="@drawable/gray_white_circle"
+            android:layout_margin="10dp"
+            android:layout_centerInParent="true">
 
         </FrameLayout>
 
+    </RelativeLayout>
 
 
-        <!-- OK -->
-        <Button
-            android:layout_width="150dp"
-            android:layout_height="60dp"
-            android:text="@string/ok"
-            android:background="@drawable/trans_blue_selector"
-            android:textColor="@color/colorPrimary"
-            android:textSize="@dimen/in_frame_text_size"
-            android:gravity="center"
-            android:layout_gravity="right"
-            android:id="@+id/ok_button"/>
-
-        <!-- Cancel -->
-        <Button
-            android:layout_width="150dp"
-            android:layout_height="60dp"
-            android:text="@string/cancel"
-            android:background="@drawable/trans_orange_selector"
-            android:textColor="@color/colorAccent"
-            android:textSize="@dimen/in_frame_text_size"
-            android:gravity="center"
-            android:layout_gravity="right"
-            android:id="@+id/cancel_button"/>
-
-        <!-- Delete -->
-        <Button
-            android:layout_width="150dp"
-            android:layout_height="60dp"
-            android:text="@string/delete"
-            android:background="@drawable/trans_red_selector"
-            android:textColor="@color/rvRed"
-            android:textSize="@dimen/in_frame_text_size"
-            android:gravity="center"
-            android:layout_gravity="right"
-            android:id="@+id/delete_button"/>
-
-    </LinearLayout>
 
 
-</ScrollView>
+</FrameLayout>
