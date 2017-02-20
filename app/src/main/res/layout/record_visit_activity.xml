@@ -103,7 +103,8 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/gray_white_circle">
+            android:background="@drawable/gray_white_circle"
+            android:layout_margin="@dimen/ui_margin_normal">
 
             <!-- Visit Detail Frame -->
             <LinearLayout
@@ -117,7 +118,7 @@
 
                     <TextView
                         android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:text="@string/visit_details"
                         android:textColor="@color/textColorGray"
                         android:textSize="15sp"
@@ -144,6 +145,30 @@
                     android:textSize="@dimen/in_frame_text_size"
                     android:gravity="center"
                     android:text="@string/add_person"/>
+
+                <!-- Add person from other place button -->
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/ui_height_small"
+                    android:id="@+id/other_place_person_button"
+                    android:background="@drawable/primary_blue_selector"
+                    android:layout_margin="@dimen/ui_margin_normal"
+                    android:textColor="#FFF"
+                    android:textSize="@dimen/in_frame_text_size"
+                    android:gravity="center"
+                    android:text="@string/person_from_other_place"/>
+
+                <!-- Record Placement -->
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/ui_height_small"
+                    android:id="@+id/record_placement_button"
+                    android:background="@drawable/primary_blue_selector"
+                    android:layout_margin="@dimen/ui_margin_normal"
+                    android:textColor="#FFF"
+                    android:textSize="@dimen/in_frame_text_size"
+                    android:gravity="center"
+                    android:text="@string/record_placement_button"/>
 
                 <!-- Record Not home button 2-->
                 <Button
