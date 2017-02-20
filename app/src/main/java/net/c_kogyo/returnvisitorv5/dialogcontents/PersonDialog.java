@@ -1,20 +1,24 @@
 package net.c_kogyo.returnvisitorv5.dialogcontents;
 
 import android.content.Context;
+import android.support.v7.widget.AppCompatSpinner;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.RadioButton;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
 
@@ -79,15 +83,17 @@ public class PersonDialog extends FrameLayout {
 
     }
 
-    private Spinner ageSpinner;
+    private AppCompatSpinner ageSpinner;
     private void initAgeSpinner() {
 
-        ageSpinner = (Spinner) findViewById(R.id.age_spinner);
+        ageSpinner = (AppCompatSpinner) findViewById(R.id.age_spinner);
 
-        ArrayAdapter<CharSequence> adapter
-                = ArrayAdapter.createFromResource(getContext(),
-                R.array.age_array,
-                android.R.layout.simple_spinner_item);
+//        ArrayAdapter<CharSequence> adapter
+//                = ArrayAdapter.createFromResource(getContext(),
+//                R.array.age_array,
+//                android.R.layout.simple_spinner_item);
+
+        AgeSpinnerAdapter adapter = new AgeSpinnerAdapter();
 
         ageSpinner.setAdapter(adapter);
 
@@ -198,5 +204,35 @@ public class PersonDialog extends FrameLayout {
 //        }
     }
 
+    class AgeSpinnerAdapter extends BaseAdapter {
+
+        String[] ageArray;
+        public AgeSpinnerAdapter() {
+            ageArray = getContext().getResources().getStringArray(R.array.age_array);
+        }
+
+        @Override
+        public int getCount() {
+            return ageArray.length;
+        }
+
+        @Override
+        public Object getItem(int i) {
+            return ageArray[i];
+        }
+
+        @Override
+        public long getItemId(int i) {
+            return 0;
+        }
+
+        @Override
+        public View getView(int i, View view, ViewGroup viewGroup) {
+            view = LayoutInflater.from(getContext()).inflate(R.layout.age_spinner_option, null);
+            TextView textView = ( TextView) view.findViewById(R.id.text_view);
+            textView.setText(ageArray[i]);
+            return view;
+        }
+    }
 
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -10,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/ui_height_small"
         android:textColor="@color/textColorGray"
-        android:textSize="15sp"
+        android:textSize="@dimen/text_size_large"
         android:gravity="center"
         android:text="@string/person"/>
 
@@ -77,8 +78,8 @@
             android:textSize="15sp"
             android:textColor="@color/textColorGray"/>
 
-        <Spinner
-            android:layout_width="wrap_content"
+        <android.support.v7.widget.AppCompatSpinner
+            android:layout_width="100dp"
             android:layout_height="@dimen/ui_height_small"
             android:id="@+id/age_spinner"
             android:layout_alignParentRight="true"/>
