@@ -278,16 +278,17 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#B000">
+        android:background="#B000"
+        android:id="@+id/dialog_overlay"
+        android:visibility="invisible">
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="300dp"
             android:background="@drawable/gray_white_circle"
             android:layout_margin="10dp"
-            android:layout_centerInParent="true">
-
-        </FrameLayout>
+            android:layout_centerInParent="true"
+            android:id="@+id/dialog_frame"/>
 
     </RelativeLayout>
 

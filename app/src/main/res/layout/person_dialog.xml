@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFF">
+
+    <!-- Name Text -->
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_height_small"
+        android:id="@+id/name_text"
+        android:background="@drawable/gray_trans_circle"
+        android:padding="5dp"
+        android:hint="@string/name"
+        android:inputType="textFilter"/>
+
+    <!-- Sex Radio Button -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_height_small"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="@string/male"
+                android:id="@+id/male_button"
+                android:textColor="@color/textColorGray"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="@string/female"
+                android:id="@+id/female_button"
+                android:textColor="@color/textColorGray"/>
+
+        </RelativeLayout>
+
+
+    </LinearLayout>
+
+    <!-- Age Spinner -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_height_small">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/age"
+            android:layout_alignParentLeft="true"
+            android:textSize="15sp"
+            android:textColor="@color/textColorGray"/>
+
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/ui_height_small"
+            android:id="@+id/age_spinner"
+            android:layout_alignParentRight="true"/>
+
+    </RelativeLayout>
+
+</LinearLayout>
