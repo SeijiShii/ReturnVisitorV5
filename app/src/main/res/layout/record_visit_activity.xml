@@ -102,26 +102,28 @@
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:background="@drawable/gray_white_circle">
 
-            <!-- Record person or placement button -->
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/ui_height_large"
-                android:id="@+id/record_person_button"
-                android:background="@drawable/primary_blue_selector"
-                android:layout_margin="@dimen/ui_margin_normal"
-                android:textColor="#FFF"
-                android:textSize="@dimen/in_frame_text_size"
-                android:gravity="center"
-                android:text="@string/record_person_placement"/>
-
-            <!-- Person & Placement frame -->
+            <!-- Visit Detail Frame -->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:orientation="vertical"
-                android:visibility="invisible">
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/ui_height_small">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:text="@string/visit_details"
+                        android:textColor="@color/textColorGray"
+                        android:textSize="15sp"
+                        android:layout_centerInParent="true"/>
+
+                </RelativeLayout>
 
                 <!-- Historical persons -->
                 <LinearLayout
@@ -143,39 +145,64 @@
                     android:gravity="center"
                     android:text="@string/add_person"/>
 
-                <!-- Search window -->
-                <EditText
+                <!-- Record Not home button 2-->
+                <Button
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/ui_height_small"
-                    android:textSize="@dimen/in_frame_text_size"
-                    android:hint="@string/search"
-                    android:id="@+id/search_text_view"
-                    android:background="@drawable/gray_trans_circle"
-                    android:layout_margin="@dimen/ui_margin_normal"/>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:orientation="vertical"
+                    android:id="@+id/record_not_home_button2"
+                    android:background="@drawable/sea_blue_selector"
                     android:layout_margin="@dimen/ui_margin_normal"
-                    android:id="@+id/search_result_linear"/>
-
+                    android:textColor="#FFF"
+                    android:textSize="@dimen/in_frame_text_size"
+                    android:gravity="center"
+                    android:text="@string/record_not_home2"/>
 
             </LinearLayout>
 
+            <!-- Frame for Visit Detail Button and NH Button -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#CFFF"
+                android:id="@+id/two_buttons_frame">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_centerInParent="true">
+
+                    <!-- Record Visit Detail Button -->
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/ui_height_small"
+                        android:id="@+id/visit_detail_button"
+                        android:background="@drawable/primary_blue_selector"
+                        android:layout_margin="@dimen/ui_margin_normal"
+                        android:textColor="#FFF"
+                        android:textSize="@dimen/in_frame_text_size"
+                        android:gravity="center"
+                        android:text="@string/record_visit_detail" />
+
+                    <!-- Record Not home button -->
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/ui_height_small"
+                        android:id="@+id/record_not_home_button"
+                        android:background="@drawable/sea_blue_selector"
+                        android:layout_margin="@dimen/ui_margin_normal"
+                        android:textColor="#FFF"
+                        android:textSize="@dimen/in_frame_text_size"
+                        android:gravity="center"
+                        android:text="@string/record_not_home"/>
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
         </FrameLayout>
 
-        <!-- Record Not home button -->
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/ui_height_large"
-            android:id="@+id/record_not_home_button"
-            android:background="@drawable/sea_blue_selector"
-            android:layout_margin="@dimen/ui_margin_normal"
-            android:textColor="#FFF"
-            android:textSize="@dimen/in_frame_text_size"
-            android:gravity="center"
-            android:text="@string/record_not_home"/>
+
 
         <!-- OK -->
         <Button

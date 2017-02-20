@@ -1,10 +1,13 @@
 package net.c_kogyo.returnvisitorv5.activity;
 
+import android.animation.Animator;
+import android.animation.ValueAnimator;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +29,7 @@ public class RecordVisitActivity extends AppCompatActivity {
 
         initAddressText();
         initPlaceNameText();
+        initTwoButtonsFrame();
         initCancelButton();
     }
 
@@ -43,6 +47,58 @@ public class RecordVisitActivity extends AppCompatActivity {
     private ClearEditText placeNameText;
     private void initPlaceNameText() {
         placeNameText = (ClearEditText) findViewById(R.id.place_name_text_view);
+    }
+
+    private RelativeLayout twoButtonsFrame;
+    private void initTwoButtonsFrame() {
+        twoButtonsFrame = (RelativeLayout) findViewById(R.id.two_buttons_frame);
+
+        initVisitDetailButton();
+    }
+
+    private Button visitDetailButton;
+    private void initVisitDetailButton() {
+        visitDetailButton = (Button) findViewById(R.id.visit_detail_button);
+        visitDetailButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                fadeOutTwoButtonsFrame();
+            }
+        });
+    }
+
+    private void fadeOutTwoButtonsFrame() {
+        ValueAnimator animator = ValueAnimator.ofFloat(1f, 0f);
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                twoButtonsFrame.setAlpha((float) valueAnimator.getAnimatedValue());
+                twoButtonsFrame.requestLayout();
+            }
+        });
+        animator.setDuration(500);
+        animator.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                twoButtonsFrame.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {
+
+            }
+        });
+        animator.start();
     }
 
     private Button cancelButton;
