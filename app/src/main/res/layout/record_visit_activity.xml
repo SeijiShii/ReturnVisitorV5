@@ -109,6 +109,7 @@
             <!-- Visit Detail Frame -->
             <LinearLayout
                 android:layout_width="match_parent"
+<<<<<<< HEAD
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
@@ -125,6 +126,12 @@
                         android:layout_centerInParent="true"/>
 
                 </RelativeLayout>
+=======
+                android:layout_height="0dp"
+                android:orientation="vertical"
+                android:alpha="0"
+                android:id="@+id/person_frame">
+>>>>>>> b91ea7e7d113c1ad449f81b102a9a97b7e70dc62
 
                 <!-- Historical persons -->
                 <LinearLayout
