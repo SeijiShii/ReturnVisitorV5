@@ -31,10 +31,6 @@ public class DataItem implements Cloneable{
 
     protected String idHeader;
 
-    DataItem() {
-        initCommon();
-    }
-
     DataItem(String idHeader){
 
         this.idHeader = idHeader;

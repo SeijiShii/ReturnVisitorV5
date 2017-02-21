@@ -45,6 +45,23 @@ public abstract class DataList<T extends DataItem> implements Iterable<T>{
         }
     }
 
+    public JSONObject jsonObject() {
+
+        JSONObject object = new JSONObject();
+        JSONArray array = new JSONArray();
+
+        for (T item : list) {
+            array.put(item.jsonObject());
+        }
+
+        try {
+            object.put(mListHeader, array);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return object;
+    }
+
     public abstract T getInstance(JSONObject object);
 
     private void setToList(T data) {
@@ -98,7 +115,6 @@ public abstract class DataList<T extends DataItem> implements Iterable<T>{
         if ( data == null ) return;
 
         list.remove(data);
-        onDataChanged(data);
     }
 
     @Override
@@ -126,9 +142,6 @@ public abstract class DataList<T extends DataItem> implements Iterable<T>{
     public ArrayList<T> getList() {
         return list;
     }
-
-    public abstract void onDataChanged(T data);
-
 
 }
 
