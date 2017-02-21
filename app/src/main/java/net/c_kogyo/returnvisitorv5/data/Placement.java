@@ -1,21 +1,21 @@
 package net.c_kogyo.returnvisitorv5.data;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
 
-import net.c_kogyo.returnvisitor.R;
+import net.c_kogyo.returnvisitorv5.R;
 
-import java.text.DateFormat;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 
 /**
  * Created by 56255 on 2016/07/19.
  */
-public class Placement extends BaseDataItem {
+public class Placement extends DataItem {
 
     public enum Category {
 
@@ -78,7 +78,6 @@ public class Placement extends BaseDataItem {
     }
 
     public static final String PLACEMENT = "Placement";
-    public static final String PLACEMENT_CATEGORY = "placement_category";
 
     public static final String CATEGORY = "category";
     public static final String MAGAZINE_CATEGORY = "magazine_category";
@@ -89,7 +88,7 @@ public class Placement extends BaseDataItem {
     private Calendar number;
 
     public Placement() {
-        super();
+        super(PLACEMENT);
 
         this.category = Category.OTHER;
         this.magCategory = MagazineCategory.WATCHTOWER;
@@ -104,16 +103,42 @@ public class Placement extends BaseDataItem {
         this.category = category;
     }
 
-    public Placement(HashMap<String, Object> map) {
+    public Placement(JSONObject object) {
+        super(object);
 
-        super();
-        setMap(map);
+        try {
+            if (object.has(CATEGORY))
+                this.category = Category.valueOf(object.getString(CATEGORY));
+            if (object.has(MAGAZINE_CATEGORY))
+                this.magCategory = MagazineCategory.valueOf(object.getString(MAGAZINE_CATEGORY));
+            if (object.has(NUMBER)) {
+                this.number = Calendar.getInstance();
+                this.number.setTimeInMillis(object.getLong(NUMBER));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
-    @Override
-    public String getIdHeader() {
-        return PLACEMENT;
+    public JSONObject jsonObject() {
+
+        JSONObject object = super.jsonObject();
+
+        try {
+            object.put(CATEGORY, this.category);
+            object.put(MAGAZINE_CATEGORY, this.magCategory);
+            object.put(NUMBER, this.number.getTimeInMillis());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return object;
     }
+
+//    public Placement(HashMap<String, Object> map) {
+//
+//        super();
+//        setMap(map);
+//    }
 
     public String toString(Context context) {
 
@@ -161,39 +186,34 @@ public class Placement extends BaseDataItem {
         this.magCategory = magCategory;
     }
 
-    /**
-     *
-     * @return int number [1 - 6] if Category == MAGAZINE except STUDY
-     * else return 0
-     */
     public Calendar getNumber() {
 
         return number;
 
     }
 
-    @Override
-    public HashMap<String, Object> toMap() {
-
-        HashMap<String, Object> map = super.toMap();
-
-        map.put(CATEGORY, category.toString());
-        map.put(MAGAZINE_CATEGORY, magCategory.toString());
-        map.put(NUMBER, number.getTimeInMillis());
-
-        return map;
-  }
-
-    @Override
-    public void setMap(@NonNull HashMap<String, Object> map) {
-        super.setMap(map);
-
-        this.category = Category.valueOf(map.get(CATEGORY).toString());
-        this.magCategory = MagazineCategory.valueOf(map.get(MAGAZINE_CATEGORY).toString());
-        this.number = Calendar.getInstance();
-        this.number.setTimeInMillis(Long.valueOf(map.get(NUMBER).toString()));
-
-    }
+//    @Override
+//    public HashMap<String, Object> toMap() {
+//
+//        HashMap<String, Object> map = super.toMap();
+//
+//        map.put(CATEGORY, category.toString());
+//        map.put(MAGAZINE_CATEGORY, magCategory.toString());
+//        map.put(NUMBER, number.getTimeInMillis());
+//
+//        return map;
+//  }
+//
+//    @Override
+//    public void setMap(@NonNull HashMap<String, Object> map) {
+//        super.setMap(map);
+//
+//        this.category = Category.valueOf(map.get(CATEGORY).toString());
+//        this.magCategory = MagazineCategory.valueOf(map.get(MAGAZINE_CATEGORY).toString());
+//        this.number = Calendar.getInstance();
+//        this.number.setTimeInMillis(Long.valueOf(map.get(NUMBER).toString()));
+//
+//    }
 
     public void setNumber(Calendar number) {
         this.number = number;
@@ -215,7 +235,7 @@ public class Placement extends BaseDataItem {
 
         } else {
 
-            String numString = String.valueOf((number.get(Calendar.MONTH) + 1 )/ 2);
+            String numString = String.valueOf((number.get(Calendar.MONTH) + 2 ) / 2);
 
             magNumString = context.getString(R.string.magazine_number_number, numString, yearString);
         }
