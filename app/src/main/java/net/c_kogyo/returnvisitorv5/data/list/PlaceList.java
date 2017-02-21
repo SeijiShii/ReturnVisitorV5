@@ -1,4 +1,4 @@
-package net.c_kogyo.returnvisitorv5.list;
+package net.c_kogyo.returnvisitorv5.data.list;
 
 import net.c_kogyo.returnvisitorv5.data.Place;
 
@@ -8,7 +8,7 @@ import org.json.JSONObject;
  * Created by SeijiShii on 2017/02/21.
  */
 
-public class PlaceList extends DataList<Place> {
+public class PlaceList extends BaseList<Place> {
 
     public static final String PLACE_LIST = "place_list";
 

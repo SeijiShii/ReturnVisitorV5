@@ -1,4 +1,4 @@
-package net.c_kogyo.returnvisitorv5.list;
+package net.c_kogyo.returnvisitorv5.data.list;
 
 import net.c_kogyo.returnvisitorv5.data.Person;
 
@@ -8,7 +8,7 @@ import org.json.JSONObject;
  * Created by SeijiShii on 2017/02/21.
  */
 
-public class PersonList extends DataList<Person> {
+public class PersonList extends BaseList<Person> {
 
     public static final String PERSON_LIST = "person_list";
 

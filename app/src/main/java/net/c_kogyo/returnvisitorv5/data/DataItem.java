@@ -31,14 +31,14 @@ public class DataItem implements Cloneable{
 
     protected String idHeader;
 
-    DataItem(String idHeader){
+    public DataItem(String idHeader){
 
         this.idHeader = idHeader;
         initCommon();
 
     }
 
-    DataItem(JSONObject object) {
+    public DataItem(JSONObject object) {
 
         initCommon();
 

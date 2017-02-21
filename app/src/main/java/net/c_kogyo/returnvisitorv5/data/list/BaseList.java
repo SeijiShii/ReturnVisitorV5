@@ -1,4 +1,4 @@
-package net.c_kogyo.returnvisitorv5.list;
+package net.c_kogyo.returnvisitorv5.data.list;
 
 import net.c_kogyo.returnvisitorv5.data.DataItem;
 
@@ -14,15 +14,15 @@ import java.util.Iterator;
  */
 
 
-public abstract class DataList<T extends DataItem> implements Iterable<T>{
+public abstract class BaseList<T extends DataItem> implements Iterable<T>{
 
-    public static final String DATA_LIST_TAG = "DataList";
+    public static final String DATA_LIST_TAG = "BaseList";
 
     protected ArrayList<T> list;
     private Class<T> klass;
     private String mListHeader;
 
-    DataList(final Class<T> clazz, String listHeader) {
+    BaseList(final Class<T> clazz, String listHeader) {
 
         this.mListHeader = listHeader;
         this.klass = clazz;
@@ -30,7 +30,7 @@ public abstract class DataList<T extends DataItem> implements Iterable<T>{
 
     }
 
-    DataList(final Class<T> clazz, String listHeader, JSONObject object) {
+    BaseList(final Class<T> clazz, String listHeader, JSONObject object) {
         this(clazz, listHeader);
 
         try {
