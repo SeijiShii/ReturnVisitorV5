@@ -160,6 +160,10 @@ public class Person extends DataItem implements Cloneable{
         }
     }
 
+    public Person(CloudData data) {
+        this(data.getJson());
+    }
+
     public Sex getSex() {
         return sex;
     }

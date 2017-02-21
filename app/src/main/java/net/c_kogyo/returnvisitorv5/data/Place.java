@@ -52,6 +52,10 @@ public class Place extends DataItem {
         }
     }
 
+    public Place(CloudData data) {
+        this(data.getJson());
+    }
+
     private void initCommon() {
         this.latLng = new LatLng(0, 0);
         this.address = "";

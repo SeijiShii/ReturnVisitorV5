@@ -65,6 +65,12 @@ public class DataItem implements Cloneable{
         }
     }
 
+    public DataItem(CloudData data) {
+
+        this(data.getJson());
+
+    }
+
     private void initCommon() {
         this.updatedAt = Calendar.getInstance();
         this.id = generateNewId();

@@ -80,7 +80,7 @@ public class RVData {
         protected void onHandleIntent(Intent intent) {
 
             jsonToData(stringToJson(loadStringFromFile()));
-            
+
             // データの読み込みが終わったら
             isDataLoaded = true;
         }

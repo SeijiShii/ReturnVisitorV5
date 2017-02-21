@@ -79,6 +79,10 @@ public class Visit extends DataItem {
 
     }
 
+    public Visit(CloudData data) {
+        this(data.getJson());
+    }
+
     private void initCommon() {
         this.datetime = Calendar.getInstance();
         this.placeId = null;
