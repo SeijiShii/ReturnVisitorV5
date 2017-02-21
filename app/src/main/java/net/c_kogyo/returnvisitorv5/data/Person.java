@@ -15,7 +15,7 @@ import java.util.HashMap;
 /**
  * Created by sayjey on 2015/06/18.
  */
-public class Person extends BaseDataItem implements Cloneable{
+public class Person extends DataItem implements Cloneable{
 
     public static final String PERSON       = "person";
 
@@ -123,14 +123,11 @@ public class Person extends BaseDataItem implements Cloneable{
 
     private Sex sex;
     private Age age;
-//    private Interest interest;
-
-    // タグは個人につけるもの
-//    private ArrayList<String> tagIds;
 
     private ArrayList<String> placeIds;
 
     public Person() {
+        super(PERSON);
         initCommon();
     }
 
@@ -179,64 +176,32 @@ public class Person extends BaseDataItem implements Cloneable{
         this.age = age;
     }
 
-//    public Interest getInterest() {
-//        return interest;
-//    }
-//
-//    public void setInterest(Interest interest) {
-//        this.interest = interest;
-//    }
 
-//    public ArrayList<String> getTagIds() {
-//        return tagIds;
-//    }
-//
-//    public void setTagIds(ArrayList<String> tagIds) {
-//        this.tagIds = tagIds;
-//    }
-//
-//    public void addTagIds(String tagId) {
-//        this.tagIds.add(tagId);
-//    }
-//
-//    public void removeTagId(String tagId) {
-//        this.tagIds.remove(tagId);
-//    }
+        public String getSexString(Context context) {
 
+        String[] sexStringArray = context.getResources().getStringArray(R.array.sex_array);
+        return sexStringArray[sex.num()];
 
-
-    @Override
-    public String idHeader() {
-        return PERSON;
     }
 
-    //    public String getSexString(Context context) {
-//
-//        String[] sexStringArray = context.getResources().getStringArray(R.array.sex_array);
-//        return sexStringArray[sex.num()];
-//
-//    }
+    public String getAgeString(Context context) {
 
-//    public String getAgeString(Context context) {
-//
-//        String[] ageStringArray = context.getResources().getStringArray(R.array.age_array);
-//        return ageStringArray[age.num()];
-//
-//    }
+        String[] ageStringArray = context.getResources().getStringArray(R.array.age_array);
+        return ageStringArray[age.num()];
 
-//    @Override
-//    protected Object clone() throws CloneNotSupportedException {
-//
-//        Person person = (Person) super.clone();
-//
-//        person.sex  = this.sex;
-//        person.age  = this.age;
-//        person.interest = this.interest;
-//        person.tagIds = new ArrayList<>(this.tagIds);
-//        person.placeIds = new ArrayList<>(this.placeIds);
-//
-//        return person;
-//    }
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+
+        Person person = (Person) super.clone();
+
+        person.sex  = this.sex;
+        person.age  = this.age;
+        person.placeIds = new ArrayList<>(this.placeIds);
+
+        return person;
+    }
 
     @Override
     public JSONObject jsonObject() {
@@ -266,54 +231,8 @@ public class Person extends BaseDataItem implements Cloneable{
         StringBuilder builder = new StringBuilder(super.toStringForSearch(context));
         builder.append(context.getResources().getStringArray(R.array.sex_array)[this.sex.num()]).append(" ");
         builder.append(context.getResources().getStringArray(R.array.age_array)[this.age.num()]).append(" ");
-//        builder.append(context.getResources().getStringArray(R.array.interest_array)[this.interest.num()]).append(" ");
-
-        // Tagを実装したらappend
-//        for (String tagId : tagIds) {
-//
-//            Tag tag = RVData.getInstance().tagList.getById(tagId);
-//            if (tag != null) {
-//
-//                builder.append(tag.name).append(" ");
-//            }
-//        }
-
 
         return builder.toString();
-    }
-
-    @Override
-    public HashMap<String, Object> toMap() {
-
-        HashMap<String, Object> map = super.toMap();
-
-        map.put(SEX, sex.toString());
-        map.put(AGE, age.toString());
-//        map.put(INTEREST, interest.toString());
-
-//        map.put(TAG_IDS, tagIds);
-        map.put(PLACE_IDS, placeIds);
-
-        return map;
-    }
-
-    @Override
-    public void setMap(@NonNull HashMap<String, Object> map) {
-        super.setMap(map);
-
-        this.sex = Sex.valueOf(map.get(SEX).toString());
-        this.age = Age.valueOf(map.get(AGE).toString());
-//        this.interest = Interest.valueOf(map.get(INTEREST).toString());
-
-//        Object tagO = map.get(TAG_IDS);
-//        if (tagO != null) {
-//            this.tagIds = (ArrayList<String>) tagO;
-//        }
-
-        Object placeO = map.get(PLACE_IDS);
-        if (placeO != null) {
-            this.placeIds = (ArrayList<String>) placeO;
-        }
     }
 
     public String toString(Context context) {
@@ -331,12 +250,6 @@ public class Person extends BaseDataItem implements Cloneable{
 
         String[] ageArray = context.getResources().getStringArray(R.array.age_array);
         builder.append(ageArray[age.num()]).append(" ");
-
-//        String[] interestArray = context.getResources().getStringArray(R.array.interest_array);
-//        if (interest != Interest.NONE) {
-//            builder.append(interestArray[interest.num()]).append(" ");
-//        }
-
         builder.append(note);
 
         return builder.toString();
@@ -350,27 +263,4 @@ public class Person extends BaseDataItem implements Cloneable{
         this.placeIds = placeIds;
     }
 
-//    public boolean isRV(Context context) {
-//
-//        ArrayList<Tag> tags = RVData.getInstance().tagList.getList(this.tagIds);
-//
-//        for (Tag tag : tags) {
-//            if (tag.isBibleStudyTag(context) || tag.isMRTag(context) || tag.isRVTag(context)){
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-
-//    public boolean isBS(Context context) {
-//
-//        ArrayList<Tag> tags = RVData.getInstance().tagList.getList(this.tagIds);
-//
-//        for (Tag tag : tags) {
-//            if (tag.isBibleStudyTag(context)){
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
 }
