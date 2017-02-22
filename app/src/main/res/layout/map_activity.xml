@@ -1,28 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Tool bar -->
+    <!-- Main Map Frame -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- Tool bar -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@color/creamWhite">
+
+        </RelativeLayout>
+
+        <com.google.android.gms.maps.MapView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:id="@+id/map_view"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@color/adFrameGray">
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <!-- Dialog overlay -->
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:background="@color/creamWhite">
+        android:layout_height="match_parent"
+        android:background="#B000"
+        android:id="@+id/dialog_overlay"
+        android:visibility="invisible">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/gray_white_circle"
+            android:layout_margin="10dp"
+            android:layout_centerInParent="true"
+            android:padding="@dimen/padding_normal">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/dialog_frame"/>
+
+        </ScrollView>
 
     </RelativeLayout>
 
-    <com.google.android.gms.maps.MapView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:id="@+id/map_view"/>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:background="@color/adFrameGray">
-
-    </RelativeLayout>
-
-</LinearLayout>
+</FrameLayout>

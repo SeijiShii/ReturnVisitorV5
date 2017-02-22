@@ -280,18 +280,21 @@
         android:id="@+id/dialog_overlay"
         android:visibility="invisible">
 
-        <FrameLayout
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/gray_white_circle"
             android:layout_margin="10dp"
             android:layout_centerInParent="true"
-            android:id="@+id/dialog_frame"
-            android:padding="@dimen/padding_normal"/>
+            android:padding="@dimen/padding_normal">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/dialog_frame"/>
+
+        </ScrollView>
 
     </RelativeLayout>
-
-
-
 
 </FrameLayout>

@@ -10,6 +10,9 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -18,6 +21,9 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 
 import net.c_kogyo.returnvisitorv5.R;
+import net.c_kogyo.returnvisitorv5.data.DataItem;
+import net.c_kogyo.returnvisitorv5.view.SmallTagView;
+import net.c_kogyo.returnvisitorv5.view.TagFrame;
 
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_PLACE_ACTION;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_VISIT_REQUEST_CODE;
@@ -39,6 +45,9 @@ public class MapActivity extends AppCompatActivity
         setContentView(R.layout.map_activity);
 
         initMapView(savedInstanceState);
+        initDialogOverlay();
+
+        testView();
 
     }
 
@@ -252,4 +261,29 @@ public class MapActivity extends AppCompatActivity
         startActivityForResult(recordVisitIntent, NEW_VISIT_REQUEST_CODE);
 
     }
+
+    private RelativeLayout dialogOverlay;
+    private void initDialogOverlay() {
+        dialogOverlay = (RelativeLayout) findViewById(R.id.dialog_overlay);
+
+        initDialogFrame();
+    }
+
+    private FrameLayout dialogFrame;
+    private void initDialogFrame() {
+        dialogFrame = (FrameLayout) findViewById(R.id.dialog_frame);
+    }
+
+    private void testView() {
+
+        dialogOverlay.setVisibility(View.VISIBLE);
+
+        DataItem tag = new DataItem("TAG");
+        tag.setName("Very Kind");
+        SmallTagView smallTag = new SmallTagView(this, tag);
+
+        dialogFrame.addView(smallTag);
+
+    }
+
 }
