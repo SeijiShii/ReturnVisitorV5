@@ -121,7 +121,7 @@ public class PersonDialog extends FrameLayout {
         noteText = (AutoCompleteTextView) findViewById(R.id.note_text);
 //        noteText.setText(mPerson.getNote());
 
-//        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, RVData.getInstance().noteCompleteList.getList());
+//        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, RVDB.getInstance().noteCompleteList.getList());
 //        noteText.setAdapter(adapter);
         noteText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -153,18 +153,18 @@ public class PersonDialog extends FrameLayout {
 //                mPerson.setNote(noteText.getText().toString());
 //
 //                if (getIntent().getIntExtra(Constants.REQUEST_CODE, 0) == Constants.PersonCode.ADD_PERSON_REQUEST_CODE) {
-//                    RVData.getInstance().personList.addOrSet(mPerson);
+//                    RVDB.getInstance().personList.addOrSet(mPerson);
 //
-//                    RVData.getInstance().noteCompleteList.addToBoth(mPerson.getNote());
+//                    RVDB.getInstance().noteCompleteList.addToBoth(mPerson.getNote());
 //
 //                    Intent intent = new Intent();
 //                    intent.putExtra(Person.PERSON, mPerson.getId());
 //                    setResult(Constants.PersonCode.PERSON_ADDED_RESULT_CODE, intent);
 //                } else if (getIntent().getIntExtra(Constants.REQUEST_CODE, 0) == Constants.PersonCode.EDIT_PERSON_REQUEST_CODE) {
 //
-//                    RVData.getInstance().personList.addOrSet(mPerson);
+//                    RVDB.getInstance().personList.addOrSet(mPerson);
 //
-//                    RVData.getInstance().noteCompleteList.addToBoth(mPerson.getNote());
+//                    RVDB.getInstance().noteCompleteList.addToBoth(mPerson.getNote());
 //
 //                    Intent intent = new Intent();
 //                    intent.putExtra(Person.PERSON, mPerson.getId());
@@ -191,7 +191,7 @@ public class PersonDialog extends FrameLayout {
     private void initDeleteButton() {
 
         Button deleteButton = (Button) findViewById(R.id.delete_button);
-//        if (RVData.getInstance().personList.contains(mPerson)) {
+//        if (RVDB.getInstance().personList.contains(mPerson)) {
 //            deleteButton.setVisibility(View.VISIBLE);
 //            deleteButton.setOnClickListener(new View.OnClickListener() {
 //                @Override

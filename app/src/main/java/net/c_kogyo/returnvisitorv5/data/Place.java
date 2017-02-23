@@ -52,8 +52,8 @@ public class Place extends DataItem {
         }
     }
 
-    public Place(CloudData data) {
-        this(data.getJson());
+    public Place(Record record) {
+        this(record.getJSON());
     }
 
     private void initCommon() {

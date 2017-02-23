@@ -79,8 +79,8 @@ public class Visit extends DataItem {
 
     }
 
-    public Visit(CloudData data) {
-        this(data.getJson());
+    public Visit(Record record) {
+        this(record.getJSON());
     }
 
     private void initCommon() {
