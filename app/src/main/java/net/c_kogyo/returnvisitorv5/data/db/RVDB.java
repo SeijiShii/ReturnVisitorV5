@@ -26,7 +26,7 @@ public class RVDB {
     public void loadAllPlaces(Context context, QueryDataListener listener) {
 
         SQLiteDatabase db = mHelper.getReadableDatabase();
-        
+
     }
 
     public interface QueryDataListener {

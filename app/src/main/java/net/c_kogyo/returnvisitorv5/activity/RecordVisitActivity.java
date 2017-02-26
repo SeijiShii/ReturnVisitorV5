@@ -2,8 +2,13 @@ package net.c_kogyo.returnvisitorv5.activity;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -13,6 +18,7 @@ import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.dialogcontents.PersonDialog;
+import net.c_kogyo.returnvisitorv5.service.FetchAddressIntentService;
 import net.c_kogyo.returnvisitorv5.view.BaseAnimateView;
 import net.c_kogyo.returnvisitorv5.view.ClearEditText;
 
@@ -34,7 +40,10 @@ public class RecordVisitActivity extends AppCompatActivity {
         initAddPersonButton();
         initDialogOverlay();
         initCancelButton();
+        initBroadcastManager();
+        inquireAddress();
     }
+
 
     private TextView addressText;
     private void initAddressText() {
@@ -46,6 +55,8 @@ public class RecordVisitActivity extends AppCompatActivity {
             }
         });
     }
+
+
 
     private ClearEditText placeNameText;
     private void initPlaceNameText() {
@@ -165,4 +176,42 @@ public class RecordVisitActivity extends AppCompatActivity {
             }
         });
     }
+
+    BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch (intent.getAction()) {
+                case FetchAddressIntentService.SEND_FETCED_ADDRESS_ACTION:
+                    String address = intent.getStringExtra(FetchAddressIntentService.ADDRESS_FETCHED);
+                    addressText.setText(address);
+                    break;
+            }
+
+        }
+    };
+
+    private void initBroadcastManager() {
+        LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this);
+        manager.registerReceiver(receiver, new IntentFilter(FetchAddressIntentService.SEND_FETCED_ADDRESS_ACTION));
+    }
+
+    private void inquireAddress() {
+
+        double lat = getIntent().getDoubleExtra(Constants.LATITUDE, 1000);
+        double lng = getIntent().getDoubleExtra(Constants.LONGITUDE, 1000);
+
+        if (lat >= 1000 & lng >= 1000) return;
+
+        Intent addressServiceIntent = new Intent(this, FetchAddressIntentService.class);
+
+        addressServiceIntent.putExtra(Constants.LATITUDE, lat);
+        addressServiceIntent.putExtra(Constants.LONGITUDE, lng);
+        addressServiceIntent.putExtra(FetchAddressIntentService.IS_USING_MAP_LOCALE, true);
+
+        startService(addressServiceIntent);
+    }
+
+
+
+
 }

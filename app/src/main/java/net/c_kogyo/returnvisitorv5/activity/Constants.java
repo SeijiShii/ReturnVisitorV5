@@ -13,10 +13,12 @@ public class Constants {
 
         public static final String RETURN_VISITOR_SHARED_PREFS = "return_visitor_shared_prefs";
         static final String ZOOM_LEVEL = "zoom_level";
-        static final String LATITUDE = "latitude";
-        static final String LONGITUDE = "longitude";
+
 //        public static final String USER_NAME = "user_name";
     }
+
+    public static final String LATITUDE = "latitude";
+    public static final String LONGITUDE = "longitude";
 
 
 //    public static final int[] buttonRes = {

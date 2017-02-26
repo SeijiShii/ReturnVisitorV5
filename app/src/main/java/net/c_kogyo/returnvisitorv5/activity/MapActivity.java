@@ -25,10 +25,10 @@ import net.c_kogyo.returnvisitorv5.data.DataItem;
 import net.c_kogyo.returnvisitorv5.view.SmallTagView;
 import net.c_kogyo.returnvisitorv5.view.TagFrame;
 
+import static net.c_kogyo.returnvisitorv5.activity.Constants.LATITUDE;
+import static net.c_kogyo.returnvisitorv5.activity.Constants.LONGITUDE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_PLACE_ACTION;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_VISIT_REQUEST_CODE;
-import static net.c_kogyo.returnvisitorv5.activity.Constants.SharedPrefTags.LATITUDE;
-import static net.c_kogyo.returnvisitorv5.activity.Constants.SharedPrefTags.LONGITUDE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.SharedPrefTags.ZOOM_LEVEL;
 
@@ -47,7 +47,7 @@ public class MapActivity extends AppCompatActivity
         initMapView(savedInstanceState);
         initDialogOverlay();
 
-        testView();
+//        testView();
 
     }
 
@@ -258,8 +258,9 @@ public class MapActivity extends AppCompatActivity
     public void onMapLongClick(LatLng latLng) {
         Intent recordVisitIntent = new Intent(this, RecordVisitActivity.class);
         recordVisitIntent.setAction(NEW_PLACE_ACTION);
+        recordVisitIntent.putExtra(LATITUDE, latLng.latitude);
+        recordVisitIntent.putExtra(LONGITUDE, latLng.longitude);
         startActivityForResult(recordVisitIntent, NEW_VISIT_REQUEST_CODE);
-
     }
 
     private RelativeLayout dialogOverlay;

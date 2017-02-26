@@ -60,6 +60,8 @@
                 android:layout_height="@dimen/ui_height_large"
                 android:textSize="@dimen/in_frame_text_size"
                 android:hint="@string/address"
+                android:textColorHint="@color/textHintGray"
+                android:textColor="@color/textColorGray"
                 android:id="@+id/address_text_view"
                 android:background="@drawable/gray_trans_circle"
                 android:layout_margin="@dimen/ui_margin_normal"/>
