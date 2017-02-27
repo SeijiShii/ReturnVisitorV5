@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -24,7 +23,8 @@
         android:padding="5dp"
         android:hint="@string/name"
         android:textColorHint="@color/textHintGray"
-        android:inputType="textFilter"/>
+        android:inputType="textFilter"
+        android:textColor="@color/textColorGray" />
 
     <!-- Sex Radio Button -->
     <LinearLayout
@@ -98,6 +98,7 @@
         android:minHeight="@dimen/ui_height_large"
         android:gravity="left|top"
         android:textColorHint="@color/textHintGray"
+        android:textColor="@color/textColorGray"
         android:textSize="12sp"/>
 
     <!-- OK -->

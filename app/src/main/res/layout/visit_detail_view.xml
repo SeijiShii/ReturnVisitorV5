@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/gray_white_circle">
+
+    <!-- First Line -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_height_small"
+        android:orientation="horizontal">
+
+        <!-- Person Data -->
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:id="@+id/person_data_text"
+            android:textColor="@color/textColorGray"
+            android:textSize="@dimen/text_size_middle"/>
+
+        <!-- Open Close Button -->
+        <RelativeLayout
+            android:layout_width="@dimen/ui_height_small"
+            android:layout_height="@dimen/ui_height_small">
+
+            <Button
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:id="@+id/open_close_button"
+                android:background="@drawable/upper_arrow_selector"
+                android:layout_centerInParent="true"/>
+
+        </RelativeLayout>
+    </LinearLayout>
+
+    <!-- Seen Switch -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_height_small">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <android.support.v7.widget.SwitchCompat
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:id="@+id/seen_switch"
+                android:gravity="right|center_vertical"
+                android:layout_margin="@dimen/ui_margin_normal"
+                android:checked="true"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:id="@+id/seen_text"
+                android:textColor="@color/textColorGray"
+                android:text="@string/seen"
+                android:gravity="left|center_vertical"
+                android:layout_margin="@dimen/ui_margin_normal"/>
+
+        </LinearLayout>
+    </RelativeLayout>
+
+    <!-- Edit Person Button -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_height_small">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/edit_person_button"
+            android:background="@drawable/trans_blue_selector"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/text_size_middle"
+            android:text="@string/edit_person"
+            android:layout_alignParentLeft="true"
+            android:layout_margin="@dimen/ui_margin_normal"/>
+    </RelativeLayout>
+
+    <!-- Placements -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_height_small">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/add_placement_button"
+            android:background="@drawable/trans_blue_selector"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/text_size_middle"
+            android:text="@string/add_placement"
+            android:layout_alignParentLeft="true"
+            android:layout_margin="@dimen/ui_margin_normal"/>
+    </RelativeLayout>
+
+    <!-- Tag -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_height_small">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/tag_button"
+            android:background="@drawable/trans_blue_selector"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/text_size_middle"
+            android:text="@string/tag"
+            android:layout_alignParentLeft="true"
+            android:layout_margin="@dimen/ui_margin_normal"/>
+    </RelativeLayout>
+
+    <!-- Priority -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_height_small"/>
+
+    <!-- Note -->
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/ui_height_small"
+        android:background="@drawable/gray_trans_circle"
+        android:textColor="@color/textColorGray"
+        android:textSize="@dimen/in_frame_text_size"
+        android:gravity="left|top"
+        android:layout_margin="@dimen/ui_margin_normal"/>
+
+    <!-- Is Return Visit -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_height_small">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <android.support.v7.widget.SwitchCompat
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:id="@+id/rv_switch"
+                android:gravity="right|center_vertical"
+                android:layout_margin="@dimen/ui_margin_normal"
+                android:checked="true"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:textColor="@color/textColorGray"
+                android:text="@string/count_as_rv"
+                android:gravity="left|center_vertical"
+                android:layout_margin="@dimen/ui_margin_normal"/>
+
+        </LinearLayout>
+    </RelativeLayout>
+
+    <!-- Is Study -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_height_small">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <android.support.v7.widget.SwitchCompat
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:id="@+id/study_switch"
+                android:gravity="right|center_vertical"
+                android:layout_margin="@dimen/ui_margin_normal"
+                android:checked="true"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:textColor="@color/textColorGray"
+                android:text="@string/count_as_study"
+                android:gravity="left|center_vertical"
+                android:layout_margin="@dimen/ui_margin_normal"/>
+
+        </LinearLayout>
+    </RelativeLayout>
+
+</LinearLayout>

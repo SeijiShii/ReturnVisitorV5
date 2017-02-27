@@ -37,6 +37,8 @@ public class PersonDialog extends FrameLayout {
 
         mPerson = person;
         mListener = listener;
+
+        initCommon();
     }
 
     public PersonDialog(Context context, AttributeSet attrs) {

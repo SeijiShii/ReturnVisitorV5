@@ -85,7 +85,15 @@ public class BaseAnimateView extends FrameLayout {
 
         view = LayoutInflater.from(getContext()).inflate(mResId, this);
 
-//        setHeightPostDrawn();
+        switch (mInitCondition) {
+            case ZERO:
+                this.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0));
+                extractPostDrawn();
+                break;
+            case EX_HEIGHT:
+                this.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, mExHeight));
+                break;
+        }
 
     }
 
@@ -96,6 +104,31 @@ public class BaseAnimateView extends FrameLayout {
     @Override
     protected void dispatchDraw(Canvas canvas) {
         super.dispatchDraw(canvas);
+    }
+
+    private void extractPostDrawn() {
+
+        final Handler handler = new Handler();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (BaseAnimateView.this.getWidth() <= 0) {
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        //
+                    }
+                }
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        changeViewHeight(AnimateCondition.FROM_0_TO_EX_HEIGHT, true, null, null);
+                    }
+                });
+            }
+        }).start();
     }
 
     private void setHeightPostDrawn() {
@@ -177,5 +210,9 @@ public class BaseAnimateView extends FrameLayout {
 
     public interface HeightUpdateListener {
         void onUpdate();
+    }
+
+    public void setExHeight(int exHeight) {
+        this.mExHeight = mExHeight;
     }
 }

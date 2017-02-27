@@ -23,7 +23,6 @@ import com.google.android.gms.maps.model.LatLng;
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.DataItem;
 import net.c_kogyo.returnvisitorv5.view.SmallTagView;
-import net.c_kogyo.returnvisitorv5.view.TagFrame;
 
 import static net.c_kogyo.returnvisitorv5.activity.Constants.LATITUDE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.LONGITUDE;
@@ -274,6 +273,7 @@ public class MapActivity extends AppCompatActivity
     private void initDialogFrame() {
         dialogFrame = (FrameLayout) findViewById(R.id.dialog_frame);
     }
+
 
     private void testView() {
 

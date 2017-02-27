@@ -2,6 +2,7 @@ package net.c_kogyo.returnvisitorv5.activity;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -11,8 +12,10 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -22,10 +25,12 @@ import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.Visit;
+import net.c_kogyo.returnvisitorv5.data.VisitDetail;
 import net.c_kogyo.returnvisitorv5.dialogcontents.PersonDialog;
 import net.c_kogyo.returnvisitorv5.service.FetchAddressIntentService;
 import net.c_kogyo.returnvisitorv5.view.BaseAnimateView;
 import net.c_kogyo.returnvisitorv5.view.ClearEditText;
+import net.c_kogyo.returnvisitorv5.view.VisitDetailView;
 
 import java.util.ArrayList;
 
@@ -43,12 +48,15 @@ public class RecordVisitActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        initData();
+
         setContentView(R.layout.record_visit_activity);
 
         initAddressText();
         initPlaceNameText();
         initTwoButtonsFrame();
         initAddPersonButton();
+        initVisitDetailFrame();
         initDialogOverlay();
         initCancelButton();
         initBroadcastManager();
@@ -74,7 +82,6 @@ public class RecordVisitActivity extends AppCompatActivity {
         }
     }
 
-
     private TextView addressText;
     private void initAddressText() {
         addressText = (TextView) findViewById(R.id.address_text_view);
@@ -85,8 +92,6 @@ public class RecordVisitActivity extends AppCompatActivity {
             }
         });
     }
-
-
 
     private ClearEditText placeNameText;
     private void initPlaceNameText() {
@@ -161,11 +166,22 @@ public class RecordVisitActivity extends AppCompatActivity {
         PersonDialog personDialog = new PersonDialog(this, new Person(mPlace.getId()), new PersonDialog.OnPersonEditFinishListener() {
             @Override
             public void onFinishEdit(Person person) {
+
+                hideSoftKeyboard();
                 mPersons.add(person);
+                final VisitDetail visitDetail = new VisitDetail(person.getId(), mVisit.getId());
+                mVisit.addVisitDetail(visitDetail);
+                fadeDialogOverlay(false, new DialogPostAnimationListener() {
+                    @Override
+                    public void onFinishAnimation() {
+                        // Person Dialogが消えたら実行するアニメーション
+                        addVisitDetailView(visitDetail);
+                    }
+                });
             }
         });
         dialogFrame.addView(personDialog);
-        fadeDialogOverlay(true);
+        fadeDialogOverlay(true, null);
     }
 
     private RelativeLayout dialogOverlay;
@@ -180,26 +196,87 @@ public class RecordVisitActivity extends AppCompatActivity {
         dialogFrame = (FrameLayout) findViewById(R.id.dialog_frame);
     }
 
-    private void fadeDialogOverlay(boolean isFadeIn) {
+    private void fadeDialogOverlay(boolean isFadeIn, final DialogPostAnimationListener listener) {
 
         if (isFadeIn) {
             dialogOverlay.setVisibility(View.VISIBLE);
 
-            ValueAnimator fadeinAnimator = ValueAnimator.ofFloat(0f, 1f);
-            fadeinAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            ValueAnimator fadeInAnimator = ValueAnimator.ofFloat(0f, 1f);
+            fadeInAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator valueAnimator) {
                     dialogOverlay.setAlpha((float) valueAnimator.getAnimatedValue());
                     dialogOverlay.requestLayout();
                 }
             });
-            fadeinAnimator.setDuration(500);
-            fadeinAnimator.start();
+            fadeInAnimator.setDuration(500);
+
+            if (listener != null) {
+                fadeInAnimator.addListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animator) {
+                        listener.onFinishAnimation();
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animator) {
+
+                    }
+                });
+            }
+
+            fadeInAnimator.start();
 
         } else {
+            ValueAnimator fadeOutAnimator = ValueAnimator.ofFloat(1f, 0f);
+            fadeOutAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                    dialogOverlay.setAlpha((float) valueAnimator.getAnimatedValue());
+                    dialogOverlay.requestLayout();
+                }
+            });
+            fadeOutAnimator.setDuration(500);
+            fadeOutAnimator.addListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animator) {
 
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animator) {
+                    dialogOverlay.setVisibility(View.INVISIBLE);
+                    if (listener == null) return;
+                    listener.onFinishAnimation();
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animator) {
+
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animator) {
+
+                }
+            });
+
+            fadeOutAnimator.start();
         }
+    }
 
+    interface DialogPostAnimationListener {
+        void onFinishAnimation();
     }
 
     private Button cancelButton;
@@ -247,7 +324,24 @@ public class RecordVisitActivity extends AppCompatActivity {
         startService(addressServiceIntent);
     }
 
+    private LinearLayout visitDetailFrame;
+    private void initVisitDetailFrame() {
+        visitDetailFrame = (LinearLayout) findViewById(R.id.visit_detail_frame);
+    }
 
+    private void addVisitDetailView(VisitDetail visitDetail){
+        VisitDetailView detailView = new VisitDetailView(this, visitDetail, BaseAnimateView.InitialHeightCondition.ZERO);
+        visitDetailFrame.addView(detailView);
+    }
+
+    private void hideSoftKeyboard() {
+        InputMethodManager inputMethodManager = (InputMethodManager)  this.getSystemService(Activity.INPUT_METHOD_SERVICE);
+
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
 
 
 }

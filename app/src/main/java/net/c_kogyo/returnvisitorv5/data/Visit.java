@@ -15,11 +15,13 @@ public class Visit extends DataItem {
     public static final String VISIT = "visit";
     public static final String PLACE_ID = "place_id";
     public static final String PLACEMENTS = "placements";
+    public static final String VISIT_DETAILS = "visit_details";
     public static final String DATE_TIME = "datetime";
 
     private Calendar datetime;
     private String placeId;
     private ArrayList<Placement> placements;
+    private ArrayList<VisitDetail> visitDetails;
 
     public enum Priority {
 
@@ -73,6 +75,12 @@ public class Visit extends DataItem {
                     this.placements.add(new Placement(array.getJSONObject(i)));
                 }
             }
+            if (object.has(VISIT_DETAILS)) {
+                JSONArray array = object.getJSONArray(VISIT_DETAILS);
+                for ( int i = 0 ; i < array.length() ; i++ ) {
+                    this.visitDetails.add(new VisitDetail(array.getJSONObject(i)));
+                }
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -87,6 +95,7 @@ public class Visit extends DataItem {
         this.datetime = Calendar.getInstance();
         this.placeId = null;
         this.placements = new ArrayList<>();
+        this.visitDetails = new ArrayList<>();
     }
 
     public void addPlacement(Placement placement) {
@@ -111,6 +120,10 @@ public class Visit extends DataItem {
 
     public void setPlacements(ArrayList<Placement> placements) {
         this.placements = placements;
+    }
+
+    public void addVisitDetail(VisitDetail visitDetail) {
+        this.visitDetails.add(visitDetail);
     }
 
 
