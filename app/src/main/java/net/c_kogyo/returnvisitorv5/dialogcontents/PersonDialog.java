@@ -21,6 +21,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
+import net.c_kogyo.returnvisitorv5.data.Person;
 
 /**
  * Created by SeijiShii on 2017/02/20.
@@ -28,8 +29,14 @@ import net.c_kogyo.returnvisitorv5.R;
 
 public class PersonDialog extends FrameLayout {
 
-    public PersonDialog(Context context) {
-        this(context, null);
+    private Person mPerson;
+    private OnPersonEditFinishListener mListener;
+
+    public PersonDialog(Context context, Person person, OnPersonEditFinishListener listener) {
+        super(context);
+
+        mPerson = person;
+        mListener = listener;
     }
 
     public PersonDialog(Context context, AttributeSet attrs) {
@@ -55,6 +62,10 @@ public class PersonDialog extends FrameLayout {
     private EditText nameText;
     private void initNameText() {
         nameText = (EditText) view.findViewById(R.id.name_text);
+
+        if (mPerson.getName() != null || !mPerson.getName().equals("")){
+            nameText.setText(mPerson.getName());
+        }
     }
 
     private RadioButton maleButton, femaleButton;
@@ -62,6 +73,17 @@ public class PersonDialog extends FrameLayout {
 
         maleButton = (RadioButton) view.findViewById(R.id.male_button);
         femaleButton = (RadioButton) view.findViewById(R.id.female_button);
+
+        switch (mPerson.getSex()) {
+            case MALE:
+                maleButton.setChecked(true);
+                femaleButton.setChecked(false);
+                break;
+            case FEMALE:
+                femaleButton.setChecked(true);
+                maleButton.setChecked(false);
+                break;
+        }
 
         maleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -88,23 +110,16 @@ public class PersonDialog extends FrameLayout {
 
         ageSpinner = (AppCompatSpinner) findViewById(R.id.age_spinner);
 
-//        ArrayAdapter<CharSequence> adapter
-//                = ArrayAdapter.createFromResource(getContext(),
-//                R.array.age_array,
-//                android.R.layout.simple_spinner_item);
-
         AgeSpinnerAdapter adapter = new AgeSpinnerAdapter();
 
         ageSpinner.setAdapter(adapter);
 
-//        if (mPerson != null) {
-//            ageSpinner.setSelection(mPerson.getAge().num());
-//        }
+        ageSpinner.setSelection(mPerson.getAge().num());
 
         ageSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-//                mPerson.setAge(Person.Age.getEnum(i));
+                mPerson.setAge(Person.Age.getEnum(i));
             }
 
             @Override
@@ -119,7 +134,7 @@ public class PersonDialog extends FrameLayout {
     private void initNoteText() {
 
         noteText = (AutoCompleteTextView) findViewById(R.id.note_text);
-//        noteText.setText(mPerson.getNote());
+        noteText.setText(mPerson.getNote());
 
 //        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, RVDB.getInstance().noteCompleteList.getList());
 //        noteText.setAdapter(adapter);
@@ -137,7 +152,7 @@ public class PersonDialog extends FrameLayout {
             @Override
             public void afterTextChanged(Editable editable) {
 
-//                mPerson.setNote(editable.toString());
+                mPerson.setNote(editable.toString());
             }
         });
     }
@@ -149,30 +164,10 @@ public class PersonDialog extends FrameLayout {
             @Override
             public void onClick(View view) {
 
-//                mPerson.setName(nameText.getText().toString());
-//                mPerson.setNote(noteText.getText().toString());
-//
-//                if (getIntent().getIntExtra(Constants.REQUEST_CODE, 0) == Constants.PersonCode.ADD_PERSON_REQUEST_CODE) {
-//                    RVDB.getInstance().personList.addOrSet(mPerson);
-//
-//                    RVDB.getInstance().noteCompleteList.addToBoth(mPerson.getNote());
-//
-//                    Intent intent = new Intent();
-//                    intent.putExtra(Person.PERSON, mPerson.getId());
-//                    setResult(Constants.PersonCode.PERSON_ADDED_RESULT_CODE, intent);
-//                } else if (getIntent().getIntExtra(Constants.REQUEST_CODE, 0) == Constants.PersonCode.EDIT_PERSON_REQUEST_CODE) {
-//
-//                    RVDB.getInstance().personList.addOrSet(mPerson);
-//
-//                    RVDB.getInstance().noteCompleteList.addToBoth(mPerson.getNote());
-//
-//                    Intent intent = new Intent();
-//                    intent.putExtra(Person.PERSON, mPerson.getId());
-//                    setResult(Constants.PersonCode.PERSON_EDITED_RESULT_CODE, intent);
+                mPerson.setName(nameText.getText().toString());
+                mPerson.setNote(noteText.getText().toString());
+                mListener.onFinishEdit(mPerson);
 
-//                }
-
-//                finish();
             }
         });
     }
@@ -235,4 +230,7 @@ public class PersonDialog extends FrameLayout {
         }
     }
 
+    public interface OnPersonEditFinishListener {
+        void onFinishEdit(Person person);
+    }
 }

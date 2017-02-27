@@ -126,22 +126,25 @@ public class Person extends DataItem implements Cloneable{
 
     private ArrayList<String> placeIds;
 
-    public Person() {
+    public Person(String placeId) {
         super(PERSON);
-        initCommon();
+        initCommon(placeId);
     }
 
-    private void initCommon() {
+    private void initCommon(String placeId) {
         this.sex = Sex.SEX_UNKNOWN;
         this.age = Age.AGE_UNKNOWN;
 //        this.interest = Interest.NONE;
 //        this.tagIds = new ArrayList<>();
         this.placeIds = new ArrayList<>();
+
+        if (placeId == null) return;
+        this.placeIds.add(placeId);
     }
 
     public Person(JSONObject object) {
         super(object);
-        initCommon();
+        initCommon(null);
 
         try {
             if (object.has(SEX))            this.sex         = Sex.valueOf(object.get(SEX).toString());

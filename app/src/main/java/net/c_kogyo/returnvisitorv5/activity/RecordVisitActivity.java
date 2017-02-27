@@ -16,17 +16,28 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import net.c_kogyo.returnvisitorv5.R;
+import net.c_kogyo.returnvisitorv5.data.Person;
+import net.c_kogyo.returnvisitorv5.data.Place;
+import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.dialogcontents.PersonDialog;
 import net.c_kogyo.returnvisitorv5.service.FetchAddressIntentService;
 import net.c_kogyo.returnvisitorv5.view.BaseAnimateView;
 import net.c_kogyo.returnvisitorv5.view.ClearEditText;
+
+import java.util.ArrayList;
 
 /**
  * Created by SeijiShii on 2017/02/16.
  */
 
 public class RecordVisitActivity extends AppCompatActivity {
+
+    private Place mPlace;
+    private Visit mVisit;
+    private ArrayList<Person> mPersons;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -42,6 +53,25 @@ public class RecordVisitActivity extends AppCompatActivity {
         initCancelButton();
         initBroadcastManager();
         inquireAddress();
+    }
+
+    private void initData() {
+
+        mPersons = new ArrayList<>();
+
+        Intent intent = getIntent();
+        switch (intent.getAction()) {
+            case Constants.RecordVisitActions.NEW_PLACE_ACTION:
+
+                double lat = intent.getDoubleExtra(Constants.LATITUDE, 0);
+                double lng = intent.getDoubleExtra(Constants.LONGITUDE, 0);
+
+                mPlace = new Place(new LatLng(lat, lng));
+                mVisit = new Visit();
+                mVisit.setPlaceId(mPlace.getId());
+
+                break;
+        }
     }
 
 
@@ -121,13 +151,19 @@ public class RecordVisitActivity extends AppCompatActivity {
         addPersonButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showPersonDialog();
+                showPersonDialogForNew();
             }
         });
     }
 
-    private void showPersonDialog() {
-        PersonDialog personDialog = new PersonDialog(this);
+    private void showPersonDialogForNew() {
+
+        PersonDialog personDialog = new PersonDialog(this, new Person(mPlace.getId()), new PersonDialog.OnPersonEditFinishListener() {
+            @Override
+            public void onFinishEdit(Person person) {
+                mPersons.add(person);
+            }
+        });
         dialogFrame.addView(personDialog);
         fadeDialogOverlay(true);
     }
