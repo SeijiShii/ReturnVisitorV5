@@ -97,7 +97,7 @@ public class FetchAddressIntentService extends IntentService {
 
             if (!mIsUsingMapLocale) {
 
-                String addressString = TextUtils.join(System.getProperty("line.separator"), addressFragments);
+                String addressString = TextUtils.join(" ", addressFragments);
                 sendAddress(addressString);
 
             } else {
@@ -118,7 +118,7 @@ public class FetchAddressIntentService extends IntentService {
                     inquireAddress(new Locale(langCode, countryCode));
 
                 } else {
-                    String addressString = TextUtils.join(System.getProperty("line.separator"), addressFragments);
+                    String addressString = TextUtils.join(" ", addressFragments);
                     sendAddress(addressString);
 
                 }
