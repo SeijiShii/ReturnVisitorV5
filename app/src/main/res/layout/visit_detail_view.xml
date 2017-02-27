@@ -117,10 +117,26 @@
     </RelativeLayout>
 
     <!-- Priority -->
-    <RelativeLayout
+
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="@dimen/ui_height_small"
-        android:id="@+id/priority_frame"/>
+        android:textSize="@dimen/text_size_middle"
+        android:textColor="@color/textColorGray"
+        android:text="@string/priority_description"
+        android:gravity="center"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_height_small">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:id="@+id/priority_frame"
+            android:layout_centerInParent="true"/>
+    </RelativeLayout>
 
     <TextView
         android:layout_width="match_parent"

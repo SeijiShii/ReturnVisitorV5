@@ -9,17 +9,23 @@ import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
+import net.c_kogyo.returnvisitorv5.activity.Constants;
 import net.c_kogyo.returnvisitorv5.data.Person;
+import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
+
+import static net.c_kogyo.returnvisitorv5.activity.Constants.buttonRes;
 
 /**
  * Created by SeijiShii on 2017/02/27.
@@ -30,7 +36,7 @@ public class VisitDetailView extends BaseAnimateView {
     private VisitDetail mVisitDetail;
     private Person mPerson;
     public VisitDetailView(Context context, VisitDetail visitDetail, Person person, InitialHeightCondition condition) {
-        super(context, 700, condition, R.layout.visit_detail_view);
+        super(context, 1300, condition, R.layout.visit_detail_view);
         mVisitDetail = visitDetail;
         mPerson = person;
 
@@ -49,8 +55,8 @@ public class VisitDetailView extends BaseAnimateView {
         initEditPersonButton();
         initPlacementButton();
         initTagButton();
-        initPriorityFrame();
         initPriorityText();
+        initPriorityFrame();
         initNoteText();
         initRVSwitch();
         initStudySwitch();
@@ -131,10 +137,65 @@ public class VisitDetailView extends BaseAnimateView {
         });
     }
     
-    private RelativeLayout priorityFrame;
+    private LinearLayout priorityFrame;
+    private Button[] raterButtons;
     private void initPriorityFrame() {
-        priorityFrame = (RelativeLayout) getViewById(R.id.priority_frame);
-        // TODO: 2017/02/27 Implement priorityFrame
+        priorityFrame = (LinearLayout) getViewById(R.id.priority_frame);
+
+        final int raterSize = (int) (getContext().getResources().getDisplayMetrics().density * 25);
+        final int buttonMargin = (int) (getContext().getResources().getDisplayMetrics().density * 15);
+
+        // 2017/02/27 Implement priorityFrame
+        priorityFrame.removeAllViews();
+
+        raterButtons = new Button[8];
+        for ( int i = 0 ; i < 7 ; i++ ) {
+            raterButtons[i] = new Button(getContext());
+            raterButtons[i].setBackgroundResource(buttonRes[0]);
+            raterButtons[i].setTag(i);
+
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(raterSize, raterSize);
+
+            raterButtons[i].setLayoutParams(params);
+            priorityFrame.addView(raterButtons[i]);
+
+            if ( i < 6 ) {
+                View view = new View(getContext());
+                FrameLayout.LayoutParams params2 = new FrameLayout.LayoutParams(buttonMargin, ViewGroup.LayoutParams.MATCH_PARENT);
+                view.setLayoutParams(params2);
+                priorityFrame.addView(view);
+            }
+
+            raterButtons[i].setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    int tag = Integer.parseInt(view.getTag().toString());
+                    Visit.Priority priority = Visit.Priority.getEnum(tag);
+
+                    mVisitDetail.setPriority(priority);
+
+                    refreshRater(priority);
+
+                }
+            });
+        }
+        refreshRater(mVisitDetail.getPriority());
+    }
+
+    private void refreshRater(Visit.Priority priority) {
+
+        int num = priority.num();
+
+        priorityText.setText(getResources().getStringArray(R.array.priority_array)[mVisitDetail.getPriority().num()]);
+
+        for (int i = 0 ; i <= num ; i++) {
+            raterButtons[i].setBackgroundResource(Constants.buttonRes[num]);
+        }
+
+        for (int i = num + 1 ; i < 7 ; i++ ) {
+            raterButtons[i].setBackgroundResource(Constants.buttonRes[0]);
+        }
     }
     
     private TextView priorityText;

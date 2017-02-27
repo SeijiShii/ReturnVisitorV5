@@ -156,4 +156,12 @@ public class VisitDetail extends DataItem {
     public void setSeen(boolean seen) {
         this.seen = seen;
     }
+
+    public void setPriority(Visit.Priority priority) {
+        this.priority = priority;
+    }
+
+    public Visit.Priority getPriority() {
+        return priority;
+    }
 }
