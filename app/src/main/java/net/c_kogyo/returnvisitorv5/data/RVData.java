@@ -36,4 +36,28 @@ public class RVData {
     }
 
     public static RVData getInstance() {return instance;}
+
+    public PersonList getPersonList() {
+        return personList;
+    }
+
+    public PlaceList getPlaceList() {
+        return placeList;
+    }
+
+    public VisitList getVisitList() {
+        return visitList;
+    }
+
+    public DataList getTagList() {
+        return tagList;
+    }
+
+    public DataList getNoteCompList() {
+        return noteCompList;
+    }
+
+    public DataList getPubList() {
+        return pubList;
+    }
 }

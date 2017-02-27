@@ -25,12 +25,13 @@ public class Visit extends DataItem {
 
     public enum Priority {
 
-        NEGATIVE(0),
-        NOT_HOME(1),
-        BUSY(2),
-        NONE(3),
+        NONE(0),
+        NEGATIVE(1),
+        NOT_HOME(2),
+        BUSY(3),
         LOW(4),
-        HIGH(5);
+        MIDDLE(5),
+        HIGH(6);
 
         private final int num;
 

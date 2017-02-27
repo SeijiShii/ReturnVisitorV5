@@ -13,14 +13,14 @@
         <item>81～</item>
     </array>
 
-    <array name="interest_array">
+    <array name="priority_array">
         <item>None</item>
-        <item>Refused</item>
-        <item>Indifferent</item>
-        <item>Fair</item>
-        <item>Kind</item>
-        <item>Interested</item>
-        <item>Strongly Interested</item>
+        <item>Negative</item>
+        <item>Not Home</item>
+        <item>Busy</item>
+        <item>Low</item>
+        <item>Middle</item>
+        <item>High</item>
     </array>
 
     <array name="sex_array">

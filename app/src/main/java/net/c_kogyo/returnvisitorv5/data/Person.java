@@ -183,8 +183,7 @@ public class Person extends DataItem implements Cloneable{
         this.age = age;
     }
 
-
-        public String getSexString(Context context) {
+    public String getSexString(Context context) {
 
         String[] sexStringArray = context.getResources().getStringArray(R.array.sex_array);
         return sexStringArray[sex.num()];

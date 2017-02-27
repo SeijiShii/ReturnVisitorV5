@@ -16,9 +16,9 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:id="@+id/person_data_text"
+            android:id="@+id/data_text"
             android:textColor="@color/textColorGray"
-            android:textSize="@dimen/text_size_middle"/>
+            android:textSize="@dimen/text_size_middle" />
 
         <!-- Open Close Button -->
         <RelativeLayout
@@ -57,7 +57,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:id="@+id/seen_text"
-                android:textColor="@color/textColorGray"
+                android:textColor="@color/colorPrimary"
                 android:text="@string/seen"
                 android:gravity="left|center_vertical"
                 android:layout_margin="@dimen/ui_margin_normal"/>
@@ -117,12 +117,21 @@
     </RelativeLayout>
 
     <!-- Priority -->
-    <FrameLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/ui_height_small"/>
+        android:layout_height="@dimen/ui_height_small"
+        android:id="@+id/priority_frame"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_height_small"
+        android:id="@+id/priority_state_text"
+        android:textColor="@color/textColorGray"
+        android:textSize="@dimen/text_size_middle"
+        android:gravity="center"/>
 
     <!-- Note -->
-    <EditText
+    <AutoCompleteTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="@dimen/ui_height_small"
@@ -130,7 +139,8 @@
         android:textColor="@color/textColorGray"
         android:textSize="@dimen/in_frame_text_size"
         android:gravity="left|top"
-        android:layout_margin="@dimen/ui_margin_normal"/>
+        android:layout_margin="@dimen/ui_margin_normal"
+        android:id="@+id/note_text"/>
 
     <!-- Is Return Visit -->
     <RelativeLayout

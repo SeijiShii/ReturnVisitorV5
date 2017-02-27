@@ -165,7 +165,7 @@ public class RecordVisitActivity extends AppCompatActivity {
 
         PersonDialog personDialog = new PersonDialog(this, new Person(mPlace.getId()), new PersonDialog.OnPersonEditFinishListener() {
             @Override
-            public void onFinishEdit(Person person) {
+            public void onFinishEdit(final Person person) {
 
                 hideSoftKeyboard();
                 mPersons.add(person);
@@ -175,7 +175,7 @@ public class RecordVisitActivity extends AppCompatActivity {
                     @Override
                     public void onFinishAnimation() {
                         // Person Dialogが消えたら実行するアニメーション
-                        addVisitDetailView(visitDetail);
+                        addVisitDetailView(visitDetail, person);
                     }
                 });
             }
@@ -329,8 +329,8 @@ public class RecordVisitActivity extends AppCompatActivity {
         visitDetailFrame = (LinearLayout) findViewById(R.id.visit_detail_frame);
     }
 
-    private void addVisitDetailView(VisitDetail visitDetail){
-        VisitDetailView detailView = new VisitDetailView(this, visitDetail, BaseAnimateView.InitialHeightCondition.ZERO);
+    private void addVisitDetailView(VisitDetail visitDetail, Person person){
+        VisitDetailView detailView = new VisitDetailView(this, visitDetail, person, BaseAnimateView.InitialHeightCondition.ZERO);
         visitDetailFrame.addView(detailView);
     }
 

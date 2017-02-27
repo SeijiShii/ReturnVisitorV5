@@ -1,5 +1,7 @@
 package net.c_kogyo.returnvisitorv5.data;
 
+import android.content.Context;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -130,5 +132,28 @@ public class VisitDetail extends DataItem {
         }
 
         return object;
+    }
+
+    public String getPersonData(Context context) {
+
+        Person person = RVData.getInstance().getPersonList().getById(personId);
+
+        if (person == null) {
+            return null;
+        }
+
+        return person.toString(context);
+    }
+
+    public void setIsRv(boolean isRv) {
+        this.isRV = isRv;
+    }
+
+    public void setIsStudy(boolean isStudy) {
+        this.isStudy = isStudy;
+    }
+
+    public void setSeen(boolean seen) {
+        this.seen = seen;
     }
 }
