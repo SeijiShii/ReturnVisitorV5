@@ -37,23 +37,24 @@ public class Place extends DataItem {
     public Place(JSONObject object) {
         super(object);
         initCommon();
+        setJSON(this, object);
 
-        try {
-            if (object.has(LATITUDE) && object.has(LONGITUDE)) {
-                double lat = object.getDouble(LATITUDE);
-                double lng = object.getDouble(LONGITUDE);
-                this.latLng = new LatLng(lat, lng);
-            }
-
-            if (object.has(ADDRESS)) this.address = object.getString(ADDRESS);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            if (object.has(LATITUDE) && object.has(LONGITUDE)) {
+//                double lat = object.getDouble(LATITUDE);
+//                double lng = object.getDouble(LONGITUDE);
+//                this.latLng = new LatLng(lat, lng);
+//            }
+//
+//            if (object.has(ADDRESS)) this.address = object.getString(ADDRESS);
+//
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
     }
 
     public Place(Record record) {
-        this(record.getJSON());
+        this(record.getDataJSON());
     }
 
     private void initCommon() {
@@ -144,5 +145,22 @@ public class Place extends DataItem {
         if (address.length() > 0) return address;
 
         return "";
+    }
+
+    public static Place setJSON(Place place, JSONObject object) {
+
+        try {
+            if (object.has(LATITUDE) && object.has(LONGITUDE)) {
+                double lat = object.getDouble(LATITUDE);
+                double lng = object.getDouble(LONGITUDE);
+                place.latLng = new LatLng(lat, lng);
+            }
+
+            if (object.has(ADDRESS)) place.address = object.getString(ADDRESS);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return place;
     }
 }

@@ -22,6 +22,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.DataItem;
+import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.view.SmallTagView;
 
 import static net.c_kogyo.returnvisitorv5.activity.Constants.LATITUDE;
@@ -33,7 +34,8 @@ import static net.c_kogyo.returnvisitorv5.activity.Constants.SharedPrefTags.ZOOM
 
 public class MapActivity extends AppCompatActivity
                             implements OnMapReadyCallback,
-                                        GoogleMap.OnMapLongClickListener{
+                                        GoogleMap.OnMapLongClickListener,
+                                        RVData.RVDataStoreCallback{
 
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
 
@@ -41,12 +43,26 @@ public class MapActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // 初期化のために一回ゲットする
+        RVData.getInstance();
+        new RVData.LoadData(this).equals();
+
         setContentView(R.layout.map_activity);
 
         initMapView(savedInstanceState);
         initDialogOverlay();
 
 //        testView();
+
+    }
+
+    @Override
+    public void onDataLoaded() {
+
+    }
+
+    @Override
+    public void onDataSaved() {
 
     }
 

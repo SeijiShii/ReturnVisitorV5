@@ -1,7 +1,6 @@
 package net.c_kogyo.returnvisitorv5.data;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 
 import net.c_kogyo.returnvisitorv5.R;
 
@@ -10,7 +9,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Created by sayjey on 2015/06/18.
@@ -126,6 +124,8 @@ public class Person extends DataItem implements Cloneable{
 
     private ArrayList<String> placeIds;
 
+    public Person(){};
+
     public Person(String placeId) {
         super(PERSON);
         initCommon(placeId);
@@ -145,26 +145,27 @@ public class Person extends DataItem implements Cloneable{
     public Person(JSONObject object) {
         super(object);
         initCommon(null);
+        setJSON(this, object);
 
-        try {
-            if (object.has(SEX))            this.sex         = Sex.valueOf(object.get(SEX).toString());
-            if (object.has(AGE))            this.age         = Age.valueOf(object.get(AGE).toString());
-
-            if (object.has(PLACE_IDS)) {
-                this.placeIds = new ArrayList<>();
-                JSONArray array = object.getJSONArray(PLACE_IDS);
-                for ( int i = 0 ; i < array.length() ; i++ ) {
-                    this.placeIds.add(array.getString(i));
-                }
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            if (object.has(SEX))            this.sex         = Sex.valueOf(object.get(SEX).toString());
+//            if (object.has(AGE))            this.age         = Age.valueOf(object.get(AGE).toString());
+//
+//            if (object.has(PLACE_IDS)) {
+//                this.placeIds = new ArrayList<>();
+//                JSONArray array = object.getJSONArray(PLACE_IDS);
+//                for ( int i = 0 ; i < array.length() ; i++ ) {
+//                    this.placeIds.add(array.getString(i));
+//                }
+//            }
+//
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
     }
 
     public Person(Record record) {
-        this(record.getJSON());
+        this(record.getDataJSON());
     }
 
     public Sex getSex() {
@@ -267,6 +268,25 @@ public class Person extends DataItem implements Cloneable{
 
     public void setPlaceIds(ArrayList<String> placeIds) {
         this.placeIds = placeIds;
+    }
+
+    public static Person setJSON(Person person, JSONObject object) {
+        try {
+            if (object.has(SEX))            person.sex         = Sex.valueOf(object.get(SEX).toString());
+            if (object.has(AGE))            person.age         = Age.valueOf(object.get(AGE).toString());
+
+            if (object.has(PLACE_IDS)) {
+                person.placeIds = new ArrayList<>();
+                JSONArray array = object.getJSONArray(PLACE_IDS);
+                for ( int i = 0 ; i < array.length() ; i++ ) {
+                    person.placeIds.add(array.getString(i));
+                }
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return person;
     }
 
 }

@@ -1,14 +1,12 @@
 package net.c_kogyo.returnvisitorv5.data;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Locale;
 
 
@@ -32,6 +30,8 @@ public class DataItem implements Cloneable{
     protected String idHeader;
     protected boolean isDeleted;
 
+    public DataItem(){}
+
     public DataItem(String idHeader){
 
         this.idHeader = idHeader;
@@ -43,32 +43,34 @@ public class DataItem implements Cloneable{
 
         initCommon();
 
-        try {
-            if (object.has(ID)) {
-                this.id = object.getString(ID);
-            }
+        setJSON(this, object);
 
-            if (object.has(UPDATED_AT)) {
-                this.updatedAt = Calendar.getInstance();
-                this.updatedAt.setTimeInMillis(object.getLong(UPDATED_AT));
-            }
-
-            if (object.has(NAME)) {
-                this.name = object.getString(NAME);
-            }
-
-            if (object.has(NOTE)) {
-                this.note = object.getString(NOTE);
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            if (object.has(ID)) {
+//                this.id = object.getString(ID);
+//            }
+//
+//            if (object.has(UPDATED_AT)) {
+//                this.updatedAt = Calendar.getInstance();
+//                this.updatedAt.setTimeInMillis(object.getLong(UPDATED_AT));
+//            }
+//
+//            if (object.has(NAME)) {
+//                this.name = object.getString(NAME);
+//            }
+//
+//            if (object.has(NOTE)) {
+//                this.note = object.getString(NOTE);
+//            }
+//
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
     }
 
     public DataItem(Record record) {
 
-        this(record.getJSON());
+        this(record.getDataJSON());
 
     }
 
@@ -181,7 +183,34 @@ public class DataItem implements Cloneable{
         this.isDeleted = toDelete;
     }
 
-//    public HashMap<String, Object> toMap() {
+    public static DataItem setJSON(DataItem item, JSONObject object) {
+
+        try {
+            if (object.has(ID)) {
+                item.id = object.getString(ID);
+            }
+
+            if (object.has(UPDATED_AT)) {
+                item.updatedAt = Calendar.getInstance();
+                item.updatedAt.setTimeInMillis(object.getLong(UPDATED_AT));
+            }
+
+            if (object.has(NAME)) {
+                item.name = object.getString(NAME);
+            }
+
+            if (object.has(NOTE)) {
+                item.note = object.getString(NOTE);
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return item;
+    }
+
+
+    //    public HashMap<String, Object> toMap() {
 //
 //        HashMap<String, Object> map = new HashMap<>();
 //

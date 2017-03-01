@@ -67,29 +67,29 @@ public class Visit extends DataItem {
         super(object);
         initCommon();
 
-        try {
-            if (object.has(PLACE_ID)) this.placeId = object.getString(PLACE_ID);
-            if (object.has(DATE_TIME)) this.datetime.setTimeInMillis(object.getLong(DATE_TIME));
-            if (object.has(PLACEMENTS)) {
-                JSONArray array = object.getJSONArray(PLACEMENTS);
-                for ( int i = 0 ; i < array.length() ; i++ ) {
-                    this.placements.add(new Placement(array.getJSONObject(i)));
-                }
-            }
-            if (object.has(VISIT_DETAILS)) {
-                JSONArray array = object.getJSONArray(VISIT_DETAILS);
-                for ( int i = 0 ; i < array.length() ; i++ ) {
-                    this.visitDetails.add(new VisitDetail(array.getJSONObject(i)));
-                }
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            if (object.has(PLACE_ID)) this.placeId = object.getString(PLACE_ID);
+//            if (object.has(DATE_TIME)) this.datetime.setTimeInMillis(object.getLong(DATE_TIME));
+//            if (object.has(PLACEMENTS)) {
+//                JSONArray array = object.getJSONArray(PLACEMENTS);
+//                for ( int i = 0 ; i < array.length() ; i++ ) {
+//                    this.placements.add(new Placement(array.getJSONObject(i)));
+//                }
+//            }
+//            if (object.has(VISIT_DETAILS)) {
+//                JSONArray array = object.getJSONArray(VISIT_DETAILS);
+//                for ( int i = 0 ; i < array.length() ; i++ ) {
+//                    this.visitDetails.add(new VisitDetail(array.getJSONObject(i)));
+//                }
+//            }
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
 
     }
 
     public Visit(Record record) {
-        this(record.getJSON());
+        this(record.getDataJSON());
     }
 
     private void initCommon() {
@@ -151,6 +151,29 @@ public class Visit extends DataItem {
             }
         }
         return count;
+    }
+
+    public static Visit setJSON(Visit visit, JSONObject object) {
+
+        try {
+            if (object.has(PLACE_ID)) visit.placeId = object.getString(PLACE_ID);
+            if (object.has(DATE_TIME)) visit.datetime.setTimeInMillis(object.getLong(DATE_TIME));
+            if (object.has(PLACEMENTS)) {
+                JSONArray array = object.getJSONArray(PLACEMENTS);
+                for ( int i = 0 ; i < array.length() ; i++ ) {
+                    visit.placements.add(new Placement(array.getJSONObject(i)));
+                }
+            }
+            if (object.has(VISIT_DETAILS)) {
+                JSONArray array = object.getJSONArray(VISIT_DETAILS);
+                for ( int i = 0 ; i < array.length() ; i++ ) {
+                    visit.visitDetails.add(new VisitDetail(array.getJSONObject(i)));
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return visit;
     }
 
 }
