@@ -36,7 +36,7 @@ public class VisitDetailView extends BaseAnimateView {
     private VisitDetail mVisitDetail;
     private Person mPerson;
 
-    private int mExHeight;
+    private int mExHeight, fixedHeight, noteLineHeight;
 
     public VisitDetailView(Context context,
                            VisitDetail visitDetail,
@@ -70,9 +70,13 @@ public class VisitDetailView extends BaseAnimateView {
         // TODO: exHeightをセットする
 
         int rowHeight = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small);
-        int fixHeight = rowHeight * 10;
+        int padding = getContext().getResources().getDimensionPixelSize(R.dimen.padding_normal);
+        fixedHeight = rowHeight * 10 + padding * 2;
 
-        mExHeight = fixHeight + 200;
+        noteLineHeight = (int) (noteText.getPaint().getFontMetrics().bottom - noteText.getPaint().getFontMetrics().top);
+
+        mExHeight = fixedHeight + noteLineHeight;
+
         this.setExHeight(mExHeight);
 
     }
@@ -229,6 +233,10 @@ public class VisitDetailView extends BaseAnimateView {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                mExHeight = noteLineHeight * noteText.getLineCount();
+                VisitDetailView.this.setExHeight(fixedHeight + mExHeight);
+                VisitDetailView.this.changeViewHeight(AnimateCondition.TO_EX_HEIGHT, true, null, null);
 
             }
 

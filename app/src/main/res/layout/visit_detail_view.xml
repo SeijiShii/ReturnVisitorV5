@@ -150,10 +150,10 @@
     <AutoCompleteTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="@dimen/ui_height_small"
+        android:minLines="1"
         android:background="@drawable/gray_trans_circle"
         android:textColor="@color/textColorGray"
-        android:textSize="@dimen/in_frame_text_size"
+        android:textSize="@dimen/text_size_middle"
         android:gravity="left|top"
         android:layout_margin="@dimen/ui_margin_normal"
         android:id="@+id/note_text"/>
