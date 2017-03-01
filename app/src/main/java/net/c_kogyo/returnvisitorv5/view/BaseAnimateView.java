@@ -24,10 +24,12 @@ public class BaseAnimateView extends FrameLayout {
     int mExHeight;
     int mResId;
     InitialHeightCondition mInitCondition;
+    float multi;
 
     public enum InitialHeightCondition{
         ZERO(0),
-        EX_HEIGHT(1);
+        EX_HEIGHT(1),
+        EXTRACT_POST_DRAWN(2);
 
         private final int num;
 
@@ -85,13 +87,18 @@ public class BaseAnimateView extends FrameLayout {
 
         view = LayoutInflater.from(getContext()).inflate(mResId, this);
 
+        multi = getContext().getResources().getDisplayMetrics().density / 3;
+
         switch (mInitCondition) {
             case ZERO:
                 this.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0));
-                extractPostDrawn();
                 break;
             case EX_HEIGHT:
                 this.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, mExHeight));
+                break;
+            case EXTRACT_POST_DRAWN:
+                this.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0));
+                extractPostDrawn();
                 break;
         }
 
@@ -106,7 +113,7 @@ public class BaseAnimateView extends FrameLayout {
         super.dispatchDraw(canvas);
     }
 
-    private void extractPostDrawn() {
+    public void extractPostDrawn() {
 
         final Handler handler = new Handler();
 
@@ -199,7 +206,7 @@ public class BaseAnimateView extends FrameLayout {
                 }
             });
 
-            int duration = Math.abs(targetHeight - originHeight) * 3;
+            int duration =  (int) (Math.abs(targetHeight - originHeight) * multi);
             animator.setDuration(duration);
 
             if (animatorListener != null) animator.addListener(animatorListener);
@@ -213,6 +220,6 @@ public class BaseAnimateView extends FrameLayout {
     }
 
     public void setExHeight(int exHeight) {
-        this.mExHeight = mExHeight;
+        this.mExHeight = exHeight;
     }
 }

@@ -131,6 +131,9 @@ public class RVData {
 
         private JSONObject stringToJson(String string) {
 
+            if (string.equals("") || string.length() <= 0)
+                return null;
+
             try {
                 return new JSONObject(string);
             } catch (JSONException e) {
@@ -140,6 +143,8 @@ public class RVData {
         }
 
         private void jsonToData(JSONObject object) {
+
+            if (object == null) return;
 
             try {
 

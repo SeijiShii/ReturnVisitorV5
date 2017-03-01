@@ -35,8 +35,14 @@ public class VisitDetailView extends BaseAnimateView {
 
     private VisitDetail mVisitDetail;
     private Person mPerson;
-    public VisitDetailView(Context context, VisitDetail visitDetail, Person person, InitialHeightCondition condition) {
-        super(context, 1300, condition, R.layout.visit_detail_view);
+
+    private int mExHeight;
+
+    public VisitDetailView(Context context,
+                           VisitDetail visitDetail,
+                           Person person,
+                           InitialHeightCondition condition) {
+        super(context, 0, condition, R.layout.visit_detail_view);
         mVisitDetail = visitDetail;
         mPerson = person;
 
@@ -63,6 +69,11 @@ public class VisitDetailView extends BaseAnimateView {
 
         // TODO: exHeightをセットする
 
+        int rowHeight = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small);
+        int fixHeight = rowHeight * 10;
+
+        mExHeight = fixHeight + 200;
+        this.setExHeight(mExHeight);
 
     }
 

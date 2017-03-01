@@ -330,7 +330,11 @@ public class RecordVisitActivity extends AppCompatActivity {
     }
 
     private void addVisitDetailView(VisitDetail visitDetail, Person person){
-        VisitDetailView detailView = new VisitDetailView(this, visitDetail, person, BaseAnimateView.InitialHeightCondition.ZERO);
+        VisitDetailView detailView
+                = new VisitDetailView(this,
+                                visitDetail,
+                                person,
+                                BaseAnimateView.InitialHeightCondition.EXTRACT_POST_DRAWN);
         visitDetailFrame.addView(detailView);
     }
 

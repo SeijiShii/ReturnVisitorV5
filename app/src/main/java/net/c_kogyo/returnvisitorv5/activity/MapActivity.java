@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -44,8 +45,7 @@ public class MapActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
 
         // 初期化のために一回ゲットする
-        RVData.getInstance();
-        new RVData.LoadData(this).equals();
+        RVData.getInstance().loadData(this);
 
         setContentView(R.layout.map_activity);
 
@@ -56,9 +56,10 @@ public class MapActivity extends AppCompatActivity
 
     }
 
+    private boolean isDataLoaded = false;
     @Override
     public void onDataLoaded() {
-
+        isDataLoaded = true;
     }
 
     @Override
@@ -125,8 +126,37 @@ public class MapActivity extends AppCompatActivity
 
         loadCameraPosition();
 
-        mMap.setOnMapLongClickListener(this);
+        initDataOnMap();
+    }
+    
+    private void initDataOnMap() {
+        
+        final Handler handler = new Handler();
+        
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                
+                while (!isDataLoaded) {
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        //
+                    }
+                }
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
 
+                        mMap.setOnMapLongClickListener(MapActivity.this);
+
+                        // TODO: 2017/03/01 ここにマーカー描画処理を記述する
+                    }
+                });
+                
+            }
+        }).start();
+        
     }
 
     @Override
