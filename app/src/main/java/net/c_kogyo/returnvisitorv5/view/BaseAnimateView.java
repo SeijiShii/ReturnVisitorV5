@@ -28,8 +28,8 @@ public class BaseAnimateView extends FrameLayout {
 
     public enum InitialHeightCondition{
         ZERO(0),
-        EX_HEIGHT(1),
-        EXTRACT_POST_DRAWN(2);
+        EX_HEIGHT(1);
+//        EXTRACT_POST_DRAWN(2);
 
         private final int num;
 
@@ -96,10 +96,10 @@ public class BaseAnimateView extends FrameLayout {
             case EX_HEIGHT:
                 this.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, mExHeight));
                 break;
-            case EXTRACT_POST_DRAWN:
-                this.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0));
-                extractPostDrawn();
-                break;
+//            case EXTRACT_POST_DRAWN:
+//                this.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0));
+//                extractPostDrawn();
+//                break;
         }
 
     }

@@ -12,8 +12,9 @@ public class NoteCompItem extends DataItem {
 
     public static final String NOTE_COMP_ITEM = "note_comp_item";
 
-    public NoteCompItem() {
+    public NoteCompItem(String name) {
         super(NOTE_COMP_ITEM);
+        this.name = name;
     }
 
     public NoteCompItem(Record record) {

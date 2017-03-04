@@ -25,18 +25,20 @@ import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
 
+import java.util.ArrayList;
+
 import static net.c_kogyo.returnvisitorv5.activity.Constants.buttonRes;
 
 /**
  * Created by SeijiShii on 2017/02/27.
  */
 
-public class VisitDetailView extends BaseAnimateView {
+public class VisitDetailView extends BaseAnimateView implements TagFrame.OnSetHeightCallback{
 
     private VisitDetail mVisitDetail;
     private Person mPerson;
 
-    private int mExHeight, fixedHeight, noteLineHeight;
+    private int mExHeight, fixedHeight, noteLineHeight, mTagFrameHeight;
 
     public VisitDetailView(Context context,
                            VisitDetail visitDetail,
@@ -61,6 +63,7 @@ public class VisitDetailView extends BaseAnimateView {
         initEditPersonButton();
         initPlacementButton();
         initTagButton();
+        initTagFrame();
         initPriorityText();
         initPriorityFrame();
         initNoteText();
@@ -69,15 +72,9 @@ public class VisitDetailView extends BaseAnimateView {
 
         // TODO: exHeightをセットする
 
-        int rowHeight = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small);
-        int padding = getContext().getResources().getDimensionPixelSize(R.dimen.padding_normal);
-        fixedHeight = rowHeight * 10 + padding * 2;
 
-        noteLineHeight = (int) (noteText.getPaint().getFontMetrics().bottom - noteText.getPaint().getFontMetrics().top);
 
-        mExHeight = fixedHeight + noteLineHeight;
-
-        this.setExHeight(mExHeight);
+        // 高さをセットするのはコールバックに譲る
 
     }
 
@@ -235,7 +232,7 @@ public class VisitDetailView extends BaseAnimateView {
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
                 mExHeight = noteLineHeight * noteText.getLineCount();
-                VisitDetailView.this.setExHeight(fixedHeight + mExHeight);
+                VisitDetailView.this.setExHeight(fixedHeight + mExHeight + mTagFrameHeight);
                 VisitDetailView.this.changeViewHeight(AnimateCondition.TO_EX_HEIGHT, true, null, null);
 
             }
@@ -268,5 +265,31 @@ public class VisitDetailView extends BaseAnimateView {
             }
         });
     }
-    
+
+    private TagFrame tagFrame;
+    private void initTagFrame() {
+
+        tagFrame = (TagFrame) getViewById(R.id.tag_frame);
+        tagFrame.setTagIdsAndInitialize(new ArrayList<String>(), null, this);
+    }
+
+    @Override
+    public void onSetHeight(int frameHeight) {
+
+        mTagFrameHeight = frameHeight;
+
+        // タグフレームの高さが渡されたらビュー全体の高さを設定しアニメーションする。
+        int rowHeight = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small);
+        int padding = getContext().getResources().getDimensionPixelSize(R.dimen.padding_normal);
+        fixedHeight = rowHeight * 10 + padding * 2;
+
+        noteLineHeight = (int) (noteText.getPaint().getFontMetrics().bottom - noteText.getPaint().getFontMetrics().top);
+
+        mExHeight = fixedHeight + noteLineHeight + mTagFrameHeight;
+
+        this.setExHeight(mExHeight);
+        this.changeViewHeight(AnimateCondition.FROM_0_TO_EX_HEIGHT, true, null, null);
+    }
+
+
 }

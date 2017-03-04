@@ -11,6 +11,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
@@ -25,6 +26,9 @@ import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.DataItem;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.view.SmallTagView;
+import net.c_kogyo.returnvisitorv5.view.TagFrame;
+
+import java.util.ArrayList;
 
 import static net.c_kogyo.returnvisitorv5.activity.Constants.LATITUDE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.LONGITUDE;
@@ -311,6 +315,12 @@ public class MapActivity extends AppCompatActivity
     private RelativeLayout dialogOverlay;
     private void initDialogOverlay() {
         dialogOverlay = (RelativeLayout) findViewById(R.id.dialog_overlay);
+        dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                return true;
+            }
+        });
 
         initDialogFrame();
     }
@@ -325,11 +335,6 @@ public class MapActivity extends AppCompatActivity
 
         dialogOverlay.setVisibility(View.VISIBLE);
 
-        DataItem tag = new DataItem("TAG");
-        tag.setName("Very Kind");
-        SmallTagView smallTag = new SmallTagView(this, tag);
-
-        dialogFrame.addView(smallTag);
 
     }
 

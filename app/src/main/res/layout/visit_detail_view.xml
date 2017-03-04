@@ -116,6 +116,11 @@
             android:layout_margin="@dimen/ui_margin_normal"/>
     </RelativeLayout>
 
+    <net.c_kogyo.returnvisitorv5.view.TagFrame
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tag_frame"/>
+
     <!-- Priority -->
 
     <TextView

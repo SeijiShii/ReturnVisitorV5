@@ -9,8 +9,9 @@ import org.json.JSONObject;
 public class Tag extends DataItem {
 
     public static final String TAG = "tag";
-    public Tag() {
+    public Tag(String name) {
         super(TAG);
+        this.name = name;
     }
 
     public Tag(Record record) {

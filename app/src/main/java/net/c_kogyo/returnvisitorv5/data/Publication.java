@@ -9,8 +9,9 @@ import org.json.JSONObject;
 public class Publication extends DataItem {
 
     public static final String PUBLICATION = "publication";
-    public Publication() {
+    public Publication(String name) {
         super(PUBLICATION);
+        this.name = name;
     }
 
     public Publication(Record record) {
