@@ -1,5 +1,7 @@
 package net.c_kogyo.returnvisitorv5.view;
 
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -57,6 +59,8 @@ public class VisitDetailView extends BaseAnimateView implements TagFrame.OnSetHe
 
     private void initCommon() {
 
+        isViewOpen = true;
+
         initDataText();
         initOpenCloseButton();
         initSeenSwitch();
@@ -70,10 +74,7 @@ public class VisitDetailView extends BaseAnimateView implements TagFrame.OnSetHe
         initRVSwitch();
         initStudySwitch();
 
-        // TODO: exHeightをセットする
-
-
-
+        // exHeightをセットする DONE
         // 高さをセットするのはコールバックに譲る
 
     }
@@ -85,14 +86,46 @@ public class VisitDetailView extends BaseAnimateView implements TagFrame.OnSetHe
     }
 
     private Button openCloseButton;
+    private boolean isViewOpen;
     private void initOpenCloseButton() {
         openCloseButton = (Button) getViewById(R.id.open_close_button);
         openCloseButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 // TODO: 2017/02/27 開閉アニメーション
+                if (isViewOpen) {
+
+                    int padding = (int) (getContext().getResources().getDisplayMetrics().density * 5);
+                    int targetHeight = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small)
+                            + padding;
+                    VisitDetailView.this.changeViewHeight(AnimateCondition.TO_TARGET_HEIGHT, targetHeight, true, null, null);
+
+                } else {
+                    VisitDetailView.this.changeViewHeight(AnimateCondition.TO_EX_HEIGHT, 0, true, null, null);
+                }
+
+                rotateOpenCloseButton();
+
+                isViewOpen = !isViewOpen;
             }
         });
+    }
+
+    private void rotateOpenCloseButton() {
+
+        float originAngle, targetAngle;
+
+        if (isViewOpen) {
+            originAngle = 0f;
+            targetAngle = 180f;
+        } else {
+            originAngle = 180f;
+            targetAngle = 0f;
+        }
+
+        ObjectAnimator animator = ObjectAnimator.ofFloat(openCloseButton, "rotation", originAngle, targetAngle);
+        animator.setDuration(300);
+        animator.start();
     }
     
     private SwitchCompat seenSwitch;
@@ -233,7 +266,7 @@ public class VisitDetailView extends BaseAnimateView implements TagFrame.OnSetHe
 
                 mExHeight = noteLineHeight * noteText.getLineCount();
                 VisitDetailView.this.setExHeight(fixedHeight + mExHeight + mTagFrameHeight);
-                VisitDetailView.this.changeViewHeight(AnimateCondition.TO_EX_HEIGHT, true, null, null);
+                VisitDetailView.this.changeViewHeight(AnimateCondition.TO_EX_HEIGHT, 0, true, null, null);
 
             }
 
@@ -288,7 +321,7 @@ public class VisitDetailView extends BaseAnimateView implements TagFrame.OnSetHe
         mExHeight = fixedHeight + noteLineHeight + mTagFrameHeight;
 
         this.setExHeight(mExHeight);
-        this.changeViewHeight(AnimateCondition.FROM_0_TO_EX_HEIGHT, true, null, null);
+        this.changeViewHeight(AnimateCondition.FROM_0_TO_EX_HEIGHT, 0, true, null, null);
     }
 
 

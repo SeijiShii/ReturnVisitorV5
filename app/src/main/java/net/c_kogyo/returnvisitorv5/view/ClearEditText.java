@@ -47,7 +47,7 @@ public class ClearEditText extends BaseAnimateView{
             @Override
             public void onClick(View view) {
                 editText.setText("");
-                ClearEditText.this.changeViewHeight(AnimateCondition.FROM_EX_HEIGHT_TO_ZERO, true, null, null);
+                ClearEditText.this.changeViewHeight(AnimateCondition.FROM_EX_HEIGHT_TO_ZERO, 0, true, null, null);
             }
         });
     }

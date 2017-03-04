@@ -88,7 +88,7 @@ public class RecordVisitActivity extends AppCompatActivity {
         addressText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                placeNameText.changeViewHeight(BaseAnimateView.AnimateCondition.FROM_0_TO_EX_HEIGHT, true, null, null);
+                placeNameText.changeViewHeight(BaseAnimateView.AnimateCondition.FROM_0_TO_EX_HEIGHT, 0, true, null, null);
             }
         });
     }

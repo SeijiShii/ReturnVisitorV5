@@ -53,7 +53,8 @@ public class BaseAnimateView extends FrameLayout {
     public enum AnimateCondition {
         FROM_0_TO_EX_HEIGHT,
         FROM_EX_HEIGHT_TO_ZERO,
-        TO_EX_HEIGHT
+        TO_EX_HEIGHT,
+        TO_TARGET_HEIGHT
     }
 
     public BaseAnimateView(Context context, int exHeight, InitialHeightCondition initCondition, int resId) {
@@ -131,7 +132,7 @@ public class BaseAnimateView extends FrameLayout {
                     @Override
                     public void run() {
 
-                        changeViewHeight(AnimateCondition.FROM_0_TO_EX_HEIGHT, true, null, null);
+                        changeViewHeight(AnimateCondition.FROM_0_TO_EX_HEIGHT, 0, true, null, null);
                     }
                 });
             }
@@ -169,33 +170,38 @@ public class BaseAnimateView extends FrameLayout {
     }
 
     public void changeViewHeight(AnimateCondition condition,
+                                 int targetHeight,
                                  boolean toAnimate,
                                  final HeightUpdateListener heightUpdateListener,
                                  Animator.AnimatorListener animatorListener) {
         int originHeight = 0;
-        int targetHeight = 0;
+        int mTargetHeight = 0;
 
         switch (condition) {
             case FROM_0_TO_EX_HEIGHT:
                 originHeight = 0;
-                targetHeight = mExHeight;
+                mTargetHeight = mExHeight;
                 break;
             case FROM_EX_HEIGHT_TO_ZERO:
                 originHeight = mExHeight;
-                targetHeight = 0;
+                mTargetHeight = 0;
                 break;
             case TO_EX_HEIGHT:
                 originHeight = getMeasuredHeight();
-                targetHeight = mExHeight;
+                mTargetHeight = mExHeight;
+                break;
+            case TO_TARGET_HEIGHT:
+                originHeight = getMeasuredHeight();
+                mTargetHeight = targetHeight;
                 break;
         }
 
         if (!toAnimate) {
-            BaseAnimateView.this.getLayoutParams().height = targetHeight;
+            BaseAnimateView.this.getLayoutParams().height = mTargetHeight;
             BaseAnimateView.this.requestLayout();
         } else {
 
-            ValueAnimator animator = ValueAnimator.ofInt(originHeight, targetHeight);
+            ValueAnimator animator = ValueAnimator.ofInt(originHeight, mTargetHeight);
             animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator animation) {
@@ -206,7 +212,7 @@ public class BaseAnimateView extends FrameLayout {
                 }
             });
 
-            int duration =  (int) (Math.abs(targetHeight - originHeight) * multi);
+            int duration =  (int) (Math.abs(mTargetHeight - originHeight) * multi);
             animator.setDuration(duration);
 
             if (animatorListener != null) animator.addListener(animatorListener);
