@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.os.Environment;
 
 import net.c_kogyo.returnvisitorv5.data.list.DataList;
+import net.c_kogyo.returnvisitorv5.data.list.VisitList;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,7 +33,7 @@ public class RVData {
 
     private DataList<Place> placeList;
     private DataList<Person> personList;
-    private DataList<Visit> visitList;
+    private VisitList visitList;
     private DataList<Tag> tagList;
     private DataList<NoteCompItem> noteCompList;
     private DataList<Publication> pubList;
@@ -42,7 +43,7 @@ public class RVData {
 
         placeList = new DataList<>();
         personList = new DataList<>();
-        visitList = new DataList<>();
+        visitList = new VisitList();
 
         tagList = new DataList<>();
         noteCompList = new DataList<>();
@@ -60,7 +61,7 @@ public class RVData {
         return placeList;
     }
 
-    public DataList<Visit> getVisitList() {
+    public VisitList getVisitList() {
         return visitList;
     }
 

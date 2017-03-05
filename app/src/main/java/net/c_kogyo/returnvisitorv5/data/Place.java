@@ -165,7 +165,13 @@ public class Place extends DataItem {
     }
     
     public Visit.Priority getPriority() {
-        return Visit.Priority.NOT_HOME;
-        // TODO: 2017/03/05 実際のpriority処理を記述 
+        
+        Visit visit = RVData.getInstance().getVisitList().getLatestVisitToPlace(this.id);
+
+        if (visit == null) return Visit.Priority.NOT_HOME;
+
+        return visit.getPriority();
+
+        // DONE: 2017/03/05 実際のpriority処理を記述
     }
 }

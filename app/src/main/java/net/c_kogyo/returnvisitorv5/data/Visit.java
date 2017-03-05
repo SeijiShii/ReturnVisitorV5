@@ -179,4 +179,9 @@ public class Visit extends DataItem {
     public Calendar getDatetime() {
         return datetime;
     }
+    
+    public Priority getPriority() {
+        return Priority.NOT_HOME;
+        // // TODO: 2017/03/05 VisitDetailからpriorityを抽出して 
+    }
 }
