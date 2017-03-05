@@ -176,4 +176,7 @@ public class Visit extends DataItem {
         return visit;
     }
 
+    public Calendar getDatetime() {
+        return datetime;
+    }
 }

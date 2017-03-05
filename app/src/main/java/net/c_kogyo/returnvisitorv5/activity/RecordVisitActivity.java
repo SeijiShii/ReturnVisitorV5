@@ -3,6 +3,8 @@ package net.c_kogyo.returnvisitorv5.activity;
 import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -15,10 +17,12 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -29,11 +33,14 @@ import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
 import net.c_kogyo.returnvisitorv5.dialogcontents.PersonDialog;
 import net.c_kogyo.returnvisitorv5.service.FetchAddressIntentService;
+import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 import net.c_kogyo.returnvisitorv5.view.BaseAnimateView;
 import net.c_kogyo.returnvisitorv5.view.ClearEditText;
 import net.c_kogyo.returnvisitorv5.view.VisitDetailView;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  * Created by SeijiShii on 2017/02/16.
@@ -55,6 +62,8 @@ public class RecordVisitActivity extends AppCompatActivity {
 
         initAddressText();
         initPlaceNameText();
+        initDateText();
+        initTimeText();
         initTwoButtonsFrame();
         initAddPersonButton();
         initVisitDetailFrame();
@@ -97,6 +106,57 @@ public class RecordVisitActivity extends AppCompatActivity {
     private ClearEditText placeNameText;
     private void initPlaceNameText() {
         placeNameText = (ClearEditText) findViewById(R.id.place_name_text_view);
+    }
+
+    private TextView dateText;
+    private void initDateText() {
+        dateText = (TextView) findViewById(R.id.date_text_view);
+
+        final DateFormat format = android.text.format.DateFormat.getMediumDateFormat(this);
+        dateText.setText(format.format(mVisit.getDatetime().getTime()));
+        dateText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new DatePickerDialog(RecordVisitActivity.this,
+                        new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
+                                mVisit.getDatetime().set(Calendar.YEAR, i);
+                                mVisit.getDatetime().set(Calendar.MONTH, i1);
+                                mVisit.getDatetime().set(Calendar.DAY_OF_MONTH, i2);
+
+                                dateText.setText(format.format(mVisit.getDatetime().getTime()));
+                            }
+                        },
+                        mVisit.getDatetime().get(Calendar.YEAR),
+                        mVisit.getDatetime().get(Calendar.MONTH),
+                        mVisit.getDatetime().get(Calendar.DAY_OF_MONTH)).show();
+            }
+        });
+    }
+
+    private TextView timeText;
+    private void initTimeText() {
+        timeText = (TextView) findViewById(R.id.time_text_view);
+        timeText.setText(DateTimeText.getTimeText(mVisit.getDatetime()));
+        timeText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new TimePickerDialog(RecordVisitActivity.this,
+                        new TimePickerDialog.OnTimeSetListener() {
+                            @Override
+                            public void onTimeSet(TimePicker timePicker, int i, int i1) {
+                                mVisit.getDatetime().set(Calendar.HOUR_OF_DAY, i);
+                                mVisit.getDatetime().set(Calendar.MINUTE, i1);
+
+                                timeText.setText(DateTimeText.getTimeText(mVisit.getDatetime()));
+                            }
+                        },
+                        mVisit.getDatetime().get(Calendar.HOUR_OF_DAY),
+                        mVisit.getDatetime().get(Calendar.MINUTE),
+                        true).show();
+            }
+        });
     }
 
     private RelativeLayout twoButtonsFrame;
