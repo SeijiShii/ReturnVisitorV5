@@ -20,11 +20,16 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.DataItem;
+import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.RVData;
+import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.view.SmallTagView;
 import net.c_kogyo.returnvisitorv5.view.TagFrame;
 
@@ -34,6 +39,7 @@ import static net.c_kogyo.returnvisitorv5.activity.Constants.LATITUDE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.LONGITUDE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_PLACE_ACTION;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_VISIT_REQUEST_CODE;
+import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.VISIT_ADDED_RESULT_CODE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.SharedPrefTags.ZOOM_LEVEL;
 
@@ -127,6 +133,7 @@ public class MapActivity extends AppCompatActivity
 
         // xmlでの指定の方法が分からん
         mMap.setPadding(0, 40, 0, 0);
+        mMap.getUiSettings().setMapToolbarEnabled(false);
 
         loadCameraPosition();
 
@@ -155,6 +162,7 @@ public class MapActivity extends AppCompatActivity
                         mMap.setOnMapLongClickListener(MapActivity.this);
 
                         // TODO: 2017/03/01 ここにマーカー描画処理を記述する
+                        drawAllMarkers();
                     }
                 });
                 
@@ -330,6 +338,46 @@ public class MapActivity extends AppCompatActivity
         dialogFrame = (FrameLayout) findViewById(R.id.dialog_frame);
     }
 
+    private void drawAllMarkers() {
+        mMap.clear();
+        for (Place place : RVData.getInstance().getPlaceList()) {
+
+            addMarker(place);
+
+        }
+    }
+
+    private void addMarker(Place place) {
+        MarkerOptions options = new MarkerOptions()
+                .icon(BitmapDescriptorFactory.fromResource(Constants.markerRes[place.getPriority().num()]))
+                .position(place.getLatLng());
+
+        Marker marker = mMap.addMarker(options);
+        place.setMarkerId(marker.getId());
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case Constants.RecordVisitActions.NEW_VISIT_REQUEST_CODE:
+                if (resultCode == VISIT_ADDED_RESULT_CODE) {
+                    String visitId = data.getStringExtra(Visit.VISIT);
+                    if (visitId != null) {
+                        Visit visit = RVData.getInstance().getVisitList().getById(visitId);
+                        if (visit != null) {
+                            String placeId = visit.getPlaceId();
+                            Place place = RVData.getInstance().getPlaceList().getById(placeId);
+                            if (place != null) {
+                                addMarker(place);
+                            }
+                        }
+                    }
+                }
+                break;
+        }
+    }
 
     private void testView() {
 

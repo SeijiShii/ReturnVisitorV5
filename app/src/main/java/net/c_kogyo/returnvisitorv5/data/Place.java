@@ -163,4 +163,9 @@ public class Place extends DataItem {
         }
         return place;
     }
+    
+    public Visit.Priority getPriority() {
+        return Visit.Priority.NOT_HOME;
+        // TODO: 2017/03/05 実際のpriority処理を記述 
+    }
 }

@@ -29,6 +29,7 @@ import com.google.android.gms.maps.model.LatLng;
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Place;
+import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
 import net.c_kogyo.returnvisitorv5.dialogcontents.PersonDialog;
@@ -68,7 +69,9 @@ public class RecordVisitActivity extends AppCompatActivity {
         initAddPersonButton();
         initVisitDetailFrame();
         initDialogOverlay();
+        initOkButton();
         initCancelButton();
+        initDeleteButton();
         initBroadcastManager();
         inquireAddress();
     }
@@ -171,6 +174,7 @@ public class RecordVisitActivity extends AppCompatActivity {
         });
 
         initVisitDetailButton();
+        initNotHomeButton();
     }
 
     private Button visitDetailButton;
@@ -182,6 +186,26 @@ public class RecordVisitActivity extends AppCompatActivity {
                 fadeOutTwoButtonsFrame();
             }
         });
+    }
+
+    private Button notHomeButton;
+    private void initNotHomeButton() {
+        notHomeButton = (Button) findViewById(R.id.record_not_home_button);
+        notHomeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                recordAsNotHome();
+            }
+        });
+    }
+
+    private void recordAsNotHome() {
+        RVData.getInstance().getVisitList().add(mVisit);
+        RVData.getInstance().getPlaceList().add(mPlace);
+        Intent intent = new Intent();
+        intent.putExtra(Visit.VISIT, mVisit.getId());
+        setResult(Constants.RecordVisitActions.VISIT_ADDED_RESULT_CODE, intent);
+        finish();
     }
 
     private void fadeOutTwoButtonsFrame() {
@@ -356,17 +380,6 @@ public class RecordVisitActivity extends AppCompatActivity {
         void onFinishAnimation();
     }
 
-    private Button cancelButton;
-    private void initCancelButton(){
-        cancelButton = (Button) findViewById(R.id.cancel_button);
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
-    }
-
     BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -423,6 +436,64 @@ public class RecordVisitActivity extends AppCompatActivity {
             inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
+
+    private Button okButton;
+    private void initOkButton() {
+
+        okButton = (Button) findViewById(R.id.ok_button);
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                RVData.getInstance().getVisitList().add(mVisit);
+
+                switch (getIntent().getAction()) {
+                    case Constants.RecordVisitActions.NEW_PLACE_ACTION:
+
+                        RVData.getInstance().getPlaceList().add(mPlace);
+
+                        Intent intent = new Intent();
+                        intent.putExtra(Visit.VISIT, mVisit.getId());
+                        setResult(Constants.RecordVisitActions.VISIT_ADDED_RESULT_CODE, intent);
+
+                        break;
+                }
+                finish();
+
+            }
+        });
+    }
+
+    private Button cancelButton;
+    private void initCancelButton(){
+        cancelButton = (Button) findViewById(R.id.cancel_button);
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+    }
+
+    private Button deleteButton;
+    private void initDeleteButton() {
+        deleteButton = (Button) findViewById(R.id.delete_button);
+        if (RVData.getInstance().getVisitList().contains(mVisit)) {
+            deleteButton.setVisibility(View.VISIBLE);
+            deleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                }
+            });
+        } else {
+            deleteButton.setVisibility(View.INVISIBLE);
+        }
+    }
+
+
+
+
 
 
 }
