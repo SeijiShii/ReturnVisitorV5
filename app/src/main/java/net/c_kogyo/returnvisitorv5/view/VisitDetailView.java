@@ -92,7 +92,7 @@ public class VisitDetailView extends BaseAnimateView implements TagFrame.OnSetHe
         openCloseButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: 2017/02/27 開閉アニメーション
+                // 開閉アニメーション DONE
                 if (isViewOpen) {
 
                     int padding = (int) (getContext().getResources().getDisplayMetrics().density * 5);
@@ -143,10 +143,15 @@ public class VisitDetailView extends BaseAnimateView implements TagFrame.OnSetHe
                 } else {
                     seenText.setText(R.string.not_seen);
                     seenText.setTextColor(getContext().getResources().getColor(R.color.textHintGray));
-
                 }
             }
         });
+//        seenText.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                seenSwitch.;
+//            }
+//        });
     }
 
     private Button editPersonButton;
@@ -246,7 +251,7 @@ public class VisitDetailView extends BaseAnimateView implements TagFrame.OnSetHe
     private TextView priorityText;
     private void initPriorityText() {
         priorityText = (TextView) getViewById(R.id.priority_state_text);
-        // TODO: 2017/02/27 priorityText 
+        // DONE priorityText
     }
 
     private AutoCompleteTextView noteText;

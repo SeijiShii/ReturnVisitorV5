@@ -31,12 +31,14 @@ public class PersonDialog extends FrameLayout {
 
     private Person mPerson;
     private OnPersonEditFinishListener mListener;
+    private boolean isPersonEdited;
 
     public PersonDialog(Context context, Person person, OnPersonEditFinishListener listener) {
         super(context);
 
         mPerson = person;
         mListener = listener;
+        isPersonEdited = false;
 
         initCommon();
     }
@@ -68,6 +70,24 @@ public class PersonDialog extends FrameLayout {
         if (mPerson.getName() != null || !mPerson.getName().equals("")){
             nameText.setText(mPerson.getName());
         }
+
+        nameText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                isPersonEdited = true;
+                renewOkButton();
+            }
+        });
     }
 
     private RadioButton maleButton, femaleButton;
@@ -91,7 +111,10 @@ public class PersonDialog extends FrameLayout {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 if (b) {
+                    mPerson.setSex(Person.Sex.MALE);
                     femaleButton.setChecked(false);
+                    isPersonEdited = true;
+                    renewOkButton();
                 }
             }
         });
@@ -100,7 +123,10 @@ public class PersonDialog extends FrameLayout {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 if (b) {
+                    mPerson.setSex(Person.Sex.FEMALE);
                     maleButton.setChecked(false);
+                    isPersonEdited = true;
+                    renewOkButton();
                 }
             }
         });
@@ -109,6 +135,8 @@ public class PersonDialog extends FrameLayout {
 
     private AppCompatSpinner ageSpinner;
     private void initAgeSpinner() {
+
+        final Person.Age oldAge = mPerson.getAge();
 
         ageSpinner = (AppCompatSpinner) findViewById(R.id.age_spinner);
 
@@ -122,6 +150,11 @@ public class PersonDialog extends FrameLayout {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 mPerson.setAge(Person.Age.getEnum(i));
+
+                if (Person.Age.getEnum(i) != oldAge) {
+                    isPersonEdited = true;
+                    renewOkButton();
+                }
             }
 
             @Override
@@ -155,13 +188,19 @@ public class PersonDialog extends FrameLayout {
             public void afterTextChanged(Editable editable) {
 
                 mPerson.setNote(editable.toString());
+                isPersonEdited = true;
+                renewOkButton();
             }
         });
     }
 
+    private Button okButton;
     private void initOkButton() {
 
-        Button okButton = (Button) findViewById(R.id.ok_button);
+        okButton = (Button) findViewById(R.id.ok_button);
+
+        renewOkButton();
+
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -172,6 +211,19 @@ public class PersonDialog extends FrameLayout {
 
             }
         });
+
+    }
+
+    private void renewOkButton() {
+
+        okButton.setEnabled(isPersonEdited);
+
+        if (isPersonEdited) {
+            okButton.setAlpha(1f);
+
+        } else {
+            okButton.setAlpha(0.3f);
+        }
     }
 
     private void initCancelButton() {

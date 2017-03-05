@@ -168,6 +168,7 @@ public class RecordVisitActivity extends AppCompatActivity {
             public void onFinishEdit(final Person person) {
 
                 hideSoftKeyboard();
+                // とりあえずアクティビティ内のアレイリストに追加
                 mPersons.add(person);
                 final VisitDetail visitDetail = new VisitDetail(person.getId(), mVisit.getId());
                 mVisit.addVisitDetail(visitDetail);
