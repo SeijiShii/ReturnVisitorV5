@@ -163,24 +163,31 @@ public class RecordVisitActivity extends AppCompatActivity {
 
     private void showPersonDialogForNew() {
 
-        PersonDialog personDialog = new PersonDialog(this, new Person(mPlace.getId()), new PersonDialog.OnPersonEditFinishListener() {
-            @Override
-            public void onFinishEdit(final Person person) {
-
-                hideSoftKeyboard();
-                // とりあえずアクティビティ内のアレイリストに追加
-                mPersons.add(person);
-                final VisitDetail visitDetail = new VisitDetail(person.getId(), mVisit.getId());
-                mVisit.addVisitDetail(visitDetail);
-                fadeDialogOverlay(false, new DialogPostAnimationListener() {
+        PersonDialog personDialog = new PersonDialog(this, new Person(mPlace.getId()),
+                new PersonDialog.OnPersonEditFinishListener() {
                     @Override
-                    public void onFinishAnimation() {
-                        // Person Dialogが消えたら実行するアニメーション
-                        addVisitDetailView(visitDetail, person);
+                    public void onFinishEdit(final Person person) {
+
+                        hideSoftKeyboard();
+                        // とりあえずアクティビティ内のアレイリストに追加
+                        mPersons.add(person);
+                        final VisitDetail visitDetail = new VisitDetail(person.getId(), mVisit.getId());
+                        mVisit.addVisitDetail(visitDetail);
+                        fadeDialogOverlay(false, new DialogPostAnimationListener() {
+                            @Override
+                            public void onFinishAnimation() {
+                                // Person Dialogが消えたら実行するアニメーション
+                                addVisitDetailView(visitDetail, person);
+                            }
+                        });
+                    }
+                },
+                new PersonDialog.OnCancelClickedListener() {
+                    @Override
+                    public void onCancelClicked() {
+                        fadeDialogOverlay(false, null);
                     }
                 });
-            }
-        });
         dialogFrame.addView(personDialog);
         fadeDialogOverlay(true, null);
     }
@@ -257,6 +264,7 @@ public class RecordVisitActivity extends AppCompatActivity {
                 @Override
                 public void onAnimationEnd(Animator animator) {
                     dialogOverlay.setVisibility(View.INVISIBLE);
+                    dialogFrame.removeAllViews();
                     if (listener == null) return;
                     listener.onFinishAnimation();
                 }

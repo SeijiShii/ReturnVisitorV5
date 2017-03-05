@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -17,7 +16,6 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.RadioButton;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
@@ -31,14 +29,19 @@ import net.c_kogyo.returnvisitorv5.data.RVData;
 public class PersonDialog extends FrameLayout {
 
     private Person mPerson;
-    private OnPersonEditFinishListener mListener;
+    private OnPersonEditFinishListener mOkListener;
+    private OnCancelClickedListener mCancelListener;
     private boolean isPersonEdited;
 
-    public PersonDialog(Context context, Person person, OnPersonEditFinishListener listener) {
+    public PersonDialog(Context context,
+                        Person person,
+                        OnPersonEditFinishListener okListener,
+                        OnCancelClickedListener cancelListener) {
         super(context);
 
         mPerson = person;
-        mListener = listener;
+        mOkListener = okListener;
+        mCancelListener = cancelListener;
         isPersonEdited = false;
 
         initCommon();
@@ -208,7 +211,7 @@ public class PersonDialog extends FrameLayout {
 
                 mPerson.setName(nameText.getText().toString());
                 mPerson.setNote(noteText.getText().toString());
-                mListener.onFinishEdit(mPerson);
+                mOkListener.onFinishEdit(mPerson);
 
             }
         });
@@ -233,7 +236,7 @@ public class PersonDialog extends FrameLayout {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                finish();
+                mCancelListener.onCancelClicked();
             }
         });
     }
@@ -287,5 +290,9 @@ public class PersonDialog extends FrameLayout {
 
     public interface OnPersonEditFinishListener {
         void onFinishEdit(Person person);
+    }
+
+    public interface OnCancelClickedListener {
+        void onCancelClicked();
     }
 }
