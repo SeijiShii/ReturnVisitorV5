@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.Person;
+import net.c_kogyo.returnvisitorv5.data.RVData;
 
 /**
  * Created by SeijiShii on 2017/02/20.
@@ -240,17 +241,17 @@ public class PersonDialog extends FrameLayout {
     private void initDeleteButton() {
 
         Button deleteButton = (Button) findViewById(R.id.delete_button);
-//        if (RVDB.getInstance().personList.contains(mPerson)) {
-//            deleteButton.setVisibility(View.VISIBLE);
-//            deleteButton.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View view) {
-//
-//                }
-//            });
-//        } else {
-//            deleteButton.setVisibility(View.INVISIBLE);
-//        }
+        if (RVData.getInstance().getPersonList().contains(mPerson)) {
+            deleteButton.setVisibility(View.VISIBLE);
+            deleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    // TODO: 2017/03/05 削除処理 
+                }
+            });
+        } else {
+            deleteButton.setVisibility(View.INVISIBLE);
+        }
     }
 
     class AgeSpinnerAdapter extends BaseAdapter {
