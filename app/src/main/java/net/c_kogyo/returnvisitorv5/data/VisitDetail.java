@@ -164,4 +164,8 @@ public class VisitDetail extends DataItem {
     public Visit.Priority getPriority() {
         return priority;
     }
+
+    public String getPersonId() {
+        return personId;
+    }
 }

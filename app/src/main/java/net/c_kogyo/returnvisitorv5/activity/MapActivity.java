@@ -161,7 +161,7 @@ public class MapActivity extends AppCompatActivity
 
                         mMap.setOnMapLongClickListener(MapActivity.this);
 
-                        // TODO: 2017/03/01 ここにマーカー描画処理を記述する
+                        // DONE: 2017/03/01 ここにマーカー描画処理を記述する
                         drawAllMarkers();
                     }
                 });

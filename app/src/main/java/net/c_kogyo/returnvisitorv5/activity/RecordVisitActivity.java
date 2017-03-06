@@ -435,6 +435,49 @@ public class RecordVisitActivity extends AppCompatActivity {
                 priorityRater.setPriority(mVisit.getPriority());
             }
         });
+        detailView.setOnEditPersonClickListener(new VisitDetailView.OnEditPersonClickListener() {
+            @Override
+            public void onEditPersonClick(Person person) {
+                showPersonDialogForEdit(person);
+            }
+        });
+    }
+
+    private void showPersonDialogForEdit(Person person) {
+
+        PersonDialog personDialog
+                = new PersonDialog(this,
+                person,
+            new PersonDialog.OnPersonEditFinishListener() {
+            @Override
+            public void onFinishEdit(Person person) {
+                VisitDetailView visitDetailView = getVisitDetailView(person);
+                if (visitDetailView != null) {
+                    visitDetailView.refreshPersonData();
+                }
+                fadeDialogOverlay(false, null);
+            }
+        }, new PersonDialog.OnCancelClickedListener() {
+            @Override
+            public void onCancelClicked() {
+                fadeDialogOverlay(false, null);
+            }
+        });
+        dialogFrame.addView(personDialog);
+        fadeDialogOverlay(true, null);
+    }
+
+    @Nullable
+    private VisitDetailView getVisitDetailView(Person person) {
+
+        for ( int i = 0 ; i < visitDetailFrame.getChildCount() ; i++ ) {
+
+            VisitDetailView visitDetailView = (VisitDetailView) visitDetailFrame.getChildAt(i);
+            if (visitDetailView.getVisitDetail().getPersonId().equals(person.getId())) {
+                return visitDetailView;
+            }
+        }
+        return null;
     }
 
     private PriorityRater priorityRater;
