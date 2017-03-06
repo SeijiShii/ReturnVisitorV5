@@ -37,6 +37,7 @@ import net.c_kogyo.returnvisitorv5.service.FetchAddressIntentService;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 import net.c_kogyo.returnvisitorv5.view.BaseAnimateView;
 import net.c_kogyo.returnvisitorv5.view.ClearEditText;
+import net.c_kogyo.returnvisitorv5.view.PriorityRater;
 import net.c_kogyo.returnvisitorv5.view.VisitDetailView;
 
 import java.text.DateFormat;
@@ -74,6 +75,7 @@ public class RecordVisitActivity extends AppCompatActivity {
         initDeleteButton();
         initBroadcastManager();
         inquireAddress();
+        initPriorityRater();
     }
 
     private void initData() {
@@ -426,6 +428,26 @@ public class RecordVisitActivity extends AppCompatActivity {
                                 person,
                                 BaseAnimateView.InitialHeightCondition.ZERO);
         visitDetailFrame.addView(detailView);
+        detailView.setOnPersonPrioritySetListener(new VisitDetailView.OnPersonPrioritySetListener() {
+            @Override
+            public void onPersonPrioritySet(Visit.Priority priority) {
+                mVisit.refreshPriority();
+                priorityRater.setPriority(mVisit.getPriority());
+            }
+        });
+    }
+
+    private PriorityRater priorityRater;
+    private void initPriorityRater() {
+        priorityRater = (PriorityRater) findViewById(R.id.priority_rater);
+        priorityRater.setPriority(mVisit.getPriority());
+        priorityRater.setOnPrioritySetListener(new PriorityRater.OnPrioritySetListener() {
+            @Override
+            public void onPrioritySet(Visit.Priority priority) {
+                mVisit.setPriority(priority);
+            }
+        });
+
     }
 
     private void hideSoftKeyboard() {

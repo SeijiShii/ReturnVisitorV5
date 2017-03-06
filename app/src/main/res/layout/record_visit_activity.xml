@@ -175,6 +175,20 @@
                         android:gravity="center"
                         android:text="@string/record_placement_button"/>
 
+                    <!-- Priority -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/ui_height_small"
+                        android:textSize="@dimen/text_size_middle"
+                        android:textColor="@color/textColorGray"
+                        android:text="@string/priority_for_place"
+                        android:gravity="center"/>
+
+                    <net.c_kogyo.returnvisitorv5.view.PriorityRater
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/priority_rater"/>
+
                     <!-- Record Not home button 2-->
                     <Button
                         android:layout_width="match_parent"

@@ -22,6 +22,7 @@ public class Visit extends DataItem {
     private String placeId;
     private ArrayList<Placement> placements;
     private ArrayList<VisitDetail> visitDetails;
+    private Priority priority;
 
     public enum Priority {
 
@@ -97,6 +98,7 @@ public class Visit extends DataItem {
         this.placeId = null;
         this.placements = new ArrayList<>();
         this.visitDetails = new ArrayList<>();
+        this.priority = Priority.NONE;
     }
 
     public void addPlacement(Placement placement) {
@@ -181,7 +183,22 @@ public class Visit extends DataItem {
     }
     
     public Priority getPriority() {
-        return Priority.NOT_HOME;
-        // // TODO: 2017/03/05 VisitDetailからpriorityを抽出して 
+        return priority;
+    }
+
+    public void setPriority(Priority priority) {
+        this.priority = priority;
+    }
+
+    public void refreshPriority() {
+
+        if (visitDetails.size() <= 0) return;
+
+        priority = visitDetails.get(0).getPriority();
+        for (VisitDetail visitDetail : visitDetails) {
+            if (visitDetail.getPriority().num() > priority.num()) {
+                priority = visitDetail.getPriority();
+            }
+        }
     }
 }

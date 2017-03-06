@@ -39,6 +39,7 @@ public class VisitDetailView extends BaseAnimateView implements TagFrame.OnSetHe
 
     private VisitDetail mVisitDetail;
     private Person mPerson;
+    private OnPersonPrioritySetListener mListener;
 
     private int mExHeight, fixedHeight, noteLineHeight, mTagFrameHeight;
 
@@ -68,8 +69,9 @@ public class VisitDetailView extends BaseAnimateView implements TagFrame.OnSetHe
         initPlacementButton();
         initTagButton();
         initTagFrame();
-        initPriorityText();
-        initPriorityFrame();
+//        initPriorityText();
+//        initPriorityFrame();
+        initPriorityRater();
         initNoteText();
         initRVSwitch();
         initStudySwitch();
@@ -77,6 +79,10 @@ public class VisitDetailView extends BaseAnimateView implements TagFrame.OnSetHe
         // exHeightをセットする DONE
         // 高さをセットするのはコールバックに譲る
 
+    }
+
+    public void setOnPersonPrioritySetListener(OnPersonPrioritySetListener listener) {
+        this.mListener = listener;
     }
 
     private TextView dataText;
@@ -186,73 +192,88 @@ public class VisitDetailView extends BaseAnimateView implements TagFrame.OnSetHe
             }
         });
     }
-    
-    private LinearLayout priorityFrame;
-    private Button[] raterButtons;
-    private void initPriorityFrame() {
-        priorityFrame = (LinearLayout) getViewById(R.id.priority_frame);
 
-        final int raterSize = (int) (getContext().getResources().getDisplayMetrics().density * 25);
-        final int buttonMargin = (int) (getContext().getResources().getDisplayMetrics().density * 15);
-
-        // 2017/02/27 Implement priorityFrame
-        priorityFrame.removeAllViews();
-
-        raterButtons = new Button[8];
-        for ( int i = 0 ; i < 7 ; i++ ) {
-            raterButtons[i] = new Button(getContext());
-            raterButtons[i].setBackgroundResource(buttonRes[0]);
-            raterButtons[i].setTag(i);
-
-            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(raterSize, raterSize);
-
-            raterButtons[i].setLayoutParams(params);
-            priorityFrame.addView(raterButtons[i]);
-
-            if ( i < 6 ) {
-                View view = new View(getContext());
-                FrameLayout.LayoutParams params2 = new FrameLayout.LayoutParams(buttonMargin, ViewGroup.LayoutParams.MATCH_PARENT);
-                view.setLayoutParams(params2);
-                priorityFrame.addView(view);
-            }
-
-            raterButtons[i].setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-
-                    int tag = Integer.parseInt(view.getTag().toString());
-                    Visit.Priority priority = Visit.Priority.getEnum(tag);
-
-                    mVisitDetail.setPriority(priority);
-
-                    refreshRater(priority);
-
+    private PriorityRater priorityRater;
+    private void initPriorityRater() {
+        priorityRater = (PriorityRater) getViewById(R.id.priority_rater);
+        priorityRater.setPriority(mVisitDetail.getPriority());
+        priorityRater.setOnPrioritySetListener(new PriorityRater.OnPrioritySetListener() {
+            @Override
+            public void onPrioritySet(Visit.Priority priority) {
+                mVisitDetail.setPriority(priority);
+                if (mListener != null) {
+                    mListener.onPersonPrioritySet(priority);
                 }
-            });
-        }
-        refreshRater(mVisitDetail.getPriority());
-    }
-
-    private void refreshRater(Visit.Priority priority) {
-
-        int num = priority.num();
-
-        priorityText.setText(getResources().getStringArray(R.array.priority_array)[mVisitDetail.getPriority().num()]);
-
-        for (int i = 0 ; i <= num ; i++) {
-            raterButtons[i].setBackgroundResource(Constants.buttonRes[num]);
-        }
-
-        for (int i = num + 1 ; i < 7 ; i++ ) {
-            raterButtons[i].setBackgroundResource(Constants.buttonRes[0]);
-        }
+            }
+        });
     }
     
-    private TextView priorityText;
-    private void initPriorityText() {
-        priorityText = (TextView) getViewById(R.id.priority_state_text);
-        // DONE priorityText
-    }
+//    private LinearLayout priorityFrame;
+//    private Button[] raterButtons;
+//    private void initPriorityFrame() {
+//        priorityFrame = (LinearLayout) getViewById(R.id.priority_frame);
+//
+//        final int raterSize = (int) (getContext().getResources().getDisplayMetrics().density * 25);
+//        final int buttonMargin = (int) (getContext().getResources().getDisplayMetrics().density * 15);
+//
+//        // 2017/02/27 Implement priorityFrame
+//        priorityFrame.removeAllViews();
+//
+//        raterButtons = new Button[8];
+//        for ( int i = 0 ; i < 7 ; i++ ) {
+//            raterButtons[i] = new Button(getContext());
+//            raterButtons[i].setBackgroundResource(buttonRes[0]);
+//            raterButtons[i].setTag(i);
+//
+//            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(raterSize, raterSize);
+//
+//            raterButtons[i].setLayoutParams(params);
+//            priorityFrame.addView(raterButtons[i]);
+//
+//            if ( i < 6 ) {
+//                View view = new View(getContext());
+//                FrameLayout.LayoutParams params2 = new FrameLayout.LayoutParams(buttonMargin, ViewGroup.LayoutParams.MATCH_PARENT);
+//                view.setLayoutParams(params2);
+//                priorityFrame.addView(view);
+//            }
+//
+//            raterButtons[i].setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//
+//                    int tag = Integer.parseInt(view.getTag().toString());
+//                    Visit.Priority priority = Visit.Priority.getEnum(tag);
+//
+//                    mVisitDetail.setPriority(priority);
+//
+//                    refreshRater(priority);
+//
+//                }
+//            });
+//        }
+//        refreshRater(mVisitDetail.getPriority());
+//    }
+//
+//    private void refreshRater(Visit.Priority priority) {
+//
+//        int num = priority.num();
+//
+//        priorityText.setText(getResources().getStringArray(R.array.priority_array)[mVisitDetail.getPriority().num()]);
+//
+//        for (int i = 0 ; i <= num ; i++) {
+//            raterButtons[i].setBackgroundResource(Constants.buttonRes[num]);
+//        }
+//
+//        for (int i = num + 1 ; i < 7 ; i++ ) {
+//            raterButtons[i].setBackgroundResource(Constants.buttonRes[0]);
+//        }
+//    }
+//
+//    private TextView priorityText;
+//    private void initPriorityText() {
+//        priorityText = (TextView) getViewById(R.id.priority_state_text);
+//        // DONE priorityText
+//    }
 
     private AutoCompleteTextView noteText;
     private void initNoteText() {
@@ -327,6 +348,10 @@ public class VisitDetailView extends BaseAnimateView implements TagFrame.OnSetHe
 
         this.setExHeight(mExHeight);
         this.changeViewHeight(AnimateCondition.FROM_0_TO_EX_HEIGHT, 0, true, null, null);
+    }
+
+    public interface OnPersonPrioritySetListener {
+        void onPersonPrioritySet(Visit.Priority priority);
     }
 
 

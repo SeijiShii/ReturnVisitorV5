@@ -165,7 +165,7 @@ public class Place extends DataItem {
     }
     
     public Visit.Priority getPriority() {
-        
+
         Visit visit = RVData.getInstance().getVisitList().getLatestVisitToPlace(this.id);
 
         if (visit == null) return Visit.Priority.NOT_HOME;
