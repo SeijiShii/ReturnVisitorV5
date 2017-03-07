@@ -113,7 +113,7 @@ public class RVData {
                 return "";
             }
 
-            File file = new File(dir.getPath() + RV_FILE_NAME);
+            File file = new File(dir.getPath() + "/" + RV_FILE_NAME);
             if (!file.exists()) {
                 return "";
             }
@@ -284,7 +284,7 @@ public class RVData {
                 dir.mkdir();
             }
 
-            File file = new File(dir.getPath() + RV_FILE_NAME);
+            File file = new File(dir.getPath() + "/" + RV_FILE_NAME);
             try {
                 if (!file.exists()) {
                     file.createNewFile();

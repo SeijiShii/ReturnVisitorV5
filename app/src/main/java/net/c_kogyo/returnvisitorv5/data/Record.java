@@ -119,7 +119,7 @@ public class Record {
 
         try {
             object.put(DataItem.ID, id);
-            object.put(DataItem.UPDATED_AT, updatedAt);
+            object.put(DataItem.UPDATED_AT, updatedAt.getTimeInMillis());
             object.put(DATA, data);
             object.put(CLASS_NAME, className);
 

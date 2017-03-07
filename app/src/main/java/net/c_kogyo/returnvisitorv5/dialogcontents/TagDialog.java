@@ -4,10 +4,13 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.ListViewCompat;
+import android.support.v7.widget.PopupMenu;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -104,9 +107,14 @@ public class TagDialog extends FrameLayout {
                 String data = searchText.getText().toString();
                 searchText.setText("");
 
+                if (data.equals("") || data.length() <= 0) {
+                    return;
+                }
+
                 if (RVData.getInstance().getTagList().containsDataWithName(data)){
                     return;
                 }
+
                 Tag newTag = new Tag(data);
                 RVData.getInstance().getTagList().add(newTag);
                 mSelectedIds.add(newTag.getId());
@@ -133,7 +141,8 @@ public class TagDialog extends FrameLayout {
 
     private void setListViewHeight() {
 
-        int rowHeight = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small);
+        int rowHeight = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small)
+                 + (int) (getContext().getResources().getDisplayMetrics().density * 10);
         int count = mAdapter.getCount();
         if (count > 6) {
             count = 5;
@@ -167,7 +176,7 @@ public class TagDialog extends FrameLayout {
         });
     }
 
-    class TagListAdapter extends BaseAdapter{
+    private class TagListAdapter extends BaseAdapter{
 
         @Override
         public int getCount() {
@@ -194,6 +203,28 @@ public class TagDialog extends FrameLayout {
             } else {
                 ((TagListCell) view).refreshData(tag, mSelectedIds.contains(tag.getId()));
             }
+
+            ((TagListCell) view).setOnTagSelectChangeListener(new OnTagListCellListener() {
+                @Override
+                public void onTagSelectChange(Tag tag, boolean selected) {
+                    if (selected) {
+                        mSelectedIds.add(tag.getId());
+                    } else {
+                        mSelectedIds.remove(tag.getId());
+                    }
+                }
+
+                @Override
+                public void onDeleteTag(Tag tag) {
+                    RVData.getInstance().getTagList().removeById(tag.getId());
+                    mSelectedIds.remove(tag.getId());
+                    notifyDataSetChanged();
+                    setListViewHeight();
+
+                    RVData.getInstance().saveData(null);
+                }
+            });
+
             return view;
         }
     }
@@ -221,6 +252,8 @@ public class TagDialog extends FrameLayout {
         private View mView;
         private TextView textView;
         private Button editButton;
+        private OnTagListCellListener mListener;
+
         private void initCommon() {
             mView = LayoutInflater.from(getContext()).inflate(R.layout.tag_list_cell, this);
             
@@ -230,7 +263,23 @@ public class TagDialog extends FrameLayout {
             editButton.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    // TODO: 2017/03/06 ポップアップで削除を尋ねる 
+                    // TODO: 2017/03/06 ポップアップで削除を尋ねる
+                    PopupMenu popupMenu = new PopupMenu(getContext(), editButton);
+                    MenuInflater inflater = popupMenu.getMenuInflater();
+                    inflater.inflate(R.menu.tag_list_cell_menu, popupMenu.getMenu());
+                    popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+
+                            if (item.getItemId() == R.id.tag_list_cell_delete) {
+                                if (mListener != null) {
+                                    mListener.onDeleteTag(mTag);
+                                }
+                            }
+                            return true;
+                        }
+                    });
+                    popupMenu.show();
                 }
             });
 
@@ -240,10 +289,17 @@ public class TagDialog extends FrameLayout {
                 public void onClick(View view) {
                     mIsSelected = !mIsSelected;
                     refreshData(mTag, mIsSelected);
+                    if (mListener != null) {
+                        mListener.onTagSelectChange(mTag, mIsSelected);
+                    }
                 }
             });
         }
-        
+
+        public void setOnTagSelectChangeListener(OnTagListCellListener listener) {
+            mListener = listener;
+        }
+
         private void refreshData(Tag tag, boolean isSelected) {
             // TODO: 2017/03/06 情報の更新
 
@@ -258,6 +314,14 @@ public class TagDialog extends FrameLayout {
                 this.setBackgroundResource(0);
             }
         }
+
+
     }
 
+    interface OnTagListCellListener {
+
+        void onTagSelectChange(Tag tag, boolean selected);
+
+        void onDeleteTag(Tag tag);
+    }
 }
