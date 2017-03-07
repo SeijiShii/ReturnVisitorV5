@@ -29,6 +29,7 @@ public class VisitDetailView extends BaseAnimateView implements TagFrame.OnSetHe
     private Person mPerson;
     private OnPersonPrioritySetListener mPriorityListener;
     private OnEditPersonClickListener mPersonClickListener;
+    private OnTagButtonClickListener mTagButtonClickListener;
 
     private int mExHeight, fixedHeight, noteLineHeight, mTagFrameHeight;
 
@@ -76,6 +77,10 @@ public class VisitDetailView extends BaseAnimateView implements TagFrame.OnSetHe
 
     public void setOnEditPersonClickListener(OnEditPersonClickListener listener) {
         this.mPersonClickListener = listener;
+    }
+
+    public void setOnTagButtonClickListener(OnTagButtonClickListener listener) {
+        this.mTagButtonClickListener = listener;
     }
 
     private TextView dataText;
@@ -159,7 +164,7 @@ public class VisitDetailView extends BaseAnimateView implements TagFrame.OnSetHe
         editPersonButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: 2017/02/27 人編集ダイアログへの遷移
+                // DONE: 2017/02/27 人編集ダイアログへの遷移
                 if (mPersonClickListener != null){
                     mPersonClickListener.onEditPersonClick(mPerson);
                 }
@@ -184,7 +189,10 @@ public class VisitDetailView extends BaseAnimateView implements TagFrame.OnSetHe
         tagButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: 2017/02/27 tagDialogへの遷移 
+                // TODO: 2017/02/27 tagDialogへの遷移
+                if (mTagButtonClickListener != null) {
+                    mTagButtonClickListener.onTagButtonClick(mVisitDetail);
+                }
             }
         });
     }
@@ -293,6 +301,10 @@ public class VisitDetailView extends BaseAnimateView implements TagFrame.OnSetHe
 
     public interface OnEditPersonClickListener {
         void onEditPersonClick(Person person);
+    }
+
+    public interface OnTagButtonClickListener {
+        void onTagButtonClick(VisitDetail visitDetail);
     }
 
 

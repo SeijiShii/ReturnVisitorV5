@@ -175,7 +175,7 @@ public class DataItem implements Cloneable{
         this.updatedAt = updatedAt;
     }
 
-    public <T extends DataItem>boolean equals(T o) {
+    public <T extends DataItem> boolean equals(T o) {
         return this.getId().equals(o.getId());
     }
 
@@ -208,6 +208,10 @@ public class DataItem implements Cloneable{
         }
         return item;
     }
+
+
+
+
 
 
     //    public HashMap<String, Object> toMap() {

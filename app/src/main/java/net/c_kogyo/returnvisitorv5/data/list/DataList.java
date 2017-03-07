@@ -110,5 +110,23 @@ public class DataList<T extends DataItem> implements Iterable<T>{
     public void add(T item) {
         list.add(item);
     }
+
+    public int size() {
+        return list.size();
+    }
+
+    public T get(int index) {
+        return list.get(index);
+    }
+
+    public boolean containsDataWithName(String data) {
+
+        for (T item : list) {
+            if (item.getName().equals(data)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
 

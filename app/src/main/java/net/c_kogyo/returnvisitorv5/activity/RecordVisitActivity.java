@@ -33,6 +33,7 @@ import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
 import net.c_kogyo.returnvisitorv5.dialogcontents.PersonDialog;
+import net.c_kogyo.returnvisitorv5.dialogcontents.TagDialog;
 import net.c_kogyo.returnvisitorv5.service.FetchAddressIntentService;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 import net.c_kogyo.returnvisitorv5.view.BaseAnimateView;
@@ -441,6 +442,12 @@ public class RecordVisitActivity extends AppCompatActivity {
                 showPersonDialogForEdit(person);
             }
         });
+        detailView.setOnTagButtonClickListener(new VisitDetailView.OnTagButtonClickListener() {
+            @Override
+            public void onTagButtonClick(VisitDetail visitDetail1) {
+                showTagDialog(visitDetail1);
+            }
+        });
     }
 
     private void showPersonDialogForEdit(Person person) {
@@ -556,6 +563,11 @@ public class RecordVisitActivity extends AppCompatActivity {
         }
     }
 
+    private void showTagDialog(VisitDetail visitDetail) {
+        TagDialog tagDialog = new TagDialog(this, visitDetail.getTagIds());
+        dialogFrame.addView(tagDialog);
+        fadeDialogOverlay(true, null);
+    }
 
 
 

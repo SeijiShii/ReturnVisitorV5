@@ -2,6 +2,7 @@ package net.c_kogyo.returnvisitorv5.data;
 
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.support.annotation.Nullable;
 
 import net.c_kogyo.returnvisitorv5.data.list.DataList;
 import net.c_kogyo.returnvisitorv5.data.list.VisitList;
@@ -77,18 +78,18 @@ public class RVData {
         return pubList;
     }
 
-    public void saveData(RVDataStoreCallback callback){
+    public void saveData(@Nullable RVDataStoreCallback callback){
         new SaveData(callback).execute();
     }
 
-    public void loadData(RVDataStoreCallback callback) {
+    public void loadData(@Nullable RVDataStoreCallback callback) {
         new LoadData(callback).execute();
     }
 
-    public class LoadData extends AsyncTask<Void, Void, Void> {
+    private class LoadData extends AsyncTask<Void, Void, Void> {
 
         RVDataStoreCallback mCallback;
-        public LoadData(RVDataStoreCallback callback) {
+        private LoadData(RVDataStoreCallback callback) {
             mCallback = callback;
         }
 
@@ -96,7 +97,10 @@ public class RVData {
         protected Void doInBackground(Void... voids) {
 
             jsonToData(stringToJson(loadStringFromFile()));
-            mCallback.onDataLoaded();
+
+            if (mCallback != null) {
+                mCallback.onDataLoaded();
+            }
 
             return null;
         }
@@ -187,10 +191,10 @@ public class RVData {
     }
 
     private boolean isDataSaving = false;
-    public class SaveData extends AsyncTask<Void, Void, Void> {
+    private class SaveData extends AsyncTask<Void, Void, Void> {
 
         RVDataStoreCallback mCallback;
-        public SaveData(RVDataStoreCallback callback) {
+        private SaveData(RVDataStoreCallback callback) {
             mCallback = callback;
         }
 
@@ -215,8 +219,9 @@ public class RVData {
             // 書き込みが終わった
             isDataSaving = false;
 
-            mCallback.onDataSaved();
-
+            if (mCallback != null) {
+                mCallback.onDataSaved();
+            }
             return null;
         }
 

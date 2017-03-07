@@ -168,4 +168,8 @@ public class VisitDetail extends DataItem {
     public String getPersonId() {
         return personId;
     }
+
+    public ArrayList<String> getTagIds() {
+        return tagIds;
+    }
 }

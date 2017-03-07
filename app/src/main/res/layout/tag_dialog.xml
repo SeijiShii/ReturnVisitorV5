@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFF">
+
+    <!-- Dialog title -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_height_small"
+        android:textColor="@color/textColorGray"
+        android:textSize="@dimen/text_size_large"
+        android:gravity="center"
+        android:text="@string/tag"/>
+
+    <!-- Search Row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_height_small"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:background="@drawable/gray_trans_circle"
+            android:layout_margin="5dp">
+
+            <EditText
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@null"
+                android:gravity="center_vertical|left"
+                android:id="@+id/search_text"/>
+
+            <RelativeLayout
+                android:layout_width="30dp"
+                android:layout_height="match_parent">
+
+                <Button
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/gray_x_selector"
+                    android:id="@+id/clear_button"/>
+
+            </RelativeLayout>
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="40dp"
+            android:layout_height="match_parent">
+
+            <Button
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/green_plus_selector"
+                android:id="@+id/add_button"
+                android:layout_centerInParent="true"/>
+        </RelativeLayout>
+    </LinearLayout>
+
+    <!-- Tag List -->
+    <android.support.v7.widget.ListViewCompat
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:id="@+id/tag_list_view"/>
+
+    <!-- OK -->
+    <Button
+        android:layout_width="150dp"
+        android:layout_height="@dimen/ui_height_small"
+        android:text="@string/ok"
+        android:background="@drawable/trans_blue_selector"
+        android:textColor="@color/colorPrimary"
+        android:textSize="@dimen/in_frame_text_size"
+        android:gravity="center"
+        android:layout_gravity="right"
+        android:id="@+id/ok_button"/>
+
+    <!-- Cancel -->
+    <Button
+        android:layout_width="150dp"
+        android:layout_height="@dimen/ui_height_small"
+        android:text="@string/cancel"
+        android:background="@drawable/trans_orange_selector"
+        android:textColor="@color/colorAccent"
+        android:textSize="@dimen/in_frame_text_size"
+        android:gravity="center"
+        android:layout_gravity="right"
+        android:id="@+id/cancel_button"/>
+
+</LinearLayout>

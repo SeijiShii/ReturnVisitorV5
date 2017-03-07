@@ -1,140 +1,145 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="#FFF">
+    android:layout_height="match_parent">
 
-    <!-- Dialog title -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/ui_height_small"
-        android:textColor="@color/textColorGray"
-        android:textSize="@dimen/text_size_large"
-        android:gravity="center"
-        android:text="@string/person"/>
-
-    <!-- Name Text -->
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/ui_height_small"
-        android:id="@+id/name_text"
-        android:background="@drawable/gray_trans_circle"
-        android:padding="5dp"
-        android:hint="@string/name"
-        android:textColorHint="@color/textHintGray"
-        android:inputType="textFilter"
-        android:textColor="@color/textColorGray" />
-
-    <!-- Sex Radio Button -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/ui_height_small"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#FFF">
 
-        <RelativeLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1">
-
-            <RadioButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:text="@string/male"
-                android:id="@+id/male_button"
-                android:textColor="@color/textColorGray"/>
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1">
-
-            <RadioButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:text="@string/female"
-                android:id="@+id/female_button"
-                android:textColor="@color/textColorGray"/>
-
-        </RelativeLayout>
-
-
-    </LinearLayout>
-
-    <!-- Age Spinner -->
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/ui_height_small">
-
+        <!-- Dialog title -->
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="@string/age"
-            android:layout_alignParentLeft="true"
-            android:textSize="15sp"
-            android:textColor="@color/textColorGray"/>
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/ui_height_small"
+            android:textColor="@color/textColorGray"
+            android:textSize="@dimen/text_size_large"
+            android:gravity="center"
+            android:text="@string/person"/>
 
-        <android.support.v7.widget.AppCompatSpinner
+        <!-- Name Text -->
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/ui_height_small"
+            android:id="@+id/name_text"
+            android:background="@drawable/gray_trans_circle"
+            android:padding="5dp"
+            android:hint="@string/name"
+            android:textColorHint="@color/textHintGray"
+            android:inputType="textFilter"
+            android:textColor="@color/textColorGray" />
+
+        <!-- Sex Radio Button -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/ui_height_small"
+            android:orientation="horizontal">
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="@string/male"
+                    android:id="@+id/male_button"
+                    android:textColor="@color/textColorGray"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="@string/female"
+                    android:id="@+id/female_button"
+                    android:textColor="@color/textColorGray"/>
+
+            </RelativeLayout>
+
+
+        </LinearLayout>
+
+        <!-- Age Spinner -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/ui_height_small">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="@string/age"
+                android:layout_alignParentLeft="true"
+                android:textSize="15sp"
+                android:textColor="@color/textColorGray"/>
+
+            <android.support.v7.widget.AppCompatSpinner
+                android:layout_width="150dp"
+                android:layout_height="@dimen/ui_height_small"
+                android:id="@+id/age_spinner"
+                android:layout_alignParentRight="true"/>
+
+        </RelativeLayout>
+
+        <!-- Note -->
+        <AutoCompleteTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/note_text"
+            android:background="@drawable/gray_trans_circle"
+            android:padding="5dp"
+            android:hint="@string/note"
+            android:inputType="textMultiLine"
+            android:minHeight="@dimen/ui_height_large"
+            android:gravity="left|top"
+            android:textColorHint="@color/textHintGray"
+            android:textColor="@color/textColorGray"
+            android:textSize="12sp"/>
+
+        <!-- OK -->
+        <Button
             android:layout_width="150dp"
             android:layout_height="@dimen/ui_height_small"
-            android:id="@+id/age_spinner"
-            android:layout_alignParentRight="true"/>
+            android:text="@string/ok"
+            android:background="@drawable/trans_blue_selector"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/in_frame_text_size"
+            android:gravity="center"
+            android:layout_gravity="right"
+            android:id="@+id/ok_button"/>
 
-    </RelativeLayout>
+        <!-- Cancel -->
+        <Button
+            android:layout_width="150dp"
+            android:layout_height="@dimen/ui_height_small"
+            android:text="@string/cancel"
+            android:background="@drawable/trans_orange_selector"
+            android:textColor="@color/colorAccent"
+            android:textSize="@dimen/in_frame_text_size"
+            android:gravity="center"
+            android:layout_gravity="right"
+            android:id="@+id/cancel_button"/>
 
-    <!-- Note -->
-    <AutoCompleteTextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/note_text"
-        android:background="@drawable/gray_trans_circle"
-        android:padding="5dp"
-        android:hint="@string/note"
-        android:inputType="textMultiLine"
-        android:minHeight="@dimen/ui_height_large"
-        android:gravity="left|top"
-        android:textColorHint="@color/textHintGray"
-        android:textColor="@color/textColorGray"
-        android:textSize="12sp"/>
+        <!-- Delete -->
+        <Button
+            android:layout_width="150dp"
+            android:layout_height="@dimen/ui_height_small"
+            android:text="@string/delete"
+            android:background="@drawable/trans_red_selector"
+            android:textColor="@color/rvRed"
+            android:textSize="@dimen/in_frame_text_size"
+            android:gravity="center"
+            android:layout_gravity="right"
+            android:id="@+id/delete_button"/>
+    </LinearLayout>
 
-    <!-- OK -->
-    <Button
-        android:layout_width="150dp"
-        android:layout_height="@dimen/ui_height_small"
-        android:text="@string/ok"
-        android:background="@drawable/trans_blue_selector"
-        android:textColor="@color/colorPrimary"
-        android:textSize="@dimen/in_frame_text_size"
-        android:gravity="center"
-        android:layout_gravity="right"
-        android:id="@+id/ok_button"/>
-
-    <!-- Cancel -->
-    <Button
-        android:layout_width="150dp"
-        android:layout_height="@dimen/ui_height_small"
-        android:text="@string/cancel"
-        android:background="@drawable/trans_orange_selector"
-        android:textColor="@color/colorAccent"
-        android:textSize="@dimen/in_frame_text_size"
-        android:gravity="center"
-        android:layout_gravity="right"
-        android:id="@+id/cancel_button"/>
-
-    <!-- Delete -->
-    <Button
-        android:layout_width="150dp"
-        android:layout_height="@dimen/ui_height_small"
-        android:text="@string/delete"
-        android:background="@drawable/trans_red_selector"
-        android:textColor="@color/rvRed"
-        android:textSize="@dimen/in_frame_text_size"
-        android:gravity="center"
-        android:layout_gravity="right"
-        android:id="@+id/delete_button"/>
-
-</LinearLayout>
+</ScrollView>
