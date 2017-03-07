@@ -2,6 +2,7 @@ package net.c_kogyo.returnvisitorv5.view;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.os.Handler;
 import android.support.v7.widget.SwitchCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -17,13 +18,11 @@ import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
 
-import java.util.ArrayList;
-
 /**
  * Created by SeijiShii on 2017/02/27.
  */
 
-public class VisitDetailView extends BaseAnimateView implements TagFrame.OnSetHeightCallback{
+public class VisitDetailView extends BaseAnimateView {
 
     private VisitDetail mVisitDetail;
     private Person mPerson;
@@ -58,16 +57,15 @@ public class VisitDetailView extends BaseAnimateView implements TagFrame.OnSetHe
         initEditPersonButton();
         initPlacementButton();
         initTagButton();
-        initTagFrame();
-//        initPriorityText();
-//        initPriorityFrame();
         initPriorityRater();
         initNoteText();
         initRVSwitch();
         initStudySwitch();
+        initTagFrame();
 
         // exHeightをセットする DONE
         // 高さをセットするのはコールバックに譲る
+        extractAfterTagFrameHeightSet();
 
     }
 
@@ -263,29 +261,68 @@ public class VisitDetailView extends BaseAnimateView implements TagFrame.OnSetHe
     }
 
     private TagFrame tagFrame;
+    private boolean hasSetTagFrameHeight = false;
+
     private void initTagFrame() {
 
         tagFrame = (TagFrame) getViewById(R.id.tag_frame);
-        tagFrame.setTagIdsAndInitialize(new ArrayList<String>(), null, this);
+        tagFrame.setTagIdsAndInitialize(mVisitDetail.getTagIds(),
+                new TagFrame.TagFrameCallback() {
+            @Override
+            public void onSetHeight(int frameHeight) {
+                mTagFrameHeight = frameHeight;
+                hasSetTagFrameHeight = true;
+            }
+
+            @Override
+            public void onSetHeightZero() {
+                mTagFrameHeight = 0;
+                hasSetTagFrameHeight = true;
+                extractAfterTagFrameHeightSet();
+            }
+
+            @Override
+            public void onClickFrame() {
+                mTagButtonClickListener.onTagButtonClick(mVisitDetail);
+            }
+        });
     }
 
-    @Override
-    public void onSetHeight(int frameHeight) {
+    private void extractAfterTagFrameHeightSet() {
 
-        mTagFrameHeight = frameHeight;
+        final Handler handler = new Handler();
 
-        // タグフレームの高さが渡されたらビュー全体の高さを設定しアニメーションする。
-        int rowHeight = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small);
-        int padding = getContext().getResources().getDimensionPixelSize(R.dimen.padding_normal);
-        fixedHeight = rowHeight * 10 + padding * 2;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (!hasSetTagFrameHeight) {
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        //
+                    }
+                }
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        // タグフレームの高さが渡されたらビュー全体の高さを設定しアニメーションする。
+                        int rowHeight = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small);
+                        int padding = getContext().getResources().getDimensionPixelSize(R.dimen.padding_normal);
+                        fixedHeight = rowHeight * 10 + padding * 2;
 
-        noteLineHeight = (int) (noteText.getPaint().getFontMetrics().bottom - noteText.getPaint().getFontMetrics().top);
+                        noteLineHeight = (int) (noteText.getPaint().getFontMetrics().bottom - noteText.getPaint().getFontMetrics().top);
 
-        mExHeight = fixedHeight + noteLineHeight + mTagFrameHeight;
+                        mExHeight = fixedHeight + noteLineHeight + mTagFrameHeight;
 
-        this.setExHeight(mExHeight);
-        this.changeViewHeight(AnimateCondition.FROM_0_TO_EX_HEIGHT, 0, true, null, null);
+                        VisitDetailView.this.setExHeight(mExHeight);
+                        VisitDetailView.this.changeViewHeight(AnimateCondition.TO_EX_HEIGHT, 0, true, null, null);
+                    }
+                });
+            }
+        }).start();
+
     }
+
 
     public VisitDetail getVisitDetail() {
         return mVisitDetail;
@@ -293,6 +330,10 @@ public class VisitDetailView extends BaseAnimateView implements TagFrame.OnSetHe
 
     public void refreshPersonData() {
         dataText.setText(mPerson.toString(getContext()));
+    }
+
+    public void refreshTagFrame() {
+        initTagFrame();
     }
 
     public interface OnPersonPrioritySetListener {

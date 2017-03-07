@@ -1,5 +1,7 @@
 package net.c_kogyo.returnvisitorv5.data;
 
+import android.support.annotation.Nullable;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -200,5 +202,16 @@ public class Visit extends DataItem {
                 priority = visitDetail.getPriority();
             }
         }
+    }
+
+    @Nullable
+    public VisitDetail getVisitDetail(Person person) {
+
+        for (VisitDetail visitDetail : visitDetails) {
+            if (visitDetail.getPersonId().equals(person.getId())) {
+                return visitDetail;
+            }
+        }
+        return null;
     }
 }

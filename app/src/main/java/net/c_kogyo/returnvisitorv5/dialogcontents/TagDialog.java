@@ -22,6 +22,7 @@ import android.widget.TextView;
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Tag;
+import net.c_kogyo.returnvisitorv5.data.VisitDetail;
 
 import java.util.ArrayList;
 
@@ -31,12 +32,13 @@ import java.util.ArrayList;
 
 public class TagDialog extends FrameLayout {
 
-    private ArrayList<String> mSelectedIds;
+    private VisitDetail mVisitDetail;
+    private OnButtonsClickListener mButtonsClickListener;
 
-    public TagDialog(@NonNull Context context, ArrayList<String> selectedIds) {
+    public TagDialog(@NonNull Context context, VisitDetail visitDetail) {
         super(context);
 
-        this.mSelectedIds = new ArrayList<>(selectedIds);
+        this.mVisitDetail = visitDetail;
 
         initCommon();
     }
@@ -57,10 +59,6 @@ public class TagDialog extends FrameLayout {
         initTagListView();
         initOkButton();
         initCancelButton();
-    }
-
-    public void setSelectedIds(ArrayList<String> selectedIds) {
-        this.mSelectedIds = new ArrayList<>(selectedIds);
     }
 
     private EditText searchText;
@@ -117,7 +115,8 @@ public class TagDialog extends FrameLayout {
 
                 Tag newTag = new Tag(data);
                 RVData.getInstance().getTagList().add(newTag);
-                mSelectedIds.add(newTag.getId());
+
+                mVisitDetail.getTagIds().add(newTag.getId());
 
                 mAdapter.notifyDataSetChanged();
                 setListViewHeight();
@@ -160,6 +159,9 @@ public class TagDialog extends FrameLayout {
             @Override
             public void onClick(View view) {
                 // TODO: 2017/03/06 OK
+                if (mButtonsClickListener != null) {
+                    mButtonsClickListener.onOkClick(mVisitDetail);
+                }
             }
         });
     }
@@ -172,8 +174,22 @@ public class TagDialog extends FrameLayout {
             @Override
             public void onClick(View view) {
                 // TODO: 2017/03/06 Cancel
+                if (mButtonsClickListener != null) {
+                    mButtonsClickListener.onCancelClick();
+                }
             }
         });
+    }
+
+    public void setOnButtonsClickListener(OnButtonsClickListener listener) {
+        this.mButtonsClickListener = listener;
+    }
+
+    public interface OnButtonsClickListener {
+
+        void onOkClick(VisitDetail visitDetail);
+
+        void onCancelClick();
     }
 
     private class TagListAdapter extends BaseAdapter{
@@ -199,32 +215,31 @@ public class TagDialog extends FrameLayout {
             Tag tag = (Tag) getItem(i);
 
             if (view == null) {
-                view = new TagListCell(getContext(), tag, mSelectedIds.contains(tag.getId()));
+                view = new TagListCell(getContext(), tag, mVisitDetail.getTagIds().contains(tag.getId()));
             } else {
-                ((TagListCell) view).refreshData(tag, mSelectedIds.contains(tag.getId()));
+                ((TagListCell) view).refreshData(tag, mVisitDetail.getTagIds().contains(tag.getId()));
             }
 
             ((TagListCell) view).setOnTagSelectChangeListener(new OnTagListCellListener() {
                 @Override
                 public void onTagSelectChange(Tag tag, boolean selected) {
                     if (selected) {
-                        mSelectedIds.add(tag.getId());
+                        mVisitDetail.getTagIds().add(tag.getId());
                     } else {
-                        mSelectedIds.remove(tag.getId());
+                        mVisitDetail.getTagIds().remove(tag.getId());
                     }
                 }
 
                 @Override
                 public void onDeleteTag(Tag tag) {
                     RVData.getInstance().getTagList().removeById(tag.getId());
-                    mSelectedIds.remove(tag.getId());
+                    mVisitDetail.getTagIds().remove(tag.getId());
                     notifyDataSetChanged();
                     setListViewHeight();
 
                     RVData.getInstance().saveData(null);
                 }
             });
-
             return view;
         }
     }
@@ -324,4 +339,6 @@ public class TagDialog extends FrameLayout {
 
         void onDeleteTag(Tag tag);
     }
+
+
 }

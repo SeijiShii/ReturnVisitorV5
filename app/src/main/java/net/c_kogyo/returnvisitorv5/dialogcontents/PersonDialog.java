@@ -29,19 +29,16 @@ import net.c_kogyo.returnvisitorv5.data.RVData;
 public class PersonDialog extends FrameLayout {
 
     private Person mPerson;
-    private OnPersonEditFinishListener mOkListener;
-    private OnCancelClickedListener mCancelListener;
+    private OnButtonsClickListener mButtonsClickListener;
     private boolean isPersonEdited;
 
     public PersonDialog(Context context,
                         Person person,
-                        OnPersonEditFinishListener okListener,
-                        OnCancelClickedListener cancelListener) {
+                        OnButtonsClickListener listener) {
         super(context);
 
         mPerson = person;
-        mOkListener = okListener;
-        mCancelListener = cancelListener;
+        mButtonsClickListener = listener;
         isPersonEdited = false;
 
         initCommon();
@@ -211,8 +208,10 @@ public class PersonDialog extends FrameLayout {
 
                 mPerson.setName(nameText.getText().toString());
                 mPerson.setNote(noteText.getText().toString());
-                mOkListener.onFinishEdit(mPerson);
 
+                if (mButtonsClickListener != null) {
+                    mButtonsClickListener.onOkClick(mPerson);
+                }
             }
         });
 
@@ -236,7 +235,9 @@ public class PersonDialog extends FrameLayout {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mCancelListener.onCancelClicked();
+                if (mButtonsClickListener != null) {
+                    mButtonsClickListener.onCancelClick();
+                }
             }
         });
     }
@@ -288,11 +289,11 @@ public class PersonDialog extends FrameLayout {
         }
     }
 
-    public interface OnPersonEditFinishListener {
-        void onFinishEdit(Person person);
+    public interface OnButtonsClickListener {
+
+        void onOkClick(Person person);
+
+        void onCancelClick();
     }
 
-    public interface OnCancelClickedListener {
-        void onCancelClicked();
-    }
 }

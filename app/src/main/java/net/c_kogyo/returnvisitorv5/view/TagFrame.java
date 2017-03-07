@@ -13,7 +13,6 @@ import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Tag;
 
 import java.util.ArrayList;
-import java.util.StringTokenizer;
 
 /**
  * Created by SeijiShii on 2017/02/21.
@@ -28,18 +27,15 @@ public class TagFrame extends LinearLayout implements View.OnTouchListener {
     private ArrayList<String> mTagIds;
     private ArrayList<Tag> mTags;
     private ArrayList<SmallTagView> mTagViews;
-    private OnTouchFrameListener mTouchListener;
-    private OnSetHeightCallback mHeightCallback;
+    private TagFrameCallback mCallback;
 
     public TagFrame(Context context,
                     ArrayList<String> tags,
-                    OnTouchFrameListener touchListener,
-                    OnSetHeightCallback heightCallback) {
+                    TagFrameCallback callback) {
         super(context);
 
         this.mTagIds = tags;
-        this.mTouchListener = touchListener;
-        this.mHeightCallback = heightCallback;
+        this.mCallback = callback;
 
         initCommon();
 
@@ -50,21 +46,22 @@ public class TagFrame extends LinearLayout implements View.OnTouchListener {
     }
 
     public void setTagIdsAndInitialize(ArrayList<String> tagIds,
-                                       OnTouchFrameListener touchListener,
-                                       OnSetHeightCallback heightCallback) {
+                                       TagFrameCallback callback) {
         this.mTagIds = tagIds;
 
-        this.mTouchListener = touchListener;
-        if (mTouchListener != null) {
+        this.mCallback = callback;
+        if (mCallback != null) {
             this.setOnTouchListener(this);
         }
 
-        this.mHeightCallback = heightCallback;
+        this.mCallback = callback;
 
         initCommon();
     }
 
     private void initCommon() {
+
+        this.removeAllViews();
 
         lineHeight = (int) (getContext().getResources().getDisplayMetrics().density * LINE_HEIGHT);
         margin = (int) (getContext().getResources().getDisplayMetrics().density * MARGIN);
@@ -75,10 +72,11 @@ public class TagFrame extends LinearLayout implements View.OnTouchListener {
         frameHeight = 0;
 
         setTags();
-        if (mTags.size() <= 0) return;
-
-        if (mTouchListener != null) {
-            this.setOnTouchListener(this);
+        if (mTags.size() <= 0) {
+            if (mCallback != null) {
+                mCallback.onSetHeightZero();
+            }
+            return;
         }
 
         startDrawAndMeasure();
@@ -161,8 +159,8 @@ public class TagFrame extends LinearLayout implements View.OnTouchListener {
             widthSum += (tagView.getViewWidth() + margin);
         }
 
-        if (mHeightCallback == null) return;
-        mHeightCallback.onSetHeight(frameHeight);
+        if (mCallback == null) return;
+        mCallback.onSetHeight(frameHeight);
     }
 
     private void setTags() {
@@ -177,7 +175,7 @@ public class TagFrame extends LinearLayout implements View.OnTouchListener {
         }
 
         // ここからはテスト部分
-        addTestTags();
+//        addTestTags();
 
     }
 
@@ -211,7 +209,9 @@ public class TagFrame extends LinearLayout implements View.OnTouchListener {
 
             case MotionEvent.ACTION_UP:
                 this.setAlpha(1f);
-                this.mTouchListener.onTouch(this);
+                if (mCallback != null) {
+                    mCallback.onClickFrame();
+                }
                 return true;
 
             case MotionEvent.ACTION_CANCEL:
@@ -227,11 +227,12 @@ public class TagFrame extends LinearLayout implements View.OnTouchListener {
 //        return frameHeight;
 //    }
 
-    public interface OnTouchFrameListener {
-        void onTouch(TagFrame tagFrame);
-    }
+    interface TagFrameCallback {
 
-    interface OnSetHeightCallback {
         void onSetHeight(int frameHeight);
+
+        void onSetHeightZero();
+
+        void onClickFrame();
     }
 }

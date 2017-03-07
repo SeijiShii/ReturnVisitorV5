@@ -259,10 +259,10 @@ public class RecordVisitActivity extends AppCompatActivity {
     private void showPersonDialogForNew() {
 
         PersonDialog personDialog = new PersonDialog(this, new Person(mPlace.getId()),
-                new PersonDialog.OnPersonEditFinishListener() {
-                    @Override
-                    public void onFinishEdit(final Person person) {
 
+                new PersonDialog.OnButtonsClickListener() {
+                    @Override
+                    public void onOkClick(final Person person) {
                         hideSoftKeyboard();
                         // とりあえずアクティビティ内のアレイリストに追加
                         mPersons.add(person);
@@ -276,10 +276,9 @@ public class RecordVisitActivity extends AppCompatActivity {
                             }
                         });
                     }
-                },
-                new PersonDialog.OnCancelClickedListener() {
+
                     @Override
-                    public void onCancelClicked() {
+                    public void onCancelClick() {
                         fadeDialogOverlay(false, null);
                     }
                 });
@@ -455,32 +454,35 @@ public class RecordVisitActivity extends AppCompatActivity {
         PersonDialog personDialog
                 = new PersonDialog(this,
                 person,
-            new PersonDialog.OnPersonEditFinishListener() {
-            @Override
-            public void onFinishEdit(Person person) {
-                VisitDetailView visitDetailView = getVisitDetailView(person);
-                if (visitDetailView != null) {
-                    visitDetailView.refreshPersonData();
-                }
-                fadeDialogOverlay(false, null);
-            }
-        }, new PersonDialog.OnCancelClickedListener() {
-            @Override
-            public void onCancelClicked() {
-                fadeDialogOverlay(false, null);
-            }
-        });
+                new PersonDialog.OnButtonsClickListener() {
+                    @Override
+                    public void onOkClick(Person person) {
+                        VisitDetail visitDetail = mVisit.getVisitDetail(person);
+                        if (visitDetail != null) {
+                            VisitDetailView visitDetailView = getVisitDetailView(visitDetail);
+                            if (visitDetailView != null) {
+                                visitDetailView.refreshPersonData();
+                            }
+                        }
+                        fadeDialogOverlay(false, null);
+                    }
+
+                    @Override
+                    public void onCancelClick() {
+                        fadeDialogOverlay(false, null);
+                    }
+                });
         dialogFrame.addView(personDialog);
         fadeDialogOverlay(true, null);
     }
 
     @Nullable
-    private VisitDetailView getVisitDetailView(Person person) {
+    private VisitDetailView getVisitDetailView(VisitDetail visitDetail) {
 
         for ( int i = 0 ; i < visitDetailFrame.getChildCount() ; i++ ) {
 
             VisitDetailView visitDetailView = (VisitDetailView) visitDetailFrame.getChildAt(i);
-            if (visitDetailView.getVisitDetail().getPersonId().equals(person.getId())) {
+            if (visitDetailView.getVisitDetail().getId().equals(visitDetail.getId())) {
                 return visitDetailView;
             }
         }
@@ -564,7 +566,23 @@ public class RecordVisitActivity extends AppCompatActivity {
     }
 
     private void showTagDialog(VisitDetail visitDetail) {
-        TagDialog tagDialog = new TagDialog(this, visitDetail.getTagIds());
+        TagDialog tagDialog = new TagDialog(this, visitDetail);
+        tagDialog.setOnButtonsClickListener(new TagDialog.OnButtonsClickListener() {
+            @Override
+            public void onOkClick(VisitDetail visitDetail1) {
+
+                VisitDetailView detailView = getVisitDetailView(visitDetail1);
+                if (detailView != null) {
+                    detailView.refreshTagFrame();
+                }
+                fadeDialogOverlay(false, null);
+            }
+
+            @Override
+            public void onCancelClick() {
+                fadeDialogOverlay(false, null);
+            }
+        });
         dialogFrame.addView(tagDialog);
         fadeDialogOverlay(true, null);
     }
