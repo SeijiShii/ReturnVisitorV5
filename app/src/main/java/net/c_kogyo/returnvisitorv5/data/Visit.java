@@ -214,4 +214,8 @@ public class Visit extends DataItem {
         }
         return null;
     }
+
+    public ArrayList<VisitDetail> getVisitDetails() {
+        return visitDetails;
+    }
 }

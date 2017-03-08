@@ -234,5 +234,5 @@ public class TagFrame extends LinearLayout implements View.OnTouchListener {
         void onClickFrame();
     }
 
-    // TODO: 2017/03/07 タグの内容が変更されたときの高さの変更がうまくいっていない
+    // DONE: 2017/03/07 タグの内容が変更されたときの高さの変更がうまくいっていない
 }

@@ -1,6 +1,8 @@
 package net.c_kogyo.returnvisitorv5.dialogcontents;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatSpinner;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -250,12 +252,32 @@ public class PersonDialog extends FrameLayout {
             deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    // TODO: 2017/03/05 削除処理 
+                    // DONE: 2017/03/05 削除処理 -> RecordVisitActivity内の削除動作テストに譲る
+                    confirmDeletePerson();
                 }
             });
         } else {
             deleteButton.setVisibility(View.INVISIBLE);
         }
+    }
+
+    private void confirmDeletePerson() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+
+        builder.setTitle(R.string.delete_person_title);
+        builder.setMessage(R.string.delete_person_message);
+        builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if (mButtonsClickListener != null) {
+                    mButtonsClickListener.onDeleteClick(mPerson);
+                }
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, null);
+        builder.create().show();
+
     }
 
     class AgeSpinnerAdapter extends BaseAdapter {
@@ -294,6 +316,8 @@ public class PersonDialog extends FrameLayout {
         void onOkClick(Person person);
 
         void onCancelClick();
+
+        void onDeleteClick(Person person);
     }
 
 }

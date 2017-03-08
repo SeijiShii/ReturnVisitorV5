@@ -8,6 +8,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -15,8 +16,15 @@ import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.Person;
+import net.c_kogyo.returnvisitorv5.data.Publication;
+import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.StringTokenizer;
 
 /**
  * Created by SeijiShii on 2017/02/27.
@@ -211,7 +219,18 @@ public class VisitDetailView extends BaseAnimateView {
     private void initNoteText() {
         noteText = (AutoCompleteTextView) getViewById(R.id.note_text);
 
-        // TODO: 2017/02/27 AutoCompleteTextViewアダプタ
+        // DONE: 2017/02/27 AutoCompleteTextViewアダプタ
+        // TODO: 2017/03/08 要動作検証
+
+        ArrayList<String> pubNameList = new ArrayList<>();
+        for (Publication pub : RVData.getInstance().getPubList()){
+            pubNameList.add(pub.getName());
+        }
+        String[] pubArray = pubNameList.toArray(new String[0]);
+
+        ArrayAdapter<String> adapter
+                = new ArrayAdapter<>(getContext(), android.R.layout.simple_dropdown_item_1line, pubArray);
+        noteText.setAdapter(adapter);
 
         noteText.addTextChangedListener(new TextWatcher() {
             @Override

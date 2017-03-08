@@ -283,6 +283,11 @@ public class RecordVisitActivity extends AppCompatActivity {
                     public void onCancelClick() {
                         fadeDialogOverlay(false, null);
                     }
+
+                    @Override
+                    public void onDeleteClick(Person person) {
+                        RVData.getInstance().getPersonList().removeById(person.getId());
+                    }
                 });
         dialogFrame.addView(personDialog);
         fadeDialogOverlay(true, null);
@@ -473,6 +478,12 @@ public class RecordVisitActivity extends AppCompatActivity {
                     public void onCancelClick() {
                         fadeDialogOverlay(false, null);
                     }
+
+                    @Override
+                    public void onDeleteClick(Person person) {
+                        RVData.getInstance().getPersonList().removeById(person.getId());
+                        // TODO: 2017/03/08 削除動作テスト 
+                    }
                 });
         dialogFrame.addView(personDialog);
         fadeDialogOverlay(true, null);
@@ -523,6 +534,11 @@ public class RecordVisitActivity extends AppCompatActivity {
 
                 RVData.getInstance().getVisitList().setOrAdd(mVisit);
                 RVData.getInstance().getPersonList().addList(mPersons);
+
+                // TODO: 2017/03/08 要動作検証 noteがAutoCompListについかされたかどうか
+                for (VisitDetail visitDetail : mVisit.getVisitDetails()) {
+                    RVData.getInstance().getNoteCompList().addIfNoSameName(visitDetail.getNote());
+                }
 
                 switch (getIntent().getAction()) {
                     case Constants.RecordVisitActions.NEW_PLACE_ACTION:
