@@ -61,11 +61,8 @@ public class VisitDetailView extends BaseAnimateView {
         initNoteText();
         initRVSwitch();
         initStudySwitch();
-        initTagFrame();
 
-        // exHeightをセットする DONE
-        // 高さをセットするのはコールバックに譲る
-        extractAfterTagFrameHeightSet();
+        initTagFrame();
 
     }
 
@@ -187,7 +184,7 @@ public class VisitDetailView extends BaseAnimateView {
         tagButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: 2017/02/27 tagDialogへの遷移
+                // DONE: 2017/02/27 tagDialogへの遷移
                 if (mTagButtonClickListener != null) {
                     mTagButtonClickListener.onTagButtonClick(mVisitDetail);
                 }
@@ -261,8 +258,6 @@ public class VisitDetailView extends BaseAnimateView {
     }
 
     private TagFrame tagFrame;
-    private boolean hasSetTagFrameHeight = false;
-
     private void initTagFrame() {
 
         tagFrame = (TagFrame) getViewById(R.id.tag_frame);
@@ -271,13 +266,6 @@ public class VisitDetailView extends BaseAnimateView {
             @Override
             public void onSetHeight(int frameHeight) {
                 mTagFrameHeight = frameHeight;
-                hasSetTagFrameHeight = true;
-            }
-
-            @Override
-            public void onSetHeightZero() {
-                mTagFrameHeight = 0;
-                hasSetTagFrameHeight = true;
                 extractAfterTagFrameHeightSet();
             }
 
@@ -290,36 +278,17 @@ public class VisitDetailView extends BaseAnimateView {
 
     private void extractAfterTagFrameHeightSet() {
 
-        final Handler handler = new Handler();
+        // タグフレームの高さが渡されたらビュー全体の高さを設定しアニメーションする。
+        int rowHeight = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small);
+        int padding = getContext().getResources().getDimensionPixelSize(R.dimen.padding_normal);
+        fixedHeight = rowHeight * 10 + padding * 2;
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (!hasSetTagFrameHeight) {
-                    try {
-                        Thread.sleep(50);
-                    } catch (InterruptedException e) {
-                        //
-                    }
-                }
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        // タグフレームの高さが渡されたらビュー全体の高さを設定しアニメーションする。
-                        int rowHeight = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small);
-                        int padding = getContext().getResources().getDimensionPixelSize(R.dimen.padding_normal);
-                        fixedHeight = rowHeight * 10 + padding * 2;
+        noteLineHeight = (int) (noteText.getPaint().getFontMetrics().bottom - noteText.getPaint().getFontMetrics().top);
 
-                        noteLineHeight = (int) (noteText.getPaint().getFontMetrics().bottom - noteText.getPaint().getFontMetrics().top);
+        mExHeight = fixedHeight + noteLineHeight + mTagFrameHeight;
 
-                        mExHeight = fixedHeight + noteLineHeight + mTagFrameHeight;
-
-                        VisitDetailView.this.setExHeight(mExHeight);
-                        VisitDetailView.this.changeViewHeight(AnimateCondition.TO_EX_HEIGHT, 0, true, null, null);
-                    }
-                });
-            }
-        }).start();
+        VisitDetailView.this.setExHeight(mExHeight);
+        VisitDetailView.this.changeViewHeight(AnimateCondition.TO_EX_HEIGHT, 0, true, null, null);
 
     }
 

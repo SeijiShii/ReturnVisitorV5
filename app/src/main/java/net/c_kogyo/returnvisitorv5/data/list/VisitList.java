@@ -16,9 +16,10 @@ public class VisitList extends DataList<Visit> {
 
         ArrayList<Visit> visits = new ArrayList<>();
         for (Visit visit : this) {
-
-            if (visit.getPlaceId().equals(placeId)) {
-                visits.add(visit);
+            if (visit.getPlaceId() != null) {
+                if (visit.getPlaceId().equals(placeId)) {
+                    visits.add(visit);
+                }
             }
         }
         return visits;

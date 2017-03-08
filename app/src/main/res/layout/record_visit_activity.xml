@@ -105,6 +105,7 @@
 
             </LinearLayout>
 
+            <!-- Visit Detail Frame Parent -->
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -204,45 +205,42 @@
                 </LinearLayout>
 
                 <!-- Frame for Visit Detail Button and NH Button -->
-                <RelativeLayout
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="#CFFF"
-                    android:id="@+id/two_buttons_frame">
+                    android:id="@+id/two_buttons_frame"
+                    android:orientation="vertical">
 
-                    <LinearLayout
+                    <View
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_centerInParent="true">
+                        android:layout_height="@dimen/ui_height_small"/>
 
-                        <!-- Record Visit Detail Button -->
-                        <Button
-                            android:layout_width="match_parent"
-                            android:layout_height="@dimen/ui_height_small"
-                            android:id="@+id/visit_detail_button"
-                            android:background="@drawable/primary_blue_selector"
-                            android:layout_margin="@dimen/ui_margin_normal"
-                            android:textColor="#FFF"
-                            android:textSize="@dimen/in_frame_text_size"
-                            android:gravity="center"
-                            android:text="@string/record_visit_detail" />
+                    <!-- Record Visit Detail Button -->
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/ui_height_small"
+                        android:id="@+id/visit_detail_button"
+                        android:background="@drawable/primary_blue_selector"
+                        android:layout_margin="@dimen/ui_margin_normal"
+                        android:textColor="#FFF"
+                        android:textSize="@dimen/in_frame_text_size"
+                        android:gravity="center"
+                        android:text="@string/record_visit_detail" />
 
-                        <!-- Record Not home button -->
-                        <Button
-                            android:layout_width="match_parent"
-                            android:layout_height="@dimen/ui_height_small"
-                            android:id="@+id/record_not_home_button"
-                            android:background="@drawable/sea_blue_selector"
-                            android:layout_margin="@dimen/ui_margin_normal"
-                            android:textColor="#FFF"
-                            android:textSize="@dimen/in_frame_text_size"
-                            android:gravity="center"
-                            android:text="@string/record_not_home"/>
+                    <!-- Record Not home button -->
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/ui_height_small"
+                        android:id="@+id/record_not_home_button"
+                        android:background="@drawable/sea_blue_selector"
+                        android:layout_margin="@dimen/ui_margin_normal"
+                        android:textColor="#FFF"
+                        android:textSize="@dimen/in_frame_text_size"
+                        android:gravity="center"
+                        android:text="@string/record_not_home"/>
 
-                    </LinearLayout>
-
-                </RelativeLayout>
+                </LinearLayout>
 
             </FrameLayout>
 

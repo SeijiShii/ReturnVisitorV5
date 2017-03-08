@@ -24,14 +24,19 @@ public class DataList<T extends DataItem> implements Iterable<T>{
 
     }
 
-    private void setOrAdd(T data) {
+    public void setOrAdd(T data) {
 
         if (contains(data)) {
             list.set(indexOf(data), data);
         } else {
             list.add(data);
         }
+    }
 
+    public void addList(ArrayList<T> list) {
+        for (T item : list) {
+            setOrAdd(item);
+        }
     }
 
     private int indexOf(T data) {
@@ -107,7 +112,7 @@ public class DataList<T extends DataItem> implements Iterable<T>{
         return list;
     }
 
-    public void add(T item) {
+    private void add(T item) {
         list.add(item);
     }
 

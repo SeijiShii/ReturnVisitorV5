@@ -100,7 +100,7 @@ public class TagDialog extends FrameLayout {
         addButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: 2017/03/06 タグ追加処理
+                // DONE: 2017/03/06 タグ追加処理
 
                 String data = searchText.getText().toString();
                 searchText.setText("");
@@ -114,7 +114,7 @@ public class TagDialog extends FrameLayout {
                 }
 
                 Tag newTag = new Tag(data);
-                RVData.getInstance().getTagList().add(newTag);
+                RVData.getInstance().getTagList().setOrAdd(newTag);
 
                 mVisitDetail.getTagIds().add(newTag.getId());
 
@@ -131,7 +131,7 @@ public class TagDialog extends FrameLayout {
     private void initTagListView() {
 
         tagListView = (ListViewCompat) view.findViewById(R.id.tag_list_view);
-        // TODO: 2017/03/06 tag list adapter
+        // DONE: 2017/03/06 tag list adapter
         mAdapter = new TagListAdapter();
         tagListView.setAdapter(mAdapter);
 
@@ -158,7 +158,7 @@ public class TagDialog extends FrameLayout {
         okButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: 2017/03/06 OK
+                // DONE: 2017/03/06 OK
                 if (mButtonsClickListener != null) {
                     mButtonsClickListener.onOkClick(mVisitDetail);
                 }
@@ -173,7 +173,7 @@ public class TagDialog extends FrameLayout {
         cancelButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: 2017/03/06 Cancel
+                // DONE: 2017/03/06 Cancel
                 if (mButtonsClickListener != null) {
                     mButtonsClickListener.onCancelClick();
                 }
@@ -278,7 +278,7 @@ public class TagDialog extends FrameLayout {
             editButton.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    // TODO: 2017/03/06 ポップアップで削除を尋ねる
+                    // DONE: 2017/03/06 ポップアップで削除を尋ねる
                     PopupMenu popupMenu = new PopupMenu(getContext(), editButton);
                     MenuInflater inflater = popupMenu.getMenuInflater();
                     inflater.inflate(R.menu.tag_list_cell_menu, popupMenu.getMenu());
@@ -316,7 +316,7 @@ public class TagDialog extends FrameLayout {
         }
 
         private void refreshData(Tag tag, boolean isSelected) {
-            // TODO: 2017/03/06 情報の更新
+            // DONE: 2017/03/06 情報の更新
 
             mTag = tag;
             mIsSelected = isSelected;

@@ -163,22 +163,22 @@ public class RVData {
 
                         switch (record.getClassName()) {
                             case "Place":
-                                placeList.add(new Place(record));
+                                placeList.setOrAdd(new Place(record));
                                 break;
                             case "Person":
-                                personList.add(new Person(record));
+                                personList.setOrAdd(new Person(record));
                                 break;
                             case "Visit":
-                                visitList.add(new Visit(record));
+                                visitList.setOrAdd(new Visit(record));
                                 break;
                             case "Tag":
-                                tagList.add(new Tag(record));
+                                tagList.setOrAdd(new Tag(record));
                                 break;
                             case "NoteCompItem":
-                                noteCompList.add(new NoteCompItem(record));
+                                noteCompList.setOrAdd(new NoteCompItem(record));
                                 break;
                             case "Publication":
-                                pubList.add(new Publication(record));
+                                pubList.setOrAdd(new Publication(record));
                                 break;
                         }
                     }

@@ -74,7 +74,7 @@ public class TagFrame extends LinearLayout implements View.OnTouchListener {
         setTags();
         if (mTags.size() <= 0) {
             if (mCallback != null) {
-                mCallback.onSetHeightZero();
+                mCallback.onSetHeight(0);
             }
             return;
         }
@@ -231,8 +231,8 @@ public class TagFrame extends LinearLayout implements View.OnTouchListener {
 
         void onSetHeight(int frameHeight);
 
-        void onSetHeightZero();
-
         void onClickFrame();
     }
+
+    // TODO: 2017/03/07 タグの内容が変更されたときの高さの変更がうまくいっていない
 }

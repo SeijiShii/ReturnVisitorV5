@@ -165,9 +165,9 @@ public class RecordVisitActivity extends AppCompatActivity {
         });
     }
 
-    private RelativeLayout twoButtonsFrame;
+    private LinearLayout twoButtonsFrame;
     private void initTwoButtonsFrame() {
-        twoButtonsFrame = (RelativeLayout) findViewById(R.id.two_buttons_frame);
+        twoButtonsFrame = (LinearLayout) findViewById(R.id.two_buttons_frame);
         // オーバーレイをタッチが透過するのを防ぐ
         twoButtonsFrame.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -203,11 +203,13 @@ public class RecordVisitActivity extends AppCompatActivity {
     }
 
     private void recordAsNotHome() {
-        RVData.getInstance().getVisitList().add(mVisit);
-        RVData.getInstance().getPlaceList().add(mPlace);
+        RVData.getInstance().getVisitList().setOrAdd(mVisit);
+        RVData.getInstance().getPlaceList().setOrAdd(mPlace);
         Intent intent = new Intent();
         intent.putExtra(Visit.VISIT, mVisit.getId());
         setResult(Constants.RecordVisitActions.VISIT_ADDED_RESULT_CODE, intent);
+
+        RVData.getInstance().saveData(null);
         finish();
     }
 
@@ -519,12 +521,13 @@ public class RecordVisitActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                RVData.getInstance().getVisitList().add(mVisit);
+                RVData.getInstance().getVisitList().setOrAdd(mVisit);
+                RVData.getInstance().getPersonList().addList(mPersons);
 
                 switch (getIntent().getAction()) {
                     case Constants.RecordVisitActions.NEW_PLACE_ACTION:
 
-                        RVData.getInstance().getPlaceList().add(mPlace);
+                        RVData.getInstance().getPlaceList().setOrAdd(mPlace);
 
                         Intent intent = new Intent();
                         intent.putExtra(Visit.VISIT, mVisit.getId());
@@ -532,6 +535,8 @@ public class RecordVisitActivity extends AppCompatActivity {
 
                         break;
                 }
+
+                RVData.getInstance().saveData(null);
                 finish();
 
             }
