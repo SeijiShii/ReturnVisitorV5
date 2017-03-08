@@ -73,7 +73,18 @@ public class TagDialog extends FrameLayout {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-                // TODO: 2017/03/06 インクリメンタルサーチ
+                // DONE: 2017/03/06 インクリメンタルサーチ
+
+                String s = charSequence.toString();
+                s = trimWhitespace(s);
+
+                if (s.length() <= 0) {
+                    mAdapter = new TagListAdapter(RVData.getInstance().getTagList().getList());
+                } else {
+                    mAdapter = new TagListAdapter(RVData.getInstance().getTagList().getSearchedItems(s, getContext()));
+                }
+                tagListView.setAdapter(mAdapter);
+                mAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -81,6 +92,22 @@ public class TagDialog extends FrameLayout {
 
             }
         });
+    }
+
+    public static String trimWhitespace(String str) {
+        if (str == null || str.length() == 0) {
+            return str;
+        }
+        int st = 0;
+        int len = str.length();
+        char[] val = str.toCharArray();
+        while ((st < len) && ((val[st] <= '\u0020') || (val[st] == '\u00A0') || (val[st] == '\u3000'))) {
+            st++;
+        }
+        while ((st < len) && ((val[len - 1] <= '\u0020') || (val[len - 1] == '\u00A0') || (val[len - 1] == '\u3000'))) {
+            len--;
+        }
+        return ((st > 0) || (len < str.length())) ? str.substring(st, len) : str;
     }
 
     private Button clearButton;
@@ -118,6 +145,7 @@ public class TagDialog extends FrameLayout {
 
                 mVisitDetail.getTagIds().add(newTag.getId());
 
+                mAdapter = new TagListAdapter(RVData.getInstance().getTagList().getList());
                 mAdapter.notifyDataSetChanged();
                 setListViewHeight();
 
@@ -132,7 +160,7 @@ public class TagDialog extends FrameLayout {
 
         tagListView = (ListViewCompat) view.findViewById(R.id.tag_list_view);
         // DONE: 2017/03/06 tag list adapter
-        mAdapter = new TagListAdapter();
+        mAdapter = new TagListAdapter(RVData.getInstance().getTagList().getList());
         tagListView.setAdapter(mAdapter);
 
         setListViewHeight();
@@ -194,14 +222,19 @@ public class TagDialog extends FrameLayout {
 
     private class TagListAdapter extends BaseAdapter{
 
+        private ArrayList<Tag> mTags;
+        TagListAdapter(ArrayList<Tag> tags) {
+            mTags = new ArrayList<>(tags);
+        }
+
         @Override
         public int getCount() {
-            return RVData.getInstance().getTagList().size();
+            return mTags.size();
         }
 
         @Override
         public Object getItem(int i) {
-            return RVData.getInstance().getTagList().get(i);
+            return mTags.get(i);
         }
 
         @Override

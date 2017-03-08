@@ -1,5 +1,7 @@
 package net.c_kogyo.returnvisitorv5.data.list;
 
+import android.content.Context;
+
 import net.c_kogyo.returnvisitorv5.data.DataItem;
 
 import org.json.JSONArray;
@@ -8,6 +10,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by SeijiShii on 2016/07/24.
@@ -132,6 +135,25 @@ public class DataList<T extends DataItem> implements Iterable<T>{
             }
         }
         return false;
+    }
+
+    public ArrayList<T> getSearchedItems(String searchWord, Context context) {
+
+        String[] words = searchWord.split(" ");
+
+        ArrayList<T> searchResultItems = new ArrayList<>(list);
+
+        for (String word : words) {
+            List<T> listToRemove = new ArrayList<>();
+
+            for (T t: searchResultItems) {
+                if (!t.toStringForSearch(context).contains(word)){
+                    listToRemove.add(t);
+                }
+            }
+            searchResultItems.removeAll(listToRemove);
+        }
+        return searchResultItems;
     }
 }
 
