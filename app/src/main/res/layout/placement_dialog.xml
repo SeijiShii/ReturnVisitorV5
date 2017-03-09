@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFF">
+
+    <!-- Dialog title -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_height_small"
+        android:textColor="@color/textColorGray"
+        android:textSize="@dimen/text_size_large"
+        android:gravity="center"
+        android:text="@string/placement"/>
+
+    <!-- Content frame -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <!-- Placement List -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <ListView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:id="@+id/placement_list_view"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/ui_height_small">
+
+                <Button
+                    android:layout_width="150dp"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/trans_orange_selector"
+                    android:id="@+id/cancel_button"
+                    android:text="@string/cancel"
+                    android:textSize="@dimen/text_size_middle"
+                    android:textColor="@color/colorAccent"
+                    android:layout_alignParentRight="true"/>
+
+            </RelativeLayout>
+        </LinearLayout>
+
+        <!-- General Placement Frame -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:background="#FFF"
+            android:id="@+id/general_placement_frame"
+            android:visibility="invisible">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/ui_height_small"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:id="@+id/category_text"
+                    android:textColor="@color/textColorGray"
+                    android:textSize="@dimen/text_size_large"
+                    android:text="Tract"
+                    android:layout_marginLeft="10dp"
+                    android:gravity="center_vertical"/>
+
+                <RelativeLayout
+                    android:layout_width="25dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="10dp">
+
+                    <Button
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_centerVertical="true"
+                        android:layout_centerInParent="true"
+                        android:background="@drawable/gray_x_selector"
+                        android:id="@+id/general_close_button"/>
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+            <AutoCompleteTextView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/ui_height_small"
+                android:background="@drawable/gray_trans_circle"
+                android:layout_margin="5dp"
+                android:id="@+id/general_name_text"/>
+
+        </LinearLayout>
+
+        <!-- Magazine Frame -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:background="#FFF"
+            android:id="@+id/magazine_frame"
+            android:visibility="invisible">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/ui_height_small"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:textColor="@color/textColorGray"
+                    android:textSize="@dimen/text_size_large"
+                    android:text="@string/magazine"
+                    android:layout_marginLeft="10dp"
+                    android:gravity="center_vertical"/>
+
+                <RelativeLayout
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginRight="10dp">
+
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="25dp"
+                        android:layout_centerVertical="true"
+                        android:layout_centerInParent="true"
+                        android:background="@drawable/gray_x_selector"
+                        android:id="@+id/magazine_close_button"/>
+                </RelativeLayout>
+            </LinearLayout>
+
+            <!-- Magazine Category -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/ui_height_small"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:textColor="@color/textColorGray"
+                    android:textSize="@dimen/text_size_middle"
+                    android:text="@string/magazine_category"
+                    android:gravity="center_vertical"
+                    android:layout_marginLeft="10dp"/>
+
+                <android.support.v7.widget.AppCompatSpinner
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:id="@+id/magazine_category_spinner"/>
+
+            </LinearLayout>
+
+            <!-- Number -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/ui_height_small"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:textColor="@color/textColorGray"
+                    android:textSize="@dimen/text_size_middle"
+                    android:text="@string/magazine_number"
+                    android:gravity="center_vertical"
+                    android:layout_marginLeft="10dp"/>
+
+                <android.support.v7.widget.AppCompatSpinner
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:id="@+id/number_spinner"/>
+
+            </LinearLayout>
+
+
+
+            <AutoCompleteTextView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/ui_height_small"
+                android:background="@drawable/gray_trans_circle"
+                android:layout_margin="5dp"
+                android:id="@+id/magazine_name_text"/>
+
+        </LinearLayout>
+    </FrameLayout>
+</LinearLayout>
