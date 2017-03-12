@@ -276,6 +276,8 @@ public class RecordVisitActivity extends AppCompatActivity {
                         // とりあえずアクティビティ内のアレイリストに追加
                         mPersons.add(person);
                         final VisitDetail visitDetail = new VisitDetail(person.getId(), mVisit.getId());
+                        // 新しく人を追加したということは会えたということでしょう。
+                        visitDetail.setSeen(true);
                         mVisit.addVisitDetail(visitDetail);
                         fadeDialogOverlay(false, new DialogPostAnimationListener() {
                             @Override

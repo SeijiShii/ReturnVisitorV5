@@ -176,4 +176,16 @@ public class VisitDetail extends DataItem {
     public ArrayList<Placement> getPlacements() {
         return placements;
     }
+
+    public boolean isSeen() {
+        return seen;
+    }
+
+    public boolean isStudy() {
+        return isStudy;
+    }
+
+    public boolean isRV() {
+        return isRV;
+    }
 }

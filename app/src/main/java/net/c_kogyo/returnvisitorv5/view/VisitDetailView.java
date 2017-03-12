@@ -143,6 +143,7 @@ public class VisitDetailView extends BaseAnimateView {
                 }
             }
         });
+        seenSwitch.setChecked(mVisitDetail.isSeen());
 //        seenText.setOnClickListener(new OnClickListener() {
 //            @Override
 //            public void onClick(View view) {
@@ -301,6 +302,7 @@ public class VisitDetailView extends BaseAnimateView {
     private SwitchCompat rvSwitch;
     private void initRVSwitch() {
         rvSwitch = (SwitchCompat) getViewById(R.id.rv_switch);
+        rvSwitch.setChecked(mVisitDetail.isRV());
         rvSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
@@ -312,6 +314,7 @@ public class VisitDetailView extends BaseAnimateView {
     private SwitchCompat studySwitch;
     private void initStudySwitch() {
         studySwitch = (SwitchCompat) getViewById(R.id.study_switch);
+        studySwitch.setChecked(mVisitDetail.isStudy());
         studySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
