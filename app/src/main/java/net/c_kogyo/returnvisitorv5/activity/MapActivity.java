@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -62,6 +63,7 @@ public class MapActivity extends AppCompatActivity
 
         setContentView(R.layout.map_activity);
 
+        initLogoButton();
         initMapView(savedInstanceState);
         initDialogOverlay();
 
@@ -135,7 +137,8 @@ public class MapActivity extends AppCompatActivity
         }
 
         // xmlでの指定の方法が分からん
-        mMap.setPadding(0, 40, 0, 0);
+        int topPadding = (int) (getResources().getDisplayMetrics().density * 50);
+        mMap.setPadding(0, topPadding, 0, 0);
         mMap.getUiSettings().setMapToolbarEnabled(false);
 
         loadCameraPosition();
@@ -419,6 +422,29 @@ public class MapActivity extends AppCompatActivity
                 }
                 break;
         }
+    }
+
+    private void initLogoButton() {
+        final ImageView logoButton = (ImageView) findViewById(R.id.logo_button);
+        logoButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+
+                switch (motionEvent.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        logoButton.setAlpha(0.5f);
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        logoButton.setAlpha(1f);
+                        return true;
+                    case MotionEvent.ACTION_CANCEL:
+                        logoButton.setAlpha(1f);
+                        return true;
+                }
+
+                return false;
+            }
+        });
     }
 
     private void testView() {
