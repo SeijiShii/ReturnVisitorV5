@@ -1,6 +1,7 @@
 package net.c_kogyo.returnvisitorv5.activity;
 
 import android.Manifest;
+import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -46,6 +47,8 @@ import static net.c_kogyo.returnvisitorv5.activity.Constants.SharedPrefTags.ZOOM
 public class MapActivity extends AppCompatActivity
                             implements OnMapReadyCallback,
                                         GoogleMap.OnMapLongClickListener,
+                                        GoogleMap.OnMarkerClickListener,
+                                        GoogleMap.OnMarkerDragListener,
                                         RVData.RVDataStoreCallback{
 
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
@@ -160,6 +163,8 @@ public class MapActivity extends AppCompatActivity
                     public void run() {
 
                         mMap.setOnMapLongClickListener(MapActivity.this);
+                        mMap.setOnMarkerClickListener(MapActivity.this);
+                        mMap.setOnMarkerDragListener(MapActivity.this);
 
                         // DONE: 2017/03/01 ここにマーカー描画処理を記述する
                         drawAllMarkers();
@@ -320,6 +325,27 @@ public class MapActivity extends AppCompatActivity
         startActivityForResult(recordVisitIntent, NEW_VISIT_REQUEST_CODE);
     }
 
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        fadeDialogOverlay(true);
+        return false;
+    }
+
+    @Override
+    public void onMarkerDrag(Marker marker) {
+
+    }
+
+    @Override
+    public void onMarkerDragStart(Marker marker) {
+
+    }
+
+    @Override
+    public void onMarkerDragEnd(Marker marker) {
+
+    }
+
     private RelativeLayout dialogOverlay;
     private void initDialogOverlay() {
         dialogOverlay = (RelativeLayout) findViewById(R.id.dialog_overlay);
@@ -330,13 +356,29 @@ public class MapActivity extends AppCompatActivity
             }
         });
 
-        initDialogFrame();
+//        initDialogFrame();
     }
 
-    private FrameLayout dialogFrame;
-    private void initDialogFrame() {
-        dialogFrame = (FrameLayout) findViewById(R.id.dialog_frame);
+    private void fadeDialogOverlay(boolean fadeIn) {
+        if (fadeIn) {
+            dialogOverlay.setVisibility(View.VISIBLE);
+            ValueAnimator animator = ValueAnimator.ofFloat(0f, 1f);
+            animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                    dialogOverlay.setAlpha((float) valueAnimator.getAnimatedValue());
+                    dialogOverlay.requestLayout();
+                }
+            });
+            animator.setDuration(500);
+            animator.start();
+        }
     }
+
+//    private FrameLayout dialogFrame;
+//    private void initDialogFrame() {
+//        dialogFrame = (FrameLayout) findViewById(R.id.dialog_frame);
+//    }
 
     private void drawAllMarkers() {
         mMap.clear();

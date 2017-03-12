@@ -1,60 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <!-- Main Map Frame -->
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <!-- Tool bar -->
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:background="@color/creamWhite">
-
-        </RelativeLayout>
+        android:layout_weight="1"
+        android:layout_height="0dp">
 
         <com.google.android.gms.maps.MapView
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="match_parent"
             android:id="@+id/map_view"/>
 
+        <!-- Dialog overlay -->
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:background="@color/adFrameGray">
+            android:layout_height="match_parent"
+            android:background="@drawable/gradient_overlay"
+            android:id="@+id/dialog_overlay"
+            android:visibility="invisible">
+
+            <!--<ScrollView-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:background="@drawable/gray_white_circle"-->
+            <!--android:layout_margin="10dp"-->
+            <!--android:layout_centerInParent="true"-->
+            <!--android:padding="@dimen/padding_normal">-->
+
+            <!--<FrameLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:id="@+id/dialog_frame"/>-->
+
+            <!--</ScrollView>-->
 
         </RelativeLayout>
 
-    </LinearLayout>
+    </FrameLayout>
 
-    <!-- Dialog overlay -->
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#B000"
-        android:id="@+id/dialog_overlay"
-        android:visibility="invisible">
-
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/gray_white_circle"
-            android:layout_margin="10dp"
-            android:layout_centerInParent="true"
-            android:padding="@dimen/padding_normal">
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/dialog_frame"/>
-
-        </ScrollView>
+        android:layout_height="60dp"
+        android:background="@color/adFrameGray">
 
     </RelativeLayout>
 
-</FrameLayout>
+</LinearLayout>
