@@ -262,6 +262,7 @@ public class PlacementDialog extends FrameLayout {
         ArrayAdapter<String> numAdapter
                 = new ArrayAdapter(getContext(), android.R.layout.simple_dropdown_item_1line, numList);
         numberSpinner.setAdapter(numAdapter);
+        numberSpinner.setSelection(numList.size() - 3);
 
     }
 
