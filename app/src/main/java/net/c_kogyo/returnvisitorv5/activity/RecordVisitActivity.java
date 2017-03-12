@@ -40,6 +40,7 @@ import net.c_kogyo.returnvisitorv5.service.FetchAddressIntentService;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 import net.c_kogyo.returnvisitorv5.view.BaseAnimateView;
 import net.c_kogyo.returnvisitorv5.view.ClearEditText;
+import net.c_kogyo.returnvisitorv5.view.PlacementCell;
 import net.c_kogyo.returnvisitorv5.view.PriorityRater;
 import net.c_kogyo.returnvisitorv5.view.VisitDetailView;
 
@@ -71,6 +72,10 @@ public class RecordVisitActivity extends AppCompatActivity {
         initTimeText();
         initTwoButtonsFrame();
         initAddPersonButton();
+
+        initRecordPlacementButton();
+        initPlacementContainer();
+
         initVisitDetailFrame();
         initDialogOverlay();
         initOkButton();
@@ -640,6 +645,25 @@ public class RecordVisitActivity extends AppCompatActivity {
 
         if (parentId.equals(mVisit.getId())) {
             // Visitに配布物を追加する場合
+            mVisit.addPlacement(placement);
+            PlacementCell placementCell = new PlacementCell(this,
+                    placement,
+                    BaseAnimateView.InitialHeightCondition.ZERO,
+                    new PlacementCell.PlacementCellListener() {
+                @Override
+                public void postExtract(PlacementCell cell) {
+
+                }
+
+                @Override
+                public void postCompress(PlacementCell cell) {
+
+                    mVisit.getPlacements().remove(cell.getPlacement());
+                    placementContainer.removeView(cell);
+                }
+            });
+            placementContainer.addView(placementCell);
+
         } else {
             // VisitDetailに追加する場合
 
@@ -654,6 +678,21 @@ public class RecordVisitActivity extends AppCompatActivity {
             }
         }
 
+    }
+
+    private void initRecordPlacementButton() {
+        Button recordPlcButton = (Button) findViewById(R.id.record_placement_button);
+        recordPlcButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showPlacementDialog(mVisit.getId());
+            }
+        });
+    }
+
+    private LinearLayout placementContainer;
+    private void initPlacementContainer() {
+        placementContainer = (LinearLayout) findViewById(R.id.placement_container);
     }
 
 }

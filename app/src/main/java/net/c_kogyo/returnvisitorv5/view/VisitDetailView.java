@@ -171,7 +171,7 @@ public class VisitDetailView extends BaseAnimateView {
         placementButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: 2017/02/27 placementDialogへの遷移
+                // DONE: 2017/02/27 placementDialogへの遷移
                 if (mButtonClickListener != null) {
                     mButtonClickListener.onPlacementButtonClick(mVisitDetail);
                 }
@@ -277,7 +277,7 @@ public class VisitDetailView extends BaseAnimateView {
 
     private void changeToTheHeight() {
 
-        // TODO: 2017/03/12 高さが合わない
+        // DONE: 2017/03/12 高さが合わない
         int rowHeight = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small);
         int padding = getContext().getResources().getDimensionPixelSize(R.dimen.padding_normal);
 

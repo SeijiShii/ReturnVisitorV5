@@ -41,29 +41,37 @@ public class PlacementCell extends BaseAnimateView {
         initPlacementText();
         initDeleteButton();
 
-        extractPostDrawn(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animator) {
+        if (mInitCondition == InitialHeightCondition.ZERO) {
+            extractPostDrawn(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animator) {
 
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animator) {
-                if (mCellListener != null) {
-                    mCellListener.postExtract(PlacementCell.this);
                 }
+
+                @Override
+                public void onAnimationEnd(Animator animator) {
+                    if (mCellListener != null) {
+                        mCellListener.postExtract(PlacementCell.this);
+                    }
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animator) {
+
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animator) {
+
+                }
+            });
+        } else {
+            if (mCellListener != null) {
+                mCellListener.postExtract(this);
             }
+        }
 
-            @Override
-            public void onAnimationCancel(Animator animator) {
 
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animator) {
-
-            }
-        });
     }
 
     private void initPlacementText() {
