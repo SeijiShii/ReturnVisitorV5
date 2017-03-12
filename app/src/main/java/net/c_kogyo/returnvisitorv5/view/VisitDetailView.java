@@ -1,8 +1,8 @@
 package net.c_kogyo.returnvisitorv5.view;
 
+import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.os.Handler;
 import android.support.v7.widget.SwitchCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -12,19 +12,18 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.Person;
+import net.c_kogyo.returnvisitorv5.data.Placement;
 import net.c_kogyo.returnvisitorv5.data.Publication;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.StringTokenizer;
 
 /**
  * Created by SeijiShii on 2017/02/27.
@@ -62,6 +61,7 @@ public class VisitDetailView extends BaseAnimateView {
         initSeenSwitch();
         initEditPersonButton();
         initPlacementButton();
+        initPlacementContainer();
         initTagButton();
         initPriorityRater();
         initNoteText();
@@ -178,6 +178,35 @@ public class VisitDetailView extends BaseAnimateView {
             }
         });
     }
+
+    private LinearLayout placementContainer;
+    private void initPlacementContainer() {
+        placementContainer = (LinearLayout) getViewById(R.id.placement_container);
+    }
+
+    public void addPlacementCell(Placement placement) {
+
+        PlacementCell placementCell
+                = new PlacementCell(getContext(),
+                        placement,
+                        InitialHeightCondition.ZERO,
+                        new PlacementCell.PlacementCellListener() {
+            @Override
+            public void postExtract(PlacementCell cell) {
+                mVisitDetail.getPlacements().add(cell.getPlacement());
+                changeToTheHeight();
+            }
+
+            @Override
+            public void postCompress(PlacementCell cell) {
+                placementContainer.removeView(cell);
+                mVisitDetail.getPlacements().remove(cell.getPlacement());
+                changeToTheHeight();
+            }
+        });
+        placementContainer.addView(placementCell);
+
+    }
     
     private Button tagButton;
     private void initTagButton() {
@@ -234,9 +263,7 @@ public class VisitDetailView extends BaseAnimateView {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-                mExHeight = noteLineHeight * noteText.getLineCount();
-                VisitDetailView.this.setExHeight(fixedHeight + mExHeight + mTagFrameHeight);
-                VisitDetailView.this.changeViewHeight(AnimateCondition.TO_EX_HEIGHT, 0, true, null, null);
+                changeToTheHeight();
 
             }
 
@@ -245,6 +272,24 @@ public class VisitDetailView extends BaseAnimateView {
                 mVisitDetail.setNote(editable.toString());
             }
         });
+    }
+
+    private void changeToTheHeight() {
+
+        // TODO: 2017/03/12 高さが合わない 
+        int rowHeight = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small);
+        int padding = getContext().getResources().getDimensionPixelSize(R.dimen.padding_normal);
+
+        fixedHeight = rowHeight * 11 + padding * 2;
+
+        noteLineHeight = (int) (noteText.getPaint().getFontMetrics().bottom - noteText.getPaint().getFontMetrics().top);
+        int noteHeight = noteLineHeight * noteText.getLineCount();
+        int plcHeight = rowHeight * mVisitDetail.getPlacements().size();
+
+        mExHeight = fixedHeight + plcHeight + noteHeight + mTagFrameHeight;
+
+        VisitDetailView.this.setExHeight(mExHeight);
+        VisitDetailView.this.changeViewHeight(AnimateCondition.TO_EX_HEIGHT, 0, true, null, null);
     }
 
     private SwitchCompat rvSwitch;
@@ -278,7 +323,7 @@ public class VisitDetailView extends BaseAnimateView {
             @Override
             public void onSetHeight(int frameHeight) {
                 mTagFrameHeight = frameHeight;
-                extractAfterTagFrameHeightSet();
+                changeToTheHeight();
             }
 
             @Override
@@ -289,22 +334,6 @@ public class VisitDetailView extends BaseAnimateView {
                 }
             }
         });
-    }
-
-    private void extractAfterTagFrameHeightSet() {
-
-        // タグフレームの高さが渡されたらビュー全体の高さを設定しアニメーションする。
-        int rowHeight = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small);
-        int padding = getContext().getResources().getDimensionPixelSize(R.dimen.padding_normal);
-        fixedHeight = rowHeight * 10 + padding * 2;
-
-        noteLineHeight = (int) (noteText.getPaint().getFontMetrics().bottom - noteText.getPaint().getFontMetrics().top);
-
-        mExHeight = fixedHeight + noteLineHeight + mTagFrameHeight;
-
-        VisitDetailView.this.setExHeight(mExHeight);
-        VisitDetailView.this.changeViewHeight(AnimateCondition.TO_EX_HEIGHT, 0, true, null, null);
-
     }
 
 

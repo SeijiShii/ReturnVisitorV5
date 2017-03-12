@@ -172,4 +172,8 @@ public class VisitDetail extends DataItem {
     public ArrayList<String> getTagIds() {
         return tagIds;
     }
+
+    public ArrayList<Placement> getPlacements() {
+        return placements;
+    }
 }

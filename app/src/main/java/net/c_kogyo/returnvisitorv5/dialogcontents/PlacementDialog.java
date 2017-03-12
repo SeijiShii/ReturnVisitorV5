@@ -33,10 +33,12 @@ public class PlacementDialog extends FrameLayout {
 
     private OnButtonClickListener mButtonClickListener;
     private Placement mPlacement;
+    private String mParentId;
 
-    public PlacementDialog(@NonNull Context context) {
+    public PlacementDialog(@NonNull Context context, String parentId) {
         super(context);
 
+        mParentId = parentId;
         initCommon();
     }
 
@@ -141,7 +143,7 @@ public class PlacementDialog extends FrameLayout {
             public void onClick(View view) {
                 mPlacement.setName(generalNameText.getText().toString());
                 if (mButtonClickListener != null) {
-                    mButtonClickListener.onOkClick(mPlacement);
+                    mButtonClickListener.onOkClick(mPlacement, mParentId);
                 }
             }
         });
@@ -286,7 +288,7 @@ public class PlacementDialog extends FrameLayout {
                 mPlacement.setNumber(numbers.get(numberSpinner.getSelectedItemPosition()).first);
 
                 if (mButtonClickListener != null) {
-                    mButtonClickListener.onOkClick(mPlacement);
+                    mButtonClickListener.onOkClick(mPlacement, mParentId);
                 }
             }
         });
@@ -298,7 +300,7 @@ public class PlacementDialog extends FrameLayout {
 
         void onCancelClick();
 
-        void onOkClick(Placement placement);
+        void onOkClick(Placement placement, String parentId);
 
     }
 

@@ -114,7 +114,7 @@ public class BaseAnimateView extends FrameLayout {
         super.dispatchDraw(canvas);
     }
 
-    public void extractPostDrawn() {
+    public void extractPostDrawn(final Animator.AnimatorListener listener) {
 
         final Handler handler = new Handler();
 
@@ -132,7 +132,7 @@ public class BaseAnimateView extends FrameLayout {
                     @Override
                     public void run() {
 
-                        changeViewHeight(AnimateCondition.FROM_0_TO_EX_HEIGHT, 0, true, null, null);
+                        changeViewHeight(AnimateCondition.FROM_0_TO_EX_HEIGHT, 0, true, null, listener);
                     }
                 });
             }

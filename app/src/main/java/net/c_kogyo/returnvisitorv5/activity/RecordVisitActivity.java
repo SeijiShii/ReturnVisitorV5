@@ -309,6 +309,8 @@ public class RecordVisitActivity extends AppCompatActivity {
 
     private void fadeDialogOverlay(boolean isFadeIn, final DialogPostAnimationListener listener) {
 
+        hideSoftKeyboard();
+
         if (isFadeIn) {
             dialogOverlay.setVisibility(View.VISIBLE);
 
@@ -456,7 +458,7 @@ public class RecordVisitActivity extends AppCompatActivity {
 
             @Override
             public void onPlacementButtonClick(VisitDetail visitDetail) {
-                showPlacementDialog();
+                showPlacementDialog(visitDetail.getId());
             }
         });
     }
@@ -613,9 +615,9 @@ public class RecordVisitActivity extends AppCompatActivity {
         fadeDialogOverlay(true, null);
     }
 
-    private void showPlacementDialog() {
+    private void showPlacementDialog(String parentId) {
 
-        PlacementDialog placementDialog = new PlacementDialog(this);
+        PlacementDialog placementDialog = new PlacementDialog(this, parentId);
         placementDialog.setOnButtonClickListener(new PlacementDialog.OnButtonClickListener() {
             @Override
             public void onCancelClick() {
@@ -623,8 +625,10 @@ public class RecordVisitActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onOkClick(Placement placement) {
+            public void onOkClick(Placement placement, String parentId) {
 
+                addPlacementCell(placement, parentId);
+                fadeDialogOverlay(false, null);
             }
         });
         dialogFrame.addView(placementDialog);
@@ -632,7 +636,24 @@ public class RecordVisitActivity extends AppCompatActivity {
 
     }
 
+    private void addPlacementCell(Placement placement, String parentId){
 
+        if (parentId.equals(mVisit.getId())) {
+            // Visitに配布物を追加する場合
+        } else {
+            // VisitDetailに追加する場合
 
+            for (VisitDetail visitDetail : mVisit.getVisitDetails()) {
+
+                if (visitDetail.getId().equals(parentId)) {
+                    VisitDetailView visitDetailView = getVisitDetailView(visitDetail);
+                    if (visitDetailView != null) {
+                        visitDetailView.addPlacementCell(placement);
+                    }
+                }
+            }
+        }
+
+    }
 
 }
