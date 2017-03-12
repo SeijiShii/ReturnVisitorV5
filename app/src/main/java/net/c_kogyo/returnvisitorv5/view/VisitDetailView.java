@@ -240,6 +240,7 @@ public class VisitDetailView extends BaseAnimateView {
     private AutoCompleteTextView noteText;
     private void initNoteText() {
         noteText = (AutoCompleteTextView) getViewById(R.id.note_text);
+        noteLineHeight = (int) (noteText.getPaint().getFontMetrics().bottom - noteText.getPaint().getFontMetrics().top);
 
         // DONE: 2017/02/27 AutoCompleteTextViewアダプタ
         // TODO: 2017/03/08 要動作検証
@@ -276,14 +277,19 @@ public class VisitDetailView extends BaseAnimateView {
 
     private void changeToTheHeight() {
 
-        // TODO: 2017/03/12 高さが合わない 
+        // TODO: 2017/03/12 高さが合わない
         int rowHeight = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small);
         int padding = getContext().getResources().getDimensionPixelSize(R.dimen.padding_normal);
 
-        fixedHeight = rowHeight * 11 + padding * 2;
+        fixedHeight = rowHeight * 10 + padding * 2;
 
-        noteLineHeight = (int) (noteText.getPaint().getFontMetrics().bottom - noteText.getPaint().getFontMetrics().top);
-        int noteHeight = noteLineHeight * noteText.getLineCount();
+        int lineCount;
+        if (noteText.getLineCount() <= 0) {
+            lineCount = 1;
+        } else {
+            lineCount = noteText.getLineCount();
+        }
+        int noteHeight = noteLineHeight * lineCount;
         int plcHeight = rowHeight * mVisitDetail.getPlacements().size();
 
         mExHeight = fixedHeight + plcHeight + noteHeight + mTagFrameHeight;
