@@ -26,12 +26,13 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <ListView
+            <android.support.v7.widget.ListViewCompat
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:id="@+id/placement_list_view"/>
 
+            <!-- Cancel Button -->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/ui_height_small">
@@ -97,6 +98,23 @@
                 android:background="@drawable/gray_trans_circle"
                 android:layout_margin="5dp"
                 android:id="@+id/general_name_text"/>
+
+            <!-- General OK Button -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/ui_height_small">
+
+                <Button
+                    android:layout_width="150dp"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/trans_blue_selector"
+                    android:id="@+id/general_ok_button"
+                    android:text="@string/ok"
+                    android:textSize="@dimen/text_size_middle"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:layout_alignParentRight="true"/>
+
+            </RelativeLayout>
 
         </LinearLayout>
 
@@ -187,14 +205,29 @@
 
             </LinearLayout>
 
-
-
             <AutoCompleteTextView
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/ui_height_small"
                 android:background="@drawable/gray_trans_circle"
                 android:layout_margin="5dp"
                 android:id="@+id/magazine_name_text"/>
+
+            <!-- Magazine OK Button -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/ui_height_small">
+
+                <Button
+                    android:layout_width="150dp"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/trans_blue_selector"
+                    android:id="@+id/magazine_ok_button"
+                    android:text="@string/ok"
+                    android:textSize="@dimen/text_size_middle"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:layout_alignParentRight="true"/>
+
+            </RelativeLayout>
 
         </LinearLayout>
     </FrameLayout>

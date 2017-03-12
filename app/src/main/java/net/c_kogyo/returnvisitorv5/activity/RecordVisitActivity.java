@@ -29,10 +29,12 @@ import com.google.android.gms.maps.model.LatLng;
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Place;
+import net.c_kogyo.returnvisitorv5.data.Placement;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
 import net.c_kogyo.returnvisitorv5.dialogcontents.PersonDialog;
+import net.c_kogyo.returnvisitorv5.dialogcontents.PlacementDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.TagDialog;
 import net.c_kogyo.returnvisitorv5.service.FetchAddressIntentService;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
@@ -435,23 +437,26 @@ public class RecordVisitActivity extends AppCompatActivity {
                                 person,
                                 BaseAnimateView.InitialHeightCondition.ZERO);
         visitDetailFrame.addView(detailView);
-        detailView.setOnPersonPrioritySetListener(new VisitDetailView.OnPersonPrioritySetListener() {
+        detailView.setOnButtonClickListener(new VisitDetailView.OnButtonClickListener() {
             @Override
-            public void onPersonPrioritySet(Visit.Priority priority) {
+            public void onPrioritySet(Visit.Priority priority) {
                 mVisit.refreshPriority();
                 priorityRater.setPriority(mVisit.getPriority());
             }
-        });
-        detailView.setOnEditPersonClickListener(new VisitDetailView.OnEditPersonClickListener() {
+
             @Override
             public void onEditPersonClick(Person person) {
                 showPersonDialogForEdit(person);
             }
-        });
-        detailView.setOnTagButtonClickListener(new VisitDetailView.OnTagButtonClickListener() {
+
             @Override
             public void onTagButtonClick(VisitDetail visitDetail1) {
                 showTagDialog(visitDetail1);
+            }
+
+            @Override
+            public void onPlacementButtonClick(VisitDetail visitDetail) {
+                showPlacementDialog();
             }
         });
     }
@@ -608,6 +613,24 @@ public class RecordVisitActivity extends AppCompatActivity {
         fadeDialogOverlay(true, null);
     }
 
+    private void showPlacementDialog() {
+
+        PlacementDialog placementDialog = new PlacementDialog(this);
+        placementDialog.setOnButtonClickListener(new PlacementDialog.OnButtonClickListener() {
+            @Override
+            public void onCancelClick() {
+                fadeDialogOverlay(false, null);
+            }
+
+            @Override
+            public void onOkClick(Placement placement) {
+
+            }
+        });
+        dialogFrame.addView(placementDialog);
+        fadeDialogOverlay(true, null);
+
+    }
 
 
 

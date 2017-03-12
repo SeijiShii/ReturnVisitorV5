@@ -34,9 +34,7 @@ public class VisitDetailView extends BaseAnimateView {
 
     private VisitDetail mVisitDetail;
     private Person mPerson;
-    private OnPersonPrioritySetListener mPriorityListener;
-    private OnEditPersonClickListener mPersonClickListener;
-    private OnTagButtonClickListener mTagButtonClickListener;
+    private OnButtonClickListener mButtonClickListener;
 
     private int mExHeight, fixedHeight, noteLineHeight, mTagFrameHeight;
 
@@ -74,16 +72,8 @@ public class VisitDetailView extends BaseAnimateView {
 
     }
 
-    public void setOnPersonPrioritySetListener(OnPersonPrioritySetListener listener) {
-        this.mPriorityListener = listener;
-    }
-
-    public void setOnEditPersonClickListener(OnEditPersonClickListener listener) {
-        this.mPersonClickListener = listener;
-    }
-
-    public void setOnTagButtonClickListener(OnTagButtonClickListener listener) {
-        this.mTagButtonClickListener = listener;
+    public void setOnButtonClickListener(OnButtonClickListener listener) {
+        this.mButtonClickListener = listener;
     }
 
     private TextView dataText;
@@ -168,8 +158,8 @@ public class VisitDetailView extends BaseAnimateView {
             @Override
             public void onClick(View view) {
                 // DONE: 2017/02/27 人編集ダイアログへの遷移
-                if (mPersonClickListener != null){
-                    mPersonClickListener.onEditPersonClick(mPerson);
+                if (mButtonClickListener != null){
+                    mButtonClickListener.onEditPersonClick(mPerson);
                 }
             }
         });
@@ -181,7 +171,10 @@ public class VisitDetailView extends BaseAnimateView {
         placementButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: 2017/02/27 placementDialogへの遷移 
+                // TODO: 2017/02/27 placementDialogへの遷移
+                if (mButtonClickListener != null) {
+                    mButtonClickListener.onPlacementButtonClick(mVisitDetail);
+                }
             }
         });
     }
@@ -193,8 +186,8 @@ public class VisitDetailView extends BaseAnimateView {
             @Override
             public void onClick(View view) {
                 // DONE: 2017/02/27 tagDialogへの遷移
-                if (mTagButtonClickListener != null) {
-                    mTagButtonClickListener.onTagButtonClick(mVisitDetail);
+                if (mButtonClickListener != null) {
+                    mButtonClickListener.onTagButtonClick(mVisitDetail);
                 }
             }
         });
@@ -208,8 +201,8 @@ public class VisitDetailView extends BaseAnimateView {
             @Override
             public void onPrioritySet(Visit.Priority priority) {
                 mVisitDetail.setPriority(priority);
-                if (mPriorityListener != null) {
-                    mPriorityListener.onPersonPrioritySet(priority);
+                if (mButtonClickListener != null) {
+                    mButtonClickListener.onPrioritySet(priority);
                 }
             }
         });
@@ -290,7 +283,10 @@ public class VisitDetailView extends BaseAnimateView {
 
             @Override
             public void onClickFrame() {
-                mTagButtonClickListener.onTagButtonClick(mVisitDetail);
+
+                if (mButtonClickListener != null) {
+                    mButtonClickListener.onTagButtonClick(mVisitDetail);
+                }
             }
         });
     }
@@ -324,16 +320,15 @@ public class VisitDetailView extends BaseAnimateView {
         initTagFrame();
     }
 
-    public interface OnPersonPrioritySetListener {
-        void onPersonPrioritySet(Visit.Priority priority);
-    }
+    public interface OnButtonClickListener {
 
-    public interface OnEditPersonClickListener {
         void onEditPersonClick(Person person);
-    }
 
-    public interface OnTagButtonClickListener {
         void onTagButtonClick(VisitDetail visitDetail);
+
+        void onPlacementButtonClick(VisitDetail visitDetail);
+
+        void onPrioritySet(Visit.Priority priority);
     }
 
 
