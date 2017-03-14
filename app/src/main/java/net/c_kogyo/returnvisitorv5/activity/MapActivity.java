@@ -1,6 +1,7 @@
 package net.c_kogyo.returnvisitorv5.activity;
 
 import android.Manifest;
+import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -28,15 +29,10 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import net.c_kogyo.returnvisitorv5.R;
-import net.c_kogyo.returnvisitorv5.data.DataItem;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
-import net.c_kogyo.returnvisitorv5.view.PlaceCell;
-import net.c_kogyo.returnvisitorv5.view.SmallTagView;
-import net.c_kogyo.returnvisitorv5.view.TagFrame;
-
-import java.util.ArrayList;
+import net.c_kogyo.returnvisitorv5.dialogcontents.PlaceDialog;
 
 import static net.c_kogyo.returnvisitorv5.activity.Constants.LATITUDE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.LONGITUDE;
@@ -333,7 +329,7 @@ public class MapActivity extends AppCompatActivity
         Place place = RVData.getInstance().getPlaceList().getByMarkerId(marker.getId());
         if (place == null) return false;
 
-        placeCellTest(place);
+        showPlaceDialog(place);
 
         return false;
     }
@@ -359,6 +355,7 @@ public class MapActivity extends AppCompatActivity
         dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
+                fadeOutDialogOverlay();
                 return true;
             }
         });
@@ -366,22 +363,54 @@ public class MapActivity extends AppCompatActivity
         initDialogFrame();
     }
 
-    private void fadeDialogOverlay(boolean fadeIn) {
-        if (fadeIn) {
-            dialogOverlay.setVisibility(View.VISIBLE);
-            ValueAnimator animator = ValueAnimator.ofFloat(0f, 1f);
-            animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                    dialogOverlay.setAlpha((float) valueAnimator.getAnimatedValue());
-                    dialogOverlay.requestLayout();
-                }
-            });
-            animator.setDuration(500);
-            animator.start();
-        } else {
+    private void fadeInDialogOverlay() {
 
-        }
+        dialogOverlay.setVisibility(View.VISIBLE);
+        ValueAnimator animator = ValueAnimator.ofFloat(0f, 1f);
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                dialogOverlay.setAlpha((float) valueAnimator.getAnimatedValue());
+                dialogOverlay.requestLayout();
+            }
+        });
+        animator.setDuration(500);
+        animator.start();
+    }
+
+    private void fadeOutDialogOverlay() {
+        ValueAnimator animator = ValueAnimator.ofFloat(1f, 0f);
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                dialogOverlay.setAlpha((float) valueAnimator.getAnimatedValue());
+                dialogOverlay.requestLayout();
+            }
+        });
+        animator.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                dialogOverlay.setVisibility(View.INVISIBLE);
+                dialogFrame.removeAllViews();
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {
+
+            }
+        });
+        animator.setDuration(500);
+        animator.start();
     }
 
     private LinearLayout dialogFrame;
@@ -453,10 +482,13 @@ public class MapActivity extends AppCompatActivity
         });
     }
 
-    private void placeCellTest(Place place) {
-        PlaceCell placeCell = new PlaceCell(this, place);
-        dialogFrame.addView(placeCell);
-        fadeDialogOverlay(true);
+    private void showPlaceDialog(Place place) {
+
+        PlaceDialog placeDialog = new PlaceDialog(this, place);
+        dialogFrame.addView(placeDialog);
+
+        fadeInDialogOverlay();
     }
+
 
 }

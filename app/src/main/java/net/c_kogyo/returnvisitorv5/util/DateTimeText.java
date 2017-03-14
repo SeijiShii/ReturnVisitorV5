@@ -1,5 +1,8 @@
 package net.c_kogyo.returnvisitorv5.util;
 
+import android.content.Context;
+
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -49,5 +52,14 @@ public class DateTimeText {
 
     static public String getMonthText(Calendar month) {
         return android.text.format.DateFormat.format("yyyy, MMM", month).toString();
+    }
+
+
+
+    static public String getDateTimeText(Calendar calendar, Context context) {
+        DateFormat format = android.text.format.DateFormat.getMediumDateFormat(context);
+        String dateString = format.format(calendar.getTime());
+
+        return dateString + " " + getTimeText(calendar);
     }
 }

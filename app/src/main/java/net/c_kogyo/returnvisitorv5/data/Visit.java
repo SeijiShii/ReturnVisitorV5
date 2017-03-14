@@ -1,6 +1,10 @@
 package net.c_kogyo.returnvisitorv5.data;
 
+import android.content.Context;
 import android.support.annotation.Nullable;
+
+import net.c_kogyo.returnvisitorv5.R;
+import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -70,25 +74,7 @@ public class Visit extends DataItem {
         super(object);
         initCommon();
 
-//        try {
-//            if (object.has(PLACE_ID)) this.placeId = object.getString(PLACE_ID);
-//            if (object.has(DATE_TIME)) this.datetime.setTimeInMillis(object.getLong(DATE_TIME));
-//            if (object.has(PLACEMENTS)) {
-//                JSONArray array = object.getJSONArray(PLACEMENTS);
-//                for ( int i = 0 ; i < array.length() ; i++ ) {
-//                    this.placements.add(new Placement(array.getJSONObject(i)));
-//                }
-//            }
-//            if (object.has(VISIT_DETAILS)) {
-//                JSONArray array = object.getJSONArray(VISIT_DETAILS);
-//                for ( int i = 0 ; i < array.length() ; i++ ) {
-//                    this.visitDetails.add(new VisitDetail(array.getJSONObject(i)));
-//                }
-//            }
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-
+        setJSON(this, object);
     }
 
     public Visit(Record record) {
@@ -131,6 +117,17 @@ public class Visit extends DataItem {
         this.visitDetails.add(visitDetail);
     }
 
+    @Override
+    public JSONObject jsonObject() {
+
+        // TODO: 2017/03/14 Missing jsonObject Method
+        JSONObject object = super.jsonObject();
+        try {
+            object
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 
     // そう考えると場所無き訪問もあるよね
 
@@ -217,5 +214,30 @@ public class Visit extends DataItem {
 
     public ArrayList<VisitDetail> getVisitDetails() {
         return visitDetails;
+    }
+
+    public String toStringWithLineBreak(Context context) {
+        StringBuilder builder = new StringBuilder();
+
+        builder.append(DateTimeText.getDateTimeText(datetime, context));
+
+        if (priority != Priority.NONE) {
+            builder.append("\n").append(context.getResources().getStringArray(R.array.priority_array)[priority.num()]);
+        }
+
+        if (visitDetails.size() >= 0) {
+            for (VisitDetail visitDetail : visitDetails) {
+                builder.append("\n").append(visitDetail.toString(context, 4));
+                builder.append("\n");
+            }
+        }
+
+        if (placements.size() >= 0) {
+            for (Placement placement : placements) {
+                builder.append("\n    ").append(placement.toString(context));
+            }
+        }
+
+        return builder.toString();
     }
 }

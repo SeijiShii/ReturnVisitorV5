@@ -2,6 +2,8 @@ package net.c_kogyo.returnvisitorv5.data;
 
 import android.content.Context;
 
+import net.c_kogyo.returnvisitorv5.R;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -187,5 +189,60 @@ public class VisitDetail extends DataItem {
 
     public boolean isRV() {
         return isRV;
+    }
+
+    public String toString(Context context, int indents) {
+
+        StringBuilder builder0 = new StringBuilder();
+        for (int i = 0 ; i < indents ; i++) {
+            builder0.append(" ");
+        }
+        String spaces = builder0.toString();
+
+        StringBuilder builder = new StringBuilder();
+
+        Person person = RVData.getInstance().getPersonList().getById(personId);
+        if (person != null) {
+            builder.append(spaces).append(person.toString(context));
+        }
+
+        builder.append("\n").append(spaces);
+
+        if (seen) {
+            builder.append(context.getString(R.string.seen));
+        } else {
+            builder.append(context.getString(R.string.not_seen));
+        }
+
+        if (isRV) {
+            builder.append("\n").append(spaces).append(context.getString(R.string.return_visit));
+        }
+
+        if (isStudy) {
+            builder.append("\n").append(spaces).append(context.getString(R.string.study));
+        }
+
+        if (tagIds.size() > 0 ) {
+            builder.append("\n").append(context.getString(R.string.tag)).append(":");
+            for (String id : tagIds) {
+                Tag tag = RVData.getInstance().getTagList().getById(id);
+                if (tag != null) {
+                    builder.append(" ").append(tag.getName());
+                }
+            }
+        }
+
+        if (placements.size() > 0) {
+            builder.append("\n").append(context.getString(R.string.placement)).append(":");
+            for (Placement placement : placements) {
+                builder.append("\n").append(spaces).append(placement.toString(context));
+            }
+        }
+
+        if (note.length() >= 0) {
+            builder.append("\n").append(note);
+        }
+
+        return builder.toString();
     }
 }
