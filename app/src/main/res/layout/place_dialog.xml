@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <net.c_kogyo.returnvisitorv5.view.PlaceCell
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/place_cell"/>
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_height_small">
+
+        <Button
+            android:layout_width="150dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/trans_blue_selector"
+            android:id="@+id/record_visit_button"
+            android:text="@string/record_visit_button"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/text_size_middle"
+            android:layout_centerInParent="true"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_height_small">
+
+        <Button
+            android:layout_width="150dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/trans_orange_selector"
+            android:id="@+id/cancel_button"
+            android:text="@string/cancel"
+            android:textColor="@color/colorAccent"
+            android:textSize="@dimen/text_size_middle"
+            android:layout_centerInParent="true"/>
+
+    </RelativeLayout>
+
+</LinearLayout>

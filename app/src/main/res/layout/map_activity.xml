@@ -46,21 +46,17 @@
             android:id="@+id/dialog_overlay"
             android:visibility="invisible">
 
-            <!--<ScrollView-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:background="@drawable/gray_white_circle"-->
-            <!--android:layout_margin="10dp"-->
-            <!--android:layout_centerInParent="true"-->
-            <!--android:padding="@dimen/padding_normal">-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_margin="10dp"
+                android:layout_centerInParent="true"
+                android:background="@drawable/gray_fog_circle"
+                android:id="@+id/dialog_frame">
 
-            <!--<FrameLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:id="@+id/dialog_frame"/>-->
 
-            <!--</ScrollView>-->
-
+            </LinearLayout>
         </RelativeLayout>
 
     </FrameLayout>

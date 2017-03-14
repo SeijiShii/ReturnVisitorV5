@@ -61,4 +61,8 @@ public class ClearEditText extends BaseAnimateView{
         editText.addTextChangedListener(textWatcher);
     }
 
+    public String getText() {
+        return editText.getText().toString();
+    }
+
 }

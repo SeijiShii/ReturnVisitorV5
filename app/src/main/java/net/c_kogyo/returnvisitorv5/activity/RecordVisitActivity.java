@@ -406,7 +406,8 @@ public class RecordVisitActivity extends AppCompatActivity {
             switch (intent.getAction()) {
                 case FetchAddressIntentService.SEND_FETCED_ADDRESS_ACTION:
                     String address = intent.getStringExtra(FetchAddressIntentService.ADDRESS_FETCHED);
-                    addressText.setText(address);
+                    mPlace.setAddress(address);
+                    addressText.setText(mPlace.getAddress());
                     break;
             }
 
@@ -557,6 +558,7 @@ public class RecordVisitActivity extends AppCompatActivity {
                 switch (getIntent().getAction()) {
                     case Constants.RecordVisitActions.NEW_PLACE_ACTION:
 
+                        mPlace.setName(placeNameText.getText());
                         RVData.getInstance().getPlaceList().setOrAdd(mPlace);
 
                         Intent intent = new Intent();

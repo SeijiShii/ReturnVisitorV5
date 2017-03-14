@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 
 import net.c_kogyo.returnvisitorv5.data.list.DataList;
 import net.c_kogyo.returnvisitorv5.data.list.NoteCompList;
+import net.c_kogyo.returnvisitorv5.data.list.PlaceList;
 import net.c_kogyo.returnvisitorv5.data.list.VisitList;
 
 import org.json.JSONArray;
@@ -33,7 +34,7 @@ public class RVData {
 //    public static final String NOTE_COMP_LIST = "note_comp_list";
 //    public static final String PUB_LIST = "pub_list";
 
-    private DataList<Place> placeList;
+    private PlaceList placeList;
     private DataList<Person> personList;
     private VisitList visitList;
     private DataList<Tag> tagList;
@@ -43,7 +44,7 @@ public class RVData {
     private static RVData instance = new RVData();
     private RVData() {
 
-        placeList = new DataList<>();
+        placeList = new PlaceList();
         personList = new DataList<>();
         visitList = new VisitList();
 
@@ -59,7 +60,7 @@ public class RVData {
         return personList;
     }
 
-    public DataList<Place> getPlaceList() {
+    public PlaceList getPlaceList() {
         return placeList;
     }
 

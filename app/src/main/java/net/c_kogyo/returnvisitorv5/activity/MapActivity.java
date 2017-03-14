@@ -14,7 +14,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
@@ -32,6 +32,7 @@ import net.c_kogyo.returnvisitorv5.data.DataItem;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
+import net.c_kogyo.returnvisitorv5.view.PlaceCell;
 import net.c_kogyo.returnvisitorv5.view.SmallTagView;
 import net.c_kogyo.returnvisitorv5.view.TagFrame;
 
@@ -66,8 +67,6 @@ public class MapActivity extends AppCompatActivity
         initLogoButton();
         initMapView(savedInstanceState);
         initDialogOverlay();
-
-//        testView();
 
     }
 
@@ -330,7 +329,12 @@ public class MapActivity extends AppCompatActivity
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        fadeDialogOverlay(true);
+
+        Place place = RVData.getInstance().getPlaceList().getByMarkerId(marker.getId());
+        if (place == null) return false;
+
+        placeCellTest(place);
+
         return false;
     }
 
@@ -359,7 +363,7 @@ public class MapActivity extends AppCompatActivity
             }
         });
 
-//        initDialogFrame();
+        initDialogFrame();
     }
 
     private void fadeDialogOverlay(boolean fadeIn) {
@@ -375,13 +379,15 @@ public class MapActivity extends AppCompatActivity
             });
             animator.setDuration(500);
             animator.start();
+        } else {
+
         }
     }
 
-//    private FrameLayout dialogFrame;
-//    private void initDialogFrame() {
-//        dialogFrame = (FrameLayout) findViewById(R.id.dialog_frame);
-//    }
+    private LinearLayout dialogFrame;
+    private void initDialogFrame() {
+        dialogFrame = (LinearLayout) findViewById(R.id.dialog_frame);
+    }
 
     private void drawAllMarkers() {
         mMap.clear();
@@ -447,11 +453,10 @@ public class MapActivity extends AppCompatActivity
         });
     }
 
-    private void testView() {
-
-        dialogOverlay.setVisibility(View.VISIBLE);
-
-
+    private void placeCellTest(Place place) {
+        PlaceCell placeCell = new PlaceCell(this, place);
+        dialogFrame.addView(placeCell);
+        fadeDialogOverlay(true);
     }
 
 }
