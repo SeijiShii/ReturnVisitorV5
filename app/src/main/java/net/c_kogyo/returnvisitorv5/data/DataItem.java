@@ -136,6 +136,14 @@ public class DataItem implements Cloneable{
         return name;
     }
 
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -176,7 +184,8 @@ public class DataItem implements Cloneable{
     }
 
     public <T extends DataItem> boolean equals(T o) {
-        return this.getId().equals(o.getId());
+        return this.getId().equals(o.getId()) && !this.isDeleted;
+        // 削除されていたら反応しない
     }
 
     public void delete(boolean toDelete) {

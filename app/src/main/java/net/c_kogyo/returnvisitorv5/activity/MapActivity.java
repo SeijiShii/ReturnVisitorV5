@@ -484,7 +484,21 @@ public class MapActivity extends AppCompatActivity
 
     private void showPlaceDialog(Place place) {
 
-        PlaceDialog placeDialog = new PlaceDialog(this, place);
+        PlaceDialog placeDialog
+                = new PlaceDialog(this,
+                        place,
+                        new PlaceDialog.PlaceDialogListener() {
+                            @Override
+                            public void onRecordVisitClick(Place place) {
+                                fadeOutDialogOverlay();
+                                // TODO: 2017/03/16 Record Visitへの遷移
+                            }
+
+                            @Override
+                            public void onCancelClick() {
+                                fadeOutDialogOverlay();
+                            }
+                        });
         dialogFrame.addView(placeDialog);
 
         fadeInDialogOverlay();

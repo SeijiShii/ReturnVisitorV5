@@ -3,12 +3,15 @@ package net.c_kogyo.returnvisitorv5.dialogcontents;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.PopupMenu;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 
@@ -26,10 +29,12 @@ import net.c_kogyo.returnvisitorv5.view.VisitCell;
 public class PlaceDialog extends FrameLayout {
 
     private Place mPlace;
+    private PlaceDialogListener mListener;
 
-    public PlaceDialog(@NonNull Context context, Place place) {
+    public PlaceDialog(@NonNull Context context, Place place, PlaceDialogListener listener) {
         super(context);
 
+        mListener = listener;
         mPlace = place;
 
         initCommon();
@@ -45,6 +50,8 @@ public class PlaceDialog extends FrameLayout {
 
         initPlaceCell();
         initVisitListView();
+        initRecordVisitButton();
+        initCancelButton();
     }
 
     private PlaceCell placeCell;
@@ -57,6 +64,22 @@ public class PlaceDialog extends FrameLayout {
                 return true;
             }
         });
+
+        // TODO: 2017/03/16 editMenu
+        PopupMenu editMenuPopup = new PopupMenu(getContext(), placeCell.getEditButton());
+        editMenuPopup.getMenuInflater().inflate(R.menu.place_cell_menu, editMenuPopup.getMenu());
+        editMenuPopup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+
+                switch (item.getItemId()) {
+                    case R.id.delete:
+                        return true;
+                }
+                return false;
+            }
+        });
+        editMenuPopup.show();
     }
 
     private ListView visitListView;
@@ -65,6 +88,32 @@ public class PlaceDialog extends FrameLayout {
         visitListView = (ListView) view.findViewById(R.id.visit_list_view);
         visitListView.setAdapter(new VisitListAdapter());
 
+    }
+
+    private void initRecordVisitButton() {
+        Button recordVisitButton = (Button) view.findViewById(R.id.record_visit_button);
+        recordVisitButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // DONE: 2017/03/16 Record Visitへの遷移
+                if (mListener != null) {
+                    mListener.onRecordVisitClick(mPlace);
+                }
+            }
+        });
+    }
+
+    private void initCancelButton() {
+        Button cancelButton = (Button) view.findViewById(R.id.cancel_button);
+        cancelButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // DONE: 2017/03/16 Cancel Action
+                if (mListener != null) {
+                    mListener.onCancelClick();
+                }
+            }
+        });
     }
 
     class VisitListAdapter extends BaseAdapter {
@@ -94,5 +143,10 @@ public class PlaceDialog extends FrameLayout {
 
             return view;
         }
+    }
+
+    public interface PlaceDialogListener {
+        void onRecordVisitClick(Place place);
+        void onCancelClick();
     }
 }
