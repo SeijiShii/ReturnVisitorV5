@@ -48,6 +48,10 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.EDIT_VISIT_ACTION;
+import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_PLACE_ACTION;
+import static net.c_kogyo.returnvisitorv5.data.Visit.VISIT;
+
 /**
  * Created by SeijiShii on 2017/02/16.
  */
@@ -92,7 +96,7 @@ public class RecordVisitActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         switch (intent.getAction()) {
-            case Constants.RecordVisitActions.NEW_PLACE_ACTION:
+            case NEW_PLACE_ACTION:
 
                 double lat = intent.getDoubleExtra(Constants.LATITUDE, 0);
                 double lng = intent.getDoubleExtra(Constants.LONGITUDE, 0);
@@ -100,6 +104,15 @@ public class RecordVisitActivity extends AppCompatActivity {
                 mPlace = new Place(new LatLng(lat, lng));
                 mVisit = new Visit();
                 mVisit.setPlaceId(mPlace.getId());
+
+                break;
+
+            case EDIT_VISIT_ACTION:
+                String visitId = intent.getStringExtra(VISIT);
+                mVisit = RVData.getInstance().getVisitList().getById(visitId);
+                mPlace = RVData.getInstance().getPlaceList().getById(mVisit.getId());
+
+                // TODO: 2017/03/16 Edit Visit で遷移してきたときの UI描画
 
                 break;
         }
@@ -213,7 +226,7 @@ public class RecordVisitActivity extends AppCompatActivity {
         RVData.getInstance().getVisitList().setOrAdd(mVisit);
         RVData.getInstance().getPlaceList().setOrAdd(mPlace);
         Intent intent = new Intent();
-        intent.putExtra(Visit.VISIT, mVisit.getId());
+        intent.putExtra(VISIT, mVisit.getId());
         setResult(Constants.RecordVisitActions.VISIT_ADDED_RESULT_CODE, intent);
 
         RVData.getInstance().saveData(this, null);
@@ -421,6 +434,8 @@ public class RecordVisitActivity extends AppCompatActivity {
 
     private void inquireAddress() {
 
+        if (!mPlace.getAddress().equals("") && mPlace.getAddress() != null) return;
+
         double lat = getIntent().getDoubleExtra(Constants.LATITUDE, 1000);
         double lng = getIntent().getDoubleExtra(Constants.LONGITUDE, 1000);
 
@@ -556,15 +571,18 @@ public class RecordVisitActivity extends AppCompatActivity {
                 }
 
                 switch (getIntent().getAction()) {
-                    case Constants.RecordVisitActions.NEW_PLACE_ACTION:
+                    case NEW_PLACE_ACTION:
 
                         mPlace.setName(placeNameText.getText());
                         RVData.getInstance().getPlaceList().setOrAdd(mPlace);
 
                         Intent intent = new Intent();
-                        intent.putExtra(Visit.VISIT, mVisit.getId());
+                        intent.putExtra(VISIT, mVisit.getId());
                         setResult(Constants.RecordVisitActions.VISIT_ADDED_RESULT_CODE, intent);
 
+                        break;
+                    case EDIT_VISIT_ACTION:
+                        // TODO: 2017/03/16 MapActivityへの戻り処理 
                         break;
                 }
 

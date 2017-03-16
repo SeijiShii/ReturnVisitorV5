@@ -23,6 +23,7 @@ import android.widget.TextView;
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.RVData;
+import net.c_kogyo.returnvisitorv5.util.ConfirmDialog;
 
 /**
  * Created by SeijiShii on 2017/02/20.
@@ -253,31 +254,20 @@ public class PersonDialog extends FrameLayout {
                 @Override
                 public void onClick(View view) {
                     // DONE: 2017/03/05 削除処理 -> RecordVisitActivity内の削除動作テストに譲る
-                    confirmDeletePerson();
+                    ConfirmDialog.confirmAndDeletePerson(getContext(),
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    if (mButtonsClickListener != null) {
+                                        mButtonsClickListener.onDeleteClick(mPerson);
+                                    }
+                                }
+                            });
                 }
             });
         } else {
             deleteButton.setVisibility(View.INVISIBLE);
         }
-    }
-
-    private void confirmDeletePerson() {
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-
-        builder.setTitle(R.string.delete_person_title);
-        builder.setMessage(R.string.delete_person_message);
-        builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                if (mButtonsClickListener != null) {
-                    mButtonsClickListener.onDeleteClick(mPerson);
-                }
-            }
-        });
-        builder.setNegativeButton(R.string.cancel, null);
-        builder.create().show();
-
     }
 
     class AgeSpinnerAdapter extends BaseAdapter {

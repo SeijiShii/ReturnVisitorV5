@@ -38,11 +38,14 @@ import java.util.ArrayList;
 
 import static net.c_kogyo.returnvisitorv5.activity.Constants.LATITUDE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.LONGITUDE;
+import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.EDIT_VISIT_ACTION;
+import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.EDIT_VISIT_REQUEST_CODE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_PLACE_ACTION;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_VISIT_REQUEST_CODE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.VISIT_ADDED_RESULT_CODE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.SharedPrefTags.ZOOM_LEVEL;
+import static net.c_kogyo.returnvisitorv5.data.Visit.VISIT;
 
 public class MapActivity extends AppCompatActivity
                             implements OnMapReadyCallback,
@@ -424,7 +427,7 @@ public class MapActivity extends AppCompatActivity
         switch (requestCode) {
             case Constants.RecordVisitActions.NEW_VISIT_REQUEST_CODE:
                 if (resultCode == VISIT_ADDED_RESULT_CODE) {
-                    String visitId = data.getStringExtra(Visit.VISIT);
+                    String visitId = data.getStringExtra(VISIT);
                     if (visitId != null) {
                         Visit visit = RVData.getInstance().getVisitList().getById(visitId);
                         if (visit != null) {
@@ -479,6 +482,20 @@ public class MapActivity extends AppCompatActivity
                             public void onCancelClick() {
                                 fadeOutDialogOverlay();
                             }
+
+                            @Override
+                            public void onDeleteClick(Place place) {
+                                fadeOutDialogOverlay();
+                                RVData.getInstance().getPlaceList().removeById(place.getId());
+                                RVData.getInstance().saveData(MapActivity.this, null);
+                                placeMarkers.removeByPlace(place);
+                            }
+
+                            @Override
+                            public void onEditVisitClick(Visit visit) {
+                                fadeOutDialogOverlay();
+                                startRecordVisitActivityToEditVisit(visit);
+                            }
                         });
         dialogFrame.addView(placeDialog);
 
@@ -495,7 +512,11 @@ public class MapActivity extends AppCompatActivity
     }
 
     private void startRecordVisitActivityToEditVisit(Visit visit) {
-        // TODO: 2017/03/16
+        // DONE: 2017/03/16
+        Intent editVisitIntent = new Intent(this, RecordVisitActivity.class);
+        editVisitIntent.setAction(EDIT_VISIT_ACTION);
+        editVisitIntent.putExtra(VISIT, visit.getId());
+        startActivityForResult(editVisitIntent, EDIT_VISIT_REQUEST_CODE);
     }
 
     class PlaceMarkers {

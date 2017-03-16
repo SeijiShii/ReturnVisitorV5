@@ -1,8 +1,10 @@
 package net.c_kogyo.returnvisitorv5.dialogcontents;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -19,6 +21,7 @@ import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
+import net.c_kogyo.returnvisitorv5.util.ConfirmDialog;
 import net.c_kogyo.returnvisitorv5.view.PlaceCell;
 import net.c_kogyo.returnvisitorv5.view.VisitCell;
 
@@ -65,21 +68,38 @@ public class PlaceDialog extends FrameLayout {
             }
         });
 
-        // TODO: 2017/03/16 editMenu
-        PopupMenu editMenuPopup = new PopupMenu(getContext(), placeCell.getEditButton());
-        editMenuPopup.getMenuInflater().inflate(R.menu.place_cell_menu, editMenuPopup.getMenu());
-        editMenuPopup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+        placeCell.getEditButton().setOnClickListener(new OnClickListener() {
             @Override
-            public boolean onMenuItemClick(MenuItem item) {
+            public void onClick(View view) {
+                // TODO: 2017/03/16 editMenu
+                PopupMenu editMenuPopup = new PopupMenu(getContext(), placeCell.getEditButton());
+                editMenuPopup.getMenuInflater().inflate(R.menu.place_cell_menu, editMenuPopup.getMenu());
+                editMenuPopup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
 
-                switch (item.getItemId()) {
-                    case R.id.delete:
-                        return true;
-                }
-                return false;
+                        switch (item.getItemId()) {
+                            case R.id.delete:
+
+                                ConfirmDialog.confirmAndDeletePlace(getContext(),
+                                        new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                if (mListener != null) {
+                                                    mListener.onDeleteClick(mPlace);
+                                                }
+                                            }
+                                        });
+                                return true;
+                        }
+                        return false;
+                    }
+                });
+                editMenuPopup.show();
             }
         });
-        editMenuPopup.show();
+
+
     }
 
     private ListView visitListView;
@@ -117,6 +137,7 @@ public class PlaceDialog extends FrameLayout {
     }
 
     class VisitListAdapter extends BaseAdapter {
+
         @Override
         public int getCount() {
             return RVData.getInstance().getVisitList().getVisitsForPlace(mPlace.getId()).size();
@@ -136,17 +157,50 @@ public class PlaceDialog extends FrameLayout {
         public View getView(int i, View view, ViewGroup viewGroup) {
 
             if (view == null) {
-                view = new VisitCell(getContext(), (Visit) getItem(i));
+                view = new VisitCell(getContext(),
+                        (Visit) getItem(i),
+                        new VisitCell.VisitCellListener() {
+                            @Override
+                            public void onDeleteClick(final Visit visit) {
+
+                                ConfirmDialog.confirmAndDeleteVisit(getContext(),
+                                        new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                RVData.getInstance().getVisitList().removeById(visit.getId());
+                                                RVData.getInstance().saveData(getContext(), null);
+                                                notifyDataSetChanged();
+                                            }
+                                        });
+                            }
+
+                            @Override
+                            public void onEditClick(Visit visit) {
+                                if (mListener != null) {
+                                    mListener.onEditVisitClick(visit);
+                                }
+                            }
+                        });
             } else {
                 ((VisitCell) view).refreshVisit((Visit) getItem(i));
             }
 
             return view;
         }
+
+
+
     }
 
     public interface PlaceDialogListener {
+
         void onRecordVisitClick(Place place);
+
         void onCancelClick();
+
+        void onDeleteClick(Place place);
+
+        void onEditVisitClick(Visit visit);
     }
+
 }

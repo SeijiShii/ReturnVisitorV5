@@ -39,7 +39,7 @@ public class DataList<T extends DataItem> implements Iterable<T>{
         }
     }
 
-    public ArrayList<T> safeList() {
+    private ArrayList<T> safeList() {
         ArrayList<T> safeList = new ArrayList<>();
         for (T data : list) {
             if (!data.isDeleted()) {
@@ -49,7 +49,7 @@ public class DataList<T extends DataItem> implements Iterable<T>{
         return safeList;
     }
 
-    private int indexOf(T data) {
+    public int indexOf(T data) {
 
         for (int i = 0; i < safeList().size() ; i++ ) {
 

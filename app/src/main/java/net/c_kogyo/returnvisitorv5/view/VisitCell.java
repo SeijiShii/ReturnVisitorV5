@@ -25,13 +25,15 @@ public class VisitCell extends BaseAnimateView {
 
     private Visit mVisit;
     private int collapseHeight;
+    private VisitCellListener mListener;
 
-    public VisitCell(Context context, Visit visit) {
+    public VisitCell(Context context, Visit visit, VisitCellListener listener) {
         super(context,
                 (int) (context.getResources().getDisplayMetrics().density * 270),
                 InitialHeightCondition.EX_HEIGHT,
                 R.layout.visit_cell);
         mVisit = visit;
+        mListener = listener;
         initCommon();
     }
 
@@ -154,10 +156,16 @@ public class VisitCell extends BaseAnimateView {
 
                 switch (item.getItemId()) {
                     case R.id.edit_visit:
-                        // TODO: 2017/03/14 編集遷移
+                        // DONE: 2017/03/14 編集遷移
+                        if (mListener != null) {
+                            mListener.onEditClick(mVisit);
+                        }
                         return true;
                     case R.id.delete:
-                        // TODO: 2017/03/14 削除プロセス
+                        // DONE: 2017/03/14 削除プロセス
+                        if (mListener != null) {
+                            mListener.onDeleteClick(mVisit);
+                        }
                         return true;
                 }
                 return false;
@@ -174,5 +182,15 @@ public class VisitCell extends BaseAnimateView {
         visitDataText.setText(mVisit.toStringWithLineBreak(getContext()));
 
     }
+
+    public interface VisitCellListener {
+
+        void onDeleteClick(Visit visit);
+
+        void onEditClick(Visit visit);
+
+    }
+
+
 
 }
