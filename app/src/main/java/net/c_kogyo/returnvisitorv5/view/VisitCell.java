@@ -2,15 +2,14 @@ package net.c_kogyo.returnvisitorv5.view;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.PopupMenu;
 import android.util.AttributeSet;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
@@ -25,10 +24,11 @@ import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 public class VisitCell extends BaseAnimateView {
 
     private Visit mVisit;
+    private int collapseHeight;
 
     public VisitCell(Context context, Visit visit) {
         super(context,
-                (int) (context.getResources().getDisplayMetrics().density * 70),
+                (int) (context.getResources().getDisplayMetrics().density * 270),
                 InitialHeightCondition.EX_HEIGHT,
                 R.layout.visit_cell);
         mVisit = visit;
@@ -41,11 +41,42 @@ public class VisitCell extends BaseAnimateView {
 
     private void initCommon() {
 
-        initMarker();
-        initDateText();
-        initOpenCloseButton();
+        collapseHeight = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small)
+                + (int)(getContext().getResources().getDisplayMetrics().density * 5);
+
+        initHeadRow();
         initVisitDataText();
         initEditButton();
+
+        this.getLayoutParams().height = collapseHeight;
+    }
+
+    private LinearLayout headRow;
+    private void initHeadRow() {
+        headRow = (LinearLayout) getViewById(R.id.head_row);
+        headRow.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+
+                switch (motionEvent.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        headRow.setAlpha(0.5f);
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        headRow.setAlpha(1f);
+                        openCloseCell();
+                        return true;
+                    case MotionEvent.ACTION_CANCEL:
+                        headRow.setAlpha(1f);
+                        return true;
+                }
+                return false;
+            }
+        });
+
+        initMarker();
+        initDateText();
+        initOpenCloseMark();
     }
 
     private ImageView marker;
@@ -60,33 +91,27 @@ public class VisitCell extends BaseAnimateView {
         dateText.setText(DateTimeText.getDateTimeText(mVisit.getDatetime(), getContext()));
     }
 
-    private Button openCloseButton;
-    private boolean isViewOpen;
-    private void initOpenCloseButton() {
-        openCloseButton = (Button) getViewById(R.id.open_close_button);
-        openCloseButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // 開閉アニメーション DONE
-                if (isViewOpen) {
-
-                    int padding = (int) (getContext().getResources().getDisplayMetrics().density * 5);
-                    int targetHeight = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small)
-                            + padding;
-                    VisitCell.this.changeViewHeight(AnimateCondition.TO_TARGET_HEIGHT, targetHeight, true, null, null);
-
-                } else {
-                    VisitCell.this.changeViewHeight(AnimateCondition.TO_EX_HEIGHT, 0, true, null, null);
-                }
-
-                rotateOpenCloseButton();
-
-                isViewOpen = !isViewOpen;
-            }
-        });
+    private ImageView openCloseMark;
+    private void initOpenCloseMark() {
+        openCloseMark = (ImageView) getViewById(R.id.open_close_mark);
     }
 
-    private void rotateOpenCloseButton() {
+    private boolean isViewOpen = false;
+    private void openCloseCell() {
+        if (isViewOpen) {
+
+            VisitCell.this.changeViewHeight(AnimateCondition.TO_TARGET_HEIGHT, collapseHeight, true, null, null);
+
+        } else {
+            VisitCell.this.changeViewHeight(AnimateCondition.TO_EX_HEIGHT, 0, true, null, null);
+        }
+
+        rotateOpenCloseMark();
+
+        isViewOpen = !isViewOpen;
+    }
+
+    private void rotateOpenCloseMark() {
 
         float originAngle, targetAngle;
 
@@ -98,7 +123,7 @@ public class VisitCell extends BaseAnimateView {
             targetAngle = 0f;
         }
 
-        ObjectAnimator animator = ObjectAnimator.ofFloat(openCloseButton, "rotation", originAngle, targetAngle);
+        ObjectAnimator animator = ObjectAnimator.ofFloat(openCloseMark, "rotation", originAngle, targetAngle);
         animator.setDuration(300);
         animator.start();
     }

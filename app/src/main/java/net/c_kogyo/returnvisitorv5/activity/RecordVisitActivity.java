@@ -216,7 +216,7 @@ public class RecordVisitActivity extends AppCompatActivity {
         intent.putExtra(Visit.VISIT, mVisit.getId());
         setResult(Constants.RecordVisitActions.VISIT_ADDED_RESULT_CODE, intent);
 
-        RVData.getInstance().saveData(null);
+        RVData.getInstance().saveData(this, null);
         finish();
     }
 
@@ -568,7 +568,7 @@ public class RecordVisitActivity extends AppCompatActivity {
                         break;
                 }
 
-                RVData.getInstance().saveData(null);
+                RVData.getInstance().saveData(getApplicationContext(), null);
                 finish();
 
             }

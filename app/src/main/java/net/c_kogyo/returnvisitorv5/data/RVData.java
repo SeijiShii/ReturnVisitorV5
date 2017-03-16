@@ -1,5 +1,6 @@
 package net.c_kogyo.returnvisitorv5.data;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.annotation.Nullable;
@@ -80,18 +81,20 @@ public class RVData {
         return pubList;
     }
 
-    public void saveData(@Nullable RVDataStoreCallback callback){
-        new SaveData(callback).execute();
+    public void saveData(Context context, @Nullable RVDataStoreCallback callback){
+        new SaveData(context, callback).execute();
     }
 
-    public void loadData(@Nullable RVDataStoreCallback callback) {
-        new LoadData(callback).execute();
+    public void loadData(Context context, @Nullable RVDataStoreCallback callback) {
+        new LoadData(context, callback).execute();
     }
 
     private class LoadData extends AsyncTask<Void, Void, Void> {
 
         RVDataStoreCallback mCallback;
-        private LoadData(RVDataStoreCallback callback) {
+        Context mContext;
+        private LoadData(Context context, RVDataStoreCallback callback) {
+            mContext = context;
             mCallback = callback;
         }
 
@@ -109,11 +112,13 @@ public class RVData {
 
         private String loadStringFromFile() {
 
-            File dir = new File(Environment.getExternalStorageDirectory().toString()
-                    + "/" + RV_DIR_NAME + "/");
-            if (!dir.exists()) {
-                return "";
-            }
+//            File dir = new File(Environment.getExternalStorageDirectory().toString()
+//                    + "/" + RV_DIR_NAME + "/");
+//            if (!dir.exists()) {
+//                return "";
+//            }
+
+            File dir = mContext.getDir(RV_DIR_NAME, Context.MODE_PRIVATE);
 
             File file = new File(dir.getPath() + "/" + RV_FILE_NAME);
             if (!file.exists()) {
@@ -196,7 +201,9 @@ public class RVData {
     private class SaveData extends AsyncTask<Void, Void, Void> {
 
         RVDataStoreCallback mCallback;
-        private SaveData(RVDataStoreCallback callback) {
+        Context mContext;
+        private SaveData(Context context, RVDataStoreCallback callback) {
+            mContext = context;
             mCallback = callback;
         }
 
@@ -279,8 +286,9 @@ public class RVData {
 
         private void saveToFile(String s) {
 
-            File dir = new File(Environment.getExternalStorageDirectory().toString()
-                    + "/" + RV_DIR_NAME + "/");
+            File dir = mContext.getDir(RV_DIR_NAME, Context.MODE_PRIVATE);
+//                    = new File(Environment.getExternalStorageDirectory().toString()
+//                    + "/" + RV_DIR_NAME + "/");
 
             if (!dir.exists()) {
                 dir.mkdir();

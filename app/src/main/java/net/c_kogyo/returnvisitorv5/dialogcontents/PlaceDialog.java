@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -50,6 +51,12 @@ public class PlaceDialog extends FrameLayout {
     private void initPlaceCell(){
         placeCell = (PlaceCell) view.findViewById(R.id.place_cell);
         placeCell.setPlaceAndInitialize(mPlace);
+        placeCell.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                return true;
+            }
+        });
     }
 
     private ListView visitListView;

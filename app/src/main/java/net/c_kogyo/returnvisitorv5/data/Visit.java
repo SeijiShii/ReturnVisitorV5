@@ -23,6 +23,7 @@ public class Visit extends DataItem {
     public static final String PLACEMENTS = "placements";
     public static final String VISIT_DETAILS = "visit_details";
     public static final String DATE_TIME = "datetime";
+    public static final String PRIORITY = "priority";
 
     private Calendar datetime;
     private String placeId;
@@ -123,10 +124,27 @@ public class Visit extends DataItem {
         // TODO: 2017/03/14 Missing jsonObject Method
         JSONObject object = super.jsonObject();
         try {
-            object
+            object.put(DATE_TIME, datetime.getTimeInMillis());
+            object.put(PLACE_ID, placeId);
+
+            JSONArray detailArray = new JSONArray();
+            for (VisitDetail visitDetail : visitDetails) {
+                detailArray.put(visitDetail.jsonObject());
+            }
+            object.put(VISIT_DETAILS, detailArray);
+
+            JSONArray plcArray = new JSONArray();
+            for (Placement placement : placements) {
+                plcArray.put(placement.jsonObject());
+            }
+            object.put(PLACEMENTS, plcArray);
+
+            object.put(PRIORITY, priority.toString());
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        return object;
     }
 
     // そう考えると場所無き訪問もあるよね

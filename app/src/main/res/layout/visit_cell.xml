@@ -8,7 +8,8 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/ui_height_small">
+        android:layout_height="@dimen/ui_height_small"
+        android:id="@+id/head_row">
 
         <RelativeLayout
             android:layout_width="30dp"
@@ -35,11 +36,11 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent">
 
-            <Button
+            <ImageView
                 android:layout_width="25dp"
                 android:layout_height="25dp"
-                android:id="@+id/open_close_button"
-                android:background="@drawable/upper_arrow_selector"
+                android:id="@+id/open_close_mark"
+                android:background="@drawable/upper_arrow"
                 android:layout_centerInParent="true"/>
 
         </RelativeLayout>
@@ -47,7 +48,7 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="200dp"
         android:id="@+id/visit_data_text"
         android:textColor="@color/textColorGray"
         android:textSize="@dimen/text_size_middle"

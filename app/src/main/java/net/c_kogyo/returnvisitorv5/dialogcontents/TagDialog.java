@@ -20,6 +20,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
+import net.c_kogyo.returnvisitorv5.activity.RecordVisitActivity;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Tag;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
@@ -149,7 +150,7 @@ public class TagDialog extends FrameLayout {
                 mAdapter.notifyDataSetChanged();
                 setListViewHeight();
 
-                RVData.getInstance().saveData(null);
+                RVData.getInstance().saveData(getContext(), null);
             }
         });
     }
@@ -270,7 +271,7 @@ public class TagDialog extends FrameLayout {
                     notifyDataSetChanged();
                     setListViewHeight();
 
-                    RVData.getInstance().saveData(null);
+                    RVData.getInstance().saveData(getContext(), null);
                 }
             });
             return view;

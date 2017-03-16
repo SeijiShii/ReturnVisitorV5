@@ -56,7 +56,7 @@ public class MapActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
 
         // 初期化のために一回ゲットする
-        RVData.getInstance().loadData(this);
+        RVData.getInstance().loadData(this, this);
 
         setContentView(R.layout.map_activity);
 
