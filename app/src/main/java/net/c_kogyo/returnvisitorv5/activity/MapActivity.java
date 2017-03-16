@@ -34,6 +34,8 @@ import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.dialogcontents.PlaceDialog;
 
+import java.util.ArrayList;
+
 import static net.c_kogyo.returnvisitorv5.activity.Constants.LATITUDE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.LONGITUDE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_PLACE_ACTION;
@@ -140,7 +142,8 @@ public class MapActivity extends AppCompatActivity
 
         initDataOnMap();
     }
-    
+
+    private PlaceMarkers placeMarkers;
     private void initDataOnMap() {
         
         final Handler handler = new Handler();
@@ -165,7 +168,7 @@ public class MapActivity extends AppCompatActivity
                         mMap.setOnMarkerDragListener(MapActivity.this);
 
                         // DONE: 2017/03/01 ここにマーカー描画処理を記述する
-                        drawAllMarkers();
+                        placeMarkers = new PlaceMarkers();
                     }
                 });
                 
@@ -316,11 +319,7 @@ public class MapActivity extends AppCompatActivity
 
     @Override
     public void onMapLongClick(LatLng latLng) {
-        Intent recordVisitIntent = new Intent(this, RecordVisitActivity.class);
-        recordVisitIntent.setAction(NEW_PLACE_ACTION);
-        recordVisitIntent.putExtra(LATITUDE, latLng.latitude);
-        recordVisitIntent.putExtra(LONGITUDE, latLng.longitude);
-        startActivityForResult(recordVisitIntent, NEW_VISIT_REQUEST_CODE);
+        startRecordVisitActivityForNewPlace(latLng);
     }
 
     @Override
@@ -418,24 +417,6 @@ public class MapActivity extends AppCompatActivity
         dialogFrame = (LinearLayout) findViewById(R.id.dialog_frame);
     }
 
-    private void drawAllMarkers() {
-        mMap.clear();
-        for (Place place : RVData.getInstance().getPlaceList()) {
-
-            addMarker(place);
-
-        }
-    }
-
-    private void addMarker(Place place) {
-        MarkerOptions options = new MarkerOptions()
-                .icon(BitmapDescriptorFactory.fromResource(Constants.markerRes[place.getPriority().num()]))
-                .position(place.getLatLng());
-
-        Marker marker = mMap.addMarker(options);
-        place.setMarkerId(marker.getId());
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -450,7 +431,7 @@ public class MapActivity extends AppCompatActivity
                             String placeId = visit.getPlaceId();
                             Place place = RVData.getInstance().getPlaceList().getById(placeId);
                             if (place != null) {
-                                addMarker(place);
+                                placeMarkers.addMarker(place);
                             }
                         }
                     }
@@ -502,6 +483,60 @@ public class MapActivity extends AppCompatActivity
         dialogFrame.addView(placeDialog);
 
         fadeInDialogOverlay();
+    }
+
+    // Method for Record Visit Activity
+    private void startRecordVisitActivityForNewPlace(LatLng latLng) {
+        Intent recordVisitIntent = new Intent(this, RecordVisitActivity.class);
+        recordVisitIntent.setAction(NEW_PLACE_ACTION);
+        recordVisitIntent.putExtra(LATITUDE, latLng.latitude);
+        recordVisitIntent.putExtra(LONGITUDE, latLng.longitude);
+        startActivityForResult(recordVisitIntent, NEW_VISIT_REQUEST_CODE);
+    }
+
+    private void startRecordVisitActivityToEditVisit(Visit visit) {
+        // TODO: 2017/03/16
+    }
+
+    class PlaceMarkers {
+        private ArrayList<Marker> markers;
+
+        public PlaceMarkers() {
+            this.markers = new ArrayList<>();
+            mMap.clear();
+            for (Place place : RVData.getInstance().getPlaceList()) {
+                addMarker(place);
+            }
+        }
+
+        private void addMarker(Place place) {
+            MarkerOptions options = new MarkerOptions()
+                    .icon(BitmapDescriptorFactory.fromResource(Constants.markerRes[place.getPriority().num()]))
+                    .position(place.getLatLng());
+
+            Marker marker = mMap.addMarker(options);
+            place.setMarkerId(marker.getId());
+            markers.add(marker);
+        }
+
+        private Marker getMarkerByPlace(Place place) {
+
+            for (Marker marker : markers) {
+                if (place.getMarkerId().equals(marker.getId())) {
+                    return marker;
+                }
+            }
+            return null;
+        }
+
+        private void removeByPlace(Place place) {
+            Marker marker = getMarkerByPlace(place);
+            if (marker == null) return;
+
+            markers.remove(marker);
+            marker.remove();
+        }
+
     }
 
 

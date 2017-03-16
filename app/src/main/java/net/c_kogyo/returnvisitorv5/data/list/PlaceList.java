@@ -13,7 +13,7 @@ public class PlaceList extends DataList<Place> {
     @Nullable
     public Place getByMarkerId(String markerId) {
 
-        for (Place place : list) {
+        for (Place place : this) {
             if (place.getMarkerId().equals(markerId)) {
                 return place;
             }

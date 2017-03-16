@@ -10,11 +10,11 @@ public class NoteCompList extends DataList<NoteCompItem> {
 
     public void addIfNoSameName(String name) {
 
-        for (NoteCompItem item : list) {
+        for (NoteCompItem item : this) {
             if (item.getName().equals(name)) {
                 return;
             }
         }
-        list.add(new NoteCompItem(name));
+        setOrAdd(new NoteCompItem(name));
     }
 }
