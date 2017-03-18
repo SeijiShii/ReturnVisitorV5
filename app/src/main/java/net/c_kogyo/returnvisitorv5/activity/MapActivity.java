@@ -29,9 +29,11 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import net.c_kogyo.returnvisitorv5.R;
+import net.c_kogyo.returnvisitorv5.data.HousingComplex;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
+import net.c_kogyo.returnvisitorv5.dialogcontents.HousingComplexDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.MapLongClickDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.PlaceDialog;
 
@@ -337,32 +339,53 @@ public class MapActivity extends AppCompatActivity
                 new MapLongClickDialog.MapLongClickDialogListener() {
             @Override
             public void onClickNewSinglePlaceButton() {
-                fadeOutDialogOverlay();
                 // TODO: 2017/03/17 record single place action
-
                 placeMarkers.removeByPlace(tmpPlace);
+                fadeOutDialogOverlay(normalFadeOutListener);
+
             }
 
             @Override
             public void onClickHousingComplexButton() {
-                fadeOutDialogOverlay();
                 // TODO: 2017/03/17 record complex action
-
                 placeMarkers.removeByPlace(tmpPlace);
+                fadeOutDialogOverlay(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        dialogFrame.removeAllViews();
+                        showHousingComplexDialog(tmpPlace.getLatLng());
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+
+                    }
+                });
+
+
             }
 
             @Override
             public void onClickNotHomeButton() {
-                fadeOutDialogOverlay();
                 // TODO: 2017/03/17 record not home action
-
                 placeMarkers.removeByPlace(tmpPlace);
+                fadeOutDialogOverlay(normalFadeOutListener);
             }
 
             @Override
             public void onClickCancelButton() {
-                fadeOutDialogOverlay();
                 placeMarkers.removeByPlace(tmpPlace);
+                fadeOutDialogOverlay(normalFadeOutListener);
             }
         });
         dialogFrame.addView(mapLongClickDialog);
@@ -372,8 +395,8 @@ public class MapActivity extends AppCompatActivity
             @Override
             public boolean onTouch(View v, MotionEvent event) {
 
-                fadeOutDialogOverlay();
                 placeMarkers.removeByPlace(tmpPlace);
+                fadeOutDialogOverlay(normalFadeOutListener);
                 return true;
             }
         });
@@ -427,7 +450,7 @@ public class MapActivity extends AppCompatActivity
         animator.start();
     }
 
-    private void fadeOutDialogOverlay() {
+    private void fadeOutDialogOverlay(Animator.AnimatorListener listener) {
         ValueAnimator animator = ValueAnimator.ofFloat(1f, 0f);
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -436,28 +459,7 @@ public class MapActivity extends AppCompatActivity
                 dialogOverlay.requestLayout();
             }
         });
-        animator.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animator) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animator) {
-                dialogOverlay.setVisibility(View.INVISIBLE);
-                dialogFrame.removeAllViews();
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animator) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animator) {
-
-            }
-        });
+        animator.addListener(listener);
         animator.setDuration(500);
         animator.start();
     }
@@ -521,18 +523,18 @@ public class MapActivity extends AppCompatActivity
                         new PlaceDialog.PlaceDialogListener() {
                             @Override
                             public void onRecordVisitClick(Place place) {
-                                fadeOutDialogOverlay();
+                                fadeOutDialogOverlay(normalFadeOutListener);
                                 // TODO: 2017/03/16 Record Visitへの遷移
                             }
 
                             @Override
                             public void onCancelClick() {
-                                fadeOutDialogOverlay();
+                                fadeOutDialogOverlay(normalFadeOutListener);
                             }
 
                             @Override
                             public void onDeleteClick(Place place) {
-                                fadeOutDialogOverlay();
+                                fadeOutDialogOverlay(normalFadeOutListener);
                                 RVData.getInstance().getPlaceList().removeById(place.getId());
                                 RVData.getInstance().saveData(MapActivity.this, null);
                                 placeMarkers.removeByPlace(place);
@@ -540,7 +542,7 @@ public class MapActivity extends AppCompatActivity
 
                             @Override
                             public void onEditVisitClick(Visit visit) {
-                                fadeOutDialogOverlay();
+                                fadeOutDialogOverlay(normalFadeOutListener);
                                 startRecordVisitActivityToEditVisit(visit);
                             }
                         });
@@ -550,7 +552,7 @@ public class MapActivity extends AppCompatActivity
         dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                fadeOutDialogOverlay();
+                fadeOutDialogOverlay(null);
                 return true;
             }
         });
@@ -573,7 +575,70 @@ public class MapActivity extends AppCompatActivity
         startActivityForResult(editVisitIntent, EDIT_VISIT_REQUEST_CODE);
     }
 
-    class PlaceMarkers {
+    private void showHousingComplexDialog(LatLng latLng) {
+
+        HousingComplex housingComplex = new HousingComplex(latLng);
+        HousingComplexDialog housingComplexDialog
+                = new HousingComplexDialog(this,
+                        housingComplex,
+                        new HousingComplexDialog.HousingComplexDialogListener() {
+                            @Override
+                            public void onClickAddRoomButton(String roomName) {
+
+                            }
+
+                            @Override
+                            public void onClickRoomCell() {
+
+                            }
+
+                            @Override
+                            public void onClickOkButton() {
+
+                            }
+
+                            @Override
+                            public void onClickCancelButton() {
+
+                            }
+                        });
+        dialogFrame.addView(housingComplexDialog);
+        fadeInDialogOverlay();
+        dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                fadeOutDialogOverlay(normalFadeOutListener);
+                return true;
+            }
+        });
+
+    }
+
+    private Animator.AnimatorListener normalFadeOutListener
+            = new Animator.AnimatorListener() {
+        @Override
+        public void onAnimationStart(Animator animation) {
+
+        }
+
+        @Override
+        public void onAnimationEnd(Animator animation) {
+            dialogOverlay.setVisibility(View.INVISIBLE);
+            dialogFrame.removeAllViews();
+        }
+
+        @Override
+        public void onAnimationCancel(Animator animation) {
+
+        }
+
+        @Override
+        public void onAnimationRepeat(Animator animation) {
+
+        }
+    };
+
+    private class PlaceMarkers {
         private ArrayList<Marker> markers;
 
         public PlaceMarkers() {

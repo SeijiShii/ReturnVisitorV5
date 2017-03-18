@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Dialog title -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_height_small"
+        android:textColor="@color/textColorGray"
+        android:textSize="@dimen/text_size_large"
+        android:gravity="center"
+        android:text="@string/housing_complex"/>
+
+    <!-- Name Text -->
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_height_small"
+        android:background="@drawable/gray_trans_circle"
+        android:layout_margin="5dp"
+        android:id="@+id/name_text"
+        android:textSize="@dimen/text_size_middle"
+        android:gravity="center_vertical|left"
+        android:hint="@string/name"/>
+
+    <!-- Address Text -->
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_height_small"
+        android:background="@drawable/gray_trans_circle"
+        android:layout_margin="5dp"
+        android:id="@+id/address_text"
+        android:textSize="@dimen/text_size_middle"
+        android:gravity="center_vertical|left"
+        android:hint="@string/address"/>
+
+    <!-- Room Number -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_height_small"
+        android:orientation="horizontal">
+
+        <EditText
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:background="@drawable/gray_trans_circle"
+            android:layout_margin="5dp"
+            android:id="@+id/room_text"
+            android:textSize="@dimen/text_size_middle"
+            android:gravity="center_vertical|left"
+            android:hint="@string/room_number" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/add_room_button"
+            android:text="@string/add_room_button"
+            android:textColor="@color/colorPrimary"
+            android:background="@drawable/trans_blue_selector"
+            android:layout_margin="5dp" />
+
+    </LinearLayout>
+
+    <!-- Room List -->
+    <android.support.v7.widget.ListViewCompat
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:id="@+id/room_list_view"/>
+
+    <!-- OK -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_height_small">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:id="@+id/ok_button"
+            android:background="@drawable/trans_blue_selector"
+            android:textSize="@dimen/text_size_middle"
+            android:textColor="@color/colorPrimary"
+            android:text="@string/ok"/>
+
+    </RelativeLayout>
+
+    <!-- Cancel -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_height_small">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:id="@+id/cancel_button"
+            android:background="@drawable/trans_orange_selector"
+            android:textSize="@dimen/text_size_middle"
+            android:textColor="@color/colorAccent"
+            android:text="@string/cancel"/>
+
+    </RelativeLayout>
+
+
+</LinearLayout>
