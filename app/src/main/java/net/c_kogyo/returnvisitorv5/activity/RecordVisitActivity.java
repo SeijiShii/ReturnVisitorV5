@@ -582,7 +582,7 @@ public class RecordVisitActivity extends AppCompatActivity {
 
                         break;
                     case EDIT_VISIT_ACTION:
-                        // TODO: 2017/03/16 MapActivityへの戻り処理 
+                        // TODO: 2017/03/16 MapActivityへの戻り処理
                         break;
                 }
 

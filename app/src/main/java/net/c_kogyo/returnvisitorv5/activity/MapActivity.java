@@ -32,6 +32,7 @@ import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
+import net.c_kogyo.returnvisitorv5.dialogcontents.MapLongClickDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.PlaceDialog;
 
 import java.util.ArrayList;
@@ -322,7 +323,61 @@ public class MapActivity extends AppCompatActivity
 
     @Override
     public void onMapLongClick(LatLng latLng) {
-        startRecordVisitActivityForNewPlace(latLng);
+        mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+        showMapLongClickDialog(latLng);
+    }
+
+    private void showMapLongClickDialog(LatLng latLng) {
+
+        final Place tmpPlace = new Place(latLng);
+        placeMarkers.addMarker(tmpPlace);
+
+        MapLongClickDialog mapLongClickDialog
+                = new MapLongClickDialog(this,
+                new MapLongClickDialog.MapLongClickDialogListener() {
+            @Override
+            public void onClickNewSinglePlaceButton() {
+                fadeOutDialogOverlay();
+                // TODO: 2017/03/17 record single place action
+
+                placeMarkers.removeByPlace(tmpPlace);
+            }
+
+            @Override
+            public void onClickHousingComplexButton() {
+                fadeOutDialogOverlay();
+                // TODO: 2017/03/17 record complex action
+
+                placeMarkers.removeByPlace(tmpPlace);
+            }
+
+            @Override
+            public void onClickNotHomeButton() {
+                fadeOutDialogOverlay();
+                // TODO: 2017/03/17 record not home action
+
+                placeMarkers.removeByPlace(tmpPlace);
+            }
+
+            @Override
+            public void onClickCancelButton() {
+                fadeOutDialogOverlay();
+                placeMarkers.removeByPlace(tmpPlace);
+            }
+        });
+        dialogFrame.addView(mapLongClickDialog);
+        fadeInDialogOverlay();
+
+        dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+
+                fadeOutDialogOverlay();
+                placeMarkers.removeByPlace(tmpPlace);
+                return true;
+            }
+        });
+
     }
 
     @Override
@@ -354,14 +409,6 @@ public class MapActivity extends AppCompatActivity
     private RelativeLayout dialogOverlay;
     private void initDialogOverlay() {
         dialogOverlay = (RelativeLayout) findViewById(R.id.dialog_overlay);
-        dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                fadeOutDialogOverlay();
-                return true;
-            }
-        });
-
         initDialogFrame();
     }
 
@@ -500,6 +547,13 @@ public class MapActivity extends AppCompatActivity
         dialogFrame.addView(placeDialog);
 
         fadeInDialogOverlay();
+        dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                fadeOutDialogOverlay();
+                return true;
+            }
+        });
     }
 
     // Method for Record Visit Activity

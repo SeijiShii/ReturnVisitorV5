@@ -18,10 +18,17 @@ public class Place extends DataItem {
     public static final String LATITUDE = "latitude";
     public static final String LONGITUDE = "longitude";
     public static final String ADDRESS = "address";
+    public static final String IS_HOUSING_COMPLEX = "is_housing_complex";
+    public static final String PARENT_PLACE_ID = "parent_place_id";
+
 
     private LatLng latLng;
     private String address;
     private String markerId;
+
+    // 集合住宅関連
+    private boolean isHousingComplex;
+    private String parentPlaceId;
 
     public Place() {
         super(PLACE);
@@ -61,6 +68,9 @@ public class Place extends DataItem {
         this.latLng = new LatLng(0, 0);
         this.address = "";
         this.markerId = null;
+
+        this.isHousingComplex = false;
+        this.parentPlaceId = null;
     }
 
     @Override
@@ -85,6 +95,10 @@ public class Place extends DataItem {
             object.put(LATITUDE, latLng.latitude);
             object.put(LONGITUDE, latLng.longitude);
             object.put(ADDRESS, address);
+
+            object.put(IS_HOUSING_COMPLEX, isHousingComplex);
+            object.put(PARENT_PLACE_ID, parentPlaceId);
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -158,12 +172,32 @@ public class Place extends DataItem {
 
             if (object.has(ADDRESS)) place.address = object.getString(ADDRESS);
 
+            if (object.has(IS_HOUSING_COMPLEX)) place.isHousingComplex = object.getBoolean(IS_HOUSING_COMPLEX);
+            if (object.has(PARENT_PLACE_ID)) place.parentPlaceId = object.getString(PARENT_PLACE_ID);
+
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return place;
     }
-    
+
+    public boolean isHousingComplex() {
+        return isHousingComplex;
+    }
+
+    public void setHousingComplex(boolean housingComplex) {
+        isHousingComplex = housingComplex;
+    }
+
+    public String getParentPlaceId() {
+        return parentPlaceId;
+    }
+
+    public void setParentPlaceId(String parentPlaceId) {
+        this.parentPlaceId = parentPlaceId;
+    }
+
     public Visit.Priority getPriority() {
 
         Visit visit = RVData.getInstance().getVisitList().getLatestVisitToPlace(this.id);
