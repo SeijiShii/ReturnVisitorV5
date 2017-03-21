@@ -1,6 +1,8 @@
 package net.c_kogyo.returnvisitorv5.view;
 
+import android.app.Activity;
 import android.content.Context;
+import android.graphics.Point;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -26,7 +28,7 @@ public class TagFrame extends LinearLayout implements View.OnTouchListener {
     private int lineHeight, frameHeight, frameWidth, margin;
     private ArrayList<String> mTagIds;
     private ArrayList<Tag> mTags;
-    private ArrayList<SmallTagView> mTagViews;
+//    private ArrayList<SmallTagView> mTagViews;
     private TagFrameCallback mCallback;
 
     public TagFrame(Context context,
@@ -45,9 +47,12 @@ public class TagFrame extends LinearLayout implements View.OnTouchListener {
         super(context, attrs);
     }
 
+    private int mPaddingInt;
     public void setTagIdsAndInitialize(ArrayList<String> tagIds,
-                                       TagFrameCallback callback) {
+                                       TagFrameCallback callback,
+                                       int paddingInt) {
         this.mTagIds = tagIds;
+        this.mPaddingInt = paddingInt;
 
         this.mCallback = callback;
         if (mCallback != null) {
@@ -61,6 +66,11 @@ public class TagFrame extends LinearLayout implements View.OnTouchListener {
 
     private void initCommon() {
 
+        Point size = new Point();
+        ((Activity) getContext()).getWindowManager().getDefaultDisplay().getSize(size);
+        int padding = (int) (getContext().getResources().getDisplayMetrics().density * mPaddingInt);
+        frameWidth = size.x - padding;
+
         this.removeAllViews();
 
         lineHeight = (int) (getContext().getResources().getDisplayMetrics().density * LINE_HEIGHT);
@@ -73,13 +83,10 @@ public class TagFrame extends LinearLayout implements View.OnTouchListener {
 
         setTags();
         if (mTags.size() <= 0) {
-            if (mCallback != null) {
-                mCallback.onSetHeight(0);
-            }
             return;
         }
-
-        startDrawAndMeasure();
+//        addTestTags();
+        putTagsInLine();
 
     }
 
@@ -92,61 +99,16 @@ public class TagFrame extends LinearLayout implements View.OnTouchListener {
         return newLine;
     }
 
-    private void startDrawAndMeasure() {
-
-        final FrameLayout testFrame = new FrameLayout(getContext());
-        testFrame.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, lineHeight));
-        this.addView(testFrame);
-
-        mTagViews = new ArrayList<>();
-
-        for (Tag tag : mTags) {
-            SmallTagView tagView = new SmallTagView(getContext(), tag);
-            mTagViews.add(tagView);
-            testFrame.addView(tagView);
-        }
-
-        final Handler handler = new Handler();
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (mTagViews.get(mTagViews.size() - 1).getWidth() <= 0) {
-                    try {
-                        Thread.sleep(50);
-                    } catch (InterruptedException e) {
-                        //
-                    }
-                }
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        frameWidth = TagFrame.this.getWidth();
-
-                        for (SmallTagView tagView : mTagViews) {
-                            tagView.setViewWidth(tagView.getWidth());
-                        }
-
-                        testFrame.removeAllViews();
-                        TagFrame.this.removeAllViews();
-
-                        startDrawingLines();
-                    }
-                });
-            }
-        }).start();
-    }
-
-    private void startDrawingLines() {
+    private void putTagsInLine() {
 
         this.addView(generateNewLine());
         frameHeight = lineHeight;
 
         int widthSum = 0;
 
-        for (SmallTagView tagView : mTagViews) {
+        for (Tag tag: mTags) {
 
+            SmallTagView tagView = new SmallTagView(getContext(), tag);
             if (tagView.getViewWidth() + margin + widthSum > frameWidth) {
 
                 // これから追加するタグの幅とすでにセットされているタグの幅を足したとき、フレームの幅を超えるようなら行を追加する
@@ -159,8 +121,6 @@ public class TagFrame extends LinearLayout implements View.OnTouchListener {
             widthSum += (tagView.getViewWidth() + margin);
         }
 
-        if (mCallback == null) return;
-        mCallback.onSetHeight(frameHeight);
     }
 
     private void setTags() {
@@ -194,6 +154,7 @@ public class TagFrame extends LinearLayout implements View.OnTouchListener {
                 "setTextSize()",
                 "を使います"};
 
+        mTags = new ArrayList<>();
         for (String text : texts) {
             mTags.add(new Tag(text));
         }
@@ -229,10 +190,15 @@ public class TagFrame extends LinearLayout implements View.OnTouchListener {
 
     interface TagFrameCallback {
 
-        void onSetHeight(int frameHeight);
+//        void onSetHeight(int frameHeight);
 
         void onClickFrame();
     }
 
     // DONE: 2017/03/07 タグの内容が変更されたときの高さの変更がうまくいっていない
+
+
+    public int getFrameHeight() {
+        return frameHeight;
+    }
 }

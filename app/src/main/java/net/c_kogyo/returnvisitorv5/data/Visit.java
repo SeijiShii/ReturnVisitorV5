@@ -70,6 +70,12 @@ public class Visit extends DataItem {
         initCommon(place);
     }
 
+    public Visit(Visit lastVisit) {
+        initCommon(null);
+
+        // TODO: 2017/03/21 先回の訪問で生成 
+    }
+
     public Visit(JSONObject object) {
 
         super(object);

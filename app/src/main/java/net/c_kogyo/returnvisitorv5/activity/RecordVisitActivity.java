@@ -109,7 +109,7 @@ public class RecordVisitActivity extends AppCompatActivity {
             case EDIT_VISIT_ACTION:
                 String visitId = intent.getStringExtra(VISIT);
                 mVisit = RVData.getInstance().getVisitList().getById(visitId);
-                mPlace = RVData.getInstance().getPlaceList().getById(mVisit.getId());
+                mPlace = RVData.getInstance().getPlaceList().getById(mVisit.getPlaceId());
 
                 // TODO: 2017/03/16 Edit Visit で遷移してきたときの UI描画
 

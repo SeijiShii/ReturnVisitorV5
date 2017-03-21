@@ -2,7 +2,6 @@ package net.c_kogyo.returnvisitorv5.view;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.support.v7.widget.ActionBarOverlayLayout;
 import android.support.v7.widget.SwitchCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -37,7 +36,7 @@ public class VisitDetailView extends BaseAnimateView {
     private OnButtonClickListener mButtonClickListener;
     private boolean mExtract;
 
-    private int mCollapseHeight, mExHeight, fixedHeight, noteLineHeight, mTagFrameHeight;
+    private int mCollapseHeight, mExtractHeight, fixedHeight, noteLineHeight;
 
     public VisitDetailView(Context context,
                            VisitDetail visitDetail,
@@ -82,6 +81,12 @@ public class VisitDetailView extends BaseAnimateView {
 
         initTagFrame();
 
+        if (mExtract) {
+            this.getLayoutParams().height = mExtractHeight;
+        } else {
+            extractPostDrawn(getExtractHeight(), null);
+        }
+
     }
 
     public void setOnButtonClickListener(OnButtonClickListener listener) {
@@ -105,7 +110,7 @@ public class VisitDetailView extends BaseAnimateView {
                 if (isViewOpen) {
                     VisitDetailView.this.changeViewHeight(mCollapseHeight, true, null, null);
                 } else {
-                    VisitDetailView.this.changeViewHeight(mExHeight, true, null, null);
+                    VisitDetailView.this.changeViewHeight(mExtractHeight, true, null, null);
                 }
 
                 rotateOpenCloseButton();
@@ -285,24 +290,8 @@ public class VisitDetailView extends BaseAnimateView {
 
     private void changeToTheHeight() {
 
-        // DONE: 2017/03/12 高さが合わない
-        int rowHeight = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small);
-        int padding = getContext().getResources().getDimensionPixelSize(R.dimen.padding_normal);
-
-        fixedHeight = rowHeight * 10 + padding * 2;
-
-        int lineCount;
-        if (noteText.getLineCount() <= 0) {
-            lineCount = 1;
-        } else {
-            lineCount = noteText.getLineCount();
-        }
-        int noteHeight = noteLineHeight * lineCount;
-        int plcHeight = rowHeight * mVisitDetail.getPlacements().size();
-
-        mExHeight = fixedHeight + plcHeight + noteHeight + mTagFrameHeight;
-
-        VisitDetailView.this.changeViewHeight(mExHeight, true, null, null);
+        setExtractHeight();
+        VisitDetailView.this.changeViewHeight(mExtractHeight, true, null, null);
     }
 
     private SwitchCompat rvSwitch;
@@ -336,19 +325,13 @@ public class VisitDetailView extends BaseAnimateView {
         tagFrame.setTagIdsAndInitialize(mVisitDetail.getTagIds(),
                 new TagFrame.TagFrameCallback() {
             @Override
-            public void onSetHeight(int frameHeight) {
-                mTagFrameHeight = frameHeight;
-                changeToTheHeight();
-            }
-
-            @Override
             public void onClickFrame() {
 
                 if (mButtonClickListener != null) {
                     mButtonClickListener.onTagButtonClick(mVisitDetail);
                 }
             }
-        });
+        }, 40);
     }
 
 
@@ -362,6 +345,34 @@ public class VisitDetailView extends BaseAnimateView {
 
     public void refreshTagFrame() {
         initTagFrame();
+        changeToTheHeight();
+    }
+
+    public void setExtractHeight() {
+
+        // DONE: 2017/03/12 高さが合わない
+        int rowHeight = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small);
+        int padding = getContext().getResources().getDimensionPixelSize(R.dimen.padding_normal);
+
+        fixedHeight = rowHeight * 10 + padding * 2;
+
+        int lineCount;
+        if (noteText.getLineCount() <= 0) {
+            lineCount = 1;
+        } else {
+            lineCount = noteText.getLineCount();
+        }
+        int noteHeight = noteLineHeight * lineCount;
+        int plcHeight = rowHeight * mVisitDetail.getPlacements().size();
+
+        mExtractHeight = fixedHeight + plcHeight + noteHeight + tagFrame.getFrameHeight();
+
+    }
+
+    public int getExtractHeight() {
+
+        setExtractHeight();
+        return mExtractHeight;
     }
 
     public interface OnButtonClickListener {

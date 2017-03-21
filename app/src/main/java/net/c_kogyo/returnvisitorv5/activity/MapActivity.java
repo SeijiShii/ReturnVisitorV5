@@ -34,10 +34,12 @@ import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.HousingComplex;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.RVData;
+import net.c_kogyo.returnvisitorv5.data.Tag;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.dialogcontents.HousingComplexDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.MapLongClickDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.PlaceDialog;
+import net.c_kogyo.returnvisitorv5.view.SmallTagView;
 
 import java.util.ArrayList;
 
@@ -73,6 +75,8 @@ public class MapActivity extends AppCompatActivity
         initLogoButton();
         initMapView(savedInstanceState);
         initDialogOverlay();
+
+//        testView();
 
     }
 
@@ -706,6 +710,12 @@ public class MapActivity extends AppCompatActivity
         RVData.getInstance().saveData(this, null);
 
         placeMarkers.addMarker(place);
+    }
+
+    private void testView() {
+        SmallTagView smallTagView = new SmallTagView(this, new Tag("hogehoge"));
+        Log.d("", "SmallTagViewWidth: " + smallTagView.getViewWidth());
+//        dialogFrame.addView(smallTagView);
     }
 
 }

@@ -147,6 +147,7 @@ public class TagDialog extends FrameLayout {
                 mVisitDetail.getTagIds().add(newTag.getId());
 
                 mAdapter = new TagListAdapter(RVData.getInstance().getTagList().getList());
+                tagListView.setAdapter(mAdapter);
                 mAdapter.notifyDataSetChanged();
                 setListViewHeight();
 
@@ -268,7 +269,11 @@ public class TagDialog extends FrameLayout {
                 public void onDeleteTag(Tag tag) {
                     RVData.getInstance().getTagList().removeById(tag.getId());
                     mVisitDetail.getTagIds().remove(tag.getId());
-                    notifyDataSetChanged();
+
+                    mAdapter = new TagListAdapter(RVData.getInstance().getTagList().getList());
+                    tagListView.setAdapter(mAdapter);
+                    mAdapter.notifyDataSetChanged();
+
                     setListViewHeight();
 
                     RVData.getInstance().saveData(getContext(), null);
