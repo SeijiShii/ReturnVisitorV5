@@ -331,7 +331,7 @@ public class MapActivity extends AppCompatActivity
         showMapLongClickDialog(latLng);
     }
 
-    private void showMapLongClickDialog(LatLng latLng) {
+    private void showMapLongClickDialog(final LatLng latLng) {
 
         final Place tmpPlace = new Place(latLng);
         placeMarkers.addMarker(tmpPlace);
@@ -341,6 +341,9 @@ public class MapActivity extends AppCompatActivity
                 new MapLongClickDialog.MapLongClickDialogListener() {
             @Override
             public void onClickNewSinglePlaceButton() {
+
+                startRecordVisitActivityForNewPlace(latLng);
+
                 // TODO: 2017/03/17 record single place action
                 placeMarkers.removeByPlace(tmpPlace);
                 fadeOutDialogOverlay(normalFadeOutListener);
@@ -529,6 +532,7 @@ public class MapActivity extends AppCompatActivity
                             public void onRecordVisitClick(Place place) {
                                 fadeOutDialogOverlay(normalFadeOutListener);
                                 // TODO: 2017/03/16 Record Visitへの遷移
+
                             }
 
                             @Override
