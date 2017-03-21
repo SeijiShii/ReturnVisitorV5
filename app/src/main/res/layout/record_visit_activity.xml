@@ -104,151 +104,104 @@
 
             </LinearLayout>
 
-            <!-- Visit Detail Frame Parent -->
-            <FrameLayout
+            <!-- Visit Detail Frame -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/gray_white_circle"
-                android:layout_margin="@dimen/ui_margin_normal">
+                android:orientation="vertical">
 
-                <!-- Visit Detail Frame -->
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/ui_height_small">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/visit_details"
+                        android:textColor="@color/textColorGray"
+                        android:textSize="15sp"
+                        android:layout_centerInParent="true"/>
+
+                </RelativeLayout>
+
+                <!-- Visit Detail Frame  -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:id="@+id/visit_detail_frame"
+                    android:layout_margin="@dimen/ui_margin_normal"/>
 
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/ui_height_small">
+                <!-- Add new person button -->
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/ui_height_small"
+                    android:id="@+id/add_person_button"
+                    android:background="@drawable/primary_blue_selector"
+                    android:layout_margin="@dimen/ui_margin_normal"
+                    android:textColor="#FFF"
+                    android:textSize="@dimen/in_frame_text_size"
+                    android:gravity="center"
+                    android:text="@string/add_person"/>
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/visit_details"
-                            android:textColor="@color/textColorGray"
-                            android:textSize="15sp"
-                            android:layout_centerInParent="true"/>
+                <!-- Add person from other place button -->
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/ui_height_small"
+                    android:id="@+id/other_place_person_button"
+                    android:background="@drawable/primary_blue_selector"
+                    android:layout_margin="@dimen/ui_margin_normal"
+                    android:textColor="#FFF"
+                    android:textSize="@dimen/in_frame_text_size"
+                    android:gravity="center"
+                    android:text="@string/person_from_other_place"/>
 
-                    </RelativeLayout>
+                <!-- Record Placement -->
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/ui_height_small"
+                    android:id="@+id/record_placement_button"
+                    android:background="@drawable/primary_blue_selector"
+                    android:layout_margin="@dimen/ui_margin_normal"
+                    android:textColor="#FFF"
+                    android:textSize="@dimen/in_frame_text_size"
+                    android:gravity="center"
+                    android:text="@string/record_placement_button"/>
 
-                    <!-- Visit Detail Frame  -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:id="@+id/visit_detail_frame"
-                        android:layout_margin="@dimen/ui_margin_normal"/>
-
-                    <!-- Add new person button -->
-                    <Button
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/ui_height_small"
-                        android:id="@+id/add_person_button"
-                        android:background="@drawable/primary_blue_selector"
-                        android:layout_margin="@dimen/ui_margin_normal"
-                        android:textColor="#FFF"
-                        android:textSize="@dimen/in_frame_text_size"
-                        android:gravity="center"
-                        android:text="@string/add_person"/>
-
-                    <!-- Add person from other place button -->
-                    <Button
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/ui_height_small"
-                        android:id="@+id/other_place_person_button"
-                        android:background="@drawable/primary_blue_selector"
-                        android:layout_margin="@dimen/ui_margin_normal"
-                        android:textColor="#FFF"
-                        android:textSize="@dimen/in_frame_text_size"
-                        android:gravity="center"
-                        android:text="@string/person_from_other_place"/>
-
-                    <!-- Record Placement -->
-                    <Button
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/ui_height_small"
-                        android:id="@+id/record_placement_button"
-                        android:background="@drawable/primary_blue_selector"
-                        android:layout_margin="@dimen/ui_margin_normal"
-                        android:textColor="#FFF"
-                        android:textSize="@dimen/in_frame_text_size"
-                        android:gravity="center"
-                        android:text="@string/record_placement_button"/>
-
-                    <!-- Placement Container -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:id="@+id/placement_container"/>
-
-                    <!-- Priority -->
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/ui_height_small"
-                        android:textSize="@dimen/text_size_middle"
-                        android:textColor="@color/textColorGray"
-                        android:text="@string/priority_for_place"
-                        android:gravity="center"/>
-
-                    <net.c_kogyo.returnvisitorv5.view.PriorityRater
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/priority_rater"/>
-
-                    <!-- Record Not home button 2-->
-                    <Button
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/ui_height_small"
-                        android:id="@+id/record_not_home_button2"
-                        android:background="@drawable/sea_blue_selector"
-                        android:layout_margin="@dimen/ui_margin_normal"
-                        android:textColor="#FFF"
-                        android:textSize="@dimen/in_frame_text_size"
-                        android:gravity="center"
-                        android:text="@string/record_not_home2"/>
-
-                </LinearLayout>
-
-                <!-- Frame for Visit Detail Button and NH Button -->
+                <!-- Placement Container -->
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="#CFFF"
-                    android:id="@+id/two_buttons_frame"
-                    android:orientation="vertical">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:id="@+id/placement_container"/>
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/ui_height_small"/>
+                <!-- Priority -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/ui_height_small"
+                    android:textSize="@dimen/text_size_middle"
+                    android:textColor="@color/textColorGray"
+                    android:text="@string/priority_for_place"
+                    android:gravity="center"/>
 
-                    <!-- Record Visit Detail Button -->
-                    <Button
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/ui_height_small"
-                        android:id="@+id/visit_detail_button"
-                        android:background="@drawable/primary_blue_selector"
-                        android:layout_margin="@dimen/ui_margin_normal"
-                        android:textColor="#FFF"
-                        android:textSize="@dimen/in_frame_text_size"
-                        android:gravity="center"
-                        android:text="@string/record_visit_detail" />
+                <net.c_kogyo.returnvisitorv5.view.PriorityRater
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/priority_rater"/>
 
-                    <!-- Record Not home button -->
-                    <Button
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/ui_height_small"
-                        android:id="@+id/record_not_home_button"
-                        android:background="@drawable/sea_blue_selector"
-                        android:layout_margin="@dimen/ui_margin_normal"
-                        android:textColor="#FFF"
-                        android:textSize="@dimen/in_frame_text_size"
-                        android:gravity="center"
-                        android:text="@string/record_not_home"/>
+                <!-- Record Not home button 2-->
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/ui_height_small"
+                    android:id="@+id/record_not_home_button2"
+                    android:background="@drawable/sea_blue_selector"
+                    android:layout_margin="@dimen/ui_margin_normal"
+                    android:textColor="#FFF"
+                    android:textSize="@dimen/in_frame_text_size"
+                    android:gravity="center"
+                    android:text="@string/record_not_home2"/>
 
-                </LinearLayout>
-
-            </FrameLayout>
+            </LinearLayout>
 
             <!-- OK -->
             <Button

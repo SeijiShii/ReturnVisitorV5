@@ -74,7 +74,6 @@ public class RecordVisitActivity extends AppCompatActivity {
         initPlaceNameText();
         initDateText();
         initTimeText();
-        initTwoButtonsFrame();
         initAddPersonButton();
 
         initRecordPlacementButton();
@@ -184,88 +183,6 @@ public class RecordVisitActivity extends AppCompatActivity {
                         true).show();
             }
         });
-    }
-
-    private LinearLayout twoButtonsFrame;
-    private void initTwoButtonsFrame() {
-        twoButtonsFrame = (LinearLayout) findViewById(R.id.two_buttons_frame);
-        // オーバーレイをタッチが透過するのを防ぐ
-        twoButtonsFrame.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                return true;
-            }
-        });
-
-        initVisitDetailButton();
-        initNotHomeButton();
-    }
-
-    private Button visitDetailButton;
-    private void initVisitDetailButton() {
-        visitDetailButton = (Button) findViewById(R.id.visit_detail_button);
-        visitDetailButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                fadeOutTwoButtonsFrame();
-            }
-        });
-    }
-
-    private Button notHomeButton;
-    private void initNotHomeButton() {
-        notHomeButton = (Button) findViewById(R.id.record_not_home_button);
-        notHomeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                recordAsNotHome();
-            }
-        });
-    }
-
-    private void recordAsNotHome() {
-        RVData.getInstance().getVisitList().setOrAdd(mVisit);
-        RVData.getInstance().getPlaceList().setOrAdd(mPlace);
-        Intent intent = new Intent();
-        intent.putExtra(VISIT, mVisit.getId());
-        setResult(Constants.RecordVisitActions.VISIT_ADDED_RESULT_CODE, intent);
-
-        RVData.getInstance().saveData(this, null);
-        finish();
-    }
-
-    private void fadeOutTwoButtonsFrame() {
-        ValueAnimator animator = ValueAnimator.ofFloat(1f, 0f);
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                twoButtonsFrame.setAlpha((float) valueAnimator.getAnimatedValue());
-                twoButtonsFrame.requestLayout();
-            }
-        });
-        animator.setDuration(500);
-        animator.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animator) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animator) {
-                twoButtonsFrame.setVisibility(View.INVISIBLE);
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animator) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animator) {
-
-            }
-        });
-        animator.start();
     }
 
     private Button addPersonButton;
