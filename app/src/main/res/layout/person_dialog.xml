@@ -82,7 +82,7 @@
                 android:textSize="15sp"
                 android:textColor="@color/textColorGray"/>
 
-            <android.support.v7.widget.AppCompatSpinner
+            <Spinner
                 android:layout_width="150dp"
                 android:layout_height="@dimen/ui_height_small"
                 android:id="@+id/age_spinner"

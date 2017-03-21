@@ -102,7 +102,7 @@ public class RecordVisitActivity extends AppCompatActivity {
                 double lng = intent.getDoubleExtra(Constants.LONGITUDE, 0);
 
                 mPlace = new Place(new LatLng(lat, lng));
-                mVisit = new Visit();
+                mVisit = new Visit(mPlace);
                 mVisit.setPlaceId(mPlace.getId());
 
                 break;
@@ -124,7 +124,8 @@ public class RecordVisitActivity extends AppCompatActivity {
         addressText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                placeNameText.changeViewHeight(BaseAnimateView.AnimateCondition.FROM_0_TO_EX_HEIGHT, 0, true, null, null);
+
+                placeNameText.extract();
             }
         });
     }
@@ -460,7 +461,7 @@ public class RecordVisitActivity extends AppCompatActivity {
                 = new VisitDetailView(this,
                                 visitDetail,
                                 person,
-                                BaseAnimateView.InitialHeightCondition.ZERO);
+                                false);
         visitDetailFrame.addView(detailView);
         detailView.setOnButtonClickListener(new VisitDetailView.OnButtonClickListener() {
             @Override
@@ -670,7 +671,7 @@ public class RecordVisitActivity extends AppCompatActivity {
             mVisit.addPlacement(placement);
             PlacementCell placementCell = new PlacementCell(this,
                     placement,
-                    BaseAnimateView.InitialHeightCondition.ZERO,
+                    0,
                     new PlacementCell.PlacementCellListener() {
                 @Override
                 public void postExtract(PlacementCell cell) {

@@ -170,7 +170,7 @@ public class Place extends DataItem {
 
         Visit visit = RVData.getInstance().getVisitList().getLatestVisitToPlace(this.id);
 
-        if (visit == null) return Visit.Priority.NOT_HOME;
+        if (visit == null) return Visit.Priority.NONE;
 
         return visit.getPriority();
 

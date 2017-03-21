@@ -27,7 +27,14 @@ public class ClearEditText extends BaseAnimateView{
 
     public ClearEditText(Context context, AttributeSet attrs) {
         super(context,attrs, R.layout.clear_edit_text);
+
+        this.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0));
         initCommon();
+    }
+
+    @Override
+    public void setLayoutParams() {
+        this.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0));
     }
 
     private void initCommon(){
@@ -47,9 +54,14 @@ public class ClearEditText extends BaseAnimateView{
             @Override
             public void onClick(View view) {
                 editText.setText("");
-                ClearEditText.this.changeViewHeight(AnimateCondition.FROM_EX_HEIGHT_TO_ZERO, 0, true, null, null);
+                ClearEditText.this.changeViewHeight(0, true, null, null);
             }
         });
+    }
+
+    public void extract() {
+        int target = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small);
+        changeViewHeight(target, true, null, null);
     }
 
     @Override

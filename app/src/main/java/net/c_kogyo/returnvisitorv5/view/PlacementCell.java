@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -18,14 +19,14 @@ public class PlacementCell extends BaseAnimateView {
 
     private Placement mPlacement;
     private PlacementCellListener mCellListener;
+    private int mExtractHeight;
 
     public PlacementCell(Context context,
                          Placement placement,
-                         InitialHeightCondition initCondition,
+                         int initialHeight,
                          PlacementCellListener listener) {
         super(context,
-                context.getResources().getDimensionPixelSize(R.dimen.ui_height_small),
-                initCondition,
+                initialHeight,
                 R.layout.placement_cell);
         mPlacement = placement;
         mCellListener = listener;
@@ -37,12 +38,20 @@ public class PlacementCell extends BaseAnimateView {
         super(context, attrs, resId);
     }
 
+    @Override
+    public void setLayoutParams() {
+        this.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0));
+    }
+
     private void initCommon() {
+
+        mExtractHeight = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small);
+
         initPlacementText();
         initDeleteButton();
 
-        if (mInitCondition == InitialHeightCondition.ZERO) {
-            extractPostDrawn(new Animator.AnimatorListener() {
+        if (mInitialHeight == 0) {
+            extractPostDrawn(mExtractHeight, new Animator.AnimatorListener() {
                 @Override
                 public void onAnimationStart(Animator animator) {
 
@@ -84,11 +93,10 @@ public class PlacementCell extends BaseAnimateView {
         deleteButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                PlacementCell.this.changeViewHeight(AnimateCondition.FROM_EX_HEIGHT_TO_ZERO,
-                        0,
-                        true,
-                        null,
-                        new Animator.AnimatorListener() {
+                PlacementCell.this.changeViewHeight(0,
+                                        true,
+                                        null,
+                                        new Animator.AnimatorListener() {
                     @Override
                     public void onAnimationStart(Animator animator) {
 

@@ -70,8 +70,7 @@
             <net.c_kogyo.returnvisitorv5.view.ClearEditText
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                custom:exHeight="50dp"
-                custom:initialHeightCondition="zero"
+                custom:initialHeight="0dp"
                 android:id="@+id/place_name_text_view"
                 android:layout_margin="@dimen/ui_margin_normal"/>
 

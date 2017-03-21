@@ -3,6 +3,7 @@ package net.c_kogyo.returnvisitorv5.activity;
 import android.Manifest;
 import android.animation.Animator;
 import android.animation.ValueAnimator;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -15,6 +16,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.LinearLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -379,6 +381,7 @@ public class MapActivity extends AppCompatActivity
             public void onClickNotHomeButton() {
                 // TODO: 2017/03/17 record not home action
                 placeMarkers.removeByPlace(tmpPlace);
+                recordNotHome(tmpPlace);
                 fadeOutDialogOverlay(normalFadeOutListener);
             }
 
@@ -459,7 +462,8 @@ public class MapActivity extends AppCompatActivity
                 dialogOverlay.requestLayout();
             }
         });
-        animator.addListener(listener);
+        if (listener != null)
+            animator.addListener(listener);
         animator.setDuration(500);
         animator.start();
     }
@@ -607,6 +611,7 @@ public class MapActivity extends AppCompatActivity
         dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+                hideSoftKeyboard();
                 fadeOutDialogOverlay(normalFadeOutListener);
                 return true;
             }
@@ -623,6 +628,7 @@ public class MapActivity extends AppCompatActivity
 
         @Override
         public void onAnimationEnd(Animator animation) {
+            hideSoftKeyboard();
             dialogOverlay.setVisibility(View.INVISIBLE);
             dialogFrame.removeAllViews();
         }
@@ -679,5 +685,23 @@ public class MapActivity extends AppCompatActivity
 
     }
 
+    private void hideSoftKeyboard() {
+        InputMethodManager inputMethodManager = (InputMethodManager)  this.getSystemService(Activity.INPUT_METHOD_SERVICE);
+
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
+
+    private void recordNotHome(Place place) {
+        Visit visit = new Visit(place);
+        visit.setPriority(Visit.Priority.NOT_HOME);
+        RVData.getInstance().getPlaceList().setOrAdd(place);
+        RVData.getInstance().getVisitList().setOrAdd(visit);
+        RVData.getInstance().saveData(this, null);
+
+        placeMarkers.addMarker(place);
+    }
 
 }

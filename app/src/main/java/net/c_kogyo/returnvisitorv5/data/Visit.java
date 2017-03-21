@@ -64,16 +64,16 @@ public class Visit extends DataItem {
 
     }
 
-    public Visit() {
+    public Visit(Place place) {
         super(VISIT);
 
-        initCommon();
+        initCommon(place);
     }
 
     public Visit(JSONObject object) {
 
         super(object);
-        initCommon();
+        initCommon(null);
 
         setJSON(this, object);
     }
@@ -82,9 +82,13 @@ public class Visit extends DataItem {
         this(record.getDataJSON());
     }
 
-    private void initCommon() {
+    private void initCommon(Place place) {
         this.datetime = Calendar.getInstance();
-        this.placeId = null;
+        if (place == null) {
+            this.placeId = null;
+        } else {
+            this.placeId = place.getId();
+        }
         this.placements = new ArrayList<>();
         this.visitDetails = new ArrayList<>();
         this.priority = Priority.NONE;

@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 24
+    compileSdkVersion 23
     buildToolsVersion '25.0.0'
     defaultConfig {
         applicationId "net.c_kogyo.returnvisitorv5"
-        minSdkVersion 14
-        targetSdkVersion 22
+        minSdkVersion 19
+        targetSdkVersion 23
         versionCode 500
         versionName '5.0.0'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"

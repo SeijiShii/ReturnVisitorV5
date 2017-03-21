@@ -7,6 +7,8 @@ import android.util.AttributeSet;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -23,14 +25,18 @@ import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 
 public class VisitCell extends BaseAnimateView {
 
+    @Override
+    public void setLayoutParams() {
+        this.setLayoutParams(new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0));
+    }
+
     private Visit mVisit;
-    private int collapseHeight;
+    private int mCollapseHeight, mExtractHeight;
     private VisitCellListener mListener;
 
     public VisitCell(Context context, Visit visit, VisitCellListener listener) {
         super(context,
-                (int) (context.getResources().getDisplayMetrics().density * 270),
-                InitialHeightCondition.EX_HEIGHT,
+                context.getResources().getDimensionPixelSize(R.dimen.ui_height_small),
                 R.layout.visit_cell);
         mVisit = visit;
         mListener = listener;
@@ -43,14 +49,15 @@ public class VisitCell extends BaseAnimateView {
 
     private void initCommon() {
 
-        collapseHeight = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small)
+        mCollapseHeight = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small)
                 + (int)(getContext().getResources().getDisplayMetrics().density * 5);
+        mExtractHeight = (int) (getContext().getResources().getDisplayMetrics().density * 270);
 
         initHeadRow();
         initVisitDataText();
         initEditButton();
 
-        this.getLayoutParams().height = collapseHeight;
+//        this.getLayoutParams().height = collapseHeight;
     }
 
     private LinearLayout headRow;
@@ -101,11 +108,9 @@ public class VisitCell extends BaseAnimateView {
     private boolean isViewOpen = false;
     private void openCloseCell() {
         if (isViewOpen) {
-
-            VisitCell.this.changeViewHeight(AnimateCondition.TO_TARGET_HEIGHT, collapseHeight, true, null, null);
-
+            VisitCell.this.changeViewHeight(mCollapseHeight, true, null, null);
         } else {
-            VisitCell.this.changeViewHeight(AnimateCondition.TO_EX_HEIGHT, 0, true, null, null);
+            VisitCell.this.changeViewHeight(mExtractHeight, true, null, null);
         }
 
         rotateOpenCloseMark();

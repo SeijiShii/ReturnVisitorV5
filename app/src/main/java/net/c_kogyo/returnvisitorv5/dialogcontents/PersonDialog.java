@@ -18,6 +18,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.RadioButton;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
@@ -137,12 +138,12 @@ public class PersonDialog extends FrameLayout {
 
     }
 
-    private AppCompatSpinner ageSpinner;
+    private Spinner ageSpinner;
     private void initAgeSpinner() {
 
         final Person.Age oldAge = mPerson.getAge();
 
-        ageSpinner = (AppCompatSpinner) findViewById(R.id.age_spinner);
+        ageSpinner = (Spinner) findViewById(R.id.age_spinner);
 
         AgeSpinnerAdapter adapter = new AgeSpinnerAdapter();
 

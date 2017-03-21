@@ -1,13 +1,14 @@
 package net.c_kogyo.returnvisitorv5.view;
 
-import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.support.v7.widget.ActionBarOverlayLayout;
 import android.support.v7.widget.SwitchCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -34,16 +35,20 @@ public class VisitDetailView extends BaseAnimateView {
     private VisitDetail mVisitDetail;
     private Person mPerson;
     private OnButtonClickListener mButtonClickListener;
+    private boolean mExtract;
 
-    private int mExHeight, fixedHeight, noteLineHeight, mTagFrameHeight;
+    private int mCollapseHeight, mExHeight, fixedHeight, noteLineHeight, mTagFrameHeight;
 
     public VisitDetailView(Context context,
                            VisitDetail visitDetail,
                            Person person,
-                           InitialHeightCondition condition) {
-        super(context, 0, condition, R.layout.visit_detail_view);
+                           boolean extract) {
+        super(context,
+                0,
+                R.layout.visit_detail_view);
         mVisitDetail = visitDetail;
         mPerson = person;
+        mExtract = extract;
 
         initCommon();
     }
@@ -52,9 +57,16 @@ public class VisitDetailView extends BaseAnimateView {
         super(context, attrs, R.layout.visit_detail_view);
     }
 
+    @Override
+    public void setLayoutParams() {
+        this.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0));
+    }
+
     private void initCommon() {
 
         isViewOpen = true;
+        mCollapseHeight = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small)
+                + (int) (getContext().getResources().getDisplayMetrics().density * 5);
 
         initDataText();
         initOpenCloseButton();
@@ -91,14 +103,9 @@ public class VisitDetailView extends BaseAnimateView {
             public void onClick(View view) {
                 // 開閉アニメーション DONE
                 if (isViewOpen) {
-
-                    int padding = (int) (getContext().getResources().getDisplayMetrics().density * 5);
-                    int targetHeight = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small)
-                            + padding;
-                    VisitDetailView.this.changeViewHeight(AnimateCondition.TO_TARGET_HEIGHT, targetHeight, true, null, null);
-
+                    VisitDetailView.this.changeViewHeight(mCollapseHeight, true, null, null);
                 } else {
-                    VisitDetailView.this.changeViewHeight(AnimateCondition.TO_EX_HEIGHT, 0, true, null, null);
+                    VisitDetailView.this.changeViewHeight(mExHeight, true, null, null);
                 }
 
                 rotateOpenCloseButton();
@@ -190,7 +197,7 @@ public class VisitDetailView extends BaseAnimateView {
         PlacementCell placementCell
                 = new PlacementCell(getContext(),
                         placement,
-                        InitialHeightCondition.ZERO,
+                        0,
                         new PlacementCell.PlacementCellListener() {
             @Override
             public void postExtract(PlacementCell cell) {
@@ -295,8 +302,7 @@ public class VisitDetailView extends BaseAnimateView {
 
         mExHeight = fixedHeight + plcHeight + noteHeight + mTagFrameHeight;
 
-        VisitDetailView.this.setExHeight(mExHeight);
-        VisitDetailView.this.changeViewHeight(AnimateCondition.TO_EX_HEIGHT, 0, true, null, null);
+        VisitDetailView.this.changeViewHeight(mExHeight, true, null, null);
     }
 
     private SwitchCompat rvSwitch;
@@ -369,5 +375,6 @@ public class VisitDetailView extends BaseAnimateView {
         void onPrioritySet(Visit.Priority priority);
     }
 
+    // TODO: 2017/03/20 mExtractによる振り分け
 
 }
