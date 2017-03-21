@@ -181,6 +181,7 @@ public class Visit extends DataItem {
         try {
             if (object.has(PLACE_ID)) visit.placeId = object.getString(PLACE_ID);
             if (object.has(DATE_TIME)) visit.datetime.setTimeInMillis(object.getLong(DATE_TIME));
+            if (object.has(PRIORITY)) visit.priority = Priority.valueOf(object.getString(PRIORITY));
             if (object.has(PLACEMENTS)) {
                 JSONArray array = object.getJSONArray(PLACEMENTS);
                 for ( int i = 0 ; i < array.length() ; i++ ) {
