@@ -19,52 +19,15 @@ import net.c_kogyo.returnvisitorv5.R;
 
 public abstract class BaseAnimateView extends FrameLayout {
 
-//    int mCollapseHeight, mExtractHeight;
     int mResId;
     int mInitialHeight;
-//    HeightCondition mInitCondition;
     float multi;
-
-//    public enum HeightCondition {
-//
-//        ZERO(0),
-//        COLLAPSE(1),
-//        EXTRACT(2);
-//
-//        private final int num;
-//
-//        HeightCondition(int num) {
-//            this.num = num;
-//        }
-//
-//        public static HeightCondition getEnum(int num) {
-//            HeightCondition[] enumArray = HeightCondition.values();
-//            for (HeightCondition condition : enumArray) {
-//                if (condition.num == num) return condition;
-//            }
-//            return null;
-//        }
-//
-//        public int num() {
-//            return num;
-//        }
-//    }
-
-//    public enum AnimateCondition {
-//        FROM_0_TO_EX_HEIGHT,
-//        FROM_EX_HEIGHT_TO_ZERO,
-//        TO_EX_HEIGHT,
-//        TO_TARGET_HEIGHT
-//    }
 
     public BaseAnimateView(Context context, int initialHeight,int resId) {
         super(context);
 
         this.mInitialHeight = initialHeight;
         this.mResId = resId;
-//        this.mCollapseHeight = collapseHeight;
-//        this.mExtractHeight = extractHeight;
-//        this.mInitCondition = initCondition;
 
         initCommon();
     }
@@ -79,9 +42,6 @@ public abstract class BaseAnimateView extends FrameLayout {
                 R.styleable.BaseAnimateView,
                 0, 0);
         mInitialHeight = a.getDimensionPixelSize(R.styleable.BaseAnimateView_initialHeight, 0);
-//        mCollapseHeight = a.getDimensionPixelSize(R.styleable.BaseAnimateView_collapseHeight, 0);
-//        mExtractHeight = a.getDimensionPixelSize(R.styleable.BaseAnimateView_extractHeight, 0);
-//        mInitCondition = HeightCondition.getEnum(a.getInteger(R.styleable.BaseAnimateView_initialHeightCondition, 0));
 
         initCommon();
     }
@@ -97,16 +57,6 @@ public abstract class BaseAnimateView extends FrameLayout {
         setLayoutParams();
 
         this.getLayoutParams().height = mInitialHeight;
-
-        // DONE: 2017/03/19 親のLayoutParams
-//        switch (mInitCondition) {
-//            case COLLAPSE:
-//                this.getLayoutParams().height = mCollapseHeight;
-//                break;
-//            case EXTRACT:
-//                this.getLayoutParams().height = mExtractHeight;
-//                break;
-//        }
 
     }
 
@@ -144,57 +94,13 @@ public abstract class BaseAnimateView extends FrameLayout {
         }).start();
     }
 
-//    private void setHeightPostDrawn() {
-//
-//        final Handler handler = new Handler();
-//
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                while (BaseAnimateView.this.getWidth() <= 0) {
-//                    try {
-//                        Thread.sleep(50);
-//                    } catch (InterruptedException e) {
-//                        //
-//                    }
-//                }
-//                handler.post(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        int height = 0;
-//                        if (mInitCondition == HeightCondition.EXTRACT) {
-//                            height = mExtractHeight;
-//                        }
-//                        // 親がLinearLayoutでなくてはならない。
-//                        BaseAnimateView.this.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height));
-//                        requestLayout();
-//                    }
-//                });
-//            }
-//        }).start();
-//    }
 
     public void changeViewHeight(int targetHeight,
                                  boolean toAnimate,
                                  final HeightUpdateListener heightUpdateListener,
                                  Animator.AnimatorListener animatorListener) {
         int originHeight = getMeasuredHeight();
-//        int targetHeight
-//                targetHeight = 0;
-//
-//        switch (targetCondition) {
-//            case COLLAPSE:
-//                originHeight = mExtractHeight;
-//                targetHeight = mCollapseHeight;
-//                break;
-//            case EXTRACT:
-//                originHeight = mCollapseHeight;
-//                targetHeight = mExtractHeight;
-//                break;
-//        }
-
         changeViewHeight(originHeight, targetHeight, toAnimate, heightUpdateListener, animatorListener);
-
     }
 
     private void changeViewHeight(int originHeight,
@@ -232,10 +138,6 @@ public abstract class BaseAnimateView extends FrameLayout {
     public interface HeightUpdateListener {
         void onUpdate();
     }
-
-//    public void setExtractHeight(int exHeight) {
-//        this.mExtractHeight = exHeight;
-//    }
 
     public abstract void setLayoutParams();
 }
