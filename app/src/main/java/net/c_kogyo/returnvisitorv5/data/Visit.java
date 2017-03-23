@@ -71,9 +71,16 @@ public class Visit extends DataItem {
     }
 
     public Visit(Visit lastVisit) {
+        super(VISIT);
         initCommon(null);
 
-        // TODO: 2017/03/21 先回の訪問で生成 
+        // TODO: 2017/03/21 先回の訪問で生成
+        this.placeId = lastVisit.getPlaceId();
+        this.priority = lastVisit.getPriority();
+
+        for (VisitDetail visitDetail : lastVisit.getVisitDetails()) {
+            this.visitDetails.add(new VisitDetail(visitDetail));
+        }
     }
 
     public Visit(JSONObject object) {

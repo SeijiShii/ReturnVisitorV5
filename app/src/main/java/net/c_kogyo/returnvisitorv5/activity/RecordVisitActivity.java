@@ -214,7 +214,7 @@ public class RecordVisitActivity extends AppCompatActivity {
                             @Override
                             public void onFinishAnimation() {
                                 // Person Dialogが消えたら実行するアニメーション
-                                addVisitDetailView(visitDetail, person);
+                                addVisitDetailView(visitDetail, person, false);
                             }
                         });
                     }
@@ -371,14 +371,20 @@ public class RecordVisitActivity extends AppCompatActivity {
     private LinearLayout visitDetailFrame;
     private void initVisitDetailFrame() {
         visitDetailFrame = (LinearLayout) findViewById(R.id.visit_detail_frame);
+        for (VisitDetail visitDetail : mVisit.getVisitDetails()) {
+            Person person = RVData.getInstance().getPersonList().getById(visitDetail.getPersonId());
+            if (person != null) {
+                addVisitDetailView(visitDetail, person, true);
+            }
+        }
     }
 
-    private void addVisitDetailView(VisitDetail visitDetail, Person person){
+    private void addVisitDetailView(VisitDetail visitDetail, Person person, boolean extracted){
         VisitDetailView detailView
                 = new VisitDetailView(this,
                                 visitDetail,
                                 person,
-                                false);
+                                extracted);
         visitDetailFrame.addView(detailView);
         detailView.setOnButtonClickListener(new VisitDetailView.OnButtonClickListener() {
             @Override

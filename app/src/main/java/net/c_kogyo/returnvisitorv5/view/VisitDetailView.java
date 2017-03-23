@@ -34,20 +34,22 @@ public class VisitDetailView extends BaseAnimateView {
     private VisitDetail mVisitDetail;
     private Person mPerson;
     private OnButtonClickListener mButtonClickListener;
-    private boolean mExtract;
+    private boolean mExtracted;
 
-    private int mCollapseHeight, mExtractHeight, fixedHeight, noteLineHeight;
+    private int mCollapseHeight,
+//            mExtractHeight,
+            fixedHeight, noteLineHeight;
 
     public VisitDetailView(Context context,
                            VisitDetail visitDetail,
                            Person person,
-                           boolean extract) {
+                           boolean extracted) {
         super(context,
                 0,
                 R.layout.visit_detail_view);
         mVisitDetail = visitDetail;
         mPerson = person;
-        mExtract = extract;
+        mExtracted = extracted;
 
         initCommon();
     }
@@ -81,8 +83,8 @@ public class VisitDetailView extends BaseAnimateView {
 
         initTagFrame();
 
-        if (mExtract) {
-            this.getLayoutParams().height = mExtractHeight;
+        if (mExtracted) {
+            this.getLayoutParams().height = getExtractHeight();
         } else {
             extractPostDrawn(getExtractHeight(), null);
         }
@@ -110,7 +112,7 @@ public class VisitDetailView extends BaseAnimateView {
                 if (isViewOpen) {
                     VisitDetailView.this.changeViewHeight(mCollapseHeight, true, null, null);
                 } else {
-                    VisitDetailView.this.changeViewHeight(mExtractHeight, true, null, null);
+                    VisitDetailView.this.changeViewHeight(getExtractHeight(), true, null, null);
                 }
 
                 rotateOpenCloseButton();
@@ -290,8 +292,7 @@ public class VisitDetailView extends BaseAnimateView {
 
     private void changeToTheHeight() {
 
-        setExtractHeight();
-        VisitDetailView.this.changeViewHeight(mExtractHeight, true, null, null);
+        VisitDetailView.this.changeViewHeight(getExtractHeight(), true, null, null);
     }
 
     private SwitchCompat rvSwitch;
@@ -348,7 +349,7 @@ public class VisitDetailView extends BaseAnimateView {
         changeToTheHeight();
     }
 
-    public void setExtractHeight() {
+    public int getExtractHeight() {
 
         // DONE: 2017/03/12 高さが合わない
         int rowHeight = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small);
@@ -365,14 +366,8 @@ public class VisitDetailView extends BaseAnimateView {
         int noteHeight = noteLineHeight * lineCount;
         int plcHeight = rowHeight * mVisitDetail.getPlacements().size();
 
-        mExtractHeight = fixedHeight + plcHeight + noteHeight + tagFrame.getFrameHeight();
+        return fixedHeight + plcHeight + noteHeight + tagFrame.getFrameHeight();
 
-    }
-
-    public int getExtractHeight() {
-
-        setExtractHeight();
-        return mExtractHeight;
     }
 
     public interface OnButtonClickListener {
