@@ -50,6 +50,7 @@ import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_PLACE_ACTION;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_VISIT_REQUEST_CODE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.VISIT_ADDED_RESULT_CODE;
+import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.VISIT_EDITED_RESULT_CODE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.SharedPrefTags.ZOOM_LEVEL;
 import static net.c_kogyo.returnvisitorv5.data.Visit.VISIT;
@@ -500,6 +501,20 @@ public class MapActivity extends AppCompatActivity
                     }
                 }
                 break;
+            case EDIT_VISIT_REQUEST_CODE:
+                if (resultCode == VISIT_EDITED_RESULT_CODE) {
+                    String visitId = data.getStringExtra(VISIT);
+                    if (visitId != null) {
+                        Visit visit = RVData.getInstance().getVisitList().getById(visitId);
+                        if (visit != null) {
+                            String placeId = visit.getPlaceId();
+                            Place place = RVData.getInstance().getPlaceList().getById(placeId);
+                            if (place != null) {
+                                placeMarkers.refreshMarker(place);
+                            }
+                        }
+                    }
+                }
         }
     }
 
@@ -671,6 +686,13 @@ public class MapActivity extends AppCompatActivity
             Marker marker = mMap.addMarker(options);
             place.setMarkerId(marker.getId());
             markers.add(marker);
+        }
+
+        private void refreshMarker(Place place) {
+            Marker marker = getMarkerByPlace(place);
+            if (marker != null) {
+                marker.setIcon(BitmapDescriptorFactory.fromResource(Constants.markerRes[place.getPriority().num()]));
+            }
         }
 
         private Marker getMarkerByPlace(Place place) {

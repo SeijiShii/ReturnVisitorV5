@@ -489,6 +489,9 @@ public class RecordVisitActivity extends AppCompatActivity {
                 RVData.getInstance().getVisitList().setOrAdd(mVisit);
                 RVData.getInstance().getPersonList().addList(mPersons);
 
+                mPlace.setName(placeNameText.getText());
+                RVData.getInstance().getPlaceList().setOrAdd(mPlace);
+
                 // TODO: 2017/03/08 要動作検証 noteがAutoCompListについかされたかどうか
                 for (VisitDetail visitDetail : mVisit.getVisitDetails()) {
                     RVData.getInstance().getNoteCompList().addIfNoSameName(visitDetail.getNote());
@@ -497,17 +500,21 @@ public class RecordVisitActivity extends AppCompatActivity {
                 switch (getIntent().getAction()) {
                     case NEW_PLACE_ACTION:
 
-                        mPlace.setName(placeNameText.getText());
-                        RVData.getInstance().getPlaceList().setOrAdd(mPlace);
-
-                        Intent intent = new Intent();
-                        intent.putExtra(VISIT, mVisit.getId());
-                        setResult(Constants.RecordVisitActions.VISIT_ADDED_RESULT_CODE, intent);
+                        Intent newPlaceReturnIntent = new Intent();
+                        newPlaceReturnIntent.putExtra(VISIT, mVisit.getId());
+                        setResult(Constants.RecordVisitActions.VISIT_ADDED_RESULT_CODE, newPlaceReturnIntent);
 
                         break;
+
                     case EDIT_VISIT_ACTION:
                         // TODO: 2017/03/16 MapActivityへの戻り処理
+
+                        Intent editVisitReturnIntent = new Intent();
+                        editVisitReturnIntent.putExtra(VISIT, mVisit.getId());
+                        setResult(Constants.RecordVisitActions.VISIT_EDITED_RESULT_CODE, editVisitReturnIntent);
+
                         break;
+
                 }
 
                 RVData.getInstance().saveData(getApplicationContext(), null);

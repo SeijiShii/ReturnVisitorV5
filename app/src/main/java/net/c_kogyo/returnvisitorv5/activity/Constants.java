@@ -84,7 +84,7 @@ public class Constants {
         public static final int NEW_VISIT_REQUEST_CODE = 4001;
 
         public static final int DELETE_VISIT_RESULT_CODE = 4010;
-        public static final int VISIT_CHANGED_RESULT_CODE = 4020;
+        public static final int VISIT_EDITED_RESULT_CODE = 4020;
         public static final int VISIT_ADDED_RESULT_CODE = 4030;
 
     }
