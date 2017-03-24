@@ -16,7 +16,7 @@ import static net.c_kogyo.returnvisitorv5.data.Visit.PRIORITY;
  * Created by SeijiShii on 2017/02/20.
  */
 
-public class VisitDetail extends DataItem {
+public class VisitDetail extends DataItem  implements Cloneable{
 
     public static final String VISIT_DETAIL = "visit_detail";
     public static final String PERSON_ID = "person_id";
@@ -245,5 +245,27 @@ public class VisitDetail extends DataItem {
         }
 
         return builder.toString();
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+
+        VisitDetail clonedDetail = (VisitDetail) super.clone();
+
+        clonedDetail.personId = this.personId;
+        clonedDetail.visitId = this.visitId;
+        clonedDetail.seen = this.seen;
+        clonedDetail.isRV = this.isRV;
+        clonedDetail.isStudy = this.isStudy;
+
+        clonedDetail.placements = new ArrayList<>();
+        for (Placement plc : this.placements ) {
+            clonedDetail.placements.add((Placement) plc.clone());
+        }
+
+        clonedDetail.tagIds = new ArrayList<>(this.tagIds);
+        clonedDetail.priority = this.priority;
+
+        return clonedDetail;
     }
 }

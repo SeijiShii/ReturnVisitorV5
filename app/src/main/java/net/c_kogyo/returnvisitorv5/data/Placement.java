@@ -15,7 +15,7 @@ import java.util.Calendar;
 /**
  * Created by 56255 on 2016/07/19.
  */
-public class Placement extends DataItem {
+public class Placement extends DataItem implements Cloneable{
 
     public enum Category {
 
@@ -281,4 +281,15 @@ public class Placement extends DataItem {
         return list;
     }
 
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+
+        Placement clonedPlc = (Placement) super.clone();
+
+        clonedPlc.category = this.category;
+        clonedPlc.magCategory = this.magCategory;
+        clonedPlc.number = (Calendar) this.number.clone();
+
+        return clonedPlc;
+    }
 }

@@ -176,4 +176,16 @@ public class Place extends DataItem {
 
         // DONE: 2017/03/05 実際のpriority処理を記述
     }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+
+        Place clonedPlace = (Place) super.clone();
+
+        clonedPlace.latLng = new LatLng(this.latLng.latitude, this.latLng.longitude);
+        clonedPlace.address = this.address;
+        clonedPlace.markerId = this.markerId;
+
+        return clonedPlace;
+    }
 }

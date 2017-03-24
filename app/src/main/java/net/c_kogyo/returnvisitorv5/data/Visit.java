@@ -16,7 +16,7 @@ import java.util.Calendar;
 /**
  * Created by 56255 on 2016/07/19.
  */
-public class Visit extends DataItem {
+public class Visit extends DataItem implements Cloneable{
 
     public static final String VISIT = "visit";
     public static final String PLACE_ID = "place_id";
@@ -277,5 +277,25 @@ public class Visit extends DataItem {
         return builder.toString();
     }
 
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        Visit clonedVisit = (Visit) super.clone();
 
+        clonedVisit.datetime = (Calendar) this.datetime.clone();
+        clonedVisit.placeId = this.placeId;
+
+        clonedVisit.placements = new ArrayList<>();
+        for (Placement placement : this.placements) {
+            clonedVisit.placements.add((Placement) placement.clone());
+        }
+
+        clonedVisit.visitDetails = new ArrayList<>();
+        for (VisitDetail detail : this.visitDetails) {
+            clonedVisit.visitDetails.add((VisitDetail) detail.clone());
+        }
+
+        clonedVisit.priority = this.priority;
+
+        return clonedVisit;
+    }
 }

@@ -107,8 +107,16 @@ public class RecordVisitActivity extends AppCompatActivity {
 
             case EDIT_VISIT_ACTION:
                 String visitId = intent.getStringExtra(VISIT);
-                mVisit = RVData.getInstance().getVisitList().getById(visitId);
-                mPlace = RVData.getInstance().getPlaceList().getById(mVisit.getPlaceId());
+
+                Visit visit = RVData.getInstance().getVisitList().getById(visitId);
+                Place place = RVData.getInstance().getPlaceList().getById(visit.getPlaceId());
+
+                try {
+                    mVisit = (Visit) visit.clone();
+                    mPlace = (Place) place.clone();
+                } catch (CloneNotSupportedException e) {
+                    e.printStackTrace();
+                }
 
                 // TODO: 2017/03/16 Edit Visit で遷移してきたときの UI描画
 

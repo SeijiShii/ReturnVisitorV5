@@ -165,6 +165,7 @@ public class DataItem implements Cloneable{
         item.name = this.name;
         item.note = this.note;
         item.updatedAt = (Calendar) this.updatedAt.clone();
+        item.isDeleted = this.isDeleted;
 
         return item;
     }
