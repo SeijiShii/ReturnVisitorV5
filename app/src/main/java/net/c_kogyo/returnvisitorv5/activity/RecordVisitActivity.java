@@ -67,6 +67,7 @@ public class RecordVisitActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         initData();
+        initBroadcastManager();
 
         setContentView(R.layout.record_visit_activity);
 
@@ -84,8 +85,6 @@ public class RecordVisitActivity extends AppCompatActivity {
         initOkButton();
         initCancelButton();
         initDeleteButton();
-        initBroadcastManager();
-        inquireAddress();
         initPriorityRater();
     }
 
@@ -127,11 +126,20 @@ public class RecordVisitActivity extends AppCompatActivity {
                 placeNameText.extract();
             }
         });
+        if (mPlace.getAddress() != null && !mPlace.getAddress().equals("")) {
+            addressText.setText(mPlace.getAddress());
+        } else {
+            inquireAddress();
+        }
     }
 
     private ClearEditText placeNameText;
     private void initPlaceNameText() {
         placeNameText = (ClearEditText) findViewById(R.id.place_name_text_view);
+        if (mPlace.getName() != null && !mPlace.getName().equals("")) {
+            placeNameText.setText(mPlace.getName());
+            placeNameText.extract();
+        }
     }
 
     private TextView dateText;
@@ -507,7 +515,7 @@ public class RecordVisitActivity extends AppCompatActivity {
                         break;
 
                     case EDIT_VISIT_ACTION:
-                        // TODO: 2017/03/16 MapActivityへの戻り処理
+                        // DONE: 2017/03/16 MapActivityへの戻り処理
 
                         Intent editVisitReturnIntent = new Intent();
                         editVisitReturnIntent.putExtra(VISIT, mVisit.getId());
@@ -526,6 +534,7 @@ public class RecordVisitActivity extends AppCompatActivity {
 
     private Button cancelButton;
     private void initCancelButton(){
+        // TODO: 2017/03/24 キャンセル時も本データが変更されてしまうのはクローンして編集していないから
         cancelButton = (Button) findViewById(R.id.cancel_button);
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -585,7 +594,8 @@ public class RecordVisitActivity extends AppCompatActivity {
             @Override
             public void onOkClick(Placement placement, String parentId) {
 
-                addPlacementCell(placement, parentId);
+                addPlacement(placement, parentId);
+                addPlacementCell(placement, parentId, false);
                 fadeDialogOverlay(false, null);
             }
         });
@@ -594,14 +604,30 @@ public class RecordVisitActivity extends AppCompatActivity {
 
     }
 
-    private void addPlacementCell(Placement placement, String parentId){
-
+    private void addPlacement(Placement placement, String parentId) {
         if (parentId.equals(mVisit.getId())) {
             // Visitに配布物を追加する場合
             mVisit.addPlacement(placement);
+
+        } else {
+            // VisitDetailに追加する場合
+
+            for (VisitDetail visitDetail : mVisit.getVisitDetails()) {
+
+                if (visitDetail.getId().equals(parentId)) {
+                    visitDetail.getPlacements().add(placement);
+                }
+            }
+        }
+    }
+
+    private void addPlacementCell(Placement placement, String parentId, boolean extracted){
+
+        if (parentId.equals(mVisit.getId())) {
+            // Visitに配布物を追加する場合
             PlacementCell placementCell = new PlacementCell(this,
                     placement,
-                    0,
+                    extracted,
                     new PlacementCell.PlacementCellListener() {
                 @Override
                 public void postExtract(PlacementCell cell) {
@@ -625,7 +651,7 @@ public class RecordVisitActivity extends AppCompatActivity {
                 if (visitDetail.getId().equals(parentId)) {
                     VisitDetailView visitDetailView = getVisitDetailView(visitDetail);
                     if (visitDetailView != null) {
-                        visitDetailView.addPlacementCell(placement);
+                        visitDetailView.addPlacementCell(placement, extracted);
                     }
                 }
             }
@@ -646,6 +672,9 @@ public class RecordVisitActivity extends AppCompatActivity {
     private LinearLayout placementContainer;
     private void initPlacementContainer() {
         placementContainer = (LinearLayout) findViewById(R.id.placement_container);
+        for (Placement placement : mVisit.getPlacements()) {
+            addPlacementCell(placement, mVisit.getId(), true);
+        }
     }
 
 }

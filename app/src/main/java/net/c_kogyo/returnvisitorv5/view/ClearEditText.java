@@ -77,4 +77,8 @@ public class ClearEditText extends BaseAnimateView{
         return editText.getText().toString();
     }
 
+    public void setText(String text) {
+        this.editText.setText(text);
+    }
+
 }

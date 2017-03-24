@@ -82,6 +82,7 @@ public class VisitDetailView extends BaseAnimateView {
         initStudySwitch();
 
         initTagFrame();
+        setPlacementCells();
 
         if (mExtracted) {
             this.getLayoutParams().height = getExtractHeight();
@@ -197,18 +198,24 @@ public class VisitDetailView extends BaseAnimateView {
     private LinearLayout placementContainer;
     private void initPlacementContainer() {
         placementContainer = (LinearLayout) getViewById(R.id.placement_container);
+
     }
 
-    public void addPlacementCell(Placement placement) {
+    private void setPlacementCells() {
+        for (Placement placement : mVisitDetail.getPlacements()) {
+            addPlacementCell(placement, false);
+        }
+    }
+
+    public void addPlacementCell(Placement placement, boolean extracted) {
 
         PlacementCell placementCell
                 = new PlacementCell(getContext(),
                         placement,
-                        0,
+                        extracted,
                         new PlacementCell.PlacementCellListener() {
             @Override
             public void postExtract(PlacementCell cell) {
-                mVisitDetail.getPlacements().add(cell.getPlacement());
                 changeToTheHeight();
             }
 
@@ -381,6 +388,6 @@ public class VisitDetailView extends BaseAnimateView {
         void onPrioritySet(Visit.Priority priority);
     }
 
-    // TODO: 2017/03/20 mExtractによる振り分け
+    // DONE: 2017/03/20 mExtractによる振り分け
 
 }

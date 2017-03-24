@@ -3,9 +3,12 @@ package net.c_kogyo.returnvisitorv5.view;
 import android.animation.Animator;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
@@ -19,15 +22,17 @@ public class PlacementCell extends BaseAnimateView {
 
     private Placement mPlacement;
     private PlacementCellListener mCellListener;
-    private int mExtractHeight;
+    private boolean mExtracted;
 
     public PlacementCell(Context context,
                          Placement placement,
-                         int initialHeight,
+                         boolean extracted,
                          PlacementCellListener listener) {
         super(context,
-                initialHeight,
+                0,
                 R.layout.placement_cell);
+
+        mExtracted = extracted;
         mPlacement = placement;
         mCellListener = listener;
 
@@ -45,12 +50,12 @@ public class PlacementCell extends BaseAnimateView {
 
     private void initCommon() {
 
-        mExtractHeight = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small);
+        int mExtractHeight = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small);
 
         initPlacementText();
         initDeleteButton();
 
-        if (mInitialHeight == 0) {
+        if (!mExtracted) {
             extractPostDrawn(mExtractHeight, new Animator.AnimatorListener() {
                 @Override
                 public void onAnimationStart(Animator animator) {
@@ -75,12 +80,11 @@ public class PlacementCell extends BaseAnimateView {
                 }
             });
         } else {
+            this.getLayoutParams().height = mExtractHeight;
             if (mCellListener != null) {
                 mCellListener.postExtract(this);
             }
         }
-
-
     }
 
     private void initPlacementText() {
@@ -89,7 +93,8 @@ public class PlacementCell extends BaseAnimateView {
     }
 
     private void initDeleteButton() {
-        Button deleteButton = (Button) getViewById(R.id.delete_button);
+        // TODO: 2017/03/23 クリックイベントが起きたり起きなかったり
+        final Button deleteButton = (Button) getViewById(R.id.plc_delete_button);
         deleteButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {

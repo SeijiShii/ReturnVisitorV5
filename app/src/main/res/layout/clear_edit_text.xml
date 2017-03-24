@@ -12,6 +12,7 @@
         android:id="@+id/edit_text"
         android:gravity="left|center_horizontal"
         android:background="@null"
+        android:textSize="@dimen/text_size_middle"
         android:textColor="@color/textColorGray"/>
 
     <Button
