@@ -93,7 +93,7 @@ public class PlacementCell extends BaseAnimateView {
     }
 
     private void initDeleteButton() {
-        // TODO: 2017/03/23 クリックイベントが起きたり起きなかったり
+        // DONE: 2017/03/23 クリックイベントが起きたり起きなかったり
         final Button deleteButton = (Button) getViewById(R.id.plc_delete_button);
         deleteButton.setOnClickListener(new OnClickListener() {
             @Override

@@ -71,7 +71,7 @@ public class PlaceDialog extends FrameLayout {
         placeCell.getEditButton().setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: 2017/03/16 editMenu
+                // DONE: 2017/03/16 editMenu
                 PopupMenu editMenuPopup = new PopupMenu(getContext(), placeCell.getEditButton());
                 editMenuPopup.getMenuInflater().inflate(R.menu.place_cell_menu, editMenuPopup.getMenu());
                 editMenuPopup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {

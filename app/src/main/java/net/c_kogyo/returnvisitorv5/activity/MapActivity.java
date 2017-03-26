@@ -48,11 +48,13 @@ import static net.c_kogyo.returnvisitorv5.activity.Constants.LONGITUDE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.EDIT_VISIT_ACTION;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.EDIT_VISIT_REQUEST_CODE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_PLACE_ACTION;
+import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_VISIT_ACTION_WITH_PLACE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_VISIT_REQUEST_CODE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.VISIT_ADDED_RESULT_CODE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.VISIT_EDITED_RESULT_CODE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.SharedPrefTags.ZOOM_LEVEL;
+import static net.c_kogyo.returnvisitorv5.data.Place.PLACE;
 import static net.c_kogyo.returnvisitorv5.data.Visit.VISIT;
 
 public class MapActivity extends AppCompatActivity
@@ -349,7 +351,7 @@ public class MapActivity extends AppCompatActivity
 
                 startRecordVisitActivityForNewPlace(latLng);
 
-                // TODO: 2017/03/17 record single place action
+                // DONE: 2017/03/17 record single place action
                 placeMarkers.removeByPlace(tmpPlace);
                 fadeOutDialogOverlay(normalFadeOutListener);
 
@@ -550,7 +552,8 @@ public class MapActivity extends AppCompatActivity
                             @Override
                             public void onRecordVisitClick(Place place) {
                                 fadeOutDialogOverlay(normalFadeOutListener);
-                                // TODO: 2017/03/16 Record Visitへの遷移
+                                // DONE: 2017/03/16 Record Visitへの遷移
+                                startRecordVisitActivityForNewVisit(place);
 
                             }
 
@@ -600,6 +603,13 @@ public class MapActivity extends AppCompatActivity
         editVisitIntent.setAction(EDIT_VISIT_ACTION);
         editVisitIntent.putExtra(VISIT, visit.getId());
         startActivityForResult(editVisitIntent, EDIT_VISIT_REQUEST_CODE);
+    }
+
+    private void startRecordVisitActivityForNewVisit(Place place) {
+        Intent newVisitIntent = new Intent(this, RecordVisitActivity.class);
+        newVisitIntent.setAction(NEW_VISIT_ACTION_WITH_PLACE);
+        newVisitIntent.putExtra(PLACE, place.getId());
+        startActivityForResult(newVisitIntent, NEW_VISIT_REQUEST_CODE);
     }
 
     private void showHousingComplexDialog(LatLng latLng) {

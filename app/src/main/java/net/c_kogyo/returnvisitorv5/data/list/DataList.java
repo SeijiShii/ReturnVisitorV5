@@ -39,6 +39,10 @@ public class DataList<T extends DataItem> implements Iterable<T>{
         }
     }
 
+    public void removeList(ArrayList<T> list) {
+        this.list.removeAll(list);
+    }
+
     private ArrayList<T> safeList() {
         ArrayList<T> safeList = new ArrayList<>();
         for (T data : list) {

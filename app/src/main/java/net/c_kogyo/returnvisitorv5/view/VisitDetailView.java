@@ -2,6 +2,7 @@ package net.c_kogyo.returnvisitorv5.view;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.SwitchCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -100,6 +101,7 @@ public class VisitDetailView extends BaseAnimateView {
     private void initDataText() {
         dataText = (TextView) getViewById(R.id.data_text);
         dataText.setText(mPerson.toString(getContext()));
+
     }
 
     private Button openCloseButton;

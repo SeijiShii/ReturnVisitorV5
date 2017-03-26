@@ -59,7 +59,7 @@ public class MapLongClickDialog extends FrameLayout {
         housingComplexButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: 2017/03/17 housing complex action
+                // DONE: 2017/03/17 housing complex action
                 if (mListener != null) {
                     mListener.onClickHousingComplexButton();
                 }
@@ -72,7 +72,7 @@ public class MapLongClickDialog extends FrameLayout {
         notHomeButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: 2017/03/17 Not Home Action
+                // DONE: 2017/03/17 Not Home Action
                 if (mListener != null) {
                     mListener.onClickNotHomeButton();
                 }
@@ -85,7 +85,7 @@ public class MapLongClickDialog extends FrameLayout {
         cancelButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: 2017/03/17 cancel action
+                // DONE: 2017/03/17 cancel action
                 if (mListener != null) {
                     mListener.onClickCancelButton();
                 }

@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -38,7 +37,6 @@ import net.c_kogyo.returnvisitorv5.dialogcontents.PlacementDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.TagDialog;
 import net.c_kogyo.returnvisitorv5.service.FetchAddressIntentService;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
-import net.c_kogyo.returnvisitorv5.view.BaseAnimateView;
 import net.c_kogyo.returnvisitorv5.view.ClearEditText;
 import net.c_kogyo.returnvisitorv5.view.PlacementCell;
 import net.c_kogyo.returnvisitorv5.view.PriorityRater;
@@ -50,6 +48,8 @@ import java.util.Calendar;
 
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.EDIT_VISIT_ACTION;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_PLACE_ACTION;
+import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_VISIT_ACTION_WITH_PLACE;
+import static net.c_kogyo.returnvisitorv5.data.Place.PLACE;
 import static net.c_kogyo.returnvisitorv5.data.Visit.VISIT;
 
 /**
@@ -58,9 +58,12 @@ import static net.c_kogyo.returnvisitorv5.data.Visit.VISIT;
 
 public class RecordVisitActivity extends AppCompatActivity {
 
+    // TODO: 2017/03/24 会えた会えないがうまく反映されていない
+
     private Place mPlace;
     private Visit mVisit;
-    private ArrayList<Person> mPersons;
+    private ArrayList<Person> mAddedPersons;
+    private ArrayList<Person> mRemovedPersons;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -90,7 +93,8 @@ public class RecordVisitActivity extends AppCompatActivity {
 
     private void initData() {
 
-        mPersons = new ArrayList<>();
+        mAddedPersons = new ArrayList<>();
+        mRemovedPersons = new ArrayList<>();
 
         Intent intent = getIntent();
         switch (intent.getAction()) {
@@ -118,7 +122,24 @@ public class RecordVisitActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-                // TODO: 2017/03/16 Edit Visit で遷移してきたときの UI描画
+                // DONE: 2017/03/16 Edit Visit で遷移してきたときの UI描画
+
+                break;
+            case NEW_VISIT_ACTION_WITH_PLACE:
+                String placeId = intent.getStringExtra(PLACE);
+                Place place1 = RVData.getInstance().getPlaceList().getById(placeId);
+                try {
+                    mPlace = (Place) place1.clone();
+                } catch (CloneNotSupportedException e) {
+                    e.printStackTrace();
+                }
+
+                Visit lastVisit = RVData.getInstance().getVisitList().getLatestVisitToPlace(placeId);
+                if (lastVisit != null) {
+                    mVisit = new Visit(lastVisit);
+                } else {
+                    mVisit = new Visit(mPlace);
+                }
 
                 break;
         }
@@ -221,7 +242,7 @@ public class RecordVisitActivity extends AppCompatActivity {
                     public void onOkClick(final Person person) {
                         hideSoftKeyboard();
                         // とりあえずアクティビティ内のアレイリストに追加
-                        mPersons.add(person);
+                        mAddedPersons.add(person);
                         final VisitDetail visitDetail = new VisitDetail(person.getId(), mVisit.getId());
                         // 新しく人を追加したということは会えたということでしょう。
                         visitDetail.setSeen(true);
@@ -242,7 +263,7 @@ public class RecordVisitActivity extends AppCompatActivity {
 
                     @Override
                     public void onDeleteClick(Person person) {
-                        RVData.getInstance().getPersonList().removeById(person.getId());
+                        // Newの時は削除ボタンが表示されないので呼ばれることはない
                     }
                 });
         dialogFrame.addView(personDialog);
@@ -396,6 +417,10 @@ public class RecordVisitActivity extends AppCompatActivity {
     }
 
     private void addVisitDetailView(VisitDetail visitDetail, Person person, boolean extracted){
+
+        // Personが削除されていたら表示しない
+        if (person == null) return;
+
         VisitDetailView detailView
                 = new VisitDetailView(this,
                                 visitDetail,
@@ -451,8 +476,14 @@ public class RecordVisitActivity extends AppCompatActivity {
 
                     @Override
                     public void onDeleteClick(Person person) {
-                        RVData.getInstance().getPersonList().removeById(person.getId());
-                        // TODO: 2017/03/08 削除動作テスト 
+                        fadeDialogOverlay(false, null);
+                        // TODO: 2017/03/08 削除動作テスト 削除時のUIの動きを実装
+                        VisitDetail visitDetail = mVisit.getVisitDetail(person);
+                        if (visitDetail == null) return;
+
+                        removeVisitDetailView(visitDetail);
+                        mVisit.getVisitDetails().remove(visitDetail);
+                        mRemovedPersons.add(person);
                     }
                 });
         dialogFrame.addView(personDialog);
@@ -470,6 +501,33 @@ public class RecordVisitActivity extends AppCompatActivity {
             }
         }
         return null;
+    }
+
+    private void removeVisitDetailView(VisitDetail visitDetail) {
+        final VisitDetailView detailView = getVisitDetailView(visitDetail);
+        if (detailView == null) return;
+
+        detailView.changeViewHeight(0, true, null, new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                visitDetailFrame.removeView(detailView);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
     }
 
     private PriorityRater priorityRater;
@@ -503,7 +561,8 @@ public class RecordVisitActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 RVData.getInstance().getVisitList().setOrAdd(mVisit);
-                RVData.getInstance().getPersonList().addList(mPersons);
+                RVData.getInstance().getPersonList().addList(mAddedPersons);
+                RVData.getInstance().getPersonList().removeList(mRemovedPersons);
 
                 mPlace.setName(placeNameText.getText());
                 RVData.getInstance().getPlaceList().setOrAdd(mPlace);
@@ -531,6 +590,14 @@ public class RecordVisitActivity extends AppCompatActivity {
 
                         break;
 
+                    case NEW_VISIT_ACTION_WITH_PLACE:
+
+                        Intent newVisitReturnIntent = new Intent();
+                        newVisitReturnIntent.putExtra(VISIT, mVisit.getId());
+                        setResult(Constants.RecordVisitActions.VISIT_ADDED_RESULT_CODE, newVisitReturnIntent);
+
+                        break;
+
                 }
 
                 RVData.getInstance().saveData(getApplicationContext(), null);
@@ -542,7 +609,7 @@ public class RecordVisitActivity extends AppCompatActivity {
 
     private Button cancelButton;
     private void initCancelButton(){
-        // TODO: 2017/03/24 キャンセル時も本データが変更されてしまうのはクローンして編集していないから
+        // DONE: 2017/03/24 キャンセル時も本データが変更されてしまうのはクローンして編集していないから
         cancelButton = (Button) findViewById(R.id.cancel_button);
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override

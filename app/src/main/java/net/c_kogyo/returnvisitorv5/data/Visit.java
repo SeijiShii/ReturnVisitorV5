@@ -74,7 +74,7 @@ public class Visit extends DataItem implements Cloneable{
         super(VISIT);
         initCommon(null);
 
-        // TODO: 2017/03/21 先回の訪問で生成
+        // DONE: 2017/03/21 先回の訪問で生成
         this.placeId = lastVisit.getPlaceId();
         this.priority = lastVisit.getPriority();
 
@@ -138,7 +138,7 @@ public class Visit extends DataItem implements Cloneable{
     @Override
     public JSONObject jsonObject() {
 
-        // TODO: 2017/03/14 Missing jsonObject Method
+        // DONE: 2017/03/14 Missing jsonObject Method
         JSONObject object = super.jsonObject();
         try {
             object.put(DATE_TIME, datetime.getTimeInMillis());
