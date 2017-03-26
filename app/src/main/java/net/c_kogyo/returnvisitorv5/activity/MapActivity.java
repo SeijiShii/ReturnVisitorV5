@@ -565,9 +565,9 @@ public class MapActivity extends AppCompatActivity
                             @Override
                             public void onDeleteClick(Place place) {
                                 fadeOutDialogOverlay(normalFadeOutListener);
+                                placeMarkers.removeByPlace(place);
                                 RVData.getInstance().getPlaceList().removeById(place.getId());
                                 RVData.getInstance().saveData(MapActivity.this, null);
-                                placeMarkers.removeByPlace(place);
                             }
 
                             @Override
