@@ -431,7 +431,7 @@ public class RecordVisitActivity extends AppCompatActivity {
             @Override
             public void onPrioritySet(Visit.Priority priority) {
                 mVisit.refreshPriority();
-                priorityRater.setPriority(mVisit.getPriority());
+                visitPriorityRater.setPriority(mVisit.getPriority());
             }
 
             @Override
@@ -477,7 +477,7 @@ public class RecordVisitActivity extends AppCompatActivity {
                     @Override
                     public void onDeleteClick(Person person) {
                         fadeDialogOverlay(false, null);
-                        // TODO: 2017/03/08 削除動作テスト 削除時のUIの動きを実装
+                        // DONE: 2017/03/08 削除動作テスト 削除時のUIの動きを実装
                         VisitDetail visitDetail = mVisit.getVisitDetail(person);
                         if (visitDetail == null) return;
 
@@ -530,11 +530,11 @@ public class RecordVisitActivity extends AppCompatActivity {
         });
     }
 
-    private PriorityRater priorityRater;
+    private PriorityRater visitPriorityRater;
     private void initPriorityRater() {
-        priorityRater = (PriorityRater) findViewById(R.id.priority_rater);
-        priorityRater.setPriority(mVisit.getPriority());
-        priorityRater.setOnPrioritySetListener(new PriorityRater.OnPrioritySetListener() {
+        visitPriorityRater = (PriorityRater) findViewById(R.id.visit_priority_rater);
+        visitPriorityRater.setPriority(mVisit.getPriority());
+        visitPriorityRater.setOnPrioritySetListener(new PriorityRater.OnPrioritySetListener() {
             @Override
             public void onPrioritySet(Visit.Priority priority) {
                 mVisit.setPriority(priority);
@@ -751,5 +751,7 @@ public class RecordVisitActivity extends AppCompatActivity {
             addPlacementCell(placement, mVisit.getId(), true);
         }
     }
+
+    // TODO: 2017/03/26 PriorityRaterの挙動がいまいち
 
 }
