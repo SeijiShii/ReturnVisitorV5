@@ -138,7 +138,7 @@ public class HousingComplexDialog extends FrameLayout {
 
                 hideSoftKeyboard();
 
-                // TODO: 2017/03/27 リストに部屋を追加する処理
+                // DONE: 2017/03/27 リストに部屋を追加する処理
                 String name = roomText.getText().toString();
                 roomText.setText("");
 

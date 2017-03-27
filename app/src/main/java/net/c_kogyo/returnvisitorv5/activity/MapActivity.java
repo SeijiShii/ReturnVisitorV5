@@ -2,6 +2,7 @@ package net.c_kogyo.returnvisitorv5.activity;
 
 import android.Manifest;
 import android.animation.Animator;
+import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Intent;
@@ -9,18 +10,25 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -78,6 +86,7 @@ public class MapActivity extends AppCompatActivity
         initLogoButton();
         initMapView(savedInstanceState);
         initDialogOverlay();
+        initDrawerOverlay();
 
 //        testView();
 
@@ -133,6 +142,7 @@ public class MapActivity extends AppCompatActivity
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.getUiSettings().setZoomGesturesEnabled(true);
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+        mMap.getUiSettings().setAllGesturesEnabled(true);
 
         // Permissionの扱いが変化するため
         try {
@@ -359,7 +369,7 @@ public class MapActivity extends AppCompatActivity
 
             @Override
             public void onClickHousingComplexButton() {
-                // TODO: 2017/03/17 record complex action
+                // DONE: 2017/03/17 record complex action
                 placeMarkers.removeByPlace(tmpPlace);
                 // 同じダイアログを使用するのでアニメータリスナエンド後に表示メソッドを起動する
                 fadeOutDialogOverlay(new Animator.AnimatorListener() {
@@ -551,6 +561,7 @@ public class MapActivity extends AppCompatActivity
                         return true;
                     case MotionEvent.ACTION_UP:
                         logoButton.setAlpha(1f);
+                        openCloseDrawer();
                         return true;
                     case MotionEvent.ACTION_CANCEL:
                         logoButton.setAlpha(1f);
@@ -830,6 +841,138 @@ public class MapActivity extends AppCompatActivity
 //        dialogFrame.addView(smallTagView);
     }
 
-    // TODO: 2017/03/27 HousingComplexMarkerRes
+    // DONE: 2017/03/27 HousingComplexMarkerRes
+    // PENDING: 2017/03/27 Mapを回転させる
+    // TODO: 2017/03/27 ドロワー
+    private View drawerOverlay;
+    private ScrollView drawer;
+    int drawerWidth;
+
+    private void initDrawerOverlay() {
+        drawerOverlay = findViewById(R.id.drawer_overlay);
+        drawerOverlay.setAlpha(0f);
+
+        initDrawer();
+    }
+
+    private void initDrawer() {
+        drawer = (ScrollView) findViewById(R.id.drawer);
+
+        drawerWidth = (int) (getResources().getDisplayMetrics().density * 250);
+
+        FrameLayout.LayoutParams params
+                = new FrameLayout.LayoutParams(drawerWidth, ViewGroup.LayoutParams.MATCH_PARENT);
+        params.setMargins(-drawerWidth, 0, 0, 0);
+        drawer.setLayoutParams(params);
+
+        initDrawerLogoButton();
+        drawer.setOnTouchListener(new View.OnTouchListener() {
+
+            float x1, x2;
+            boolean swiped;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+
+                switch (event.getAction()){
+                    case MotionEvent.ACTION_DOWN:
+                        x1 = event.getX();
+                        swiped = false;
+                        return true;
+                    case MotionEvent.ACTION_MOVE:
+                        x2 = event.getX();
+                        if (x2 < x1 && !swiped) {
+                            openCloseDrawer();
+                            swiped = true;
+                        }
+                        return true;
+                    case MotionEvent.ACTION_CANCEL:
+                        return true;
+                }
+
+                return false;
+            }
+        });
+
+    }
+
+    private void initDrawerLogoButton() {
+        final ImageView drawerLogoButton = (ImageView) findViewById(R.id.drawer_logo_button);
+        drawerLogoButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        drawerLogoButton.setAlpha(0.5f);
+                        return true;
+                    case MotionEvent.ACTION_CANCEL:
+                        drawerLogoButton.setAlpha(1f);
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        drawerLogoButton.setAlpha(1f);
+                        openCloseDrawer();
+                        return true;
+                }
+                return false;
+            }
+        });
+    }
+
+    private boolean isDrawerOpen = false;
+    private void openCloseDrawer() {
+
+        float originAlpha, targetAlpha;
+        if (isDrawerOpen) {
+            originAlpha = 1f;
+            targetAlpha = 0f;
+            drawerOverlay.setOnTouchListener(null);
+        } else {
+            originAlpha = 0f;
+            targetAlpha = 1f;
+            drawerOverlay.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    openCloseDrawer();
+                    return true;
+                }
+            });
+        }
+
+        ValueAnimator overlayAnimator = ValueAnimator.ofFloat(originAlpha, targetAlpha);
+        overlayAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                drawerOverlay.setAlpha((float) animation.getAnimatedValue());
+                drawerOverlay.requestLayout();
+                          }
+        });
+
+        int originMargin, targetMargin;
+        if (isDrawerOpen) {
+            originMargin = 0;
+            targetMargin = -drawerWidth;
+        } else {
+            originMargin = -drawerWidth;
+            targetMargin = 0;
+        }
+
+        ValueAnimator drawerAnimator = ValueAnimator.ofInt(originMargin, targetMargin);
+        drawerAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                ((FrameLayout.LayoutParams) drawer.getLayoutParams())
+                        .setMargins((int) animation.getAnimatedValue(), 0, 0, 0);
+                drawer.requestLayout();
+            }
+        });
+
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.setDuration(300);
+        animatorSet.play(overlayAnimator).with(drawerAnimator);
+        animatorSet.start();
+
+        isDrawerOpen = !isDrawerOpen;
+    }
 
 }
