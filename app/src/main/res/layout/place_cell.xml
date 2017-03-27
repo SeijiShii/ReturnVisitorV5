@@ -24,7 +24,8 @@
         android:id="@+id/place_text"
         android:textColor="@color/textColorGray"
         android:textSize="@dimen/text_size_middle"
-        android:gravity="left|center_vertical"/>
+        android:gravity="left|center_vertical"
+        android:layout_marginLeft="10dp"/>
 
     <RelativeLayout
         android:layout_width="wrap_content"

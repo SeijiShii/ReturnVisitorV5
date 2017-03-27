@@ -31,7 +31,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import net.c_kogyo.returnvisitorv5.R;
-import net.c_kogyo.returnvisitorv5.data.HousingComplex;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Tag;
@@ -47,7 +46,7 @@ import static net.c_kogyo.returnvisitorv5.activity.Constants.LATITUDE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.LONGITUDE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.EDIT_VISIT_ACTION;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.EDIT_VISIT_REQUEST_CODE;
-import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_PLACE_ACTION;
+import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_SINGLE_HOUSE_ACTION;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_VISIT_ACTION_WITH_PLACE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_VISIT_REQUEST_CODE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.VISIT_ADDED_RESULT_CODE;
@@ -340,7 +339,7 @@ public class MapActivity extends AppCompatActivity
 
     private void showMapLongClickDialog(final LatLng latLng) {
 
-        final Place tmpPlace = new Place(latLng);
+        final Place tmpPlace = new Place(latLng, Place.Category.UNDEFINED);
         placeMarkers.addMarker(tmpPlace);
 
         MapLongClickDialog mapLongClickDialog
@@ -592,7 +591,7 @@ public class MapActivity extends AppCompatActivity
     // Method for Record Visit Activity
     private void startRecordVisitActivityForNewPlace(LatLng latLng) {
         Intent recordVisitIntent = new Intent(this, RecordVisitActivity.class);
-        recordVisitIntent.setAction(NEW_PLACE_ACTION);
+        recordVisitIntent.setAction(NEW_SINGLE_HOUSE_ACTION);
         recordVisitIntent.putExtra(LATITUDE, latLng.latitude);
         recordVisitIntent.putExtra(LONGITUDE, latLng.longitude);
         startActivityForResult(recordVisitIntent, NEW_VISIT_REQUEST_CODE);
@@ -615,13 +614,13 @@ public class MapActivity extends AppCompatActivity
 
     private void showHousingComplexDialog(LatLng latLng) {
 
-        HousingComplex housingComplex = new HousingComplex(latLng);
+        Place housingComplex = new Place(latLng, Place.Category.HOUSING_COMPLEX);
         HousingComplexDialog housingComplexDialog
                 = new HousingComplexDialog(this,
                         housingComplex,
                         new HousingComplexDialog.HousingComplexDialogListener() {
                             @Override
-                            public void onClickAddRoomButton(String roomName) {
+                            public void onClickAddRoomButton(Place newRoom) {
 
                             }
 

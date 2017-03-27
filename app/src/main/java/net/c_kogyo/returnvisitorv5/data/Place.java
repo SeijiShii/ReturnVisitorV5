@@ -18,20 +18,57 @@ public class Place extends DataItem {
     public static final String LATITUDE = "latitude";
     public static final String LONGITUDE = "longitude";
     public static final String ADDRESS = "address";
+    public static final String CATEGORY = "category";
+    public static final String PARENT_ID = "parent_id";
+
+
+    public enum Category {
+        UNDEFINED(0),
+        HOUSE(1),
+        ROOM(2),
+        HOUSING_COMPLEX(3);
+
+        private final int num;
+
+        Category(int num) {
+            this.num = num;
+        }
+
+        public static Category getEnum (int num) {
+
+            Category[] enumArray = Category.values();
+
+            for (Category category : enumArray) {
+
+                if (category.num() == num) return category;
+
+            }
+
+            return null;
+        }
+
+        public int num(){
+            return num;
+        }
+    }
+
 
     private LatLng latLng;
     private String address;
     private String markerId;
+    private Category category;
+    private String parentId;
 
     public Place() {
         super(PLACE);
         initCommon();
     }
 
-    public Place(LatLng latLng) {
+    public Place(LatLng latLng, Category category) {
         this();
 
         this.latLng = latLng;
+        this.category = category;
     }
 
     public Place(JSONObject object) {
@@ -61,6 +98,8 @@ public class Place extends DataItem {
         this.latLng = new LatLng(0, 0);
         this.address = "";
         this.markerId = null;
+        this.parentId = null;
+        this.category = Category.UNDEFINED;
 
     }
 
@@ -86,7 +125,10 @@ public class Place extends DataItem {
             object.put(LATITUDE, latLng.latitude);
             object.put(LONGITUDE, latLng.longitude);
             object.put(ADDRESS, address);
-
+            object.put(CATEGORY, category.toString());
+            if (parentId != null) {
+                object.put(PARENT_ID, parentId);
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -158,7 +200,14 @@ public class Place extends DataItem {
                 place.latLng = new LatLng(lat, lng);
             }
 
-            if (object.has(ADDRESS)) place.address = object.getString(ADDRESS);
+            if (object.has(ADDRESS))
+                place.address = object.getString(ADDRESS);
+
+            if (object.has(CATEGORY))
+                place.category = Category.valueOf(object.getString(CATEGORY));
+
+            if (object.has(PARENT_ID))
+                place.parentId = object.getString(PARENT_ID);
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -187,5 +236,13 @@ public class Place extends DataItem {
         clonedPlace.markerId = this.markerId;
 
         return clonedPlace;
+    }
+
+    public String getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
     }
 }

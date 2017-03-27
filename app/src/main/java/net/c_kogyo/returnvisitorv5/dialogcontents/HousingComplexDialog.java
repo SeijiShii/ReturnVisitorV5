@@ -1,5 +1,6 @@
 package net.c_kogyo.returnvisitorv5.dialogcontents;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,7 +15,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,7 +26,6 @@ import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.activity.Constants;
-import net.c_kogyo.returnvisitorv5.data.HousingComplex;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.service.FetchAddressIntentService;
@@ -39,11 +39,13 @@ import java.util.ArrayList;
 
 public class HousingComplexDialog extends FrameLayout {
 
-    private HousingComplex mHousingComplex;
+    private Place mHousingComplex;
     private HousingComplexDialogListener mListener;
+    private ArrayList<Place> addedRooms;
+    private ArrayList<Place> removedRooms;
 
     public HousingComplexDialog(@NonNull Context context,
-                                HousingComplex housingComplex,
+                                Place housingComplex,
                                 HousingComplexDialogListener listener) {
         super(context);
         this.mHousingComplex = housingComplex;
@@ -57,6 +59,9 @@ public class HousingComplexDialog extends FrameLayout {
 
     private View view;
     private void initCommon() {
+
+        addedRooms = new ArrayList<>();
+        removedRooms = new ArrayList<>();
 
         view = LayoutInflater.from(getContext()).inflate(R.layout.housing_complex_dialog, this);
 
@@ -92,19 +97,31 @@ public class HousingComplexDialog extends FrameLayout {
         addRoomButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                hideSoftKeyboard();
+
                 // TODO: 2017/03/27 リストに部屋を追加する処理
+                String name = roomText.getText().toString();
+                roomText.setText("");
+
                 // すでにリストに存在する名前なら何もしない。追加できない
-                if (roomAdapter.hasRoomWithName(roomText.getText().toString())) {
-                    roomText.setText("");
+                if (roomAdapter.hasRoomWithName(name)) {
                     return;
                 }
 
-                Place newRoom = new Place(mHousingComplex.getLatLng());
+                Place newRoom = new Place(mHousingComplex.getLatLng(), Place.Category.ROOM);
+                newRoom.setName(name);
+                newRoom.setParentId(mHousingComplex.getId());
+                addedRooms.add(newRoom);
 
+                roomAdapter.addRoom(newRoom);
+                roomAdapter.notifyDataSetChanged();
 
+                refreshRoomListHeight();
+                confirmEdit();
 
                 if (mListener != null) {
-                    mListener.onClickAddRoomButton(roomText.getText().toString());
+                    mListener.onClickAddRoomButton(newRoom);
                 }
             }
         });
@@ -114,22 +131,24 @@ public class HousingComplexDialog extends FrameLayout {
     private void initRoomListView() {
         roomListView = (ListView) view.findViewById(R.id.room_list_view);
         initRoomAdapter();
-        refreshRoomList();
+        refreshRoomListHeight();
 
     }
 
     private RoomListAdapter roomAdapter;
     private void initRoomAdapter() {
 
-        ArrayList<Place> roomList = RVData.getInstance().getPlaceList().getList(mHousingComplex.getChildIds());
+        ArrayList<Place> roomList = RVData.getInstance().getPlaceList().getRoomList(mHousingComplex.getId());
+        roomList.addAll(addedRooms);
+        roomList.removeAll(removedRooms);
         roomAdapter = new RoomListAdapter(roomList);
         roomListView.setAdapter(roomAdapter);
 
     }
 
-    private void refreshRoomList() {
+    private void refreshRoomListHeight() {
 
-        int cellHeight = (int) (getContext().getResources().getDisplayMetrics().density * 30);
+        int cellHeight = (int) (getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small));
         int height;
         if (roomAdapter.getCount() <= 0) {
             height = cellHeight;
@@ -167,7 +186,7 @@ public class HousingComplexDialog extends FrameLayout {
 
     public interface HousingComplexDialogListener {
 
-        void onClickAddRoomButton(String roomName);
+        void onClickAddRoomButton(Place addedRoom);
 
         void onClickRoomCell();
 
@@ -213,11 +232,30 @@ public class HousingComplexDialog extends FrameLayout {
         ConfirmDialog.confirmAndDeletePlace(getContext(), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                mHousingComplex.getChildIds().remove(place.getId());
+                removedRooms.add(place);
                 initRoomAdapter();
-                refreshRoomList();
+                refreshRoomListHeight();
             }
         });
+    }
+
+    private void confirmEdit() {
+
+        mHousingComplex.setName(nameText.getText().toString());
+
+        RVData.getInstance().getPlaceList().setOrAdd(mHousingComplex);
+        RVData.getInstance().getPlaceList().addList(addedRooms);
+        RVData.getInstance().getPlaceList().removeList(removedRooms);
+        RVData.getInstance().saveData(getContext(), null);
+    }
+
+    private void hideSoftKeyboard() {
+        InputMethodManager inputMethodManager = (InputMethodManager)  getContext().getSystemService(Activity.INPUT_METHOD_SERVICE);
+
+        View view = ((Activity) getContext()).getCurrentFocus();
+        if (view != null) {
+            inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 
     private class RoomListAdapter extends BaseAdapter{
@@ -245,13 +283,13 @@ public class HousingComplexDialog extends FrameLayout {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
 
-            if (view == null) {
-                view = new RoomListCell(getContext(), (Place) getItem(position));
+            if (convertView == null) {
+                convertView = new RoomListCell(getContext(), (Place) getItem(position));
             } else {
-                ((RoomListCell) view).refreshData((Place) getItem(position));
+                ((RoomListCell) convertView).refreshData((Place) getItem(position));
             }
 
-            return view;
+            return convertView;
         }
 
         boolean hasRoomWithName(String name) {
@@ -262,6 +300,10 @@ public class HousingComplexDialog extends FrameLayout {
                 }
             }
             return false;
+        }
+
+        void addRoom(Place room) {
+            mRoomList.add(room);
         }
     }
 
@@ -329,7 +371,7 @@ public class HousingComplexDialog extends FrameLayout {
             if (room != null) {
                 mRoom = room;
             }
-            marker.setBackgroundResource(Constants.markerRes[mRoom.getPriority().num()]);
+            marker.setBackgroundResource(Constants.buttonRes[mRoom.getPriority().num()]);
             nameText.setText(mRoom.getName());
         }
 

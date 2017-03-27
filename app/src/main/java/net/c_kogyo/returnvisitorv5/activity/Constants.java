@@ -85,7 +85,8 @@ public class Constants {
 
     public class RecordVisitActions {
 
-        public static final String NEW_PLACE_ACTION             = "new_place_action";
+        public static final String NEW_SINGLE_HOUSE_ACTION = "new_single_house_action";
+        public static final String NEW_ROOM_ACTION = "new_room_action";
         public static final String NEW_VISIT_ACTION_WITH_PLACE  = "new_visit_action_with_place";
         public static final String EDIT_VISIT_ACTION            = "edit_visit_action";
         public static final String NEW_VISIT_ACTION_NO_PLACE    = "new_visit_action_no_place";

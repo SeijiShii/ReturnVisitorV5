@@ -17,7 +17,7 @@
             android:background="@drawable/trans_blue_selector"
             android:textSize="@dimen/text_size_middle"
             android:textColor="@color/colorPrimary"
-            android:text="@string/record_new_place_button"/>
+            android:text="@string/record_single_house_button"/>
 
     </RelativeLayout>
 
