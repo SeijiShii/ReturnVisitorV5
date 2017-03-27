@@ -1,21 +1,35 @@
 package net.c_kogyo.returnvisitorv5.dialogcontents;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.ListViewCompat;
+import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.widget.PopupMenu;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
+import net.c_kogyo.returnvisitorv5.activity.Constants;
 import net.c_kogyo.returnvisitorv5.data.HousingComplex;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.RVData;
+import net.c_kogyo.returnvisitorv5.service.FetchAddressIntentService;
+import net.c_kogyo.returnvisitorv5.util.ConfirmDialog;
 
 import java.util.ArrayList;
 
@@ -53,6 +67,9 @@ public class HousingComplexDialog extends FrameLayout {
         initRoomListView();
         initOKButton();
         initCancelButton();
+
+        initBroadcasting();
+        inquireAddress();
     }
 
     private EditText nameText;
@@ -75,6 +92,17 @@ public class HousingComplexDialog extends FrameLayout {
         addRoomButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                // TODO: 2017/03/27 リストに部屋を追加する処理
+                // すでにリストに存在する名前なら何もしない。追加できない
+                if (roomAdapter.hasRoomWithName(roomText.getText().toString())) {
+                    roomText.setText("");
+                    return;
+                }
+
+                Place newRoom = new Place(mHousingComplex.getLatLng());
+
+
+
                 if (mListener != null) {
                     mListener.onClickAddRoomButton(roomText.getText().toString());
                 }
@@ -82,24 +110,20 @@ public class HousingComplexDialog extends FrameLayout {
         });
     }
 
-    private ListViewCompat roomListView;
+    private ListView roomListView;
     private void initRoomListView() {
-        roomListView = (ListViewCompat) view.findViewById(R.id.room_list_view);
+        roomListView = (ListView) view.findViewById(R.id.room_list_view);
         initRoomAdapter();
         refreshRoomList();
-        roomListView.setAdapter(roomAdapter);
 
     }
 
-    private ArrayAdapter<String> roomAdapter;
+    private RoomListAdapter roomAdapter;
     private void initRoomAdapter() {
 
         ArrayList<Place> roomList = RVData.getInstance().getPlaceList().getList(mHousingComplex.getChildIds());
-        ArrayList<String> nameList = new ArrayList<>();
-        for (Place place : roomList) {
-            nameList.add(place.getName());
-        }
-        roomAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, nameList);
+        roomAdapter = new RoomListAdapter(roomList);
+        roomListView.setAdapter(roomAdapter);
 
     }
 
@@ -152,4 +176,163 @@ public class HousingComplexDialog extends FrameLayout {
         void onClickCancelButton();
     }
 
+    private void initBroadcasting() {
+
+        LocalBroadcastManager manager = LocalBroadcastManager.getInstance(getContext());
+        manager.registerReceiver(receiver, new IntentFilter(FetchAddressIntentService.SEND_FETCED_ADDRESS_ACTION));
+
+    }
+
+    private void inquireAddress() {
+        if (mHousingComplex.getAddress() == null || mHousingComplex.getAddress().equals("")) {
+
+            Intent addressServiceIntent = new Intent(getContext(), FetchAddressIntentService.class);
+
+            addressServiceIntent.putExtra(Constants.LATITUDE, mHousingComplex.getLatLng().latitude);
+            addressServiceIntent.putExtra(Constants.LONGITUDE, mHousingComplex.getLatLng().longitude);
+            addressServiceIntent.putExtra(FetchAddressIntentService.IS_USING_MAP_LOCALE, true);
+
+            getContext().startService(addressServiceIntent);
+        }
+    }
+
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch (intent.getAction()) {
+                case FetchAddressIntentService.SEND_FETCED_ADDRESS_ACTION:
+                    String address = intent.getStringExtra(FetchAddressIntentService.ADDRESS_FETCHED);
+                    mHousingComplex.setAddress(address);
+                    addressText.setText(mHousingComplex.getAddress());
+                    break;
+            }
+        }
+    };
+
+    private void confirmAndDeleteRoom(final Place place) {
+        ConfirmDialog.confirmAndDeletePlace(getContext(), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mHousingComplex.getChildIds().remove(place.getId());
+                initRoomAdapter();
+                refreshRoomList();
+            }
+        });
+    }
+
+    private class RoomListAdapter extends BaseAdapter{
+
+        private ArrayList<Place> mRoomList;
+        RoomListAdapter(ArrayList<Place> roomList) {
+            this.mRoomList = roomList;
+        }
+
+        @Override
+        public int getCount() {
+            return mRoomList.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return mRoomList.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return 0;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            if (view == null) {
+                view = new RoomListCell(getContext(), (Place) getItem(position));
+            } else {
+                ((RoomListCell) view).refreshData((Place) getItem(position));
+            }
+
+            return view;
+        }
+
+        boolean hasRoomWithName(String name) {
+
+            for (Place place : mRoomList) {
+                if (place.getName().equals(name)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    class RoomListCell extends FrameLayout {
+
+        private Place mRoom;
+
+        public RoomListCell(Context context, Place room) {
+            super(context);
+
+            this.mRoom = room;
+            initCommon();
+        }
+
+        public RoomListCell(Context context, @Nullable AttributeSet attrs) {
+            super(context, attrs);
+        }
+
+        private View view;
+        private void initCommon() {
+
+            view = LayoutInflater.from(getContext()).inflate(R.layout.place_cell, this);
+            initPriorityMarker();
+            initNameText();
+            initMenuButton();
+
+            refreshData(null);
+        }
+
+        private ImageView marker;
+        private void initPriorityMarker() {
+
+            marker = (ImageView) findViewById(R.id.place_marker);
+
+        }
+
+        private TextView nameText;
+        private void initNameText() {
+            nameText = (TextView) view.findViewById(R.id.place_text);
+        }
+
+        private void initMenuButton() {
+            Button menuButton = (Button) view.findViewById(R.id.edit_button);
+            menuButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    PopupMenu popupMenu = new PopupMenu(getContext(), RoomListCell.this);
+                    popupMenu.getMenuInflater().inflate(R.menu.place_cell_menu, popupMenu.getMenu());
+                    popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            if (item.getItemId() == R.id.delete) {
+                                confirmAndDeleteRoom(mRoom);
+                                return true;
+                            }
+                            return false;
+                        }
+                    });
+                    popupMenu.show();
+                }
+            });
+        }
+
+        public void refreshData(@Nullable Place room) {
+            if (room != null) {
+                mRoom = room;
+            }
+            marker.setBackgroundResource(Constants.markerRes[mRoom.getPriority().num()]);
+            nameText.setText(mRoom.getName());
+        }
+
+
+    }
 }

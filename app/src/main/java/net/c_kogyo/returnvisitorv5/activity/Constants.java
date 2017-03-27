@@ -43,6 +43,16 @@ public class Constants {
             R.mipmap.marker_orange
     };
 
+    public static final int[] complexRes = {
+            R.mipmap.complex_gray,
+            R.mipmap.complex_red,
+            R.mipmap.complex_purple,
+            R.mipmap.complex_blue,
+            R.mipmap.complex_green,
+            R.mipmap.complex_yellow,
+            R.mipmap.complex_orange
+    };
+
     public static final String DATE_LONG = "date_data";
 
     public static final String REQUEST_CODE = "Request Code";

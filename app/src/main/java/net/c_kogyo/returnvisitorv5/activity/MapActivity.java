@@ -361,6 +361,7 @@ public class MapActivity extends AppCompatActivity
             public void onClickHousingComplexButton() {
                 // TODO: 2017/03/17 record complex action
                 placeMarkers.removeByPlace(tmpPlace);
+                // 同じダイアログを使用するのでアニメータリスナエンド後に表示メソッドを起動する
                 fadeOutDialogOverlay(new Animator.AnimatorListener() {
                     @Override
                     public void onAnimationStart(Animator animation) {
@@ -389,7 +390,7 @@ public class MapActivity extends AppCompatActivity
 
             @Override
             public void onClickNotHomeButton() {
-                // TODO: 2017/03/17 record not home action
+                // DONE: 2017/03/17 record not home action
                 placeMarkers.removeByPlace(tmpPlace);
                 recordNotHome(tmpPlace);
                 fadeOutDialogOverlay(normalFadeOutListener);
@@ -749,5 +750,7 @@ public class MapActivity extends AppCompatActivity
         Log.d("", "SmallTagViewWidth: " + smallTagView.getViewWidth());
 //        dialogFrame.addView(smallTagView);
     }
+
+    // TODO: 2017/03/27 HousingComplexMarkerRes
 
 }

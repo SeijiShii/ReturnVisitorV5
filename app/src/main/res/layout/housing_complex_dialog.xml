@@ -31,7 +31,7 @@
         android:background="@drawable/gray_trans_circle"
         android:layout_margin="5dp"
         android:id="@+id/address_text"
-        android:textSize="@dimen/text_size_middle"
+        android:textSize="@dimen/text_size_small"
         android:gravity="center_vertical|left"
         android:hint="@string/address"/>
 
@@ -64,7 +64,7 @@
     </LinearLayout>
 
     <!-- Room List -->
-    <android.support.v7.widget.ListViewCompat
+    <ListView
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:id="@+id/room_list_view"/>

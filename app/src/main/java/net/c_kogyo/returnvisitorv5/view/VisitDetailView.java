@@ -267,7 +267,7 @@ public class VisitDetailView extends BaseAnimateView {
         noteLineHeight = (int) (noteText.getPaint().getFontMetrics().bottom - noteText.getPaint().getFontMetrics().top);
 
         // DONE: 2017/02/27 AutoCompleteTextViewアダプタ
-        // TODO: 2017/03/08 要動作検証
+        // PENDING: 2017/03/08 要動作検証
 
         ArrayList<String> pubNameList = new ArrayList<>();
         for (Publication pub : RVData.getInstance().getPubList()){

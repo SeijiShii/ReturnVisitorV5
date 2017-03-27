@@ -4,7 +4,7 @@
     <dimen name="text_size_large">18sp</dimen>
     <dimen name="text_size_middle">15sp</dimen>
     <dimen name="frame_title_text_size">15sp</dimen>
-    <dimen name="in_frame_text_size">12sp</dimen>
+    <dimen name="text_size_small">12sp</dimen>
 
     <dimen name="ui_height_double">80dp</dimen>
     <dimen name="ui_height_large">60dp</dimen>

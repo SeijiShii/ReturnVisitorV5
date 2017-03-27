@@ -58,7 +58,7 @@ import static net.c_kogyo.returnvisitorv5.data.Visit.VISIT;
 
 public class RecordVisitActivity extends AppCompatActivity {
 
-    // TODO: 2017/03/24 会えた会えないがうまく反映されていない
+    // DONE: 2017/03/24 会えた会えないがうまく反映されていない
 
     private Place mPlace;
     private Visit mVisit;
@@ -567,7 +567,7 @@ public class RecordVisitActivity extends AppCompatActivity {
                 mPlace.setName(placeNameText.getText());
                 RVData.getInstance().getPlaceList().setOrAdd(mPlace);
 
-                // TODO: 2017/03/08 要動作検証 noteがAutoCompListについかされたかどうか
+                // PENDING: 2017/03/08 要動作検証 noteがAutoCompListについかされたかどうか
                 for (VisitDetail visitDetail : mVisit.getVisitDetails()) {
                     RVData.getInstance().getNoteCompList().addIfNoSameName(visitDetail.getNote());
                 }
@@ -752,6 +752,6 @@ public class RecordVisitActivity extends AppCompatActivity {
         }
     }
 
-    // TODO: 2017/03/26 PriorityRaterの挙動がいまいち
+    // DONE: 2017/03/26 PriorityRaterの挙動がいまいち
 
 }
