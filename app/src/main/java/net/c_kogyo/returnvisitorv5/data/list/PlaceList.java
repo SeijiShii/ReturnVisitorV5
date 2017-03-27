@@ -5,6 +5,8 @@ import android.support.annotation.Nullable;
 import net.c_kogyo.returnvisitorv5.data.Place;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Created by SeijiShii on 2017/03/14.
@@ -16,7 +18,7 @@ public class PlaceList extends DataList<Place> {
     public Place getByMarkerId(String markerId) {
 
         for (Place place : this) {
-            if (place.getMarkerId().equals(markerId)) {
+            if (place.getMarkerId() != null && place.getMarkerId().equals(markerId)) {
                 return place;
             }
         }
@@ -43,5 +45,21 @@ public class PlaceList extends DataList<Place> {
             }
         }
         return roomList;
+    }
+
+    @Nullable
+    public Place getMostPriorRoom(String parentId) {
+        ArrayList<Place> roomList = getRoomList(parentId);
+
+        if (roomList.size() <= 0) return null;
+
+        if (roomList.size() == 1) return roomList.get(0);
+
+        return Collections.max(roomList, new Comparator<Place>() {
+            @Override
+            public int compare(Place lhs, Place rhs) {
+                return lhs.getPriority().num() - rhs.getPriority().num();
+            }
+        });
     }
 }

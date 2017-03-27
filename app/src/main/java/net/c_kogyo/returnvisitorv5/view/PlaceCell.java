@@ -51,7 +51,12 @@ public class PlaceCell extends FrameLayout {
     private ImageView placeMarker;
     private void initPlaceMarker() {
         placeMarker = (ImageView) view.findViewById(R.id.place_marker);
-        placeMarker.setBackgroundResource(Constants.markerRes[mPlace.getPriority().num()]);
+
+        if (mPlace.getCategory() == Place.Category.HOUSE) {
+            placeMarker.setBackgroundResource(Constants.markerRes[mPlace.getPriority().num()]);
+        } else if (mPlace.getCategory() == Place.Category.ROOM) {
+            placeMarker.setBackgroundResource(Constants.buttonRes[mPlace.getPriority().num()]);
+        }
     }
 
     private TextView placeText;

@@ -36,7 +36,8 @@ public class VisitCell extends BaseAnimateView {
 
     public VisitCell(Context context, Visit visit, VisitCellListener listener) {
         super(context,
-                context.getResources().getDimensionPixelSize(R.dimen.ui_height_small),
+                context.getResources().getDimensionPixelSize(R.dimen.ui_height_small)
+                 + (int)(context.getResources().getDisplayMetrics().density * 5),
                 R.layout.visit_cell);
         mVisit = visit;
         mListener = listener;
@@ -91,7 +92,7 @@ public class VisitCell extends BaseAnimateView {
     private ImageView marker;
     private void initMarker() {
         marker = (ImageView) getViewById(R.id.marker);
-        marker.setBackgroundResource(Constants.markerRes[mVisit.getPriority().num()]);
+        marker.setBackgroundResource(Constants.buttonRes[mVisit.getPriority().num()]);
     }
 
     private TextView dateText;

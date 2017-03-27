@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -46,7 +47,7 @@ import static net.c_kogyo.returnvisitorv5.activity.Constants.LATITUDE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.LONGITUDE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.EDIT_VISIT_ACTION;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.EDIT_VISIT_REQUEST_CODE;
-import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_PLACE_ACTION;
+import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_HOUSE_ACTION;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_VISIT_ACTION_WITH_PLACE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_VISIT_REQUEST_CODE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.VISIT_ADDED_RESULT_CODE;
@@ -370,7 +371,7 @@ public class MapActivity extends AppCompatActivity
                     @Override
                     public void onAnimationEnd(Animator animation) {
                         dialogFrame.removeAllViews();
-                        showHousingComplexDialog(tmpPlace.getLatLng());
+                        showHousingComplexDialog(null, tmpPlace.getLatLng());
                     }
 
                     @Override
@@ -422,8 +423,11 @@ public class MapActivity extends AppCompatActivity
         Place place = RVData.getInstance().getPlaceList().getByMarkerId(marker.getId());
         if (place == null) return false;
 
-        showPlaceDialog(place);
-
+        if (place.getCategory() == Place.Category.HOUSE) {
+            showPlaceDialog(place);
+        } else if (place.getCategory() == Place.Category.HOUSING_COMPLEX) {
+            showHousingComplexDialog(place, null);
+        }
         return false;
     }
 
@@ -497,7 +501,14 @@ public class MapActivity extends AppCompatActivity
                             String placeId = visit.getPlaceId();
                             Place place = RVData.getInstance().getPlaceList().getById(placeId);
                             if (place != null) {
-                                placeMarkers.addMarker(place);
+
+                                if (place.getCategory() == Place.Category.HOUSE) {
+                                    placeMarkers.addMarker(place);
+                                } else if (place.getCategory() == Place.Category.ROOM) {
+                                    String parentId = place.getParentId();
+                                    Place parent = RVData.getInstance().getPlaceList().getById(parentId);
+                                    placeMarkers.refreshMarker(parent);
+                                }
                             }
                         }
                     }
@@ -591,7 +602,7 @@ public class MapActivity extends AppCompatActivity
     // Method for Record Visit Activity
     private void startRecordVisitActivityForNewPlace(LatLng latLng) {
         Intent recordVisitIntent = new Intent(this, RecordVisitActivity.class);
-        recordVisitIntent.setAction(NEW_PLACE_ACTION);
+        recordVisitIntent.setAction(NEW_HOUSE_ACTION);
         recordVisitIntent.putExtra(LATITUDE, latLng.latitude);
         recordVisitIntent.putExtra(LONGITUDE, latLng.longitude);
         startActivityForResult(recordVisitIntent, NEW_VISIT_REQUEST_CODE);
@@ -612,32 +623,61 @@ public class MapActivity extends AppCompatActivity
         startActivityForResult(newVisitIntent, NEW_VISIT_REQUEST_CODE);
     }
 
-    private void showHousingComplexDialog(LatLng latLng) {
+    private void showHousingComplexDialog(@Nullable Place housingComplex, @Nullable LatLng latLng) {
 
-        Place housingComplex = new Place(latLng, Place.Category.HOUSING_COMPLEX);
+        Place mComplex;
+
+        if (housingComplex == null) {
+            mComplex =  new Place(latLng, Place.Category.HOUSING_COMPLEX);
+        } else {
+            mComplex = housingComplex;
+        }
+
         HousingComplexDialog housingComplexDialog
                 = new HousingComplexDialog(this,
-                        housingComplex,
+                        mComplex,
                         new HousingComplexDialog.HousingComplexDialogListener() {
                             @Override
                             public void onClickAddRoomButton(Place newRoom) {
-                                fadeOutDialogOverlay(null);
+                                fadeOutDialogOverlay(normalFadeOutListener);
                                 startRecordVisitActivityForNewVisit(newRoom);
                             }
 
                             @Override
-                            public void onClickRoomCell() {
+                            public void onClickRoomCell(final Place room) {
+                                fadeOutDialogOverlay(new Animator.AnimatorListener() {
+                                    @Override
+                                    public void onAnimationStart(Animator animation) {
+
+                                    }
+
+                                    @Override
+                                    public void onAnimationEnd(Animator animation) {
+                                        dialogFrame.removeAllViews();
+                                        showPlaceDialog(room);
+                                    }
+
+                                    @Override
+                                    public void onAnimationCancel(Animator animation) {
+
+                                    }
+
+                                    @Override
+                                    public void onAnimationRepeat(Animator animation) {
+
+                                    }
+                                });
 
                             }
 
                             @Override
                             public void onClickOkButton() {
-
+                                fadeOutDialogOverlay(normalFadeOutListener);
                             }
 
                             @Override
                             public void onClickCancelButton() {
-
+                                fadeOutDialogOverlay(normalFadeOutListener);
                             }
                         });
         dialogFrame.addView(housingComplexDialog);
@@ -685,14 +725,25 @@ public class MapActivity extends AppCompatActivity
             this.markers = new ArrayList<>();
             mMap.clear();
             for (Place place : RVData.getInstance().getPlaceList()) {
-                addMarker(place);
+
+                if (place.getCategory() != Place.Category.ROOM) {
+                    addMarker(place);
+                }
             }
         }
 
         private void addMarker(Place place) {
+
+            if (place.getCategory() == Place.Category.UNDEFINED || place.getCategory() == Place.Category.ROOM)
+                return;
+
             MarkerOptions options = new MarkerOptions()
-                    .icon(BitmapDescriptorFactory.fromResource(Constants.markerRes[place.getPriority().num()]))
                     .position(place.getLatLng());
+            if (place.getCategory() == Place.Category.HOUSE) {
+                options.icon(BitmapDescriptorFactory.fromResource(Constants.markerRes[place.getPriority().num()]));
+            } else if (place.getCategory() == Place.Category.HOUSING_COMPLEX) {
+                options.icon(BitmapDescriptorFactory.fromResource(Constants.complexRes[place.getPriority().num()]));
+            }
 
             Marker marker = mMap.addMarker(options);
             place.setMarkerId(marker.getId());
@@ -702,14 +753,20 @@ public class MapActivity extends AppCompatActivity
         private void refreshMarker(Place place) {
             Marker marker = getMarkerByPlace(place);
             if (marker != null) {
-                marker.setIcon(BitmapDescriptorFactory.fromResource(Constants.markerRes[place.getPriority().num()]));
+                if (place.getCategory() == Place.Category.HOUSE) {
+                    marker.setIcon(BitmapDescriptorFactory.fromResource(Constants.markerRes[place.getPriority().num()]));
+                } else if (place.getCategory() == Place.Category.HOUSING_COMPLEX) {
+                    marker.setIcon(BitmapDescriptorFactory.fromResource(Constants.complexRes[place.getPriority().num()]));
+                }
+            } else {
+                addMarker(place);
             }
         }
 
         private Marker getMarkerByPlace(Place place) {
 
             for (Marker marker : markers) {
-                if (place.getMarkerId().equals(marker.getId())) {
+                if (place.getMarkerId() != null && place.getMarkerId().equals(marker.getId())) {
                     return marker;
                 }
             }

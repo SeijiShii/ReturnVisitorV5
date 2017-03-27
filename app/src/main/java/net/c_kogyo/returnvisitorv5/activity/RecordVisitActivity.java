@@ -47,7 +47,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.EDIT_VISIT_ACTION;
-import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_PLACE_ACTION;
+import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_HOUSE_ACTION;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_VISIT_ACTION_WITH_PLACE;
 import static net.c_kogyo.returnvisitorv5.data.Place.PLACE;
 import static net.c_kogyo.returnvisitorv5.data.Visit.VISIT;
@@ -98,12 +98,12 @@ public class RecordVisitActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         switch (intent.getAction()) {
-            case NEW_PLACE_ACTION:
+            case NEW_HOUSE_ACTION:
 
                 double lat = intent.getDoubleExtra(Constants.LATITUDE, 0);
                 double lng = intent.getDoubleExtra(Constants.LONGITUDE, 0);
 
-                mPlace = new Place(new LatLng(lat, lng), Place.Category.UNDEFINED);
+                mPlace = new Place(new LatLng(lat, lng), Place.Category.HOUSE);
                 mVisit = new Visit(mPlace);
                 mVisit.setPlaceId(mPlace.getId());
 
@@ -140,7 +140,6 @@ public class RecordVisitActivity extends AppCompatActivity {
                 } else {
                     mVisit = new Visit(mPlace);
                 }
-
                 break;
         }
     }
@@ -573,7 +572,7 @@ public class RecordVisitActivity extends AppCompatActivity {
                 }
 
                 switch (getIntent().getAction()) {
-                    case NEW_PLACE_ACTION:
+                    case NEW_HOUSE_ACTION:
 
                         Intent newPlaceReturnIntent = new Intent();
                         newPlaceReturnIntent.putExtra(VISIT, mVisit.getId());

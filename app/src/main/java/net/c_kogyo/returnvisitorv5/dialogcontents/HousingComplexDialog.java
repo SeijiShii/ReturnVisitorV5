@@ -13,9 +13,11 @@ import android.support.v7.widget.PopupMenu;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -80,11 +82,17 @@ public class HousingComplexDialog extends FrameLayout {
     private EditText nameText;
     private void initNameText() {
         nameText = (EditText) view.findViewById(R.id.name_text);
+        if (mHousingComplex.getName() != null && !mHousingComplex.getName().equals("")) {
+            nameText.setText(mHousingComplex.getName());
+        }
     }
 
     private EditText addressText;
     private void initAddressText() {
         addressText = (EditText) view.findViewById(R.id.address_text);
+        if (mHousingComplex.getAddress() != null && !mHousingComplex.getAddress().equals("")) {
+            addressText.setText(mHousingComplex.getAddress());
+        }
     }
 
     private EditText roomText;
@@ -134,6 +142,15 @@ public class HousingComplexDialog extends FrameLayout {
         roomListView = (ListView) view.findViewById(R.id.room_list_view);
         initRoomAdapter();
         refreshRoomListHeight();
+        roomListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Place room = (Place) roomAdapter.getItem(position);
+                if (mListener != null) {
+                    mListener.onClickRoomCell(room);
+                }
+            }
+        });
 
     }
 
@@ -167,6 +184,7 @@ public class HousingComplexDialog extends FrameLayout {
         okButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                confirmEdit();
                 if (mListener != null) {
                     mListener.onClickOkButton();
                 }
@@ -190,7 +208,7 @@ public class HousingComplexDialog extends FrameLayout {
 
         void onClickAddRoomButton(Place addedRoom);
 
-        void onClickRoomCell();
+        void onClickRoomCell(Place room);
 
         void onClickOkButton();
 
@@ -244,7 +262,13 @@ public class HousingComplexDialog extends FrameLayout {
     private void confirmEdit() {
 
         mHousingComplex.setName(nameText.getText().toString());
-
+        ArrayList<Place> rooms = RVData.getInstance().getPlaceList().getRoomList(mHousingComplex.getId());
+        for (Place room : rooms) {
+            room.setAddress(mHousingComplex.getName());
+        }
+        for (Place room : addedRooms) {
+            room.setAddress(mHousingComplex.getName());
+        }
         RVData.getInstance().getPlaceList().setOrAdd(mHousingComplex);
         RVData.getInstance().getPlaceList().addList(addedRooms);
         RVData.getInstance().getPlaceList().removeList(removedRooms);
@@ -286,7 +310,9 @@ public class HousingComplexDialog extends FrameLayout {
         public View getView(int position, View convertView, ViewGroup parent) {
 
             if (convertView == null) {
-                convertView = new RoomListCell(getContext(), (Place) getItem(position));
+                convertView
+                        = new RoomListCell(getContext(),
+                                (Place) getItem(position));
             } else {
                 ((RoomListCell) convertView).refreshData((Place) getItem(position));
             }
@@ -333,6 +359,31 @@ public class HousingComplexDialog extends FrameLayout {
             initMenuButton();
 
             refreshData(null);
+
+            setOnTouchListener(new OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+
+                    hideSoftKeyboard();
+
+                    switch (event.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                            RoomListCell.this.setAlpha(0.5f);
+                            return true;
+                        case MotionEvent.ACTION_CANCEL:
+                            RoomListCell.this.setAlpha(1f);
+                            return true;
+                        case MotionEvent.ACTION_UP:
+                            RoomListCell.this.setAlpha(1f);
+                            confirmEdit();
+                            if (mListener != null) {
+                                mListener.onClickRoomCell(mRoom);
+                            }
+                            return true;
+                    }
+                    return false;
+                }
+            });
         }
 
         private ImageView marker;
@@ -376,7 +427,6 @@ public class HousingComplexDialog extends FrameLayout {
             marker.setBackgroundResource(Constants.buttonRes[mRoom.getPriority().num()]);
             nameText.setText(mRoom.getName());
         }
-
-
     }
-}
+
+   }

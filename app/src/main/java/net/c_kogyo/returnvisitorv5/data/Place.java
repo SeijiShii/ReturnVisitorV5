@@ -185,10 +185,25 @@ public class Place extends DataItem {
     @Override
     public String toString() {
 
-        if (name.length() > 0) return name;
-        if (address.length() > 0) return address;
-
-        return "";
+        switch (category) {
+            case HOUSE:
+            case HOUSING_COMPLEX:
+                if (name.length() > 0) return name;
+                if (address.length() > 0) return address;
+            case ROOM:
+                StringBuilder builder = new StringBuilder();
+                if (address.length() > 0) {
+                    builder.append(address);
+                    if (name.length() > 0) {
+                        builder.append(" ").append(name);
+                    }
+                } else if (name.length() > 0) {
+                    builder.append(name);
+                }
+                return builder.toString();
+            default:
+                return "";
+        }
     }
 
     public static Place setJSON(Place place, JSONObject object) {
@@ -217,12 +232,24 @@ public class Place extends DataItem {
 
     public Visit.Priority getPriority() {
 
-        Visit visit = RVData.getInstance().getVisitList().getLatestVisitToPlace(this.id);
+        switch (category) {
+            case HOUSE:
+            case ROOM:
+                Visit visit = RVData.getInstance().getVisitList().getLatestVisitToPlace(this.id);
+                if (visit == null) {
+                    return Visit.Priority.NONE;
+                }
+                return visit.getPriority();
 
-        if (visit == null) return Visit.Priority.NONE;
-
-        return visit.getPriority();
-
+            case HOUSING_COMPLEX:
+                Place room = RVData.getInstance().getPlaceList().getMostPriorRoom(this.id);
+                if (room == null) {
+                    return Visit.Priority.NONE;
+                }
+                return room.getPriority();
+            default:
+                return Visit.Priority.NONE;
+        }
         // DONE: 2017/03/05 実際のpriority処理を記述
     }
 
@@ -244,5 +271,9 @@ public class Place extends DataItem {
 
     public void setParentId(String parentId) {
         this.parentId = parentId;
+    }
+
+    public Category getCategory() {
+        return category;
     }
 }
