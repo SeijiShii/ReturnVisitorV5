@@ -112,6 +112,8 @@ public class HousingComplexDialog extends FrameLayout {
                 Place newRoom = new Place(mHousingComplex.getLatLng(), Place.Category.ROOM);
                 newRoom.setName(name);
                 newRoom.setParentId(mHousingComplex.getId());
+                newRoom.setAddress(nameText.getText().toString());
+
                 addedRooms.add(newRoom);
 
                 roomAdapter.addRoom(newRoom);

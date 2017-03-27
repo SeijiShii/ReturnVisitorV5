@@ -46,7 +46,7 @@ import static net.c_kogyo.returnvisitorv5.activity.Constants.LATITUDE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.LONGITUDE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.EDIT_VISIT_ACTION;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.EDIT_VISIT_REQUEST_CODE;
-import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_SINGLE_HOUSE_ACTION;
+import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_PLACE_ACTION;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_VISIT_ACTION_WITH_PLACE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_VISIT_REQUEST_CODE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.VISIT_ADDED_RESULT_CODE;
@@ -591,7 +591,7 @@ public class MapActivity extends AppCompatActivity
     // Method for Record Visit Activity
     private void startRecordVisitActivityForNewPlace(LatLng latLng) {
         Intent recordVisitIntent = new Intent(this, RecordVisitActivity.class);
-        recordVisitIntent.setAction(NEW_SINGLE_HOUSE_ACTION);
+        recordVisitIntent.setAction(NEW_PLACE_ACTION);
         recordVisitIntent.putExtra(LATITUDE, latLng.latitude);
         recordVisitIntent.putExtra(LONGITUDE, latLng.longitude);
         startActivityForResult(recordVisitIntent, NEW_VISIT_REQUEST_CODE);
@@ -621,7 +621,8 @@ public class MapActivity extends AppCompatActivity
                         new HousingComplexDialog.HousingComplexDialogListener() {
                             @Override
                             public void onClickAddRoomButton(Place newRoom) {
-
+                                fadeOutDialogOverlay(null);
+                                startRecordVisitActivityForNewVisit(newRoom);
                             }
 
                             @Override
