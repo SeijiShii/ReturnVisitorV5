@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -73,7 +72,7 @@ public class PlaceDialog extends FrameLayout {
             public void onClick(View view) {
                 // DONE: 2017/03/16 editMenu
                 PopupMenu editMenuPopup = new PopupMenu(getContext(), placeCell.getEditButton());
-                editMenuPopup.getMenuInflater().inflate(R.menu.place_cell_menu, editMenuPopup.getMenu());
+                editMenuPopup.getMenuInflater().inflate(R.menu.delete_menu, editMenuPopup.getMenu());
                 editMenuPopup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {

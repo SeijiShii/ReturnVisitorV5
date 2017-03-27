@@ -320,12 +320,12 @@ public class TagDialog extends FrameLayout {
                     // DONE: 2017/03/06 ポップアップで削除を尋ねる
                     PopupMenu popupMenu = new PopupMenu(getContext(), editButton);
                     MenuInflater inflater = popupMenu.getMenuInflater();
-                    inflater.inflate(R.menu.tag_list_cell_menu, popupMenu.getMenu());
+                    inflater.inflate(R.menu.delete_menu, popupMenu.getMenu());
                     popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                         @Override
                         public boolean onMenuItemClick(MenuItem item) {
 
-                            if (item.getItemId() == R.id.tag_list_cell_delete) {
+                            if (item.getItemId() == R.id.delete) {
                                 if (mListener != null) {
                                     mListener.onDeleteTag(mTag);
                                 }

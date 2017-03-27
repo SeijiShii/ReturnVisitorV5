@@ -68,6 +68,7 @@ public class HousingComplexDialog extends FrameLayout {
         view = LayoutInflater.from(getContext()).inflate(R.layout.housing_complex_dialog, this);
 
         initNameText();
+        initMenuButton();
         initAddressText();
         initRoomText();
         initAddRoomButton();
@@ -85,6 +86,35 @@ public class HousingComplexDialog extends FrameLayout {
         if (mHousingComplex.getName() != null && !mHousingComplex.getName().equals("")) {
             nameText.setText(mHousingComplex.getName());
         }
+    }
+
+    private void initMenuButton() {
+        final Button menuButton = (Button) view.findViewById(R.id.menu_button);
+        menuButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PopupMenu popupMenu = new PopupMenu(getContext(), menuButton);
+                popupMenu.getMenuInflater().inflate(R.menu.delete_menu, popupMenu.getMenu());
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        if (item.getItemId() == R.id.delete) {
+                            ConfirmDialog.confirmAndDeletePlace(getContext(), new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    if (mListener != null) {
+                                        mListener.onDeleteHousingComplex(mHousingComplex);
+                                    }
+                                }
+                            });
+                            return true;
+                        }
+                        return false;
+                    }
+                });
+                popupMenu.show();
+            }
+        });
     }
 
     private EditText addressText;
@@ -186,7 +216,7 @@ public class HousingComplexDialog extends FrameLayout {
             public void onClick(View v) {
                 confirmEdit();
                 if (mListener != null) {
-                    mListener.onClickOkButton();
+                    mListener.onClickOkButton(mHousingComplex);
                 }
             }
         });
@@ -210,9 +240,11 @@ public class HousingComplexDialog extends FrameLayout {
 
         void onClickRoomCell(Place room);
 
-        void onClickOkButton();
+        void onClickOkButton(Place housingComplex);
 
         void onClickCancelButton();
+
+        void onDeleteHousingComplex(Place housingComplex);
     }
 
     private void initBroadcasting() {
@@ -404,7 +436,7 @@ public class HousingComplexDialog extends FrameLayout {
                 @Override
                 public void onClick(View v) {
                     PopupMenu popupMenu = new PopupMenu(getContext(), RoomListCell.this);
-                    popupMenu.getMenuInflater().inflate(R.menu.place_cell_menu, popupMenu.getMenu());
+                    popupMenu.getMenuInflater().inflate(R.menu.delete_menu, popupMenu.getMenu());
                     popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                         @Override
                         public boolean onMenuItemClick(MenuItem item) {

@@ -8,14 +8,40 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Dialog title -->
-        <TextView
+        <!-- Title Row -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="@dimen/ui_height_small"
-            android:textColor="@color/textColorGray"
-            android:textSize="@dimen/text_size_large"
-            android:gravity="center"
-            android:text="@string/housing_complex"/>
+            android:orientation="horizontal">
+
+            <!-- Dialog title -->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:textColor="@color/textColorGray"
+                android:textSize="@dimen/text_size_large"
+                android:gravity="center"
+                android:text="@string/housing_complex"/>
+
+            <!-- Menu Button -->
+            <RelativeLayout
+                android:layout_width="30dp"
+                android:layout_height="match_parent">
+
+                <Button
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:id="@+id/menu_button"
+                    android:background="@drawable/gray_menu_button_selector"
+                    android:layout_alignParentBottom="true"/>
+
+            </RelativeLayout>
+
+
+        </LinearLayout>
+
+
 
         <!-- Name Text -->
         <EditText

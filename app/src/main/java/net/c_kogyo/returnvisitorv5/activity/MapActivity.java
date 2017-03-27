@@ -671,13 +671,22 @@ public class MapActivity extends AppCompatActivity
                             }
 
                             @Override
-                            public void onClickOkButton() {
+                            public void onClickOkButton(Place housingComplex) {
+                                placeMarkers.refreshMarker(housingComplex);
                                 fadeOutDialogOverlay(normalFadeOutListener);
                             }
 
                             @Override
                             public void onClickCancelButton() {
                                 fadeOutDialogOverlay(normalFadeOutListener);
+                            }
+
+                            @Override
+                            public void onDeleteHousingComplex(Place housingComplex) {
+                                fadeOutDialogOverlay(normalFadeOutListener);
+                                placeMarkers.removeByPlace(housingComplex);
+                                RVData.getInstance().getPlaceList().removeById(housingComplex.getId());
+                                RVData.getInstance().saveData(MapActivity.this, null);
                             }
                         });
         dialogFrame.addView(housingComplexDialog);
@@ -765,8 +774,12 @@ public class MapActivity extends AppCompatActivity
 
         private Marker getMarkerByPlace(Place place) {
 
+            if (place.getMarkerId() == null)
+                return null;
+
             for (Marker marker : markers) {
-                if (place.getMarkerId() != null && place.getMarkerId().equals(marker.getId())) {
+                String markerId = marker.getId();
+                if (place.getMarkerId().equals(markerId)) {
                     return marker;
                 }
             }
