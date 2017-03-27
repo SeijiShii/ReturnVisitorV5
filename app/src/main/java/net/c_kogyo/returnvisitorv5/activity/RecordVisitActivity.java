@@ -390,10 +390,17 @@ public class RecordVisitActivity extends AppCompatActivity {
 
         if (!mPlace.getAddress().equals("") && mPlace.getAddress() != null) return;
 
-        double lat = getIntent().getDoubleExtra(Constants.LATITUDE, 1000);
-        double lng = getIntent().getDoubleExtra(Constants.LONGITUDE, 1000);
+        double lat, lng;
 
-        if (lat >= 1000 & lng >= 1000) return;
+        if (mPlace.getLatLng() == null) {
+            lat = getIntent().getDoubleExtra(Constants.LATITUDE, 1000);
+            lng = getIntent().getDoubleExtra(Constants.LONGITUDE, 1000);
+            if (lat >= 1000 & lng >= 1000) return;
+
+        } else {
+            lat = mPlace.getLatLng().latitude;
+            lng = mPlace.getLatLng().longitude;
+        }
 
         Intent addressServiceIntent = new Intent(this, FetchAddressIntentService.class);
 

@@ -443,6 +443,14 @@ public class MapActivity extends AppCompatActivity
 
     @Override
     public void onMarkerDragEnd(Marker marker) {
+        Place place = RVData.getInstance().getPlaceList().getByMarkerId(marker.getId());
+
+        if (place == null) return;
+
+        place.setLatLng(marker.getPosition());
+        place.setAddress(null);
+
+        RVData.getInstance().saveData(this, null);
 
     }
 
@@ -747,7 +755,8 @@ public class MapActivity extends AppCompatActivity
                 return;
 
             MarkerOptions options = new MarkerOptions()
-                    .position(place.getLatLng());
+                    .position(place.getLatLng())
+                    .draggable(true);
             if (place.getCategory() == Place.Category.HOUSE) {
                 options.icon(BitmapDescriptorFactory.fromResource(Constants.markerRes[place.getPriority().num()]));
             } else if (place.getCategory() == Place.Category.HOUSING_COMPLEX) {

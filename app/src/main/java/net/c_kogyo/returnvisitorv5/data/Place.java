@@ -188,16 +188,16 @@ public class Place extends DataItem {
         switch (category) {
             case HOUSE:
             case HOUSING_COMPLEX:
-                if (name.length() > 0) return name;
-                if (address.length() > 0) return address;
+                if (name != null && name.length() > 0) return name;
+                if (address != null && address.length() > 0) return address;
             case ROOM:
                 StringBuilder builder = new StringBuilder();
-                if (address.length() > 0) {
+                if (address != null && address.length() > 0) {
                     builder.append(address);
-                    if (name.length() > 0) {
+                    if (name != null && name.length() > 0) {
                         builder.append(" ").append(name);
                     }
-                } else if (name.length() > 0) {
+                } else if (name != null && name.length() > 0) {
                     builder.append(name);
                 }
                 return builder.toString();
