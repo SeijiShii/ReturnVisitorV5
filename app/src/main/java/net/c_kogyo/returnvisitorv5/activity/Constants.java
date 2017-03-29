@@ -14,9 +14,11 @@ public class Constants {
     public static final class SharedPrefTags{
 
         public static final String RETURN_VISITOR_SHARED_PREFS = "return_visitor_shared_prefs";
-        static final String ZOOM_LEVEL = "zoom_level";
+        public static final String ZOOM_LEVEL = "zoom_level";
 
-//        public static final String USER_NAME = "user_name";
+        public static final String COUNTING_WORK_ID = "counting_work_id";
+        public static final String IS_COUNTING_TIME = "is_counting_time";
+
     }
 
     public static final String LATITUDE = "latitude";

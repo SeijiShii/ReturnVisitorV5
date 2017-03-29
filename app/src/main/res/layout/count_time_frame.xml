@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_height_small"
+        android:id="@+id/time_count_button"
+        android:textSize="@dimen/text_size_middle"
+        android:textColor="@color/colorPrimaryDark"
+        android:text="@string/count_time"
+        android:background="@drawable/trans_blue_selector"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_height_small"
+        android:background="@drawable/gray_trans_circle"
+        android:gravity="center"
+        android:id="@+id/start_time_text"
+        android:layout_margin="5dp"
+        android:textSize="@dimen/text_size_middle"
+        android:textColor="@color/textColorGray"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_height_small"
+        android:gravity="center"
+        android:id="@+id/duration_text"
+        android:layout_margin="5dp"
+        android:textSize="@dimen/text_size_middle"
+        android:textColor="@color/textColorGray"/>
+
+</LinearLayout>

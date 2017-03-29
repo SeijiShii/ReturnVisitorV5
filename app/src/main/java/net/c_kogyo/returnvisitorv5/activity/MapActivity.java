@@ -5,20 +5,21 @@ import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
-import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GestureDetectorCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,9 +48,13 @@ import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.dialogcontents.HousingComplexDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.MapLongClickDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.PlaceDialog;
+import net.c_kogyo.returnvisitorv5.service.TimeCountService;
+import net.c_kogyo.returnvisitorv5.util.DateTimeText;
+import net.c_kogyo.returnvisitorv5.view.CountTimeFrame;
 import net.c_kogyo.returnvisitorv5.view.SmallTagView;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import static net.c_kogyo.returnvisitorv5.activity.Constants.LATITUDE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.LONGITUDE;
@@ -73,6 +78,7 @@ public class MapActivity extends AppCompatActivity
                                         RVData.RVDataStoreCallback{
 
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
+    private static boolean isForeground;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +86,8 @@ public class MapActivity extends AppCompatActivity
 
         // 初期化のために一回ゲットする
         RVData.getInstance().loadData(this, this);
+
+        initLocalBroadcast();
 
         setContentView(R.layout.map_activity);
 
@@ -206,18 +214,26 @@ public class MapActivity extends AppCompatActivity
     protected void onStart() {
         super.onStart();
         mapView.onStart();
+        isForeground = true;
+
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         mapView.onStop();
+        isForeground = false;
+    }
+
+    public static boolean isInForeground() {
+        return isForeground;
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         mapView.onDestroy();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
     }
 
     @Override
@@ -245,6 +261,7 @@ public class MapActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         mapView.onResume();
+        restartTimeCountIfNeeded();
     }
 
     private void loadCameraPosition() {
@@ -894,6 +911,7 @@ public class MapActivity extends AppCompatActivity
             }
         });
 
+        initCountTimeFrame();
     }
 
     private void initDrawerLogoButton() {
@@ -973,6 +991,82 @@ public class MapActivity extends AppCompatActivity
         animatorSet.start();
 
         isDrawerOpen = !isDrawerOpen;
+    }
+
+    private CountTimeFrame countTimeFrame;
+    private void initCountTimeFrame() {
+        countTimeFrame = (CountTimeFrame) findViewById(R.id.count_time_frame);
+        countTimeFrame.setExtracted(TimeCountService.isTimeCounting());
+        countTimeFrame.setListener(new CountTimeFrame.CountTimeFrameListener() {
+            @Override
+            public void onClickStartButton() {
+                Intent startTimeCountIntent = new Intent(getApplicationContext(), TimeCountService.class);
+                startTimeCountIntent.setAction(TimeCountService.START_COUNTING_ACTION_TO_SERVICE);
+                startService(startTimeCountIntent);
+            }
+
+            @Override
+            public void onClickStopButton() {
+                TimeCountService.stopTimeCount();
+            }
+        });
+    }
+
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+           if (intent.getAction().equals(TimeCountService.STOP_TIME_COUNT_ACTION_TO_ACTIVITY)) {
+               countTimeFrame.updateUI(false, null, null);
+
+               SharedPreferences preferences = getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
+               SharedPreferences.Editor editor = preferences.edit();
+               editor.putBoolean(Constants.SharedPrefTags.IS_COUNTING_TIME, false);
+               editor.apply();
+
+           } else if (intent.getAction().equals(TimeCountService.TIME_COUNTING_ACTION_TO_ACTIVITY)) {
+
+               long startTime = intent.getLongExtra(TimeCountService.START_TIME, 0);
+               Calendar start = Calendar.getInstance();
+               start.setTimeInMillis(startTime);
+               String startText = getString(R.string.start_time_text, DateTimeText.getTimeText(start));
+
+               long duration = intent.getLongExtra(TimeCountService.DURATION, 0);
+               String durationText = getString(R.string.duration_text, DateTimeText.getDurationString(duration, true));
+
+               countTimeFrame.updateUI(true, startText, durationText);
+
+               SharedPreferences preferences = getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
+               SharedPreferences.Editor editor = preferences.edit();
+               editor.putBoolean(Constants.SharedPrefTags.IS_COUNTING_TIME, true);
+               editor.putString(Constants.SharedPrefTags.COUNTING_WORK_ID, intent.getStringExtra(TimeCountService.COUNTING_WORK_ID));
+               editor.apply();
+
+           }
+        }
+    };
+
+    private void initLocalBroadcast() {
+        LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this);
+
+        manager.registerReceiver(receiver, new IntentFilter(TimeCountService.TIME_COUNTING_ACTION_TO_ACTIVITY));
+        manager.registerReceiver(receiver, new IntentFilter(TimeCountService.STOP_TIME_COUNT_ACTION_TO_ACTIVITY));
+    }
+
+    private void restartTimeCountIfNeeded() {
+        SharedPreferences preferences
+                = getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
+        boolean isCounting = preferences.getBoolean(Constants.SharedPrefTags.IS_COUNTING_TIME, false);
+        if (isCounting) {
+            String workId = preferences.getString(Constants.SharedPrefTags.COUNTING_WORK_ID, null);
+
+            if (workId == null) return;
+
+            Intent restartCountIntent = new Intent(this, TimeCountService.class);
+            restartCountIntent.setAction(TimeCountService.RESTART_COUNTING_ACTION_TO_SERVICE);
+            restartCountIntent.putExtra(TimeCountService.COUNTING_WORK_ID, workId);
+            startService(restartCountIntent);
+        }
+
     }
 
 }

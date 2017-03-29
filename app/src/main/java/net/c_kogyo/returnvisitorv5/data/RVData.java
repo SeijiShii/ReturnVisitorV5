@@ -41,6 +41,7 @@ public class RVData {
     private DataList<Tag> tagList;
     private NoteCompList noteCompList;
     private DataList<Publication> pubList;
+    private DataList<Work> workList;
 
     private static RVData instance = new RVData();
     private RVData() {
@@ -52,6 +53,8 @@ public class RVData {
         tagList = new DataList<>();
         noteCompList = new NoteCompList();
         pubList = new DataList<>();
+
+        workList = new DataList<>();
 
     }
 
@@ -79,6 +82,10 @@ public class RVData {
 
     public DataList<Publication> getPubList() {
         return pubList;
+    }
+
+    public DataList<Work> getWorkList() {
+        return workList;
     }
 
     public void saveData(Context context, @Nullable RVDataStoreCallback callback){
@@ -187,6 +194,9 @@ public class RVData {
                             case "Publication":
                                 pubList.setOrAdd(new Publication(record));
                                 break;
+                            case "Work":
+                                workList.setOrAdd(new Work(record));
+                                break;
                         }
                     }
                 }
@@ -261,6 +271,10 @@ public class RVData {
 
             for (Publication pub : pubList ) {
                 array.put(new Record(pub).getFullJSON());
+            }
+
+            for (Work work : workList) {
+                array.put(new Record(work).getFullJSON());
             }
 
             try {

@@ -23,9 +23,10 @@ public class Place extends DataItem {
 
 
     public enum Category {
-        HOUSE(0),
-        ROOM(1),
-        HOUSING_COMPLEX(2);
+        UNDEFINED(0),
+        HOUSE(1),
+        ROOM(2),
+        HOUSING_COMPLEX(3);
 
         private final int num;
 
@@ -216,8 +217,13 @@ public class Place extends DataItem {
             if (object.has(ADDRESS))
                 place.address = object.getString(ADDRESS);
 
-            if (object.has(CATEGORY))
+            if (object.has(CATEGORY)) {
                 place.category = Category.valueOf(object.getString(CATEGORY));
+                if (place.category == Category.UNDEFINED) {
+                    place.category = Category.HOUSE;
+                }
+            }
+
 
             if (object.has(PARENT_ID))
                 place.parentId = object.getString(PARENT_ID);

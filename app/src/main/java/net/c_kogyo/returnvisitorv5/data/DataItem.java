@@ -102,7 +102,6 @@ public class DataItem implements Cloneable{
         return object;
     }
 
-
     /**
      * カレンダーのミリ秒を文字列にした末尾に1000までの乱数を加えて初期値を生成する
      * @return String id
@@ -218,38 +217,5 @@ public class DataItem implements Cloneable{
         }
         return item;
     }
-
-
-
-
-
-
-    //    public HashMap<String, Object> toMap() {
-//
-//        HashMap<String, Object> map = new HashMap<>();
-//
-//        map.put(ID, this.id);
-//        map.put(NAME, this.name);
-//        map.put(NOTE, this.note);
-//        map.put(UPDATED_AT, this.updatedAt.getTimeInMillis());
-//
-//        // 目視したときわかりやすいように。読み出しはしない。
-//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy,MM,dd, E, HH:mm:ss", Locale.JAPAN);
-//        map.put(UPDATED_AT_STRING, sdf.format(this.updatedAt.getTime()));
-//
-//        return map;
-//    }
-
-//    public void setMap(@NonNull HashMap<String, Object> map){
-//
-//        this.id = map.get(ID).toString();
-//        this.name = map.get(NAME).toString();
-//        this.note = map.get(NOTE).toString();
-//        this.updatedAt = Calendar.getInstance();
-//        this.updatedAt.setTimeInMillis(Long.valueOf(map.get(UPDATED_AT).toString()));
-//    }
-
-
-
 
 }
