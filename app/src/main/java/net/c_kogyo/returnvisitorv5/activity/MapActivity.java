@@ -350,7 +350,7 @@ public class MapActivity extends AppCompatActivity
 
     private void showMapLongClickDialog(final LatLng latLng) {
 
-        final Place tmpPlace = new Place(latLng, Place.Category.UNDEFINED);
+        final Place tmpPlace = new Place(latLng, Place.Category.HOUSE);
         placeMarkers.addMarker(tmpPlace);
 
         MapLongClickDialog mapLongClickDialog
@@ -762,7 +762,7 @@ public class MapActivity extends AppCompatActivity
 
         private void addMarker(Place place) {
 
-            if (place.getCategory() == Place.Category.UNDEFINED || place.getCategory() == Place.Category.ROOM)
+            if (place.getCategory() == Place.Category.ROOM)
                 return;
 
             MarkerOptions options = new MarkerOptions()

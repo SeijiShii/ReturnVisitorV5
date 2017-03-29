@@ -23,10 +23,9 @@ public class Place extends DataItem {
 
 
     public enum Category {
-        UNDEFINED(0),
-        HOUSE(1),
-        ROOM(2),
-        HOUSING_COMPLEX(3);
+        HOUSE(0),
+        ROOM(1),
+        HOUSING_COMPLEX(2);
 
         private final int num;
 
@@ -99,8 +98,7 @@ public class Place extends DataItem {
         this.address = "";
         this.markerId = null;
         this.parentId = null;
-        this.category = Category.UNDEFINED;
-
+        this.category = Category.HOUSE;
     }
 
     @Override
