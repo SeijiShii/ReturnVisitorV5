@@ -1009,6 +1009,13 @@ public class MapActivity extends AppCompatActivity
             public void onClickStopButton() {
                 TimeCountService.stopTimeCount();
             }
+
+            @Override
+            public void onChangeStart(Calendar calendar) {
+                Intent changeStartIntent = new Intent(TimeCountService.CHANGE_START_ACTION_TO_SERVICE);
+                changeStartIntent.putExtra(TimeCountService.START_TIME, calendar.getTimeInMillis());
+                LocalBroadcastManager.getInstance(MapActivity.this).sendBroadcast(changeStartIntent);
+            }
         });
     }
 
@@ -1016,7 +1023,7 @@ public class MapActivity extends AppCompatActivity
         @Override
         public void onReceive(Context context, Intent intent) {
            if (intent.getAction().equals(TimeCountService.STOP_TIME_COUNT_ACTION_TO_ACTIVITY)) {
-               countTimeFrame.updateUI(false, null, null);
+               countTimeFrame.updateUI(false, 0, null, null);
 
                SharedPreferences preferences = getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
                SharedPreferences.Editor editor = preferences.edit();
@@ -1033,13 +1040,18 @@ public class MapActivity extends AppCompatActivity
                long duration = intent.getLongExtra(TimeCountService.DURATION, 0);
                String durationText = getString(R.string.duration_text, DateTimeText.getDurationString(duration, true));
 
-               countTimeFrame.updateUI(true, startText, durationText);
+               countTimeFrame.updateUI(true, startTime, startText, durationText);
 
-               SharedPreferences preferences = getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
-               SharedPreferences.Editor editor = preferences.edit();
-               editor.putBoolean(Constants.SharedPrefTags.IS_COUNTING_TIME, true);
-               editor.putString(Constants.SharedPrefTags.COUNTING_WORK_ID, intent.getStringExtra(TimeCountService.COUNTING_WORK_ID));
-               editor.apply();
+               String countingWorkId = intent.getStringExtra(TimeCountService.COUNTING_WORK_ID);
+               if (countingWorkId != null) {
+                   SharedPreferences preferences = getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
+                   SharedPreferences.Editor editor = preferences.edit();
+                   editor.putBoolean(Constants.SharedPrefTags.IS_COUNTING_TIME, true);
+                   editor.putString(Constants.SharedPrefTags.COUNTING_WORK_ID, countingWorkId);
+                   editor.apply();
+               }
+
+
 
            }
         }

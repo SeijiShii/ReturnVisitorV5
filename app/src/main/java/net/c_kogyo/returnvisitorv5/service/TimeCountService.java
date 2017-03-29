@@ -71,6 +71,9 @@ public class TimeCountService extends Service {
 
                     long startTime = intent.getLongExtra(START_TIME, mWork.getStart().getTimeInMillis());
                     mWork.getStart().setTimeInMillis(startTime);
+
+                    RVData.getInstance().getWorkList().setOrAdd(mWork);
+                    RVData.getInstance().saveData(getApplicationContext(), null);
                 }
             }
         };
@@ -117,7 +120,9 @@ public class TimeCountService extends Service {
 
                     final Intent timeBroadCastIntent = new Intent();
                     timeBroadCastIntent.setAction(TIME_COUNTING_ACTION_TO_ACTIVITY);
-                    timeBroadCastIntent.putExtra(START_TIME, mWork.getStart().getTimeInMillis());
+                    if (mWork != null) {
+                        timeBroadCastIntent.putExtra(START_TIME, mWork.getStart().getTimeInMillis());
+                    }
                     timeBroadCastIntent.putExtra(DURATION, mWork.getDuration());
                     timeBroadCastIntent.putExtra(COUNTING_WORK_ID, mWork.getId());
 
