@@ -35,11 +35,12 @@ public class Visit extends DataItem implements Cloneable{
 
         NONE(0),
         NEGATIVE(1),
-        NOT_HOME(2),
-        BUSY(3),
-        LOW(4),
-        MIDDLE(5),
-        HIGH(6);
+        FOR_NEXT(2),
+        NOT_HOME(3),
+        BUSY(4),
+        LOW(5),
+        MIDDLE(6),
+        HIGH(7);
 
         private final int num;
 

@@ -16,6 +16,7 @@
     <array name="priority_array">
         <item>None</item>
         <item>Negative</item>
+        <item>For Next Covering</item>
         <item>Not Home</item>
         <item>Busy (Must Call Again)</item>
         <item>Low</item>

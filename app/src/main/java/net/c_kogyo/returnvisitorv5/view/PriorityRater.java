@@ -64,13 +64,13 @@ public class PriorityRater extends FrameLayout {
         priorityFrame = (LinearLayout) view.findViewById(R.id.priority_frame);
 
         final int raterSize = (int) (getContext().getResources().getDisplayMetrics().density * 25);
-        final int buttonMargin = (int) (getContext().getResources().getDisplayMetrics().density * 15);
+        final int buttonMargin = (int) (getContext().getResources().getDisplayMetrics().density * 10);
 
         // 2017/02/27 Implement priorityFrame
         priorityFrame.removeAllViews();
 
-        raterButtons = new Button[8];
-        for ( int i = 0 ; i < 7 ; i++ ) {
+        raterButtons = new Button[Visit.Priority.values().length];
+        for ( int i = 0 ; i < Visit.Priority.values().length ; i++ ) {
             raterButtons[i] = new Button(getContext());
             raterButtons[i].setBackgroundResource(buttonRes[0]);
             raterButtons[i].setTag(i);
@@ -80,7 +80,7 @@ public class PriorityRater extends FrameLayout {
             raterButtons[i].setLayoutParams(params);
             priorityFrame.addView(raterButtons[i]);
 
-            if ( i < 6 ) {
+            if ( i < Visit.Priority.values().length - 1 ) {
                 View view = new View(getContext());
                 FrameLayout.LayoutParams params2 = new FrameLayout.LayoutParams(buttonMargin, ViewGroup.LayoutParams.MATCH_PARENT);
                 view.setLayoutParams(params2);
@@ -115,7 +115,7 @@ public class PriorityRater extends FrameLayout {
             raterButtons[i].setBackgroundResource(Constants.buttonRes[num]);
         }
 
-        for (int i = num + 1 ; i < 7 ; i++ ) {
+        for (int i = num + 1 ; i < Visit.Priority.values().length ; i++ ) {
             raterButtons[i].setBackgroundResource(Constants.buttonRes[0]);
         }
     }

@@ -26,33 +26,36 @@ public class Constants {
 
 
     public static final int[] buttonRes = {
-            R.mipmap.button_gray,
-            R.mipmap.button_red,
-            R.mipmap.button_purple,
-            R.mipmap.button_blue,
-            R.mipmap.button_green,
-            R.mipmap.button_yellow,
-            R.mipmap.button_orange
+            R.mipmap.button_marker_gray,
+            R.mipmap.button_marker_red,
+            R.mipmap.button_marker_purple,
+            R.mipmap.button_marker_blue,
+            R.mipmap.button_marker_emerald,
+            R.mipmap.button_marker_green,
+            R.mipmap.button_marker_yellow,
+            R.mipmap.button_maker_orange
     } ;
 
     public static final int[] markerRes = {
-            R.mipmap.marker,
-            R.mipmap.marker_red,
-            R.mipmap.marker_purple,
-            R.mipmap.marker_blue,
-            R.mipmap.marker_green,
-            R.mipmap.marker_yellow,
-            R.mipmap.marker_orange
+            R.mipmap.pin_maker_gray,
+            R.mipmap.pin_marker_red,
+            R.mipmap.pin_maker_purple,
+            R.mipmap.pin_marker_blue,
+            R.mipmap.pin_maker_emerald,
+            R.mipmap.pin_maker_green,
+            R.mipmap.pin_maker_yellow,
+            R.mipmap.pin_maker_orange
     };
 
     public static final int[] complexRes = {
-            R.mipmap.complex_gray,
-            R.mipmap.complex_red,
-            R.mipmap.complex_purple,
-            R.mipmap.complex_blue,
-            R.mipmap.complex_green,
-            R.mipmap.complex_yellow,
-            R.mipmap.complex_orange
+            R.mipmap.square_marker_gray,
+            R.mipmap.square_marker_red,
+            R.mipmap.square_marker_purple,
+            R.mipmap.square_marker_blue,
+            R.mipmap.square_marker_emerald,
+            R.mipmap.square_marker_green,
+            R.mipmap.square_marker_yellow,
+            R.mipmap.square_marker_orange
     };
 
     public static final String DATE_LONG = "date_data";
