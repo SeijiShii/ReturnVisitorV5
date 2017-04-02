@@ -299,4 +299,14 @@ public class Visit extends DataItem implements Cloneable{
 
         return clonedVisit;
     }
+
+    public int getRVCount() {
+        int count = 0;
+        for (VisitDetail detail : visitDetails) {
+            if (detail.isRV()) {
+                count++;
+            }
+        }
+        return count;
+    }
 }

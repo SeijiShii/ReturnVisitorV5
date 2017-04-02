@@ -9,6 +9,8 @@ import net.c_kogyo.returnvisitorv5.data.list.DataList;
 import net.c_kogyo.returnvisitorv5.data.list.NoteCompList;
 import net.c_kogyo.returnvisitorv5.data.list.PlaceList;
 import net.c_kogyo.returnvisitorv5.data.list.VisitList;
+import net.c_kogyo.returnvisitorv5.data.list.WorkList;
+import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,6 +22,10 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Created by SeijiShii on 2017/02/27.
@@ -35,13 +41,13 @@ public class RVData {
 //    public static final String NOTE_COMP_LIST = "note_comp_list";
 //    public static final String PUB_LIST = "pub_list";
 
-    private PlaceList placeList;
-    private DataList<Person> personList;
-    private VisitList visitList;
-    private DataList<Tag> tagList;
-    private NoteCompList noteCompList;
-    private DataList<Publication> pubList;
-    private DataList<Work> workList;
+    public PlaceList placeList;
+    public DataList<Person> personList;
+    public VisitList visitList;
+    public DataList<Tag> tagList;
+    public NoteCompList noteCompList;
+    public DataList<Publication> pubList;
+    public WorkList workList;
 
     private static RVData instance = new RVData();
     private RVData() {
@@ -54,39 +60,11 @@ public class RVData {
         noteCompList = new NoteCompList();
         pubList = new DataList<>();
 
-        workList = new DataList<>();
+        workList = new WorkList();
 
     }
 
     public static RVData getInstance() {return instance;}
-
-    public DataList<Person> getPersonList() {
-        return personList;
-    }
-
-    public PlaceList getPlaceList() {
-        return placeList;
-    }
-
-    public VisitList getVisitList() {
-        return visitList;
-    }
-
-    public DataList<Tag> getTagList() {
-        return tagList;
-    }
-
-    public NoteCompList getNoteCompList() {
-        return noteCompList;
-    }
-
-    public DataList<Publication> getPubList() {
-        return pubList;
-    }
-
-    public DataList<Work> getWorkList() {
-        return workList;
-    }
 
     public void saveData(Context context, @Nullable RVDataStoreCallback callback){
         new SaveData(context, callback).execute();
@@ -323,6 +301,45 @@ public class RVData {
                 e.printStackTrace();
             }
         }
+    }
+
+    public ArrayList<AggregationDay> getAggregatedDays() {
+
+        ArrayList<AggregationDay> aggregationOfDays = new ArrayList<>();
+
+        for (Calendar date : getDatesWithData()) {
+
+            aggregationOfDays.add(new AggregationDay(date));
+        }
+        return aggregationOfDays;
+    }
+
+    private ArrayList<Calendar> getDatesWithData() {
+
+        ArrayList<Calendar> datesOfVisit = visitList.getDates();
+        ArrayList<Calendar> datesOfWork = workList.getDates();
+        ArrayList<Calendar> datesDoubled = new ArrayList<>();
+
+        for (Calendar date0 : datesOfVisit) {
+            for (Calendar date1 : datesOfWork) {
+
+                if (CalendarUtil.isSameDay(date0, date1)) {
+                    datesDoubled.add(date1);
+                }
+            }
+        }
+
+        datesOfWork.removeAll(datesDoubled);
+        datesOfVisit.addAll(datesOfWork);
+
+        Collections.sort(datesOfVisit, new Comparator<Calendar>() {
+            @Override
+            public int compare(Calendar calendar, Calendar t1) {
+                return calendar.compareTo(t1);
+            }
+        });
+
+        return new ArrayList<>(datesOfVisit);
     }
 
     public interface RVDataStoreCallback{

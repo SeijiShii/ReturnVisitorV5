@@ -9,7 +9,11 @@
     <dimen name="ui_height_double">80dp</dimen>
     <dimen name="ui_height_large">60dp</dimen>
     <dimen name="ui_height_small">40dp</dimen>
+    <dimen name="ui_height_45dp">45dp</dimen>
 
     <dimen name="padding_normal">10dp</dimen>
     <dimen name="ui_margin_normal">5dp</dimen>
+
+    <!-- Ad Frame  -->
+    <dimen name="ad_frame_height">60dp</dimen>
 </resources>

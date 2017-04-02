@@ -54,7 +54,7 @@ public abstract class BaseAnimateView extends FrameLayout {
 
         multi = getContext().getResources().getDisplayMetrics().density / 3;
 
-        setLayoutParams();
+        setLayoutParams(this);
 
         this.getLayoutParams().height = mInitialHeight;
 
@@ -139,5 +139,5 @@ public abstract class BaseAnimateView extends FrameLayout {
         void onUpdate();
     }
 
-    public abstract void setLayoutParams();
+    public abstract void setLayoutParams(BaseAnimateView view);
 }

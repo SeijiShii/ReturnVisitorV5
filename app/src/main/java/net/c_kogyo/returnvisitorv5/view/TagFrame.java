@@ -128,7 +128,7 @@ public class TagFrame extends LinearLayout implements View.OnTouchListener {
         mTags = new ArrayList<>();
 
         for (String id : mTagIds) {
-            Tag tag = RVData.getInstance().getTagList().getById(id);
+            Tag tag = RVData.getInstance().tagList.getById(id);
             if (tag != null) {
                 mTags.add(tag);
             }

@@ -41,8 +41,8 @@ public class CountTimeFrame extends BaseAnimateView {
     }
 
     @Override
-    public void setLayoutParams() {
-        this.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0));
+    public void setLayoutParams(BaseAnimateView view) {
+        view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0));
     }
 
     public void setListener(CountTimeFrameListener listener) {

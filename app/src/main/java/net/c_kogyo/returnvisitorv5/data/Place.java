@@ -239,14 +239,14 @@ public class Place extends DataItem {
         switch (category) {
             case HOUSE:
             case ROOM:
-                Visit visit = RVData.getInstance().getVisitList().getLatestVisitToPlace(this.id);
+                Visit visit = RVData.getInstance().visitList.getLatestVisitToPlace(this.id);
                 if (visit == null) {
                     return Visit.Priority.NONE;
                 }
                 return visit.getPriority();
 
             case HOUSING_COMPLEX:
-                Place room = RVData.getInstance().getPlaceList().getMostPriorRoom(this.id);
+                Place room = RVData.getInstance().placeList.getMostPriorRoom(this.id);
                 if (room == null) {
                     return Visit.Priority.NONE;
                 }

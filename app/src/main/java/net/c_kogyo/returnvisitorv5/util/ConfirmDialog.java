@@ -46,4 +46,15 @@ public class ConfirmDialog {
         builder.setPositiveButton(R.string.delete, listener);
         builder.create().show();
     }
+
+    public static void confirmAndDeleteWork(Context context,
+                                             DialogInterface.OnClickListener listener) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(R.string.delete_work_title);
+        builder.setMessage(R.string.delete_work_message);
+        builder.setNegativeButton(R.string.cancel, null);
+        builder.setPositiveButton(R.string.delete, listener);
+        builder.create().show();
+    }
 }

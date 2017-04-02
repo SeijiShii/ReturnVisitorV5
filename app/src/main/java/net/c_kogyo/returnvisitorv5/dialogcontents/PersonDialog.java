@@ -249,7 +249,7 @@ public class PersonDialog extends FrameLayout {
     private void initDeleteButton() {
 
         Button deleteButton = (Button) findViewById(R.id.delete_button);
-        if (RVData.getInstance().getPersonList().contains(mPerson)) {
+        if (RVData.getInstance().personList.contains(mPerson)) {
             deleteButton.setVisibility(View.VISIBLE);
             deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override

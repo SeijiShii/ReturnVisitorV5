@@ -447,7 +447,7 @@ public class MapActivity extends AppCompatActivity
     @Override
     public boolean onMarkerClick(Marker marker) {
 
-        Place place = RVData.getInstance().getPlaceList().getByMarkerId(marker.getId());
+        Place place = RVData.getInstance().placeList.getByMarkerId(marker.getId());
         if (place == null) return false;
 
         if (place.getCategory() == Place.Category.HOUSE) {
@@ -470,7 +470,7 @@ public class MapActivity extends AppCompatActivity
 
     @Override
     public void onMarkerDragEnd(Marker marker) {
-        Place place = RVData.getInstance().getPlaceList().getByMarkerId(marker.getId());
+        Place place = RVData.getInstance().placeList.getByMarkerId(marker.getId());
 
         if (place == null) return;
 
@@ -531,17 +531,17 @@ public class MapActivity extends AppCompatActivity
                 if (resultCode == VISIT_ADDED_RESULT_CODE) {
                     String visitId = data.getStringExtra(VISIT);
                     if (visitId != null) {
-                        Visit visit = RVData.getInstance().getVisitList().getById(visitId);
+                        Visit visit = RVData.getInstance().visitList.getById(visitId);
                         if (visit != null) {
                             String placeId = visit.getPlaceId();
-                            Place place = RVData.getInstance().getPlaceList().getById(placeId);
+                            Place place = RVData.getInstance().placeList.getById(placeId);
                             if (place != null) {
 
                                 if (place.getCategory() == Place.Category.HOUSE) {
                                     placeMarkers.addMarker(place);
                                 } else if (place.getCategory() == Place.Category.ROOM) {
                                     String parentId = place.getParentId();
-                                    Place parent = RVData.getInstance().getPlaceList().getById(parentId);
+                                    Place parent = RVData.getInstance().placeList.getById(parentId);
                                     placeMarkers.refreshMarker(parent);
                                 }
                             }
@@ -553,10 +553,10 @@ public class MapActivity extends AppCompatActivity
                 if (resultCode == VISIT_EDITED_RESULT_CODE) {
                     String visitId = data.getStringExtra(VISIT);
                     if (visitId != null) {
-                        Visit visit = RVData.getInstance().getVisitList().getById(visitId);
+                        Visit visit = RVData.getInstance().visitList.getById(visitId);
                         if (visit != null) {
                             String placeId = visit.getPlaceId();
-                            Place place = RVData.getInstance().getPlaceList().getById(placeId);
+                            Place place = RVData.getInstance().placeList.getById(placeId);
                             if (place != null) {
                                 placeMarkers.refreshMarker(place);
                             }
@@ -613,7 +613,7 @@ public class MapActivity extends AppCompatActivity
                             public void onDeleteClick(Place place) {
                                 fadeOutDialogOverlay(normalFadeOutListener);
                                 placeMarkers.removeByPlace(place);
-                                RVData.getInstance().getPlaceList().removeById(place.getId());
+                                RVData.getInstance().placeList.removeById(place.getId());
                                 RVData.getInstance().saveData(MapActivity.this, null);
                             }
 
@@ -721,7 +721,7 @@ public class MapActivity extends AppCompatActivity
                             public void onDeleteHousingComplex(Place housingComplex) {
                                 fadeOutDialogOverlay(normalFadeOutListener);
                                 placeMarkers.removeByPlace(housingComplex);
-                                RVData.getInstance().getPlaceList().removeById(housingComplex.getId());
+                                RVData.getInstance().placeList.removeById(housingComplex.getId());
                                 RVData.getInstance().saveData(MapActivity.this, null);
                             }
                         });
@@ -769,7 +769,7 @@ public class MapActivity extends AppCompatActivity
         public PlaceMarkers() {
             this.markers = new ArrayList<>();
             mMap.clear();
-            for (Place place : RVData.getInstance().getPlaceList()) {
+            for (Place place : RVData.getInstance().placeList) {
 
                 if (place.getCategory() != Place.Category.ROOM) {
                     addMarker(place);
@@ -845,8 +845,8 @@ public class MapActivity extends AppCompatActivity
     private void recordNotHome(Place place) {
         Visit visit = new Visit(place);
         visit.setPriority(Visit.Priority.NOT_HOME);
-        RVData.getInstance().getPlaceList().setOrAdd(place);
-        RVData.getInstance().getVisitList().setOrAdd(visit);
+        RVData.getInstance().placeList.setOrAdd(place);
+        RVData.getInstance().visitList.setOrAdd(visit);
         RVData.getInstance().saveData(this, null);
 
         placeMarkers.addMarker(place);
@@ -912,6 +912,7 @@ public class MapActivity extends AppCompatActivity
         });
 
         initCountTimeFrame();
+        initWorkButton();
     }
 
     private void initDrawerLogoButton() {
@@ -1081,4 +1082,20 @@ public class MapActivity extends AppCompatActivity
 
     }
 
+    private void initWorkButton() {
+        Button workButton = (Button) findViewById(R.id.work_button);
+        workButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onClickWorkButton();
+            }
+        });
+    }
+
+    private void onClickWorkButton() {
+        Intent workIntent = new Intent(this, WorkPagerActivity.class);
+        startActivity(workIntent);
+    }
+
+    // TODO: 2017/04/01 集合住宅のマークがでかすぎる
 }

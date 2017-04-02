@@ -112,8 +112,8 @@ public class RecordVisitActivity extends AppCompatActivity {
             case EDIT_VISIT_ACTION:
                 String visitId = intent.getStringExtra(VISIT);
 
-                Visit visit = RVData.getInstance().getVisitList().getById(visitId);
-                Place place = RVData.getInstance().getPlaceList().getById(visit.getPlaceId());
+                Visit visit = RVData.getInstance().visitList.getById(visitId);
+                Place place = RVData.getInstance().placeList.getById(visit.getPlaceId());
 
                 try {
                     mVisit = (Visit) visit.clone();
@@ -127,14 +127,14 @@ public class RecordVisitActivity extends AppCompatActivity {
                 break;
             case NEW_VISIT_ACTION_WITH_PLACE:
                 String placeId = intent.getStringExtra(PLACE);
-                Place place1 = RVData.getInstance().getPlaceList().getById(placeId);
+                Place place1 = RVData.getInstance().placeList.getById(placeId);
                 try {
                     mPlace = (Place) place1.clone();
                 } catch (CloneNotSupportedException e) {
                     e.printStackTrace();
                 }
 
-                Visit lastVisit = RVData.getInstance().getVisitList().getLatestVisitToPlace(placeId);
+                Visit lastVisit = RVData.getInstance().visitList.getLatestVisitToPlace(placeId);
                 if (lastVisit != null) {
                     mVisit = new Visit(lastVisit);
                 } else {
@@ -415,7 +415,7 @@ public class RecordVisitActivity extends AppCompatActivity {
     private void initVisitDetailFrame() {
         visitDetailFrame = (LinearLayout) findViewById(R.id.visit_detail_frame);
         for (VisitDetail visitDetail : mVisit.getVisitDetails()) {
-            Person person = RVData.getInstance().getPersonList().getById(visitDetail.getPersonId());
+            Person person = RVData.getInstance().personList.getById(visitDetail.getPersonId());
             if (person != null) {
                 addVisitDetailView(visitDetail, person, true);
             }
@@ -566,16 +566,16 @@ public class RecordVisitActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                RVData.getInstance().getVisitList().setOrAdd(mVisit);
-                RVData.getInstance().getPersonList().addList(mAddedPersons);
-                RVData.getInstance().getPersonList().removeList(mRemovedPersons);
+                RVData.getInstance().visitList.setOrAdd(mVisit);
+                RVData.getInstance().personList.addList(mAddedPersons);
+                RVData.getInstance().personList.removeList(mRemovedPersons);
 
                 mPlace.setName(placeNameText.getText());
-                RVData.getInstance().getPlaceList().setOrAdd(mPlace);
+                RVData.getInstance().placeList.setOrAdd(mPlace);
 
                 // PENDING: 2017/03/08 要動作検証 noteがAutoCompListについかされたかどうか
                 for (VisitDetail visitDetail : mVisit.getVisitDetails()) {
-                    RVData.getInstance().getNoteCompList().addIfNoSameName(visitDetail.getNote());
+                    RVData.getInstance().noteCompList.addIfNoSameName(visitDetail.getNote());
                 }
 
                 switch (getIntent().getAction()) {
@@ -628,7 +628,7 @@ public class RecordVisitActivity extends AppCompatActivity {
     private Button deleteButton;
     private void initDeleteButton() {
         deleteButton = (Button) findViewById(R.id.delete_button);
-        if (RVData.getInstance().getVisitList().contains(mVisit)) {
+        if (RVData.getInstance().visitList.contains(mVisit)) {
             deleteButton.setVisibility(View.VISIBLE);
             deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override

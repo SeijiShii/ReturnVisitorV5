@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorPrimary"
+    android:paddingLeft="2dp"
+    android:paddingRight="2dp">
+
+    <!-- Start Header -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_height_small">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@drawable/white_trans_circle"
+            android:layout_margin="5dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:gravity="center"
+            android:id="@+id/start_time_text"
+            android:textColor="#FFF"
+            android:text="@string/start_time_text"
+            android:layout_alignParentLeft="true"/>
+
+
+        <Button
+            android:layout_margin="5dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/gray_menu_button"
+            android:id="@+id/menu_button"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"/>
+
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/visit_cell_container"
+        android:background="#FFF"
+        android:minHeight="10dp"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_height_small">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:textColor="#FFF"
+            android:text="End Time"
+            android:gravity="center"
+            android:id="@+id/end_time_text"
+            android:layout_alignParentLeft="true"
+            android:paddingRight="10dp"
+            android:paddingLeft="10dp"
+            android:layout_margin="5dp"
+            android:background="@drawable/white_trans_circle"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:textColor="#FFF"
+            android:text="Duration"
+            android:gravity="center"
+            android:id="@+id/duration_text"
+            android:paddingRight="3dp"
+            android:paddingLeft="3dp"
+            android:layout_alignParentRight="true"/>
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#FFF"/>
+
+</LinearLayout>

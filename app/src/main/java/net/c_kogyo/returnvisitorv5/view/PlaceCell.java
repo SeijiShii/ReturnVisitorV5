@@ -1,10 +1,13 @@
 package net.c_kogyo.returnvisitorv5.view;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.PopupMenu;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -14,6 +17,7 @@ import android.widget.TextView;
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.activity.Constants;
 import net.c_kogyo.returnvisitorv5.data.Place;
+import net.c_kogyo.returnvisitorv5.util.ConfirmDialog;
 
 /**
  * Created by SeijiShii on 2017/03/14.
@@ -22,6 +26,7 @@ import net.c_kogyo.returnvisitorv5.data.Place;
 public class PlaceCell extends FrameLayout {
 
     private Place mPlace;
+    private PlaceCellListener mListener;
 
     public PlaceCell(@NonNull Context context, Place place) {
         super(context);
@@ -34,7 +39,8 @@ public class PlaceCell extends FrameLayout {
         super(context, attrs);
     }
 
-    public void setPlaceAndInitialize(Place place) {
+    public void setPlaceAndInitialize(Place place, PlaceCellListener listener) {
+        this.mListener = listener;
         this.mPlace = place;
         initCommon();
     }
@@ -45,7 +51,7 @@ public class PlaceCell extends FrameLayout {
 
         initPlaceMarker();
         initPlaceText();
-        initEditButton();
+        initMenuButton();
     }
 
     private ImageView placeMarker;
@@ -65,12 +71,46 @@ public class PlaceCell extends FrameLayout {
         placeText.setText(mPlace.toString());
     }
 
-    private Button editButton;
-    private void initEditButton() {
-        editButton = (Button) view.findViewById(R.id.edit_button);
+    private Button menuButton;
+    private void initMenuButton() {
+        menuButton = (Button) view.findViewById(R.id.edit_button);
+        menuButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPopupMenu();
+            }
+        });
     }
 
-    public Button getEditButton() {
-        return editButton;
+    private void showPopupMenu() {
+        PopupMenu popupMenu = new PopupMenu(getContext(), menuButton);
+        popupMenu.getMenuInflater().inflate(R.menu.delete_menu, popupMenu.getMenu());
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                if (item.getItemId() == R.id.delete) {
+                    ConfirmDialog.confirmAndDeletePlace(getContext(), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (mListener != null) {
+                                mListener.onDeletePlace(mPlace);
+                            }
+                        }
+                    });
+                    return true;
+                }
+                return false;
+            }
+        });
+        popupMenu.show();
     }
+
+    public interface PlaceCellListener {
+
+        void onDeletePlace(Place place);
+    }
+
+//    public Button getMenuButton() {
+//        return menuButton;
+//    }
 }

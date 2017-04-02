@@ -60,6 +60,11 @@ public class TimeCountService extends Service {
         return null;
     }
 
+    @Nullable
+    public static Work getWork() {
+        return mWork;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -72,7 +77,7 @@ public class TimeCountService extends Service {
                     long startTime = intent.getLongExtra(START_TIME, mWork.getStart().getTimeInMillis());
                     mWork.getStart().setTimeInMillis(startTime);
 
-                    RVData.getInstance().getWorkList().setOrAdd(mWork);
+                    RVData.getInstance().workList.setOrAdd(mWork);
                     RVData.getInstance().saveData(getApplicationContext(), null);
                 }
             }
@@ -94,11 +99,11 @@ public class TimeCountService extends Service {
 
         if (intent.getAction().equals(START_COUNTING_ACTION_TO_SERVICE)) {
             mWork = new Work(Calendar.getInstance());
-            RVData.getInstance().getWorkList().setOrAdd(mWork);
+            RVData.getInstance().workList.setOrAdd(mWork);
             RVData.getInstance().saveData(getApplicationContext(), null);
         } else if (intent.getAction().equals(RESTART_COUNTING_ACTION_TO_SERVICE)) {
             String workId = intent.getStringExtra(COUNTING_WORK_ID);
-            mWork = RVData.getInstance().getWorkList().getById(workId);
+            mWork = RVData.getInstance().workList.getById(workId);
             if (mWork == null) {
                 stopTimeCount();
                 return START_NOT_STICKY;
@@ -137,7 +142,7 @@ public class TimeCountService extends Service {
 
                         mWork.setEnd(Calendar.getInstance());
 
-                        RVData.getInstance().getWorkList().setOrAdd(mWork);
+                        RVData.getInstance().workList.setOrAdd(mWork);
                         RVData.getInstance().saveData(getApplicationContext(), null);
                         minCounter = 0;
                     }

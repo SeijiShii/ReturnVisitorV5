@@ -27,7 +27,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:id="@+id/date_text"
+            android:id="@+id/header_text"
             android:textColor="@color/colorPrimaryDark"
             android:textSize="@dimen/text_size_middle"
             android:gravity="center"/>
@@ -46,14 +46,20 @@
         </RelativeLayout>
     </LinearLayout>
 
-    <TextView
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:id="@+id/visit_data_text"
-        android:textColor="@color/textColorGray"
-        android:textSize="@dimen/text_size_middle"
         android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"/>
+        android:layout_marginRight="10dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/visit_data_text"
+            android:textColor="@color/textColorGray"
+            android:textSize="@dimen/text_size_middle" />
+
+    </ScrollView>
 
     <RelativeLayout
         android:layout_width="match_parent"

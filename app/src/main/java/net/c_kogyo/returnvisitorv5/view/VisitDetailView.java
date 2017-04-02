@@ -60,8 +60,8 @@ public class VisitDetailView extends BaseAnimateView {
     }
 
     @Override
-    public void setLayoutParams() {
-        this.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0));
+    public void setLayoutParams(BaseAnimateView view) {
+        view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0));
     }
 
     private void initCommon() {
@@ -270,7 +270,7 @@ public class VisitDetailView extends BaseAnimateView {
         // PENDING: 2017/03/08 要動作検証
 
         ArrayList<String> pubNameList = new ArrayList<>();
-        for (Publication pub : RVData.getInstance().getPubList()){
+        for (Publication pub : RVData.getInstance().pubList){
             pubNameList.add(pub.getName());
         }
         String[] pubArray = pubNameList.toArray(new String[0]);

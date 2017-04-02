@@ -187,7 +187,7 @@ public class HousingComplexDialog extends FrameLayout {
     private RoomListAdapter roomAdapter;
     private void initRoomAdapter() {
 
-        ArrayList<Place> roomList = RVData.getInstance().getPlaceList().getRoomList(mHousingComplex.getId());
+        ArrayList<Place> roomList = RVData.getInstance().placeList.getRoomList(mHousingComplex.getId());
         roomList.addAll(addedRooms);
         roomList.removeAll(removedRooms);
         roomAdapter = new RoomListAdapter(roomList);
@@ -294,16 +294,16 @@ public class HousingComplexDialog extends FrameLayout {
     private void confirmEdit() {
 
         mHousingComplex.setName(nameText.getText().toString());
-        ArrayList<Place> rooms = RVData.getInstance().getPlaceList().getRoomList(mHousingComplex.getId());
+        ArrayList<Place> rooms = RVData.getInstance().placeList.getRoomList(mHousingComplex.getId());
         for (Place room : rooms) {
             room.setAddress(mHousingComplex.getName());
         }
         for (Place room : addedRooms) {
             room.setAddress(mHousingComplex.getName());
         }
-        RVData.getInstance().getPlaceList().setOrAdd(mHousingComplex);
-        RVData.getInstance().getPlaceList().addList(addedRooms);
-        RVData.getInstance().getPlaceList().removeList(removedRooms);
+        RVData.getInstance().placeList.setOrAdd(mHousingComplex);
+        RVData.getInstance().placeList.addList(addedRooms);
+        RVData.getInstance().placeList.removeList(removedRooms);
         RVData.getInstance().saveData(getContext(), null);
     }
 

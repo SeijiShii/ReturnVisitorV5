@@ -141,7 +141,7 @@ public class VisitDetail extends DataItem  implements Cloneable{
 
     public String getPersonData(Context context) {
 
-        Person person = RVData.getInstance().getPersonList().getById(personId);
+        Person person = RVData.getInstance().personList.getById(personId);
 
         if (person == null) {
             return null;
@@ -204,7 +204,7 @@ public class VisitDetail extends DataItem  implements Cloneable{
 
         StringBuilder builder = new StringBuilder();
 
-        Person person = RVData.getInstance().getPersonList().getById(personId);
+        Person person = RVData.getInstance().personList.getById(personId);
         if (person != null) {
             builder.append(spaces).append(person.toString(context));
         }
@@ -228,7 +228,7 @@ public class VisitDetail extends DataItem  implements Cloneable{
         if (tagIds.size() > 0 ) {
             builder.append("\n").append(context.getString(R.string.tag)).append(":");
             for (String id : tagIds) {
-                Tag tag = RVData.getInstance().getTagList().getById(id);
+                Tag tag = RVData.getInstance().tagList.getById(id);
                 if (tag != null) {
                     builder.append(" ").append(tag.getName());
                 }
