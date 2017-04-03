@@ -16,6 +16,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -27,6 +29,7 @@ import net.c_kogyo.returnvisitorv5.data.Work;
 import net.c_kogyo.returnvisitorv5.service.TimeCountService;
 import net.c_kogyo.returnvisitorv5.util.ConfirmDialog;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
+import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -64,7 +67,10 @@ public class WorkView extends BaseAnimateView {
 
     int visitCellInitHeight;
 
-    public WorkView(Work work, Context context, int initHeight, WorkViewListener listener) {
+    public WorkView(Work work,
+                    Context context,
+                    int initHeight,
+                    WorkViewListener listener) {
         super(context, initHeight, R.layout.work_view);
 
         mContext = context;
@@ -96,23 +102,10 @@ public class WorkView extends BaseAnimateView {
     private TextView startTimeText;
     private void initStartTimeText() {
         startTimeText = (TextView) getViewById(R.id.start_time_text);
-        startTimeText.setOnTouchListener(new OnTouchListener() {
+        ViewUtil.setOnClickListener(startTimeText, new ViewUtil.OnViewClickListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        WorkView.this.setAlpha(0.5f);
-                        return true;
-                    case MotionEvent.ACTION_UP:
-                        WorkView.this.setAlpha(1f);
-                        showTimePickerDialog(mWork.getStart());
-                        return true;
-                    case MotionEvent.ACTION_CANCEL:
-                        WorkView.this.setAlpha(1f);
-                        return true;
-                }
-                return false;
+            public void onViewClick() {
+                showTimePickerDialog(mWork.getStart());
             }
         });
         updateStartTimeText();
@@ -143,40 +136,46 @@ public class WorkView extends BaseAnimateView {
         startTimeText.setText(startString);
     }
 
+    private ImageView menuButton;
     private PopupMenu popupMenu;
     final int STOP_COUNT_MENU_ID = 100;
     private void initMenuButton() {
 
-        final Button menuButton = (Button) getViewById(R.id.menu_button);
-        menuButton.setOnClickListener(new OnClickListener() {
+        menuButton = (ImageView) getViewById(R.id.work_view_menu_button);
+        ViewUtil.setOnClickListener(menuButton, new ViewUtil.OnViewClickListener() {
             @Override
-            public void onClick(View v) {
-                popupMenu = new PopupMenu(getContext(), menuButton);
-                refreshMenu();
-                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-
-                        switch (item.getItemId()) {
-                            case R.id.delete:
-                                ConfirmDialog.confirmAndDeleteWork(getContext(), new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        if (mListener != null) {
-                                            mListener.onDeleteWork(WorkView.this);
-                                        }
-                                    }
-                                });
-                                return true;
-                            case STOP_COUNT_MENU_ID:
-                                TimeCountService.stopTimeCount();
-                                return true;
-                        }
-                        return false;
-                    }
-                });
+            public void onViewClick() {
+                onClickMenuButton();
             }
         });
+    }
+
+    private void onClickMenuButton() {
+        popupMenu = new PopupMenu(getContext(), menuButton);
+        refreshMenu();
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+
+                switch (item.getItemId()) {
+                    case R.id.delete:
+                        ConfirmDialog.confirmAndDeleteWork(getContext(), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (mListener != null) {
+                                    mListener.onDeleteWork(WorkView.this);
+                                }
+                            }
+                        });
+                        return true;
+                    case STOP_COUNT_MENU_ID:
+                        TimeCountService.stopTimeCount();
+                        return true;
+                }
+                return false;
+            }
+        });
+        popupMenu.show();
     }
 
     private void refreshMenu() {
@@ -201,23 +200,10 @@ public class WorkView extends BaseAnimateView {
     private TextView endTimeText;
     private void initEndTimeText() {
         endTimeText = (TextView) getViewById(R.id.end_time_text);
-        endTimeText.setOnTouchListener(new OnTouchListener() {
+        ViewUtil.setOnClickListener(endTimeText, new ViewUtil.OnViewClickListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        endTimeText.setAlpha(0.5f);
-                        return true;
-                    case MotionEvent.ACTION_UP:
-                        endTimeText.setAlpha(1f);
-                        showTimePickerDialog(mWork.getEnd());
-                        return true;
-                    case MotionEvent.ACTION_CANCEL:
-                        endTimeText.setAlpha(1f);
-                        return true;
-                }
-                return false;
+            public void onViewClick() {
+                showTimePickerDialog(mWork.getEnd());
             }
         });
         refreshEndTimeText();
@@ -296,8 +282,9 @@ public class WorkView extends BaseAnimateView {
 
     }
 
+
     private VisitCell generateVisitCell(Visit visit, int initHeight) {
-        return new VisitCell(getContext(), visit, initHeight,new VisitCell.VisitCellListener() {
+        VisitCell visitCell = new VisitCell(getContext(), visit, initHeight,new VisitCell.VisitCellListener() {
             @Override
             public void onDeleteVisit(final VisitCell visitCell1) {
                 visitCell1.changeViewHeight(0, true, null, new Animator.AnimatorListener() {
@@ -345,6 +332,13 @@ public class WorkView extends BaseAnimateView {
                 view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0));
             }
         };
+        visitCell.setHeightUpdateListener(new HeightUpdateListener() {
+            @Override
+            public void onUpdate() {
+                WorkView.this.requestLayout();
+            }
+        });
+        return visitCell;
     }
 
     public Work getWork() {
@@ -416,6 +410,10 @@ public class WorkView extends BaseAnimateView {
         if (mListener != null) {
             mListener.onChangeTime(mWork, visitsAdded, visitsRemoved);
         }
+    }
+
+    public void toTheHeight() {
+
     }
 
     public void compress(Animator.AnimatorListener listener) {

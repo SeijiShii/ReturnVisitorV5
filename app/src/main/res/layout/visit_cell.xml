@@ -16,8 +16,8 @@
             android:layout_height="match_parent">
 
             <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:id="@+id/marker"
                 android:layout_centerInParent="true"/>
 
@@ -40,7 +40,7 @@
                 android:layout_width="25dp"
                 android:layout_height="25dp"
                 android:id="@+id/open_close_mark"
-                android:background="@drawable/upper_arrow"
+                android:background="@drawable/down_arrow"
                 android:layout_centerInParent="true"/>
 
         </RelativeLayout>

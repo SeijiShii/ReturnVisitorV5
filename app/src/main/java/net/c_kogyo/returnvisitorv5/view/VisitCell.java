@@ -2,6 +2,7 @@ package net.c_kogyo.returnvisitorv5.view;
 
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.widget.PopupMenu;
@@ -23,6 +24,7 @@ import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.util.ConfirmDialog;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
+import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 
 /**
  * Created by SeijiShii on 2017/03/14.
@@ -78,23 +80,10 @@ public abstract class VisitCell extends BaseAnimateView {
     private LinearLayout headerRow;
     private void initHeaderRow() {
         headerRow = (LinearLayout) getViewById(R.id.head_row);
-        headerRow.setOnTouchListener(new OnTouchListener() {
+        ViewUtil.setOnClickListener(headerRow, new ViewUtil.OnViewClickListener() {
             @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-
-                switch (motionEvent.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        headerRow.setAlpha(0.5f);
-                        return true;
-                    case MotionEvent.ACTION_UP:
-                        headerRow.setAlpha(1f);
-                        openCloseCell();
-                        return true;
-                    case MotionEvent.ACTION_CANCEL:
-                        headerRow.setAlpha(1f);
-                        return true;
-                }
-                return false;
+            public void onViewClick() {
+                openCloseCell();
             }
         });
 
@@ -146,12 +135,17 @@ public abstract class VisitCell extends BaseAnimateView {
         openCloseMark = (ImageView) getViewById(R.id.open_close_mark);
     }
 
+    private BaseAnimateView.HeightUpdateListener mHeightUpdateListener;
+    public void setHeightUpdateListener(HeightUpdateListener heightUpdateListener) {
+        mHeightUpdateListener = heightUpdateListener;
+    }
+
     private boolean isViewOpen = false;
     private void openCloseCell() {
         if (isViewOpen) {
-            VisitCell.this.changeViewHeight(mCollapseHeight, true, null, null);
+            VisitCell.this.changeViewHeight(mCollapseHeight, true, mHeightUpdateListener, null);
         } else {
-            VisitCell.this.changeViewHeight(mExtractHeight, true, null, null);
+            VisitCell.this.changeViewHeight(mExtractHeight, true, mHeightUpdateListener, null);
         }
 
         rotateOpenCloseMark();
@@ -159,16 +153,17 @@ public abstract class VisitCell extends BaseAnimateView {
         isViewOpen = !isViewOpen;
     }
 
+
     private void rotateOpenCloseMark() {
 
         float originAngle, targetAngle;
 
         if (isViewOpen) {
-            originAngle = 0f;
-            targetAngle = 180f;
-        } else {
             originAngle = 180f;
             targetAngle = 0f;
+        } else {
+            originAngle = 0f;
+            targetAngle = 180f;
         }
 
         ObjectAnimator animator = ObjectAnimator.ofFloat(openCloseMark, "rotation", originAngle, targetAngle);
@@ -243,6 +238,14 @@ public abstract class VisitCell extends BaseAnimateView {
 
     }
 
+    public Visit getVisit() {
+        return mVisit;
+    }
+
+    public void compress(Animator.AnimatorListener listener) {
+        this.changeViewHeight(0, true, null, listener);
+    }
+
     public interface VisitCellListener {
 
         void onDeleteVisit(VisitCell visitCell);
@@ -251,14 +254,6 @@ public abstract class VisitCell extends BaseAnimateView {
 
         void onClickToMap(Visit visit);
 
-    }
-
-    public Visit getVisit() {
-        return mVisit;
-    }
-
-    public void compress(Animator.AnimatorListener listener) {
-        this.changeViewHeight(0, true, null, listener);
     }
 
 

@@ -12,6 +12,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
@@ -21,10 +22,13 @@ import net.c_kogyo.returnvisitorv5.data.Work;
 import net.c_kogyo.returnvisitorv5.fragment.WorkFragment;
 import net.c_kogyo.returnvisitorv5.util.AdMobHelper;
 import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
+import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+
+import static net.c_kogyo.returnvisitorv5.util.ViewUtil.setOnClickListener;
 
 /**
  * Created by SeijiShii on 2016/09/17.
@@ -41,6 +45,7 @@ public class WorkPagerActivity extends AppCompatActivity {
 
         AdMobHelper.setAdView(this);
 
+        initHeaderRow();
         initPager();
         initButtons();
 
@@ -91,10 +96,20 @@ public class WorkPagerActivity extends AppCompatActivity {
 
     }
 
+    private void initHeaderRow() {
+        LinearLayout headerRow = (LinearLayout) findViewById(R.id.header_row);
+        headerRow.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return true;
+            }
+        });
+    }
+
     private ImageView leftButton;
     private void initLeftButton() {
         leftButton = (ImageView) findViewById(R.id.left_button);
-        setOnClickListener(leftButton, new OnViewClickListener() {
+        setOnClickListener(leftButton, new ViewUtil.OnViewClickListener() {
             @Override
             public void onViewClick() {
                 onClickLeftButton();
@@ -121,7 +136,7 @@ public class WorkPagerActivity extends AppCompatActivity {
     private ImageView rightButton;
     private void initRightButton() {
         rightButton = (ImageView) findViewById(R.id.right_button);
-        setOnClickListener(rightButton, new OnViewClickListener() {
+        setOnClickListener(rightButton, new ViewUtil.OnViewClickListener() {
             @Override
             public void onViewClick() {
                 onClickRightButton();
@@ -148,7 +163,7 @@ public class WorkPagerActivity extends AppCompatActivity {
     private TextView dateText;
     private void initDateText() {
         dateText = (TextView) findViewById(R.id.date_text);
-        setOnClickListener(dateText, new OnViewClickListener() {
+        setOnClickListener(dateText, new ViewUtil.OnViewClickListener() {
             @Override
             public void onViewClick() {
                 onClickDateText();
@@ -173,6 +188,8 @@ public class WorkPagerActivity extends AppCompatActivity {
         initLeftButton();
         initRightButton();
         initDateText();
+        initMenuButton();
+        initLogoButton();
      }
 
     private void refreshButtons() {
@@ -182,13 +199,23 @@ public class WorkPagerActivity extends AppCompatActivity {
         refreshDateText();
     }
 
-    private Button menuButton;
+    private ImageView menuButton;
     private void initMenuButton() {
-        menuButton = (Button) findViewById(R.id.menu_button);
-        menuButton.setOnClickListener(new View.OnClickListener() {
+        menuButton = (ImageView) findViewById(R.id.work_menu_button);
+        setOnClickListener(menuButton, new ViewUtil.OnViewClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onViewClick() {
                 showPopupMenu();
+            }
+        });
+    }
+
+    private void initLogoButton() {
+        ImageView logoButton = (ImageView) findViewById(R.id.logo_button);
+        setOnClickListener(logoButton, new ViewUtil.OnViewClickListener() {
+            @Override
+            public void onViewClick() {
+
             }
         });
     }
@@ -415,29 +442,5 @@ public class WorkPagerActivity extends AppCompatActivity {
         }
     }
 
-    private void setOnClickListener(View view, final OnViewClickListener listener) {
-        view.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        v.setAlpha(0.5f);
-                        return true;
-                    case MotionEvent.ACTION_CANCEL:
-                        v.setAlpha(1f);
-                        return true;
-                    case MotionEvent.ACTION_UP:
-                        v.setAlpha(1f);
-                        listener.onViewClick();
-                        return true;
-                }
-                return false;
-            }
-        });
-    }
 
-    interface OnViewClickListener {
-
-        void onViewClick();
-    }
 }

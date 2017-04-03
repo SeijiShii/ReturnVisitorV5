@@ -34,7 +34,7 @@ public class WorkFragment extends Fragment {
     private ArrayList<Work> worksInDay;
     private ArrayList<Visit> visitsInDayNotInWork;
     private static WorkFragmentListener mWorkFragmentListener;
-    private int rowHeight;
+    private int mWorkViewHeight, mVisitCellHeight;
 
     public static WorkFragment newInstance(Calendar date, WorkFragmentListener workFragmentListener) {
 
@@ -61,7 +61,8 @@ public class WorkFragment extends Fragment {
 
         view = inflater.inflate(R.layout.work_fragment, container, false);
 
-        rowHeight = getResources().getDimensionPixelSize(R.dimen.ui_height_45dp);
+        mWorkViewHeight = getResources().getDimensionPixelSize(R.dimen.ui_height_small) * 2;
+        mVisitCellHeight = getResources().getDimensionPixelSize(R.dimen.ui_height_45dp);
 
         worksInDay = RVData.getInstance().workList.getWorksInDay(mDate);
         visitsInDayNotInWork = RVData.getInstance().visitList.getVisitsInDayNotInWork(mDate);
@@ -129,7 +130,7 @@ public class WorkFragment extends Fragment {
         if (fromZero) {
             initHeight = 0;
         } else {
-            initHeight = rowHeight;
+            initHeight = mVisitCellHeight;
         }
 
         VisitCell cell = new VisitCell(getContext(), visit, initHeight,new VisitCell.VisitCellListener() {
@@ -179,7 +180,7 @@ public class WorkFragment extends Fragment {
             }
         };
         if (fromZero) {
-            cell.extractPostDrawn(rowHeight, null);
+            cell.extractPostDrawn(mVisitCellHeight, null);
         }
         return cell;
     }
@@ -190,8 +191,6 @@ public class WorkFragment extends Fragment {
         container.addView(visitCell);
     }
 
-
-
     private void addWorkView(Work work, boolean fromZero) {
         WorkView workView = generateWorkView(work, fromZero);
         container.addView(workView);
@@ -200,11 +199,11 @@ public class WorkFragment extends Fragment {
     private WorkView generateWorkView(Work work, boolean fromZero) {
 
         int initHeight;
-        int exHeight = rowHeight * (RVData.getInstance().visitList.getVisitsInWork(work).size() + 2);
+//        int exHeight = mWorkViewHeight + mVisitCellHeight * (RVData.getInstance().visitList.getVisitsInWork(work).size());
         if (fromZero) {
             initHeight = 0;
         } else {
-            initHeight = exHeight;
+            initHeight = ViewGroup.LayoutParams.WRAP_CONTENT;
         }
 
         WorkView workView = new WorkView(work,
@@ -258,7 +257,7 @@ public class WorkFragment extends Fragment {
                 };
 
         if (fromZero) {
-            workView.extractPostDrawn(exHeight, null);
+            workView.extractPostDrawn(ViewGroup.LayoutParams.WRAP_CONTENT, null);
         }
         return workView;
     }

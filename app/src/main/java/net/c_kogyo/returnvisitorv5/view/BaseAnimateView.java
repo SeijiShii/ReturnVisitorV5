@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import net.c_kogyo.returnvisitorv5.R;
@@ -86,8 +87,14 @@ public abstract class BaseAnimateView extends FrameLayout {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-
-                        changeViewHeight(extractHeight, true, null, listener);
+                        // TODO: 2017/04/03 要検証
+                        if (extractHeight == LayoutParams.WRAP_CONTENT) {
+                            BaseAnimateView.this.measure(0, 0);
+                            int height2 = getMeasuredHeight();
+                            changeViewHeight(height2, true, null, listener);
+                        } else {
+                            changeViewHeight(extractHeight, true, null, listener);
+                        }
                     }
                 });
             }
