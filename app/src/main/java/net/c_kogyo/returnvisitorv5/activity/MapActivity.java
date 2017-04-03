@@ -232,8 +232,16 @@ public class MapActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        try {
+            mMap.setMyLocationEnabled(false);
+        } catch (SecurityException e) {
+            //
+        }
+
         mapView.onDestroy();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+
     }
 
     @Override
@@ -243,12 +251,7 @@ public class MapActivity extends AppCompatActivity
 
         saveCameraPosition();
 
-        try {
 
-            mMap.setMyLocationEnabled(false);
-        } catch (SecurityException e) {
-            //
-        }
     }
 
     @Override
