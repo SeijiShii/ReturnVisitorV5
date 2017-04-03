@@ -1,5 +1,6 @@
 package net.c_kogyo.returnvisitorv5.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -215,7 +216,7 @@ public class WorkPagerActivity extends AppCompatActivity {
         setOnClickListener(logoButton, new ViewUtil.OnViewClickListener() {
             @Override
             public void onViewClick() {
-
+                returnToMapActivity();
             }
         });
     }
@@ -253,6 +254,12 @@ public class WorkPagerActivity extends AppCompatActivity {
 
     private void onClickAggregationMenu() {
         // TODO: 2017/04/02 Aggregation Action
+    }
+
+    private void returnToMapActivity() {
+        Intent intent = new Intent(this, MapActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
     }
 
 //        dateText.setOnClickListener(new View.OnClickListener() {

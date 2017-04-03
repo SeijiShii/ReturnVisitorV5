@@ -34,7 +34,7 @@ public class WorkFragment extends Fragment {
     private ArrayList<Work> worksInDay;
     private ArrayList<Visit> visitsInDayNotInWork;
     private static WorkFragmentListener mWorkFragmentListener;
-    private int mWorkViewHeight, mVisitCellHeight;
+    private int mVisitCellHeight;
 
     public static WorkFragment newInstance(Calendar date, WorkFragmentListener workFragmentListener) {
 
@@ -61,7 +61,6 @@ public class WorkFragment extends Fragment {
 
         view = inflater.inflate(R.layout.work_fragment, container, false);
 
-        mWorkViewHeight = getResources().getDimensionPixelSize(R.dimen.ui_height_small) * 2;
         mVisitCellHeight = getResources().getDimensionPixelSize(R.dimen.ui_height_45dp);
 
         worksInDay = RVData.getInstance().workList.getWorksInDay(mDate);
