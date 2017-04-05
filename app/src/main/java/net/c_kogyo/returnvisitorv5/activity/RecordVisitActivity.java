@@ -18,6 +18,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
@@ -38,6 +39,7 @@ import net.c_kogyo.returnvisitorv5.dialogcontents.PlacementDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.TagDialog;
 import net.c_kogyo.returnvisitorv5.service.FetchAddressIntentService;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
+import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 import net.c_kogyo.returnvisitorv5.view.ClearEditText;
 import net.c_kogyo.returnvisitorv5.view.PlacementCell;
 import net.c_kogyo.returnvisitorv5.view.PriorityRater;
@@ -93,6 +95,7 @@ public class RecordVisitActivity extends AppCompatActivity {
         initPriorityRater();
 
         initScrollView();
+        initLogoButton();
     }
 
     private void initData() {
@@ -770,6 +773,23 @@ public class RecordVisitActivity extends AppCompatActivity {
                 scrollView.fullScroll(View.FOCUS_UP);
             }
         });
+    }
+
+    private void initLogoButton() {
+        final ImageView logoButton = (ImageView) findViewById(R.id.logo_button);
+        ViewUtil.setOnClickListener(logoButton, new ViewUtil.OnViewClickListener() {
+            @Override
+            public void onViewClick() {
+                returnToMapActivity();
+            }
+        });
+    }
+
+    private void returnToMapActivity() {
+        Intent intent = new Intent(this, MapActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        finish();
     }
 
     // DONE: 2017/03/26 PriorityRaterの挙動がいまいち
