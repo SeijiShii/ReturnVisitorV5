@@ -62,7 +62,7 @@ import static net.c_kogyo.returnvisitorv5.data.Visit.VISIT;
 public class RecordVisitActivity extends AppCompatActivity {
 
     // DONE: 2017/03/24 会えた会えないがうまく反映されていない
-    // TODO: 2017/04/05 logoButton
+    // DONE: 2017/04/05 logoButton
 
     private Place mPlace;
     private Visit mVisit;

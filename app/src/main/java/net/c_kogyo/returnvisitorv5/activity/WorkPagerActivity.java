@@ -1,5 +1,8 @@
 package net.c_kogyo.returnvisitorv5.activity;
 
+import android.animation.Animator;
+import android.animation.ValueAnimator;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,9 +14,12 @@ import android.support.v7.widget.PopupMenu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
@@ -42,6 +48,8 @@ import static net.c_kogyo.returnvisitorv5.util.ViewUtil.setOnClickListener;
 public class WorkPagerActivity extends AppCompatActivity {
 
 
+    // DONE: 2017/04/05 Dialog Overlay
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,6 +61,7 @@ public class WorkPagerActivity extends AppCompatActivity {
         initHeaderRow();
         initPager();
         initButtons();
+        initDialogOverlay();
 
     }
 
@@ -279,6 +288,108 @@ public class WorkPagerActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    private RelativeLayout dialogOverlay;
+    private void initDialogOverlay() {
+        dialogOverlay = (RelativeLayout) findViewById(R.id.dialog_overlay);
+        initDialogFrame();
+    }
+
+    private FrameLayout dialogFrame;
+    private void initDialogFrame() {
+        dialogFrame = (FrameLayout) findViewById(R.id.dialog_frame);
+    }
+
+    private void fadeDialogOverlay(boolean isFadeIn, final DialogPostAnimationListener listener) {
+
+        hideSoftKeyboard();
+
+        if (isFadeIn) {
+            dialogOverlay.setVisibility(View.VISIBLE);
+
+            ValueAnimator fadeInAnimator = ValueAnimator.ofFloat(0f, 1f);
+            fadeInAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                    dialogOverlay.setAlpha((float) valueAnimator.getAnimatedValue());
+                    dialogOverlay.requestLayout();
+                }
+            });
+            fadeInAnimator.setDuration(500);
+
+            if (listener != null) {
+                fadeInAnimator.addListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animator) {
+                        listener.onFinishAnimation();
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animator) {
+
+                    }
+                });
+            }
+
+            fadeInAnimator.start();
+
+        } else {
+            ValueAnimator fadeOutAnimator = ValueAnimator.ofFloat(1f, 0f);
+            fadeOutAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                    dialogOverlay.setAlpha((float) valueAnimator.getAnimatedValue());
+                    dialogOverlay.requestLayout();
+                }
+            });
+            fadeOutAnimator.setDuration(500);
+            fadeOutAnimator.addListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animator) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animator) {
+                    dialogOverlay.setVisibility(View.INVISIBLE);
+                    dialogFrame.removeAllViews();
+                    if (listener == null) return;
+                    listener.onFinishAnimation();
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animator) {
+
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animator) {
+
+                }
+            });
+
+            fadeOutAnimator.start();
+        }
+    }
+
+    private void hideSoftKeyboard() {
+        InputMethodManager inputMethodManager = (InputMethodManager)  this.getSystemService(Activity.INPUT_METHOD_SERVICE);
+
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
+
     // TODO: 2017/04/05 カレンダーアクティビティと遷移
 
 //        dateText.setOnClickListener(new View.OnClickListener() {
@@ -475,5 +586,8 @@ public class WorkPagerActivity extends AppCompatActivity {
         }
     }
 
+    interface DialogPostAnimationListener {
+        void onFinishAnimation();
+    }
 
 }
