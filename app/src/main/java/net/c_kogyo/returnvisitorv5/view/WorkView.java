@@ -279,7 +279,6 @@ public class WorkView extends BaseAnimateView {
 
     }
 
-
     private VisitCell generateVisitCell(Visit visit, int initHeight) {
         VisitCell visitCell = new VisitCell(getContext(), visit, initHeight,new VisitCell.VisitCellListener() {
             @Override

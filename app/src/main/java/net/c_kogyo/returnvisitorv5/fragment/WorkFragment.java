@@ -249,6 +249,8 @@ public class WorkFragment extends Fragment {
 
                     @Override
                     public void onClickEditVisit(Visit visit) {
+                        // DONE: 2017/04/05 Edit Visit Action
+                        startRecordVisitForEdit(visit);
 
                     }
 

@@ -20,6 +20,7 @@ import android.widget.DatePicker;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
@@ -59,6 +60,7 @@ import static net.c_kogyo.returnvisitorv5.data.Visit.VISIT;
 public class RecordVisitActivity extends AppCompatActivity {
 
     // DONE: 2017/03/24 会えた会えないがうまく反映されていない
+    // TODO: 2017/04/05 logoButton
 
     private Place mPlace;
     private Visit mVisit;
@@ -89,6 +91,8 @@ public class RecordVisitActivity extends AppCompatActivity {
         initCancelButton();
         initDeleteButton();
         initPriorityRater();
+
+        initScrollView();
     }
 
     private void initData() {
@@ -758,6 +762,17 @@ public class RecordVisitActivity extends AppCompatActivity {
         }
     }
 
+    private void initScrollView() {
+        final ScrollView scrollView = (ScrollView) findViewById(R.id.scroll_view);
+        scrollView.post(new Runnable() {
+            @Override
+            public void run() {
+                scrollView.fullScroll(View.FOCUS_UP);
+            }
+        });
+    }
+
     // DONE: 2017/03/26 PriorityRaterの挙動がいまいち
+    // DONE: 2017/04/05 Activity起動時にスクロール位置が一番上にない
 
 }
