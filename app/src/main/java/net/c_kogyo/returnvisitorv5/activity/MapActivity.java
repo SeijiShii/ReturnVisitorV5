@@ -885,7 +885,7 @@ public class MapActivity extends AppCompatActivity
 
     // DONE: 2017/03/27 HousingComplexMarkerRes
     // PENDING: 2017/03/27 Mapを回転させる
-    // TODO: 2017/03/27 ドロワー
+    // DONE: 2017/03/27 ドロワー
     private View drawerOverlay;
     private ScrollView drawer;
     int drawerWidth;
@@ -1123,5 +1123,5 @@ public class MapActivity extends AppCompatActivity
         startActivity(workIntent);
     }
 
-    // TODO: 2017/04/01 集合住宅のマークがでかすぎる
+    // DONE: 2017/04/01 集合住宅のマークがでかすぎる
 }

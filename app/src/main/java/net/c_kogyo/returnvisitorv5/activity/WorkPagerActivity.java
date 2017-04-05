@@ -279,6 +279,7 @@ public class WorkPagerActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    // TODO: 2017/04/05 カレンダーアクティビティと遷移
 
 //        dateText.setOnClickListener(new View.OnClickListener() {
 //            @Override

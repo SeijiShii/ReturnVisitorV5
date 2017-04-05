@@ -221,6 +221,6 @@ public class TimeCountService extends Service {
     }
 
     // エラーで停止した後通知が消えない
-    // TODO: TimeCountがシステム側の都合で停止したときで再開できる仕組みにする
+    // DONE: TimeCountがシステム側の都合で停止したときで再開できる仕組みにする
 
 }

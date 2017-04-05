@@ -169,7 +169,7 @@ public class WorkFragment extends Fragment {
 
             @Override
             public void onClickToMap(Visit visit) {
-                // TODO: 2017/04/01 MapActivityへの遷移
+                // DONE: 2017/04/01 MapActivityへの遷移
                 if (mWorkFragmentListener != null) {
                     mWorkFragmentListener.moveToMap(visit);
                 }
