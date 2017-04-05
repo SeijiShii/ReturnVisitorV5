@@ -112,11 +112,12 @@ public class Constants {
 //        public static final int PRESS_DATE_RESULT_CODE = 5010;
 //    }
 //
-//    public class WorkActivityActions {
-//
-//        public static final String SHOW_GENERAL_WORKS = "show_general_works";
-//        public static final String POST_DELETE_VISIT = "post_delete_visit";
-//
-//    }
+    public class WorkActivityActions {
+
+        public static final String SHOW_GENERAL_WORKS = "show_general_works";
+        public static final String POST_DELETE_VISIT = "post_delete_visit";
+        public static final String MOVE_TO_MAP_ACTION = "_move_to_map_action";
+
+    }
 
 }

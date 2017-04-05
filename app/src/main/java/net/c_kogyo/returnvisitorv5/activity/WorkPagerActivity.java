@@ -18,7 +18,9 @@ import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.AggregationDay;
+import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.RVData;
+import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.Work;
 import net.c_kogyo.returnvisitorv5.fragment.WorkFragment;
 import net.c_kogyo.returnvisitorv5.util.AdMobHelper;
@@ -29,6 +31,8 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import static net.c_kogyo.returnvisitorv5.activity.Constants.LATITUDE;
+import static net.c_kogyo.returnvisitorv5.activity.Constants.LONGITUDE;
 import static net.c_kogyo.returnvisitorv5.util.ViewUtil.setOnClickListener;
 
 /**
@@ -262,6 +266,20 @@ public class WorkPagerActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    private void moveToMapWithPosition(Visit visit) {
+        String placeId = visit.getPlaceId();
+        Place place = RVData.getInstance().placeList.getById(placeId);
+        if (place == null) return;
+
+        Intent intent = new Intent(WorkPagerActivity.this, MapActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra(LATITUDE, place.getLatLng().latitude);
+        intent.putExtra(LONGITUDE, place.getLatLng().longitude);
+
+        startActivity(intent);
+    }
+
+
 //        dateText.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {
@@ -346,11 +364,18 @@ public class WorkPagerActivity extends AppCompatActivity {
 
             return WorkFragment.newInstance(mAggregationOfDays.get(position).getDate(),
                     new WorkFragment.WorkFragmentListener() {
-                @Override
-                public void onAllItemRemoved(Calendar date) {
-                    removeDay(date);
-                }
-            });
+
+                        @Override
+                        public void onAllItemRemoved(Calendar date) {
+                            removeDay(date);
+                        }
+
+                        @Override
+                        public void moveToMap(Visit visit) {
+                            moveToMapWithPosition(visit);
+                            WorkPagerActivity.this.finish();
+                        }
+                    });
         }
 
         @Override

@@ -213,8 +213,10 @@ public class MapActivity extends AppCompatActivity
     @Override
     protected void onStart() {
         super.onStart();
+        hideSoftKeyboard();
         mapView.onStart();
         isForeground = true;
+
 
     }
 
@@ -292,6 +294,26 @@ public class MapActivity extends AppCompatActivity
         editor.putString(LONGITUDE, lngSt);
 
         editor.apply();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        animateCameraIfHasIntentPosition(intent);
+    }
+
+    private void animateCameraIfHasIntentPosition(Intent intent) {
+
+        // DONE: 2017/04/03 intentのデータが消失する件
+        if (intent == null)
+            return;
+
+        double lat = intent.getDoubleExtra(LATITUDE, 1000);
+        double lng = intent.getDoubleExtra(LONGITUDE, 1000);
+
+        if (lat != 1000 && lng != 1000 && mMap != null) {
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(lat, lng)));
+        }
     }
 
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_LOCATION = 717;
@@ -1091,6 +1113,7 @@ public class MapActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 onClickWorkButton();
+                openCloseDrawer();
             }
         });
     }

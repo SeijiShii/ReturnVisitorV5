@@ -170,6 +170,9 @@ public class WorkFragment extends Fragment {
             @Override
             public void onClickToMap(Visit visit) {
                 // TODO: 2017/04/01 MapActivityへの遷移
+                if (mWorkFragmentListener != null) {
+                    mWorkFragmentListener.moveToMap(visit);
+                }
             }
 
         }, VisitCell.HeaderContent.BOTH) {
@@ -247,6 +250,13 @@ public class WorkFragment extends Fragment {
                     @Override
                     public void onClickEditVisit(Visit visit) {
 
+                    }
+
+                    @Override
+                    public void onClickToMap(Visit visit) {
+                        if (mWorkFragmentListener != null) {
+                            mWorkFragmentListener.moveToMap(visit);
+                        }
                     }
                 }) {
                     @Override
@@ -573,6 +583,8 @@ public class WorkFragment extends Fragment {
 
     public interface WorkFragmentListener {
         void onAllItemRemoved(Calendar date);
+
+        void moveToMap(Visit visit);
     }
 
 }

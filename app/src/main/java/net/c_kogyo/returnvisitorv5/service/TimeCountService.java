@@ -123,30 +123,28 @@ public class TimeCountService extends Service {
                         //
                     }
 
-                    final Intent timeBroadCastIntent = new Intent();
-                    timeBroadCastIntent.setAction(TIME_COUNTING_ACTION_TO_ACTIVITY);
+
                     if (mWork != null) {
+                        final Intent timeBroadCastIntent = new Intent();
+                        timeBroadCastIntent.setAction(TIME_COUNTING_ACTION_TO_ACTIVITY);
                         timeBroadCastIntent.putExtra(START_TIME, mWork.getStart().getTimeInMillis());
-                    }
-                    timeBroadCastIntent.putExtra(DURATION, mWork.getDuration());
-                    timeBroadCastIntent.putExtra(COUNTING_WORK_ID, mWork.getId());
-
-                    mWork.setEnd(Calendar.getInstance());
-
-                    broadcastManager.sendBroadcast(timeBroadCastIntent);
-                    updateNotification(mWork.getDuration());
-
-                    // 約1分ごとに保存するようにする
-                    minCounter++;
-                    if (minCounter > 50) {
-
+                        timeBroadCastIntent.putExtra(DURATION, mWork.getDuration());
+                        timeBroadCastIntent.putExtra(COUNTING_WORK_ID, mWork.getId());
                         mWork.setEnd(Calendar.getInstance());
+                        broadcastManager.sendBroadcast(timeBroadCastIntent);
+                        updateNotification(mWork.getDuration());
 
-                        RVData.getInstance().workList.setOrAdd(mWork);
-                        RVData.getInstance().saveData(getApplicationContext(), null);
-                        minCounter = 0;
+                        // 約1分ごとに保存するようにする
+                        minCounter++;
+                        if (minCounter > 50) {
+
+                            mWork.setEnd(Calendar.getInstance());
+
+                            RVData.getInstance().workList.setOrAdd(mWork);
+                            RVData.getInstance().saveData(getApplicationContext(), null);
+                            minCounter = 0;
+                        }
                     }
-
                 }
 
                 countStopHandler.post(new Runnable() {

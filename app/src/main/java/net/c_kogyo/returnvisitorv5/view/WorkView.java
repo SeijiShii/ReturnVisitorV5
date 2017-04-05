@@ -60,7 +60,6 @@ public class WorkView extends BaseAnimateView {
             } else if (intent.getAction().equals(TimeCountService.STOP_TIME_COUNT_ACTION_TO_ACTIVITY)) {
 
                 refreshEndTimeText();
-                refreshMenu();
             }
         }
     };
@@ -152,7 +151,10 @@ public class WorkView extends BaseAnimateView {
 
     private void onClickMenuButton() {
         popupMenu = new PopupMenu(getContext(), menuButton);
-        refreshMenu();
+        popupMenu.getMenuInflater().inflate(R.menu.work_view_menu, popupMenu.getMenu());
+        if (isWorkCountingTime()) {
+            popupMenu.getMenu().add(Menu.NONE, STOP_COUNT_MENU_ID, Menu.NONE, R.string.stop_time_count);
+        }
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -176,13 +178,6 @@ public class WorkView extends BaseAnimateView {
             }
         });
         popupMenu.show();
-    }
-
-    private void refreshMenu() {
-        popupMenu.getMenuInflater().inflate(R.menu.work_view_menu, popupMenu.getMenu());
-        if (isWorkCountingTime()) {
-            popupMenu.getMenu().add(Menu.NONE, STOP_COUNT_MENU_ID, Menu.NONE, R.string.stop_time_count);
-        }
     }
 
     private boolean isWorkCountingTime() {
@@ -211,9 +206,11 @@ public class WorkView extends BaseAnimateView {
     }
 
     private void refreshEndTimeText() {
-        if (TimeCountService.isTimeCounting()) {
-            endTimeText.setBackground(null);
-            endTimeText.setClickable(false);
+        if (TimeCountService.isTimeCounting() && TimeCountService.getWork() != null ) {
+            if (TimeCountService.getWork().equals(mWork)){
+                endTimeText.setBackground(null);
+                endTimeText.setClickable(false);
+            }
         } else {
             endTimeText.setBackgroundResource(R.drawable.white_trans_circle);
             endTimeText.setClickable(true);
@@ -322,7 +319,9 @@ public class WorkView extends BaseAnimateView {
 
             @Override
             public void onClickToMap(Visit visit) {
-
+                if (mListener != null) {
+                    mListener.onClickToMap(visit);
+                }
             }
 
         }, VisitCell.HeaderContent.BOTH)
@@ -427,6 +426,8 @@ public class WorkView extends BaseAnimateView {
         void onDeleteWork(WorkView workView);
 
         void onClickEditVisit(Visit visit);
+
+        void onClickToMap(Visit visit);
     }
 
 

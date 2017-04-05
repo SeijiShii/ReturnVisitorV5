@@ -127,7 +127,7 @@
                     android:layout_height="@dimen/ui_height_small">
 
                     <Button
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:id="@+id/work_button"
                         android:textColor="@color/colorPrimaryDark"
