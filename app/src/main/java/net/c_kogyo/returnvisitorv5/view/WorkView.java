@@ -12,11 +12,8 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.PopupMenu;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -262,9 +259,8 @@ public class WorkView extends BaseAnimateView {
         }
     }
 
-    public void addVisitCell(Visit visit) {
+    public void insertVisitCellToProperPosition(Visit visit) {
 
-        visitsInWork.add(visit);
         Collections.sort(visitsInWork, new Comparator<Visit>() {
             @Override
             public int compare(Visit o1, Visit o2) {
@@ -398,7 +394,7 @@ public class WorkView extends BaseAnimateView {
         visitsRemoved.removeAll(visitsInWork);
 
         for (Visit visit : visitsAdded) {
-            addVisitCell(visit);
+            insertVisitCellToProperPosition(visit);
         }
 
         for (Visit visit : visitsRemoved) {

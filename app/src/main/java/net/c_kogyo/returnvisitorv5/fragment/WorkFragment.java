@@ -30,6 +30,8 @@ import java.util.Calendar;
 
 public class WorkFragment extends Fragment {
 
+    // TODO: 2017/04/05 時間調整後のアニメーション
+
     private Calendar mDate;
     private ArrayList<Work> worksInDay;
     private ArrayList<Visit> visitsInDayNotInWork;
@@ -215,6 +217,9 @@ public class WorkFragment extends Fragment {
 
                     @Override
                     public void onChangeTime(Work work, ArrayList<Visit> visitsAdded, ArrayList<Visit> visitsRemoved) {
+                        // TODO: 2017/04/08 Add or Remove visitCells action
+                        removeVisitCells(visitsAdded);
+                        addVisitCells(visitsRemoved);
 
                     }
 
@@ -308,7 +313,7 @@ public class WorkFragment extends Fragment {
         //WorkViewまたはcontainerの適切なほうに挿入する
         WorkView workView = getWorkViewOfVisit(visit);
         if (workView != null) {
-            workView.addVisitCell(visit);
+            workView.insertVisitCellToProperPosition(visit);
         } else {
             container.addView(visitCell, getInsertPosition(visit.getDatetime()));
         }
@@ -454,7 +459,7 @@ public class WorkFragment extends Fragment {
             WorkView workView = getWorkViewOfVisit(visitCell.getVisit());
             if (workView == null) return;
 
-            workView.addVisitCell(visitCell.getVisit());
+            workView.insertVisitCellToProperPosition(visitCell.getVisit());
             removeVisitCell(visitCell.getVisit());
 
         } else {
@@ -570,7 +575,7 @@ public class WorkFragment extends Fragment {
     public void addWorkViewAndExtract(Work work) {
 
         int pos = getInsertPosition(work.getStart());
-        addWorkView(work, true);
+//        addWorkView(work, true);
         container.addView(generateWorkView(work, true), pos);
 
     }
