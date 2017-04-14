@@ -112,4 +112,6 @@ public class VisitList extends DataList<Visit> {
         dates.removeAll(datesToRemove);
         return dates;
     }
+
+
 }

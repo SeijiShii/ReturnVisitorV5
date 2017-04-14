@@ -217,9 +217,16 @@ public class WorkFragment extends Fragment {
 
                     @Override
                     public void onChangeTime(Work work, ArrayList<Visit> visitsAdded, ArrayList<Visit> visitsRemoved) {
+                        // TODO: 2017/04/09 Adjust works action
+                        RVData.getInstance().workList.setOrAdd(work);
+                        ArrayList<Work> worksRemoved = RVData.getInstance().workList.onChangeTime(work);
+                        removeWorkViews(worksRemoved);
+                        RVData.getInstance().workList.removeList(worksRemoved);
                         // TODO: 2017/04/08 Add or Remove visitCells action
                         removeVisitCells(visitsAdded);
                         addVisitCells(visitsRemoved);
+
+                        RVData.getInstance().saveData(getContext(), null);
 
                     }
 

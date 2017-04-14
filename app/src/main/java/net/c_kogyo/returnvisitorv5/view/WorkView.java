@@ -114,6 +114,10 @@ public class WorkView extends BaseAnimateView {
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                         time.set(Calendar.HOUR_OF_DAY, hourOfDay);
                         time.set(Calendar.MINUTE, minute);
+                        // DONE: 2017/04/14 Validate start and end
+                        if (mWork.getStart().after(mWork.getEnd()))
+                            return;
+
                         updateStartTimeText();
                         updateEndTimeText();
                         postChangeWorkTime();

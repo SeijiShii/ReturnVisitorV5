@@ -5,6 +5,8 @@ import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Created by SeijiShii on 2017/03/30.
@@ -49,5 +51,65 @@ public class WorkList extends DataList<Work> {
         }
         dates.removeAll(datesToRemove);
         return dates;
+    }
+
+    //要素の時間が変更されたとき前後に向かって調整するメソッド
+
+    /**
+     *
+     * @param work 時間の変更された
+     * @return 調整の結果削除されたWorkのリスト
+     */
+    public ArrayList<Work> onChangeTime(Work work) {
+
+        ArrayList<Work> worksRemoved = new ArrayList<>();
+
+        // 念のため存在チェック
+        if (!getList().contains(work)) return worksRemoved;
+
+        // すべてのリストを開始時間で整列
+        Collections.sort(getList(), new Comparator<Work>() {
+            @Override
+            public int compare(Work work, Work t1) {
+                return work.getStart().compareTo(t1.getStart());
+            }
+        });
+
+        // 対象の要素のindexを取得
+        int index = getList().indexOf(work);
+
+        // 過去に向かってさかのぼり
+        for ( int i = index - 1 ; i >= 0 ; i-- ) {
+
+            Work work1 = getList().get(i);
+
+            if (work.getStart().before(work1.getStart())) {
+                worksRemoved.add(work1);
+            } else if (work.getStart().before(work1.getEnd())) {
+                work.setStart(work1.getStart());
+                worksRemoved.add(work1);
+            } else {
+                break;
+            }
+        }
+
+        // 未来にむかって!!
+        for (int i = index + 1 ; i < getList().size() ; i++ ) {
+
+            Work work1 = getList().get(i);
+
+            if (work.getEnd().after(work1.getEnd())) {
+                worksRemoved.add(work1);
+            } else if (work.getEnd().after(work1.getStart())) {
+                work.setEnd(work1.getEnd());
+                worksRemoved.add(work1);
+            } else {
+                break;
+            }
+        }
+
+        getList().removeAll(worksRemoved);
+
+        return worksRemoved;
     }
 }
