@@ -11,7 +11,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
@@ -21,8 +20,6 @@ import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 
 import java.text.DateFormat;
-import java.text.Format;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 /**
@@ -59,6 +56,7 @@ public class AddWorkDialog extends FrameLayout {
         initDateText();
         initStartTimeText();
         initEndTimeText();
+        initDurationText();
         initOkButton();
         initCancelButton();
     }
@@ -132,6 +130,7 @@ public class AddWorkDialog extends FrameLayout {
                 mWork.getStart().set(Calendar.MINUTE, minute);
 
                 startTimeText.setText(DateTimeText.getTimeText(mWork.getStart()));
+                refreshDurationText();
             }
         },
                 mWork.getStart().get(Calendar.HOUR_OF_DAY),
@@ -168,11 +167,23 @@ public class AddWorkDialog extends FrameLayout {
                 mWork.getEnd().set(Calendar.MINUTE, minute);
 
                 endTimeText.setText(DateTimeText.getTimeText(mWork.getEnd()));
+                refreshDurationText();
             }
         },
                 mWork.getEnd().get(Calendar.HOUR_OF_DAY),
                 mWork.getEnd().get(Calendar.MINUTE),
                 true).show();
+    }
+
+    private TextView durationText;
+    private void initDurationText() {
+        durationText = (TextView) view.findViewById(R.id.duration_text);
+        refreshDurationText();
+    }
+
+    private void refreshDurationText() {
+        String durationString = getContext().getString(R.string.duration_string, DateTimeText.getDurationString(mWork.getDuration(), false));
+        durationText.setText(durationString);
     }
 
     private void initOkButton() {

@@ -387,17 +387,24 @@ public class WorkPagerActivity extends AppCompatActivity {
         AddWorkDialog addWorkDialog = new AddWorkDialog(this, new AddWorkDialog.AddWorkDialogListener() {
             @Override
             public void onOkClick(Work work) {
-
+                fadeDialogOverlay(false, null);
             }
 
             @Override
             public void onCancelClick() {
-
+                fadeDialogOverlay(false, null);
             }
         },
         false);
         dialogFrame.addView(addWorkDialog);
         fadeDialogOverlay(true ,null);
+        dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                fadeDialogOverlay(false, null);
+                return true;
+            }
+        });
     }
 
     private void hideSoftKeyboard() {

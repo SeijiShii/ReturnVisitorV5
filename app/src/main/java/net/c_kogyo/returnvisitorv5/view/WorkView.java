@@ -282,7 +282,7 @@ public class WorkView extends BaseAnimateView {
         } else {
 
             String timeString = DateTimeText.getDurationString(mWork.getDuration(), true);
-            timeString = mContext.getString(R.string.duration_text, timeString);
+            timeString = mContext.getString(R.string.duration_string, timeString);
             durationText.setText(timeString);
         }
 

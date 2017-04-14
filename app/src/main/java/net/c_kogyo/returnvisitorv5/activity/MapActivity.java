@@ -1064,7 +1064,7 @@ public class MapActivity extends AppCompatActivity
                String startText = getString(R.string.start_time_text, DateTimeText.getTimeText(start));
 
                long duration = intent.getLongExtra(TimeCountService.DURATION, 0);
-               String durationText = getString(R.string.duration_text, DateTimeText.getDurationString(duration, true));
+               String durationText = getString(R.string.duration_string, DateTimeText.getDurationString(duration, true));
 
                countTimeFrame.updateUI(true, startTime, startText, durationText);
 

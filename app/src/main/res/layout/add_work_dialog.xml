@@ -56,6 +56,16 @@
                 android:background="@drawable/gray_trans_circle"
                 android:layout_margin="5dp"/>
 
+            <!-- Duration text -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/ui_height_small"
+                android:id="@+id/duration_text"
+                android:gravity="center"
+                android:textColor="@color/textColorGray"
+                android:textSize="@dimen/text_size_middle"
+                android:layout_margin="5dp"/>
+
             <!-- OK -->
             <RelativeLayout
                 android:layout_width="match_parent"
