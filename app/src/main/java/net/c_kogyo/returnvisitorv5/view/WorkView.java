@@ -108,6 +108,9 @@ public class WorkView extends BaseAnimateView {
     }
 
     private void showTimePickerDialog(final Calendar time) {
+
+        final Calendar copiedTime = (Calendar) time.clone();
+
         new TimePickerDialog(getContext(),
                 new TimePickerDialog.OnTimeSetListener() {
                     @Override
@@ -115,8 +118,12 @@ public class WorkView extends BaseAnimateView {
                         time.set(Calendar.HOUR_OF_DAY, hourOfDay);
                         time.set(Calendar.MINUTE, minute);
                         // DONE: 2017/04/14 Validate start and end
-                        if (mWork.getStart().after(mWork.getEnd()))
+                        if (mWork.getStart().after(mWork.getEnd())) {
+                            // startとendが前後しているようならコピーしたCalendarの時間を代入して直す。
+                            time.set(Calendar.HOUR_OF_DAY, copiedTime.get(Calendar.HOUR_OF_DAY));
+                            time.set(Calendar.MINUTE, copiedTime.get(Calendar.MINUTE));
                             return;
+                        }
 
                         updateStartTimeText();
                         updateEndTimeText();
