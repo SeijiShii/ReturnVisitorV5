@@ -28,6 +28,7 @@ import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.Work;
+import net.c_kogyo.returnvisitorv5.dialogcontents.AddWorkDialog;
 import net.c_kogyo.returnvisitorv5.fragment.WorkFragment;
 import net.c_kogyo.returnvisitorv5.util.AdMobHelper;
 import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
@@ -259,6 +260,7 @@ public class WorkPagerActivity extends AppCompatActivity {
 
     private void onClickAddWorkMenu() {
         // TODO: 2017/04/02 Add Work Action
+        showAddWorkDialog();
     }
 
     private void onClickRecordVisitMenu() {
@@ -379,6 +381,23 @@ public class WorkPagerActivity extends AppCompatActivity {
 
             fadeOutAnimator.start();
         }
+    }
+
+    private void showAddWorkDialog() {
+        AddWorkDialog addWorkDialog = new AddWorkDialog(this, new AddWorkDialog.AddWorkDialogListener() {
+            @Override
+            public void onOkClick(Work work) {
+
+            }
+
+            @Override
+            public void onCancelClick() {
+
+            }
+        },
+        false);
+        dialogFrame.addView(addWorkDialog);
+        fadeDialogOverlay(true ,null);
     }
 
     private void hideSoftKeyboard() {

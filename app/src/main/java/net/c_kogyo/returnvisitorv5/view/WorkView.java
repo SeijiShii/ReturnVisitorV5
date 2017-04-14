@@ -101,37 +101,67 @@ public class WorkView extends BaseAnimateView {
         ViewUtil.setOnClickListener(startTimeText, new ViewUtil.OnViewClickListener() {
             @Override
             public void onViewClick() {
-                showTimePickerDialog(mWork.getStart());
+                showStartTimePickerDialog(mWork.getStart());
             }
         });
         updateStartTimeText();
     }
 
-    private void showTimePickerDialog(final Calendar time) {
-
-        final Calendar copiedTime = (Calendar) time.clone();
+    private void showStartTimePickerDialog(final Calendar start) {
 
         new TimePickerDialog(getContext(),
                 new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        time.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                        time.set(Calendar.MINUTE, minute);
+
+                        Calendar testTime = Calendar.getInstance();
+
+                        testTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        testTime.set(Calendar.MINUTE, minute);
                         // DONE: 2017/04/14 Validate start and end
-                        if (mWork.getStart().after(mWork.getEnd())) {
-                            // startとendが前後しているようならコピーしたCalendarの時間を代入して直す。
-                            time.set(Calendar.HOUR_OF_DAY, copiedTime.get(Calendar.HOUR_OF_DAY));
-                            time.set(Calendar.MINUTE, copiedTime.get(Calendar.MINUTE));
+                        if (testTime.after(mWork.getEnd())) {
                             return;
                         }
+
+                        start.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        start.set(Calendar.MINUTE, minute);
 
                         updateStartTimeText();
                         updateEndTimeText();
                         postChangeWorkTime();
                     }
                 },
-                time.get(Calendar.HOUR_OF_DAY),
-                time.get(Calendar.MINUTE),
+                start.get(Calendar.HOUR_OF_DAY),
+                start.get(Calendar.MINUTE),
+                true).show();
+    }
+
+    private void showEndTimePickerDialog(final Calendar end) {
+
+        new TimePickerDialog(getContext(),
+                new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+
+                        Calendar testTime = Calendar.getInstance();
+
+                        testTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        testTime.set(Calendar.MINUTE, minute);
+                        // DONE: 2017/04/14 Validate start and end
+                        if (testTime.before(mWork.getStart())) {
+                            return;
+                        }
+
+                        end.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        end.set(Calendar.MINUTE, minute);
+
+                        updateStartTimeText();
+                        updateEndTimeText();
+                        postChangeWorkTime();
+                    }
+                },
+                end.get(Calendar.HOUR_OF_DAY),
+                end.get(Calendar.MINUTE),
                 true).show();
     }
 
@@ -206,7 +236,7 @@ public class WorkView extends BaseAnimateView {
         ViewUtil.setOnClickListener(endTimeText, new ViewUtil.OnViewClickListener() {
             @Override
             public void onViewClick() {
-                showTimePickerDialog(mWork.getEnd());
+                showEndTimePickerDialog(mWork.getEnd());
             }
         });
         refreshEndTimeText();

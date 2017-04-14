@@ -21,6 +21,9 @@ public class Work extends TimePeriodItem {
     public Work(Calendar time) {
         super(WORK, time);
 
+        this.end = (Calendar) this.start.clone();
+        this.end.add(Calendar.MINUTE, 5);
+
         this.intervals = new ArrayList<>();
     }
 
