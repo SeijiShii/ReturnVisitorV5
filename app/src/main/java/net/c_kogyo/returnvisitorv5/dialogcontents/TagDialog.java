@@ -20,7 +20,6 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
-import net.c_kogyo.returnvisitorv5.activity.RecordVisitActivity;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Tag;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
@@ -267,7 +266,7 @@ public class TagDialog extends FrameLayout {
 
                 @Override
                 public void onDeleteTag(Tag tag) {
-                    RVData.getInstance().tagList.removeById(tag.getId());
+                    RVData.getInstance().tagList.deleteById(tag.getId());
                     mVisitDetail.getTagIds().remove(tag.getId());
 
                     mAdapter = new TagListAdapter(RVData.getInstance().tagList.getList());

@@ -328,7 +328,7 @@ public class WorkView extends BaseAnimateView {
 
                     @Override
                     public void onAnimationEnd(Animator animation) {
-                        RVData.getInstance().visitList.removeById(visitCell1.getVisit().getId());
+                        RVData.getInstance().visitList.deleteById(visitCell1.getVisit().getId());
                         RVData.getInstance().saveData(getContext(), null);
                         visitCellContainer.removeView(visitCell1);
                     }

@@ -258,7 +258,7 @@ public class WorkPagerActivity extends AppCompatActivity {
     }
 
     private void onClickAddWorkMenu() {
-        // TODO: 2017/04/02 Add Work Action
+        // DONE: 2017/04/02 Add Work Action
         showAddWorkDialog();
     }
 

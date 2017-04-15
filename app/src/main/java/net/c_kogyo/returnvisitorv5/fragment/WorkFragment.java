@@ -34,7 +34,7 @@ public class WorkFragment extends Fragment {
 
     private Calendar mDate;
     private ArrayList<Work> worksInDay;
-    private ArrayList<Visit> visitsInDayNotInWork;
+//    private ArrayList<Visit> visitsInDayNotInWork;
     private static WorkFragmentListener mWorkFragmentListener;
     private int mVisitCellHeight;
 
@@ -68,7 +68,7 @@ public class WorkFragment extends Fragment {
         mVisitCellHeight = getResources().getDimensionPixelSize(R.dimen.ui_height_45dp);
 
         worksInDay = RVData.getInstance().workList.getWorksInDay(mDate);
-        visitsInDayNotInWork = RVData.getInstance().visitList.getVisitsInDayNotInWork(mDate);
+//        visitsInDayNotInWork = RVData.getInstance().visitList.getVisitsInDayNotInWork(mDate);
 
         initContainer();
 
@@ -97,6 +97,7 @@ public class WorkFragment extends Fragment {
 
         int visitCounter = 0;
         int workCounter = 0;
+        ArrayList<Visit> visitsInDayNotInWork = RVData.getInstance().visitList.getVisitsInDayNotInWork(mDate);
 
         while (visitCounter < visitsInDayNotInWork.size() && workCounter < worksInDay.size()) {
 
@@ -147,7 +148,7 @@ public class WorkFragment extends Fragment {
 
                     @Override
                     public void onAnimationEnd(Animator animation) {
-                        RVData.getInstance().visitList.removeById(visitCell1.getVisit().getId());
+                        RVData.getInstance().visitList.deleteById(visitCell1.getVisit().getId());
                         RVData.getInstance().saveData(getContext(), null);
                         container.removeView(visitCell1);
                     }
@@ -234,31 +235,36 @@ public class WorkFragment extends Fragment {
 
 
                     @Override
-                    public void onDeleteWork(final WorkView workView) {
-                        workView.changeViewHeight(0, true, null, new Animator.AnimatorListener() {
-                            @Override
-                            public void onAnimationStart(Animator animation) {
+                    public void onDeleteWork(WorkView workView) {
+                        Work deletedWork = workView.getWork();
+                        RVData.getInstance().workList.deleteById(deletedWork.getId());
+                        removeWorkView(deletedWork);
+                        RVData.getInstance().saveData(getContext(), null);
 
-                            }
-
-                            @Override
-                            public void onAnimationEnd(Animator animation) {
-                                Work work1 = workView.getWork();
-                                RVData.getInstance().workList.removeById(work1.getId());
-                                RVData.getInstance().saveData(getContext(), null);
-                                container.removeView(workView);
-                            }
-
-                            @Override
-                            public void onAnimationCancel(Animator animation) {
-
-                            }
-
-                            @Override
-                            public void onAnimationRepeat(Animator animation) {
-
-                            }
-                        });
+//                        workView.changeViewHeight(0, true, null, new Animator.AnimatorListener() {
+//                            @Override
+//                            public void onAnimationStart(Animator animation) {
+//
+//                            }
+//
+//                            @Override
+//                            public void onAnimationEnd(Animator animation) {
+//                                Work work1 = workView.getWork();
+//                                RVData.getInstance().workList.deleteById(work1.getId());
+//                                RVData.getInstance().saveData(getContext(), null);
+//                                container.removeView(workView);
+//                            }
+//
+//                            @Override
+//                            public void onAnimationCancel(Animator animation) {
+//
+//                            }
+//
+//                            @Override
+//                            public void onAnimationRepeat(Animator animation) {
+//
+//                            }
+//                        });
                     }
 
                     @Override
@@ -320,9 +326,15 @@ public class WorkFragment extends Fragment {
 
         VisitCell visitCell = generateVisitCell(visit, true);
         //WorkViewまたはcontainerの適切なほうに挿入する
-        WorkView workView = getWorkViewOfVisit(visit);
-        if (workView != null) {
-            workView.insertVisitCellToProperPosition(visit);
+
+        Work work = RVData.getInstance().workList.getByVisit(visit);
+        if (work != null) {
+            WorkView workView = getWorkView(work.getId());
+            if (workView != null) {
+                workView.insertVisitCellToProperPosition(visit);
+            } else {
+                container.addView(visitCell, getInsertPosition(visit.getDatetime()));
+            }
         } else {
             container.addView(visitCell, getInsertPosition(visit.getDatetime()));
         }
@@ -347,7 +359,7 @@ public class WorkFragment extends Fragment {
 
     @Nullable
     private Visit getVisit(String visitId) {
-        for (Visit visit : visitsInDayNotInWork) {
+        for (Visit visit : RVData.getInstance().visitList.getVisitsInDayNotInWork(mDate)) {
             if (visit.getId().equals(visitId)) {
                 return visit;
             }
@@ -369,7 +381,7 @@ public class WorkFragment extends Fragment {
                 if (visit == null) return;
 
                 removeVisitCell(visit);
-                visitsInDayNotInWork.remove(visit);
+//                visitsInDayNotInWork.remove(visit);
 
             } else if (resultCode == Constants.RecordVisitActions.VISIT_EDITED_RESULT_CODE) {
                 // VisitCellの内容が変更されたとき
@@ -529,6 +541,14 @@ public class WorkFragment extends Fragment {
 
             }
         });
+
+        moveVisitCellsInRemoveWorkView(work);
+    }
+
+    private void moveVisitCellsInRemoveWorkView(Work work) {
+        // TODO: 2017/04/15  削除したWork内のVisitを付け替える
+
+        addVisitCells(RVData.getInstance().visitList.getVisitsInWork(work));
     }
 
     public void removeWorkViews(ArrayList<Work> works) {

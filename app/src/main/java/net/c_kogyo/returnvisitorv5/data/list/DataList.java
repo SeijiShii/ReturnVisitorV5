@@ -80,16 +80,22 @@ public class DataList<T extends DataItem> implements Iterable<T>{
         return null;
     }
 
-    private void remove(T data) {
+    private void delete(T data) {
         data.setDeleted(true);
     }
 
-    public void removeById(String id) {
+    public void deleteAll(ArrayList<T> dataList) {
+        for ( T data : dataList ) {
+            delete(data);
+        }
+    }
+
+    public void deleteById(String id) {
 
         T data = getById(id);
         if ( data == null ) return;
 
-        remove(data);
+        delete(data);
     }
 
     private void removeByIdIfContained(String id) {

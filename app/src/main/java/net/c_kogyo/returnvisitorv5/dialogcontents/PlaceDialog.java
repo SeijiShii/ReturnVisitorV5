@@ -5,10 +5,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.PopupMenu;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -155,7 +153,7 @@ public class PlaceDialog extends FrameLayout {
 
                                     @Override
                                     public void onAnimationEnd(Animator animation) {
-                                        RVData.getInstance().visitList.removeById(visitCell.getVisit().getId());
+                                        RVData.getInstance().visitList.deleteById(visitCell.getVisit().getId());
                                         RVData.getInstance().saveData(getContext(), null);
                                         notifyDataSetChanged();
 

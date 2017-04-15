@@ -638,7 +638,7 @@ public class MapActivity extends AppCompatActivity
                             public void onDeleteClick(Place place) {
                                 fadeOutDialogOverlay(normalFadeOutListener);
                                 placeMarkers.removeByPlace(place);
-                                RVData.getInstance().placeList.removeById(place.getId());
+                                RVData.getInstance().placeList.deleteById(place.getId());
                                 RVData.getInstance().saveData(MapActivity.this, null);
                             }
 
@@ -746,7 +746,7 @@ public class MapActivity extends AppCompatActivity
                             public void onDeleteHousingComplex(Place housingComplex) {
                                 fadeOutDialogOverlay(normalFadeOutListener);
                                 placeMarkers.removeByPlace(housingComplex);
-                                RVData.getInstance().placeList.removeById(housingComplex.getId());
+                                RVData.getInstance().placeList.deleteById(housingComplex.getId());
                                 RVData.getInstance().saveData(MapActivity.this, null);
                             }
                         });

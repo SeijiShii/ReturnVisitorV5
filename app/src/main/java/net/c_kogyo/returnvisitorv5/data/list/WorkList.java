@@ -1,5 +1,8 @@
 package net.c_kogyo.returnvisitorv5.data.list;
 
+import android.support.annotation.Nullable;
+
+import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.Work;
 import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
 
@@ -108,8 +111,18 @@ public class WorkList extends DataList<Work> {
             }
         }
 
-        getList().removeAll(worksRemoved);
+        deleteAll(worksRemoved);
 
         return worksRemoved;
+    }
+
+    @Nullable
+    public Work getByVisit(Visit visit) {
+        for (Work work : getList()) {
+            if (visit.getDatetime().after(work.getStart()) && visit.getDatetime().before(work.getEnd())) {
+                return work;
+            }
+        }
+        return null;
     }
 }
