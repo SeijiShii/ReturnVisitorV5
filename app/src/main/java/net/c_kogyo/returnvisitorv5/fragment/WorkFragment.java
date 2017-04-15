@@ -426,6 +426,7 @@ public class WorkFragment extends Fragment {
         }
     }
 
+    @Nullable
     private VisitCell getVisitCell(String visitId, boolean fromDeep) {
 
         for ( int i = 0 ; i < container.getChildCount() ; i++ ) {
@@ -454,6 +455,7 @@ public class WorkFragment extends Fragment {
         return null;
     }
 
+    @Nullable
     private WorkView getWorkView(String workId) {
 
         for ( int i = 0 ; i < container.getChildCount() ; i++ ) {
