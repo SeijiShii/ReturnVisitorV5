@@ -206,7 +206,6 @@ public class WorkFragment extends Fragment {
     private WorkView generateWorkView(Work work, boolean fromZero) {
 
         int initHeight;
-//        int exHeight = mWorkViewHeight + mVisitCellHeight * (RVData.getInstance().visitList.getVisitsInWork(work).size());
         if (fromZero) {
             initHeight = 0;
         } else {
@@ -240,31 +239,6 @@ public class WorkFragment extends Fragment {
                         RVData.getInstance().workList.deleteById(deletedWork.getId());
                         removeWorkView(deletedWork);
                         RVData.getInstance().saveData(getContext(), null);
-
-//                        workView.changeViewHeight(0, true, null, new Animator.AnimatorListener() {
-//                            @Override
-//                            public void onAnimationStart(Animator animation) {
-//
-//                            }
-//
-//                            @Override
-//                            public void onAnimationEnd(Animator animation) {
-//                                Work work1 = workView.getWork();
-//                                RVData.getInstance().workList.deleteById(work1.getId());
-//                                RVData.getInstance().saveData(getContext(), null);
-//                                container.removeView(workView);
-//                            }
-//
-//                            @Override
-//                            public void onAnimationCancel(Animator animation) {
-//
-//                            }
-//
-//                            @Override
-//                            public void onAnimationRepeat(Animator animation) {
-//
-//                            }
-//                        });
                     }
 
                     @Override
@@ -392,14 +366,14 @@ public class WorkFragment extends Fragment {
                 Visit visit = RVData.getInstance().visitList.getById(visitId);
                 if (visit == null) return;
 
+                // VisitCellの時間を変化させたときに適正なポジションにあるかどうかをVerifyする必要あり
+                // 必要なら位置を変更する
+                moveVisitCellIfNeeded(visit);
+
                 VisitCell visitCell = getVisitCell(visitId, true);
                 if (visitCell == null) return;
 
                 visitCell.refreshVisit(visit);
-                // VisitCellの時間を変化させたときに適正なポジションにあるかどうかをVerifyする必要あり
-                // 必要なら位置を変更する
-                moveVisitCellIfNeeded(visitCell);
-
             }
 
         } else if (requestCode == Constants.RecordVisitActions.NEW_VISIT_REQUEST_CODE) {
@@ -474,22 +448,49 @@ public class WorkFragment extends Fragment {
         return null;
     }
 
-    private void moveVisitCellIfNeeded(final VisitCell visitCell) {
-        // 必要ならVisitCellの位置を変更する
-        // このVisitCellをふくむべきWorkViewは存在するか
-        if (getWorkViewOfVisit(visitCell.getVisit()) != null) {
-            // 存在した
-            WorkView workView = getWorkViewOfVisit(visitCell.getVisit());
-            if (workView == null) return;
-
-            workView.insertVisitCellToProperPosition(visitCell.getVisit());
-            removeVisitCell(visitCell.getVisit());
-
+    private void moveVisitCellIfNeeded(Visit visit) {
+        // まずそのVisitCellがどこにあるかを特定する
+        WorkView workView = getWorkViewOfVisit(visit);
+        if (workView != null) {
+            // そのworkViewにそのvisitのセルが現在含まれている
+            if (workView.removeVisitCellIfNotInProperPosition(visit)) {
+                insertVisitCellAndExtract(visit);
+            }
         } else {
-            // このVisitCellを含むべきWorkViewは存在しなかった
-            removeVisitCell(visitCell.getVisit());
-            insertVisitCellAndExtract(visitCell.getVisit());
+            // visitCellは現在workViewには含まれていない。
+            VisitCell visitCell = getVisitCell(visit.getId(), false);
+            if (visitCell != null) {
+                if (isVisitCellInProperPosition(visitCell))
+                    return;
+                removeVisitCell(visit);
+            }
+            insertVisitCellAndExtract(visit);
         }
+    }
+
+
+    private boolean isVisitCellInProperPosition(VisitCell visitCell) {
+
+        int currentPos = getPositionInContainer(visitCell);
+        int propPos = getInsertPosition(visitCell.getVisit().getDatetime());
+
+        return currentPos == propPos;
+    }
+
+    private  int getPositionInContainer(VisitCell visitCell) {
+
+        Visit visit = visitCell.getVisit();
+
+        for ( int i = 0 ; i < container.getChildCount() ; i++ ) {
+            View view = container.getChildAt(i);
+            if (view instanceof VisitCell) {
+                VisitCell visitCell1 = (VisitCell) view;
+                if (visitCell1.getVisit().equals(visit)) {
+                    return i;
+                }
+            }
+        }
+        return -1;
     }
 
     /**
@@ -508,9 +509,8 @@ public class WorkFragment extends Fragment {
             if (view instanceof WorkView) {
 
                 WorkView workView = (WorkView) view;
-                Work work = workView.getWork();
 
-                if (work.isVisitInWork(visit)) {
+                if (workView.hasVisitCell(visit)) {
                     return workView;
                 }
             }

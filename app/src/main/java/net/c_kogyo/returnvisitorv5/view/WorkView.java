@@ -302,6 +302,13 @@ public class WorkView extends BaseAnimateView {
 
     public void insertVisitCellToProperPosition(Visit visit) {
 
+        // 挿入ポジションを特定
+        int pos = getProperPositionOfVisit(visit);
+        visitCellContainer.addView(generateVisitCell(visit, 0), pos);
+
+    }
+
+    private int getProperPositionOfVisit(Visit visit) {
         Collections.sort(visitsInWork, new Comparator<Visit>() {
             @Override
             public int compare(Visit o1, Visit o2) {
@@ -311,9 +318,41 @@ public class WorkView extends BaseAnimateView {
         });
 
         // 挿入ポジションを特定
-        int pos = visitsInWork.indexOf(visit);
-        visitCellContainer.addView(generateVisitCell(visit, 0), pos);
 
+        for ( int i = 0 ; i < visitsInWork.size() ; i++ ) {
+            if (visitsInWork.get(i).equals(visit)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private boolean isVisitCellInProperPosition(Visit visit) {
+
+        int propPos = getProperPositionOfVisit(visit);
+
+        for (int i = 0 ; i < visitCellContainer.getChildCount() ; i++ ) {
+
+            VisitCell visitCell1 = (VisitCell) visitCellContainer.getChildAt(i);
+            if (visitCell1.getVisit().equals(visit)) {
+                if (propPos == i) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     *
+     * @param visit
+     * @return If removed visit cell
+     */
+    public boolean removeVisitCellIfNotInProperPosition(Visit visit) {
+        if (isVisitCellInProperPosition(visit))
+            return false;
+        removeVisitCell(visit);
+        return true;
     }
 
     private VisitCell generateVisitCell(Visit visit, int initHeight) {
@@ -421,6 +460,11 @@ public class WorkView extends BaseAnimateView {
             }
         }
         return null;
+    }
+
+    public boolean hasVisitCell(Visit visit) {
+        VisitCell visitCell = getVisitCell(visit.getId());
+        return visitCell != null;
     }
 
     private void postChangeWorkTime() {

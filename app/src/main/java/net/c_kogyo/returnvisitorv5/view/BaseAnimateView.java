@@ -88,13 +88,14 @@ public abstract class BaseAnimateView extends FrameLayout {
                     @Override
                     public void run() {
                         // TODO: 2017/04/03 要検証
-                        if (extractHeight == LayoutParams.WRAP_CONTENT) {
-                            BaseAnimateView.this.measure(0, 0);
-                            int height2 = getMeasuredHeight();
-                            changeViewHeight(height2, true, null, listener);
-                        } else {
-                            changeViewHeight(extractHeight, true, null, listener);
-                        }
+//                        if (extractHeight == LayoutParams.WRAP_CONTENT) {
+//                            BaseAnimateView.this.measure(0, 0);
+//                            int height2 = getMeasuredHeight();
+//                            changeViewHeight(height2, true, null, listener);
+//                        } else {
+//                            changeViewHeight(extractHeight, true, null, listener);
+//                        }
+                        changeViewHeight(extractHeight, true, null, listener);
                     }
                 });
             }
