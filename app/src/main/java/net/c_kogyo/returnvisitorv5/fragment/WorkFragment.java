@@ -40,6 +40,8 @@ public class WorkFragment extends Fragment {
 
     public static WorkFragment newInstance(Calendar date, WorkFragmentListener workFragmentListener) {
 
+        // TODO: 2017/04/14 getItemで取得したとき初期化されない
+
         mWorkFragmentListener = workFragmentListener;
 
         WorkFragment workFragment = new WorkFragment();
@@ -529,14 +531,14 @@ public class WorkFragment extends Fragment {
         });
     }
 
-    private void removeWorkViews(ArrayList<Work> works) {
+    public void removeWorkViews(ArrayList<Work> works) {
 
         for (Work work : works) {
             removeWorkView(work);
         }
     }
 
-    private void removeVisitCells(ArrayList<Visit> visits) {
+    public void removeVisitCells(ArrayList<Visit> visits) {
 
         for (Visit visit : visits) {
             removeVisitCell(visit);

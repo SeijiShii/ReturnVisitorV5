@@ -31,14 +31,17 @@ public class AddWorkDialog extends FrameLayout {
     private AddWorkDialogListener mListener;
     private boolean mIsDateChangeable;
     private Work mWork;
+    private Calendar mDate;
 
     public AddWorkDialog(@NonNull Context context,
                          AddWorkDialogListener listener,
-                         boolean isDateChangeable) {
+                         boolean isDateChangeable,
+                         Calendar date) {
         super(context);
 
         mListener = listener;
         mIsDateChangeable = isDateChangeable;
+        mDate = (Calendar) date.clone();
 
         initCommon();
     }
@@ -51,6 +54,7 @@ public class AddWorkDialog extends FrameLayout {
     private void initCommon() {
 
         mWork = new Work(Calendar.getInstance());
+        mWork.setDate(mDate);
 
         view = LayoutInflater.from(getContext()).inflate(R.layout.add_work_dialog, this);
         initDateText();
@@ -118,18 +122,17 @@ public class AddWorkDialog extends FrameLayout {
             @Override
             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
 
-                Calendar setTime = Calendar.getInstance();
-                setTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                setTime.set(Calendar.MINUTE, minute);
-
-                if (setTime.after(mWork.getEnd())) {
-                    return;
-                }
-
                 mWork.getStart().set(Calendar.HOUR_OF_DAY, hourOfDay);
                 mWork.getStart().set(Calendar.MINUTE, minute);
-
                 startTimeText.setText(DateTimeText.getTimeText(mWork.getStart()));
+
+                if (mWork.getStart().after(mWork.getEnd())) {
+                    mWork.getEnd().set(Calendar.HOUR_OF_DAY, hourOfDay);
+                    mWork.getEnd().set(Calendar.MINUTE, minute);
+                    mWork.getEnd().add(Calendar.MINUTE, 1);
+                    endTimeText.setText(DateTimeText.getTimeText(mWork.getEnd()));
+                }
+
                 refreshDurationText();
             }
         },
@@ -155,18 +158,16 @@ public class AddWorkDialog extends FrameLayout {
             @Override
             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
 
-                Calendar setTime = Calendar.getInstance();
-                setTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                setTime.set(Calendar.MINUTE, minute);
-
-                if (setTime.before(mWork.getStart())) {
-                    return;
-                }
-
                 mWork.getEnd().set(Calendar.HOUR_OF_DAY, hourOfDay);
                 mWork.getEnd().set(Calendar.MINUTE, minute);
-
                 endTimeText.setText(DateTimeText.getTimeText(mWork.getEnd()));
+
+                if (mWork.getEnd().before(mWork.getStart())) {
+                    mWork.getStart().set(Calendar.HOUR_OF_DAY, hourOfDay);
+                    mWork.getStart().set(Calendar.MINUTE, minute);
+                    mWork.getStart().add(Calendar.MINUTE, -1);
+                    startTimeText.setText(DateTimeText.getTimeText(mWork.getStart()));
+                }
                 refreshDurationText();
             }
         },

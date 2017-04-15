@@ -126,4 +126,14 @@ public class Work extends TimePeriodItem {
         }
         return duration;
     }
+
+    public void setDate(Calendar date) {
+        this.start.set(Calendar.YEAR, date.get(Calendar.YEAR));
+        this.start.set(Calendar.MONTH, date.get(Calendar.MONTH));
+        this.start.set(Calendar.DAY_OF_MONTH, date.get(Calendar.DAY_OF_MONTH));
+
+        this.end.set(Calendar.YEAR, date.get(Calendar.YEAR));
+        this.end.set(Calendar.MONTH, date.get(Calendar.MONTH));
+        this.end.set(Calendar.DAY_OF_MONTH, date.get(Calendar.DAY_OF_MONTH));
+    }
 }
