@@ -4,6 +4,7 @@ import android.support.annotation.Nullable;
 
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
+import net.c_kogyo.returnvisitorv5.data.VisitDetail;
 import net.c_kogyo.returnvisitorv5.data.Work;
 import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
 
@@ -45,6 +46,16 @@ public class VisitList extends DataList<Visit> {
             }
         }
         return visit;
+    }
+
+    private ArrayList<Visit> getVisitsInMonth(Calendar month) {
+        ArrayList<Visit> visitsInMonth = new ArrayList<>();
+        for (Visit visit : getList()) {
+            if (CalendarUtil.isSameMonth(month, visit.getDatetime())) {
+                visitsInMonth.add(visit);
+            }
+        }
+        return visitsInMonth;
     }
 
     public ArrayList<Visit> getVisitsInDay(Calendar date) {
@@ -111,6 +122,14 @@ public class VisitList extends DataList<Visit> {
         }
         dates.removeAll(datesToRemove);
         return dates;
+    }
+
+    public ArrayList<VisitDetail> getBSVisitDetailsInMonth(Calendar month) {
+        ArrayList<VisitDetail> bsVisitDetails = new ArrayList<>();
+        for (Visit visit : getVisitsInMonth(month)) {
+            bsVisitDetails.addAll(visit.getBSVisitDetails());
+        }
+        return bsVisitDetails;
     }
 
 

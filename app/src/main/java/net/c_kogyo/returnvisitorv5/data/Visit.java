@@ -309,4 +309,18 @@ public class Visit extends DataItem implements Cloneable{
         }
         return count;
     }
+
+    public ArrayList<VisitDetail> getBSVisitDetails() {
+        ArrayList<VisitDetail> bsVisitDetails = new ArrayList<>();
+        for (VisitDetail visitDetail : visitDetails) {
+            if (visitDetail.isStudy()) {
+                bsVisitDetails.add(visitDetail);
+            }
+        }
+        return bsVisitDetails;
+    }
+
+    public int getBSCount() {
+        return getBSVisitDetails().size();
+    }
 }
