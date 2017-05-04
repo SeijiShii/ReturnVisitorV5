@@ -283,6 +283,13 @@ public class WorkPagerActivity extends AppCompatActivity {
                     }
                 });
         dialogFrame.addView(dayAggregationDialog);
+        dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                fadeDialogOverlay(false, null);
+                return true;
+            }
+        });
         fadeDialogOverlay(true, null);
     }
 
@@ -379,6 +386,7 @@ public class WorkPagerActivity extends AppCompatActivity {
                 public void onAnimationEnd(Animator animator) {
                     dialogOverlay.setVisibility(View.INVISIBLE);
                     dialogFrame.removeAllViews();
+                    dialogOverlay.setOnTouchListener(null);
                     if (listener == null) return;
                     listener.onFinishAnimation();
                 }
