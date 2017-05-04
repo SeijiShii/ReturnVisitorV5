@@ -30,7 +30,7 @@ import java.util.Calendar;
 
 public class WorkFragment extends Fragment {
 
-    // TODO: 2017/04/05 時間調整後のアニメーション
+    // DONE: 2017/04/05 時間調整後のアニメーション
 
     private Calendar mDate;
     private ArrayList<Work> worksInDay;
@@ -40,7 +40,7 @@ public class WorkFragment extends Fragment {
 
     public static WorkFragment newInstance(Calendar date, WorkFragmentListener workFragmentListener) {
 
-        // TODO: 2017/04/14 getItemで取得したとき初期化されない
+        // DONE: 2017/04/14 getItemで取得したとき初期化されない pagerAdapter.instantiate()が正しい
 
         mWorkFragmentListener = workFragmentListener;
 
@@ -219,12 +219,12 @@ public class WorkFragment extends Fragment {
 
                     @Override
                     public void onChangeTime(Work work, ArrayList<Visit> visitsAdded, ArrayList<Visit> visitsRemoved) {
-                        // TODO: 2017/04/09 Adjust works action
+                        // DONE: 2017/04/09 Adjust works action
                         RVData.getInstance().workList.setOrAdd(work);
                         ArrayList<Work> worksRemoved = RVData.getInstance().workList.onChangeTime(work);
                         removeWorkViews(worksRemoved);
                         RVData.getInstance().workList.removeList(worksRemoved);
-                        // TODO: 2017/04/08 Add or Remove visitCells action
+                        // DONE: 2017/04/08 Add or Remove visitCells action
                         removeVisitCells(visitsAdded);
                         addVisitCells(visitsRemoved);
 
@@ -354,7 +354,7 @@ public class WorkFragment extends Fragment {
                 Visit visit = getVisit(visitId);
                 if (visit == null) return;
 
-                removeVisitCell(visit);
+                removeVisitCell(visit, null);
 //                visitsInDayNotInWork.remove(visit);
 
             } else if (resultCode == Constants.RecordVisitActions.VISIT_EDITED_RESULT_CODE) {
@@ -448,23 +448,31 @@ public class WorkFragment extends Fragment {
         return null;
     }
 
-    private void moveVisitCellIfNeeded(Visit visit) {
+    private void moveVisitCellIfNeeded(final Visit visit) {
         // まずそのVisitCellがどこにあるかを特定する
         WorkView workView = getWorkViewOfVisit(visit);
         if (workView != null) {
             // そのworkViewにそのvisitのセルが現在含まれている
-            if (workView.removeVisitCellIfNotInProperPosition(visit)) {
-                insertVisitCellAndExtract(visit);
-            }
+            if (workView.removeVisitCellIfNotInProperPosition(visit,
+                    new WorkView.PostRemoveVisitCellListener() {
+                        @Override
+                        public void postRemoveVisitCell() {
+                            insertVisitCellAndExtract(visit);
+                        }
+            })) ;
         } else {
             // visitCellは現在workViewには含まれていない。
             VisitCell visitCell = getVisitCell(visit.getId(), false);
             if (visitCell != null) {
                 if (isVisitCellInProperPosition(visitCell))
                     return;
-                removeVisitCell(visit);
+                removeVisitCell(visit, new PostRemoveVisitCellListener() {
+                    @Override
+                    public void postRemoveVisitCell() {
+                        insertVisitCellAndExtract(visit);
+                    }
+                });
             }
-            insertVisitCellAndExtract(visit);
         }
     }
 
@@ -548,7 +556,7 @@ public class WorkFragment extends Fragment {
     }
 
     private void moveVisitCellsInRemoveWorkView(Work work) {
-        // TODO: 2017/04/15  削除したWork内のVisitを付け替える
+        // DONE: 2017/04/15  削除したWork内のVisitを付け替える
 
         addVisitCells(RVData.getInstance().visitList.getVisitsInWork(work));
     }
@@ -563,11 +571,11 @@ public class WorkFragment extends Fragment {
     public void removeVisitCells(ArrayList<Visit> visits) {
 
         for (Visit visit : visits) {
-            removeVisitCell(visit);
+            removeVisitCell(visit, null);
         }
     }
 
-    private void removeVisitCell(Visit visit) {
+    private void removeVisitCell(Visit visit, final PostRemoveVisitCellListener postRemoveVisitCellListener) {
 
         final VisitCell visitCell = getVisitCell(visit.getId(), false);
 
@@ -585,6 +593,9 @@ public class WorkFragment extends Fragment {
                 LinearLayout linearLayout = (LinearLayout) parent;
                 linearLayout.removeView(visitCell);
                 verifyItemRemains();
+                if (postRemoveVisitCellListener != null) {
+                    postRemoveVisitCellListener.postRemoveVisitCell();
+                }
             }
 
             @Override
@@ -623,6 +634,10 @@ public class WorkFragment extends Fragment {
         void onAllItemRemoved(Calendar date);
 
         void moveToMap(Visit visit);
+    }
+
+    public interface PostRemoveVisitCellListener{
+        void postRemoveVisitCell();
     }
 
 }

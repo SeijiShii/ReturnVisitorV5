@@ -22,7 +22,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
-import net.c_kogyo.returnvisitorv5.data.AggregationDay;
+import net.c_kogyo.returnvisitorv5.data.AggregationOfDay;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
@@ -192,7 +192,7 @@ public class WorkPagerActivity extends AppCompatActivity {
 
     private void refreshDateText() {
         DateFormat format = android.text.format.DateFormat.getDateFormat(this);
-        String dateString = format.format(mDatePagerAdapter.getDay(pager.getCurrentItem()).getDate().getTime());
+        String dateString = format.format(mDatePagerAdapter.getDayItem(pager.getCurrentItem()).getTime());
 
         dateText.setText(dateString);
     }
@@ -400,7 +400,7 @@ public class WorkPagerActivity extends AppCompatActivity {
             }
         },
                 false,
-                mDatePagerAdapter.getDay(pager.getCurrentItem()).getDate());
+                mDatePagerAdapter.getDayItem(pager.getCurrentItem()));
         dialogFrame.addView(addWorkDialog);
         fadeDialogOverlay(true ,null);
         dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
@@ -447,7 +447,7 @@ public class WorkPagerActivity extends AppCompatActivity {
 //                Intent calendarIntent = new Intent(WorkPagerActivity.this, CalendarActivity.class);
 //                calendarIntent.setAction(Constants.CalendarActions.START_CALENDAR_FROM_WORK_ACTION);
 //                calendarIntent.putExtra(Constants.DATE_LONG,
-//                        mDatePagerAdapter.getDay(pager.getCurrentItem()).getDate().getTimeInMillis());
+//                        mDatePagerAdapter.getDayItem(pager.getCurrentItem()).getDate().getTimeInMillis());
 //
 //                WorkPagerActivity.this.startActivityForResult(calendarIntent, Constants.CalendarActions.START_CALENDAR_REQUEST_CODE);
 
@@ -484,7 +484,7 @@ public class WorkPagerActivity extends AppCompatActivity {
 //            @Override
 //            public void onClick(View view) {
 //
-//                AddSelectDialog.newInstance(mDatePagerAdapter.getDay(pager.getCurrentItem()).getDate(),
+//                AddSelectDialog.newInstance(mDatePagerAdapter.getDayItem(pager.getCurrentItem()).getDate(),
 //                        new AddWorkDialog.OnWorkSetListener() {
 //                    @Override
 //                    public void onWorkSet(Work work) {
@@ -510,18 +510,17 @@ public class WorkPagerActivity extends AppCompatActivity {
 
     class DatePagerAdapter extends FragmentStatePagerAdapter {
 
-        private ArrayList<AggregationDay> mAggregationOfDays;
+//        private ArrayList<Calendar> mAggregatedDates;
 
         public DatePagerAdapter(FragmentManager fm) {
             super(fm);
 
-            setDays();
         }
 
         @Override
         public Fragment getItem(int position) {
 
-            return WorkFragment.newInstance(mAggregationOfDays.get(position).getDate(),
+            return WorkFragment.newInstance(RVData.getInstance().getDatesWithData().get(position),
                     new WorkFragment.WorkFragmentListener() {
 
                         @Override
@@ -539,16 +538,16 @@ public class WorkPagerActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return mAggregationOfDays.size();
+            return RVData.getInstance().getDatesWithData().size();
         }
 
         public int getPosition(Calendar date) {
 
-            for ( int i = 0 ; i < mAggregationOfDays.size() ; i++ ) {
+            for ( int i = 0 ; i < getCount() ; i++ ) {
 
-                AggregationDay day = mAggregationOfDays.get(i);
+                Calendar dateWithData = RVData.getInstance().getDatesWithData().get(i);
 
-                if (CalendarUtil.isSameDay(date, day.getDate())) {
+                if (CalendarUtil.isSameDay(date, dateWithData)) {
                     return i;
                 }
             }
@@ -556,33 +555,30 @@ public class WorkPagerActivity extends AppCompatActivity {
             return -1;
         }
 
-        private void setDays() {
-
-            mAggregationOfDays = RVData.getInstance().getAggregatedDays();
-        }
-
-        public AggregationDay getDay(int pos) {
-            return mAggregationOfDays.get(pos);
+        public Calendar getDayItem(int pos) {
+            return RVData.getInstance().getDatesWithData().get(pos);
         }
 
 
         public int getPositionForAddedWork(Work work) {
 
+            notifyDataSetChanged();
+
             // Workが追加された時点ですでにmDatesにある日付かどうか
             int datePos = getPosition(work.getStart());
 
-            if (datePos >= 0) {
-                // 日付がすでにある
-
-            } else {
-                // 日付が存在しない(その日にはまだ何のデータもなかった)
-                // この日には削除されるWorkも存在しない
-                setDays();
-
-                // 気を取り直して…
-                datePos = getPosition(work.getStart());
-                notifyDataSetChanged();
-            }
+//            if (datePos >= 0) {
+//                // 日付がすでにある
+//
+//            } else {
+//                // 日付が存在しない(その日にはまだ何のデータもなかった)
+//                // この日には削除されるWorkも存在しない
+//                setDays();
+//
+//                // 気を取り直して…
+//                datePos = getPosition(work.getStart());
+//                notifyDataSetChanged();
+//            }
 
             return datePos;
         }
@@ -616,12 +612,12 @@ public class WorkPagerActivity extends AppCompatActivity {
 
         private void removeDay(Calendar date) {
 
-            for (AggregationDay day : mAggregationOfDays) {
-                if (CalendarUtil.isSameDay(date, day.getDate())){
-                    mAggregationOfDays.remove(day);
-                    break;
-                }
-            }
+//            for (AggregationOfDay day : mAggregationOfDays) {
+//                if (CalendarUtil.isSameDay(date, day.getDate())){
+//                    mAggregationOfDays.remove(day);
+//                    break;
+//                }
+//            }
             notifyDataSetChanged();
             pager.setCurrentItem(getClosestPosition(date), true);
             refreshButtons();

@@ -2,7 +2,6 @@ package net.c_kogyo.returnvisitorv5.data;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.support.annotation.Nullable;
 
 import net.c_kogyo.returnvisitorv5.data.list.DataList;
@@ -303,18 +302,7 @@ public class RVData {
         }
     }
 
-    public ArrayList<AggregationDay> getAggregatedDays() {
-
-        ArrayList<AggregationDay> aggregationOfDays = new ArrayList<>();
-
-        for (Calendar date : getDatesWithData()) {
-
-            aggregationOfDays.add(new AggregationDay(date));
-        }
-        return aggregationOfDays;
-    }
-
-    private ArrayList<Calendar> getDatesWithData() {
+    public ArrayList<Calendar> getDatesWithData() {
 
         ArrayList<Calendar> datesOfVisit = visitList.getDates();
         ArrayList<Calendar> datesOfWork = workList.getDates();
