@@ -268,7 +268,7 @@ public class WorkPagerActivity extends AppCompatActivity {
     }
 
     private void onClickAggregationMenu() {
-        // TODO: 2017/04/02 Aggregation Action
+        // DONE: 2017/04/02 Aggregation Action
         showDayAggregationDialog();
     }
 
