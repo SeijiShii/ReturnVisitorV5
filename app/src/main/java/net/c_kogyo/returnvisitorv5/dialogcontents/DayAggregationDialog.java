@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -22,11 +23,13 @@ import java.util.Calendar;
 public class DayAggregationDialog extends FrameLayout {
 
     private Calendar mDate;
+    private DayAggregationDialogListener mListener;
 
-    public DayAggregationDialog(@NonNull Context context, Calendar date) {
+    public DayAggregationDialog(@NonNull Context context, Calendar date, DayAggregationDialogListener listener) {
         super(context);
 
         mDate = (Calendar) date.clone();
+        mListener = listener;
 
         initCommon();
     }
@@ -43,6 +46,8 @@ public class DayAggregationDialog extends FrameLayout {
         initTimeText();
         initRVCountText();
         initStudyCountText();
+
+        initCloseButton();
     }
 
     private void initPlacementCountText() {
@@ -73,5 +78,21 @@ public class DayAggregationDialog extends FrameLayout {
         TextView studyCountText = (TextView) view.findViewById(R.id.study_count_text);
         int studyCount = AggregationOfDay.bsVisitCount(mDate);
         studyCountText.setText(String.valueOf(studyCount));
+    }
+
+    private void initCloseButton() {
+        Button closeButton = (Button) view.findViewById(R.id.close_button);
+        closeButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mListener != null) {
+                    mListener.onClickCloseButton();
+                }
+            }
+        });
+    }
+
+    public interface DayAggregationDialogListener {
+        void onClickCloseButton();
     }
 }

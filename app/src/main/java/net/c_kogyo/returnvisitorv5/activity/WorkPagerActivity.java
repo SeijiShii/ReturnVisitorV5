@@ -274,7 +274,14 @@ public class WorkPagerActivity extends AppCompatActivity {
 
     private void showDayAggregationDialog() {
         DayAggregationDialog dayAggregationDialog
-                = new DayAggregationDialog(this, mDatePagerAdapter.getDayItem(mPager.getCurrentItem()));
+                = new DayAggregationDialog(this,
+                mDatePagerAdapter.getDayItem(mPager.getCurrentItem()),
+                new DayAggregationDialog.DayAggregationDialogListener() {
+                    @Override
+                    public void onClickCloseButton() {
+                        fadeDialogOverlay(false, null);
+                    }
+                });
         dialogFrame.addView(dayAggregationDialog);
         fadeDialogOverlay(true, null);
     }
