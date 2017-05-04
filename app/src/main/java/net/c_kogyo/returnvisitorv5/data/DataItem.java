@@ -28,7 +28,7 @@ public class DataItem implements Cloneable{
     protected Calendar updatedAt;
 
     protected String idHeader;
-    // TODO: 2017/04/16 要不要要検証 
+    // TODO: 2017/04/16 要不要要検証
     protected boolean isDeleted;
 
     public DataItem(){}
