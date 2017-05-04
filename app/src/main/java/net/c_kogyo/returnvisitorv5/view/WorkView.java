@@ -44,7 +44,6 @@ public class WorkView extends BaseAnimateView {
     private Context mContext;
     private Work mWork;
     private WorkViewListener mListener;
-    private ArrayList<Visit> visitsInWork;
     private LocalBroadcastManager broadcastManager;
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
@@ -293,9 +292,7 @@ public class WorkView extends BaseAnimateView {
 
         visitCellContainer = (LinearLayout) getViewById(R.id.visit_cell_container);
 
-        visitsInWork = RVData.getInstance().visitList.getVisitsInWork(mWork);
-
-        for (Visit visit : visitsInWork) {
+        for (Visit visit : RVData.getInstance().visitList.getVisitsInWork(mWork)) {
             visitCellContainer.addView(generateVisitCell(visit, visitCellInitHeight));
         }
     }
@@ -303,12 +300,16 @@ public class WorkView extends BaseAnimateView {
     public void insertVisitCellToProperPosition(Visit visit) {
 
         // 挿入ポジションを特定
+        // TODO: 2017/04/15 挿入ポジションが微妙に残念な件
         int pos = getProperPositionOfVisit(visit);
         visitCellContainer.addView(generateVisitCell(visit, 0), pos);
 
     }
 
     private int getProperPositionOfVisit(Visit visit) {
+
+        ArrayList<Visit> visitsInWork = RVData.getInstance().visitList.getVisitsInWork(mWork);
+
         Collections.sort(visitsInWork, new Comparator<Visit>() {
             @Override
             public int compare(Visit o1, Visit o2) {
@@ -348,10 +349,10 @@ public class WorkView extends BaseAnimateView {
      * @param visit
      * @return If removed visit cell
      */
-    public boolean removeVisitCellIfNotInProperPosition(Visit visit) {
+    public boolean removeVisitCellIfNotInProperPosition(Visit visit, PostRemoveVisitCellListener postRemoveVisitCellListener) {
         if (isVisitCellInProperPosition(visit))
             return false;
-        removeVisitCell(visit);
+        removeVisitCell(visit, postRemoveVisitCellListener);
         return true;
     }
 
@@ -419,7 +420,7 @@ public class WorkView extends BaseAnimateView {
         return mWork;
     }
 
-    private void removeVisitCell(Visit visit) {
+    private void removeVisitCell(Visit visit, final PostRemoveVisitCellListener postRemoveVisitCellListener) {
 
         final VisitCell visitCell = getVisitCell(visit.getId());
         if (visitCell == null) return;
@@ -433,6 +434,9 @@ public class WorkView extends BaseAnimateView {
             @Override
             public void onAnimationEnd(Animator animation) {
                 visitCellContainer.removeView(visitCell);
+                if (postRemoveVisitCellListener != null) {
+                    postRemoveVisitCellListener.postRemoveVisitCell();
+                }
             }
 
             @Override
@@ -469,21 +473,22 @@ public class WorkView extends BaseAnimateView {
 
     private void postChangeWorkTime() {
 
-        ArrayList<Visit> oldVisits = new ArrayList<>(visitsInWork);
-        visitsInWork = RVData.getInstance().visitList.getVisitsInWork(mWork);
+        ArrayList<Visit> renewedVisits = RVData.getInstance().visitList.getVisitsInWork(mWork);
 
-        ArrayList<Visit> visitsAdded = new ArrayList<>(visitsInWork);
+        ArrayList<Visit> oldVisits = getVisitsInContainer();
+
+        ArrayList<Visit> visitsAdded = new ArrayList<>(renewedVisits);
         visitsAdded.removeAll(oldVisits);
 
         ArrayList<Visit> visitsRemoved = new ArrayList<>(oldVisits);
-        visitsRemoved.removeAll(visitsInWork);
+        visitsRemoved.removeAll(renewedVisits);
 
         for (Visit visit : visitsAdded) {
             insertVisitCellToProperPosition(visit);
         }
 
         for (Visit visit : visitsRemoved) {
-            removeVisitCell(visit);
+            removeVisitCell(visit, null);
         }
 
         if (mListener != null) {
@@ -491,9 +496,18 @@ public class WorkView extends BaseAnimateView {
         }
     }
 
-    public void toTheHeight() {
-
+    private ArrayList<Visit> getVisitsInContainer() {
+        ArrayList<Visit> visits = new ArrayList<>();
+        for (int i = 0 ; i < visitCellContainer.getChildCount() ; i++) {
+            View view = visitCellContainer.getChildAt(i);
+            if (view instanceof  VisitCell) {
+                VisitCell visitCell = (VisitCell) view;
+                visits.add(visitCell.getVisit());
+            }
+        }
+        return visits;
     }
+
 
     public void compress(Animator.AnimatorListener listener) {
         this.changeViewHeight(0, true, null, listener);
@@ -508,6 +522,10 @@ public class WorkView extends BaseAnimateView {
         void onClickEditVisit(Visit visit);
 
         void onClickToMap(Visit visit);
+    }
+
+    public interface PostRemoveVisitCellListener {
+        void postRemoveVisitCell();
     }
 
 
