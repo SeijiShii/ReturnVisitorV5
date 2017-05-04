@@ -176,6 +176,11 @@ public class Visit extends DataItem implements Cloneable{
                 count++;
             }
         }
+
+        for (VisitDetail visitDetail : visitDetails) {
+            count += visitDetail.getPlacementCount();
+        }
+
         return count;
     }
 
@@ -187,6 +192,11 @@ public class Visit extends DataItem implements Cloneable{
                 count++;
             }
         }
+
+        for (VisitDetail visitDetail : visitDetails) {
+            count += visitDetail.getShowVideoCount();
+        }
+
         return count;
     }
 

@@ -270,4 +270,27 @@ public class VisitDetail extends DataItem  implements Cloneable{
 
         return clonedDetail;
     }
+
+    public int getPlacementCount() {
+
+        int count = 0;
+        for (Placement plc : placements) {
+            if (plc.getCategory() != Placement.Category.SHOW_VIDEO
+                    && plc.getCategory() != Placement.Category.OTHER) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public int getShowVideoCount() {
+
+        int count = 0;
+        for (Placement plc : placements) {
+            if (plc.getCategory() == Placement.Category.SHOW_VIDEO) {
+                count++;
+            }
+        }
+        return count;
+    }
 }
