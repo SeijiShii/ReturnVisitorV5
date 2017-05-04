@@ -232,7 +232,7 @@ public abstract class VisitCell extends BaseAnimateView {
     public void refreshVisit(Visit visit) {
         mVisit = visit;
 
-        marker.setBackgroundResource(Constants.markerRes[mVisit.getPriority().num()]);
+        marker.setBackgroundResource(Constants.buttonRes[mVisit.getPriority().num()]);
         headerText.setText(DateTimeText.getDateTimeText(mVisit.getDatetime(), getContext()));
         visitDataText.setText(mVisit.toStringWithLineBreak(getContext()));
 
