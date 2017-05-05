@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import net.c_kogyo.returnvisitorv5.activity.CalendarPagerActivity;
 import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
 
 import java.util.Calendar;
@@ -17,15 +18,12 @@ import java.util.Calendar;
 
 public class CalendarRow extends LinearLayout {
 
-    public enum StartDay {
-        SUNDAY,
-        MONDAY
-    }
+
 
     private Calendar mDateCounter, mFirstDay;
-    StartDay mStartDay;
+    CalendarPagerActivity.StartDay mStartDay;
 
-    public CalendarRow(Context context, Calendar firstDay, StartDay startDay) {
+    public CalendarRow(Context context, Calendar firstDay, CalendarPagerActivity.StartDay startDay) {
         super(context);
 
         mFirstDay = (Calendar) firstDay.clone();
@@ -51,12 +49,10 @@ public class CalendarRow extends LinearLayout {
 
         int weekStart = 0;
         int weekEnd = 0;
-        if (mStartDay == StartDay.SUNDAY) {
+        if (mStartDay == CalendarPagerActivity.StartDay.SUNDAY) {
             weekStart = 1;
             weekEnd = 7;
-
-        } else if (mStartDay == StartDay.MONDAY) {
-
+        } else if (mStartDay == CalendarPagerActivity.StartDay.MONDAY) {
             weekStart = 2;
             weekEnd = 8;
         }
