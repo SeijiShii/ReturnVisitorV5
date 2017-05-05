@@ -58,7 +58,11 @@ public class Constants {
             R.mipmap.square_marker_orange
     };
 
-    public static final String DATE_LONG = "date_data";
+    public static final String DATE_LONG = "date_long";
+
+    public static final String MONTH_LONG = "month_long";
+    public static final String START_DAY = "start_day";
+    public static final String CALENDAR_FRAGMENT_ARGUMENT = "calendar_fragment_argument";
 
     public static final String REQUEST_CODE = "Request Code";
 

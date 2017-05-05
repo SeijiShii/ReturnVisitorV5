@@ -330,6 +330,30 @@ public class RVData {
         return new ArrayList<>(datesOfVisit);
     }
 
+    public ArrayList<Calendar> getMonthsWithData() {
+
+        ArrayList<Calendar> monthWithData = new ArrayList<>();
+        ArrayList<Calendar> datesWithData = getDatesWithData();
+
+        if (datesWithData.size() <= 0)
+            return monthWithData;
+
+        monthWithData.add(datesWithData.get(0));
+
+        int dateIndex = 0;
+        int monthIndex = 0;
+
+        while (dateIndex < datesWithData.size() - 1) {
+            dateIndex++;
+            if (!CalendarUtil.isSameMonth(datesWithData.get(dateIndex), monthWithData.get(monthIndex))) {
+                monthWithData.add(datesWithData.get(dateIndex));
+                monthIndex++;
+            }
+        }
+
+        return monthWithData;
+    }
+
     public interface RVDataStoreCallback{
 
         void onDataSaved();

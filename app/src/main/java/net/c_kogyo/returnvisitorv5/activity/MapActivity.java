@@ -1121,6 +1121,8 @@ public class MapActivity extends AppCompatActivity
 
     private void onClickCalendarButton() {
         // TODO: 2017/05/05 CalendarActivity遷移
+        Intent calendarIntent = new Intent(this, CalendarPagerActivity.class);
+        startActivity(calendarIntent);
     }
 
     // DONE: 2017/04/01 集合住宅のマークがでかすぎる
