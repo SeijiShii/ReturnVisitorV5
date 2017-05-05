@@ -58,9 +58,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="2dp"
+            android:paddingTop="0dp"
+            android:paddingBottom="0dp"
             android:textSize="15sp"
             android:textColor="@color/textColorGray"
-            android:background="#FFF"
+            android:background="#8FFF"
             android:id="@+id/date_number_text" />
 
     </RelativeLayout>

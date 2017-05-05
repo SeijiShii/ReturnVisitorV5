@@ -105,7 +105,7 @@ public class CalendarCell extends FrameLayout {
 
         View bar = new View(getContext());
         float density = getContext().getResources().getDisplayMetrics().density;
-        int barWidth = (int) (density * 30);
+        int barWidth = (int) (density * 20);
         int barHeight = (int) (density * 4);
         int margin = (int) (density * 2);
         LinearLayout.LayoutParams params
