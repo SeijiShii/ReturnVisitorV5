@@ -18,4 +18,10 @@
     <color name="orangeFog">#80ECA400</color>
     <color name="redFog">#80bc0000</color>
 
+    <color name="placement_blue">#27476E</color>
+    <color name="video_green">#3cad3a</color>
+    <color name="rv_pink">#ff638a</color>
+    <color name="study_purple">#e246c1</color>
+    <color name="time_orange">#eca400</color>
+
 </resources>
