@@ -68,6 +68,8 @@ public class CalendarFragment extends Fragment {
             Long mLong =  intent.getLongExtra(Constants.MONTH_LONG, 0);
             if (mLong != 0) {
                 mMonth.setTimeInMillis(mLong);
+                mMonth.set(Calendar.DAY_OF_MONTH, 1);
+
                 mWeekCounter = (Calendar) mMonth.clone();
             }
 
