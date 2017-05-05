@@ -48,8 +48,12 @@ import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.dialogcontents.HousingComplexDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.MapLongClickDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.PlaceDialog;
+import net.c_kogyo.returnvisitorv5.fragment.CalendarFragment;
 import net.c_kogyo.returnvisitorv5.service.TimeCountService;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
+import net.c_kogyo.returnvisitorv5.util.ViewUtil;
+import net.c_kogyo.returnvisitorv5.view.CalendarCell;
+import net.c_kogyo.returnvisitorv5.view.CalendarRow;
 import net.c_kogyo.returnvisitorv5.view.CountTimeFrame;
 import net.c_kogyo.returnvisitorv5.view.SmallTagView;
 
@@ -95,8 +99,6 @@ public class MapActivity extends AppCompatActivity
         initMapView(savedInstanceState);
         initDialogOverlay();
         initDrawerOverlay();
-
-//        testView();
 
     }
 
@@ -202,6 +204,7 @@ public class MapActivity extends AppCompatActivity
 
                         // DONE: 2017/03/01 ここにマーカー描画処理を記述する
                         placeMarkers = new PlaceMarkers();
+
                     }
                 });
                 
@@ -593,26 +596,13 @@ public class MapActivity extends AppCompatActivity
 
     private void initLogoButton() {
         final ImageView logoButton = (ImageView) findViewById(R.id.logo_button);
-        logoButton.setOnTouchListener(new View.OnTouchListener() {
+        ViewUtil.setOnClickListener(logoButton, new ViewUtil.OnViewClickListener() {
             @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-
-                switch (motionEvent.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        logoButton.setAlpha(0.5f);
-                        return true;
-                    case MotionEvent.ACTION_UP:
-                        logoButton.setAlpha(1f);
-                        openCloseDrawer();
-                        return true;
-                    case MotionEvent.ACTION_CANCEL:
-                        logoButton.setAlpha(1f);
-                        return true;
-                }
-
-                return false;
+            public void onViewClick() {
+                openCloseDrawer();
             }
         });
+
     }
 
     private void showPlaceDialog(Place place) {
@@ -877,12 +867,6 @@ public class MapActivity extends AppCompatActivity
         placeMarkers.addMarker(place);
     }
 
-    private void testView() {
-        SmallTagView smallTagView = new SmallTagView(this, new Tag("hogehoge"));
-        Log.d("", "SmallTagViewWidth: " + smallTagView.getViewWidth());
-//        dialogFrame.addView(smallTagView);
-    }
-
     // DONE: 2017/03/27 HousingComplexMarkerRes
     // PENDING: 2017/03/27 Mapを回転させる
     // DONE: 2017/03/27 ドロワー
@@ -938,6 +922,7 @@ public class MapActivity extends AppCompatActivity
 
         initCountTimeFrame();
         initWorkButton();
+        initCalendarButton();
     }
 
     private void initDrawerLogoButton() {
@@ -1123,5 +1108,35 @@ public class MapActivity extends AppCompatActivity
         startActivity(workIntent);
     }
 
+    private void initCalendarButton() {
+        Button calendarButton = (Button) findViewById(R.id.calendar_button);
+        calendarButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onClickCalendarButton();
+                openCloseDrawer();
+            }
+        });
+    }
+
+    private void onClickCalendarButton() {
+        // TODO: 2017/05/05 CalendarActivity遷移
+    }
+
     // DONE: 2017/04/01 集合住宅のマークがでかすぎる
+
+//    private void testCalendarRow() {
+//
+//        Calendar date = Calendar.getInstance();
+//        date.set(Calendar.DAY_OF_MONTH, 1);
+//
+//        CalendarRow row = new CalendarRow(this, date, CalendarRow.StartDay.SUNDAY);
+//
+//        dialogFrame.addView(row);
+//        dialogFrame.getLayoutParams().height = 80;
+//        fadeInDialogOverlay();
+//
+//
+//    }
+
 }
