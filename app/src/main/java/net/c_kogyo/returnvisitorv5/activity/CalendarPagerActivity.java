@@ -1,5 +1,6 @@
 package net.c_kogyo.returnvisitorv5.activity;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,12 +13,15 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.fragment.CalendarFragment;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
+import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 
 import java.util.Calendar;
 
@@ -40,6 +44,8 @@ public class CalendarPagerActivity extends AppCompatActivity {
         initPager();
 
         initMonthTextView();
+        initLeftButton();
+        initRightButton();
     }
 
     private ViewPager mPager;
@@ -51,12 +57,14 @@ public class CalendarPagerActivity extends AppCompatActivity {
         mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                refreshMonthText();
+
             }
 
             @Override
             public void onPageSelected(int position) {
-
+                refreshMonthText();
+                refreshLeftButton();
+                refreshRightButton();
             }
 
             @Override
@@ -80,7 +88,84 @@ public class CalendarPagerActivity extends AppCompatActivity {
         monthTextView.setText(monthText);
     }
 
-    class CalendarPagerAdapter extends FragmentStatePagerAdapter {
+    private ImageView leftButton;
+    private void initLeftButton() {
+        leftButton = (ImageView) findViewById(R.id.left_button);
+        refreshLeftButton();
+    }
+
+    private void refreshLeftButton() {
+
+        float originAlpha, targetAlpha;
+
+        if (mPager.getCurrentItem() == 0) {
+            originAlpha = 1f;
+            targetAlpha = 0f;
+            ViewUtil.setOnClickListener(leftButton, null);
+        } else {
+            originAlpha = 0f;
+            targetAlpha = 1f;
+            ViewUtil.setOnClickListener(leftButton, new ViewUtil.OnViewClickListener() {
+                @Override
+                public void onViewClick() {
+                    mPager.setCurrentItem(mPager.getCurrentItem() - 1, true);
+                    refreshLeftButton();
+                    refreshRightButton();
+                }
+            });
+        }
+
+        ValueAnimator animator = ValueAnimator.ofFloat(originAlpha, targetAlpha);
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                leftButton.setAlpha((float) animation.getAnimatedValue());
+            }
+        });
+        animator.setDuration(300);
+        animator.start();
+
+    }
+
+    private ImageView rightButton;
+    private void initRightButton() {
+        rightButton = (ImageView) findViewById(R.id.right_button);
+        refreshRightButton();
+    }
+
+    private void refreshRightButton() {
+
+        float originAlpha, targetAlpha;
+
+        if (mPager.getCurrentItem() >= mAdapter.getCount() - 1) {
+            originAlpha = 1f;
+            targetAlpha = 0f;
+            ViewUtil.setOnClickListener(rightButton, null);
+        } else {
+            originAlpha = 0f;
+            targetAlpha = 1f;
+            ViewUtil.setOnClickListener(rightButton, new ViewUtil.OnViewClickListener() {
+                @Override
+                public void onViewClick() {
+                    mPager.setCurrentItem(mPager.getCurrentItem() + 1, true);
+                    refreshLeftButton();
+                    refreshRightButton();
+                }
+            });
+        }
+
+        ValueAnimator animator = ValueAnimator.ofFloat(originAlpha, targetAlpha);
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                rightButton.setAlpha((float) animation.getAnimatedValue());
+            }
+        });
+        animator.setDuration(300);
+        animator.start();
+    }
+
+    private class CalendarPagerAdapter extends FragmentStatePagerAdapter {
 
         public CalendarPagerAdapter(FragmentManager fm) {
             super(fm);
