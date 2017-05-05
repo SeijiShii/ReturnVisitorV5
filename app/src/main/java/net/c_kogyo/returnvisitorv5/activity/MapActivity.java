@@ -1127,18 +1127,7 @@ public class MapActivity extends AppCompatActivity
 
     // DONE: 2017/04/01 集合住宅のマークがでかすぎる
 
-//    private void testCalendarRow() {
-//
-//        Calendar date = Calendar.getInstance();
-//        date.set(Calendar.DAY_OF_MONTH, 1);
-//
-//        CalendarRow row = new CalendarRow(this, date, CalendarRow.StartDay.SUNDAY);
-//
-//        dialogFrame.addView(row);
-//        dialogFrame.getLayoutParams().height = 80;
-//        fadeInDialogOverlay();
-//
-//
-//    }
+    // TODO: 2017/05/05 データ読み込みまでボタンを押せなくする
+    // TODO: 2017/05/05 データがないときにWORKやカレンダーに遷移しないようにする
 
 }
