@@ -12,10 +12,14 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.fragment.CalendarFragment;
+import net.c_kogyo.returnvisitorv5.util.DateTimeText;
+
+import java.util.Calendar;
 
 /**
  * Created by SeijiShii on 2017/05/04.
@@ -34,6 +38,8 @@ public class CalendarPagerActivity extends AppCompatActivity {
         setContentView(R.layout.calendar_pager_activity);
 
         initPager();
+
+        initMonthTextView();
     }
 
     private ViewPager mPager;
@@ -42,6 +48,36 @@ public class CalendarPagerActivity extends AppCompatActivity {
         mPager = (ViewPager) findViewById(R.id.view_pager);
         mAdapter = new CalendarPagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mAdapter);
+        mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                refreshMonthText();
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+    }
+
+    private TextView monthTextView;
+    private void initMonthTextView() {
+
+        monthTextView = (TextView) findViewById(R.id.month_text);
+        refreshMonthText();
+    }
+
+    private void refreshMonthText() {
+
+        Calendar currentMonth = mAdapter.getMonth(mPager.getCurrentItem());
+        String monthText = DateTimeText.getMonthText(currentMonth);
+        monthTextView.setText(monthText);
     }
 
     class CalendarPagerAdapter extends FragmentStatePagerAdapter {
@@ -52,12 +88,16 @@ public class CalendarPagerActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
-            return CalendarFragment.newInstance(RVData.getInstance().getMonthsWithData().get(position), StartDay.MONDAY);
+            return CalendarFragment.newInstance(getMonth(position), StartDay.MONDAY);
         }
 
         @Override
         public int getCount() {
             return RVData.getInstance().getMonthsWithData().size();
+        }
+
+        private Calendar getMonth(int position) {
+            return RVData.getInstance().getMonthsWithData().get(position);
         }
     }
  }
