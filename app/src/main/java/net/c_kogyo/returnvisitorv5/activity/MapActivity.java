@@ -1120,7 +1120,7 @@ public class MapActivity extends AppCompatActivity
     }
 
     private void onClickCalendarButton() {
-        // TODO: 2017/05/05 CalendarActivity遷移
+        // DONE: 2017/05/05 CalendarActivity遷移
         Intent calendarIntent = new Intent(this, CalendarPagerActivity.class);
         startActivity(calendarIntent);
     }
