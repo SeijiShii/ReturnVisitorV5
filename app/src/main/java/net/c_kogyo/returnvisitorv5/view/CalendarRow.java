@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.activity.CalendarPagerActivity;
 import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
 
@@ -79,6 +80,7 @@ public class CalendarRow extends LinearLayout {
     private View generateBorder() {
         View border = new View(getContext());
         border.setLayoutParams(new ViewGroup.LayoutParams(1, ViewGroup.LayoutParams.MATCH_PARENT));
+        border.setBackgroundResource(R.color.textColorGray);
         return border;
     }
 
