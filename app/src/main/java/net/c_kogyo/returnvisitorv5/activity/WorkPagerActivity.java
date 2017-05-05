@@ -538,7 +538,6 @@ public class WorkPagerActivity extends AppCompatActivity {
 
         public DatePagerAdapter(FragmentManager fm) {
             super(fm);
-
         }
 
         @Override
