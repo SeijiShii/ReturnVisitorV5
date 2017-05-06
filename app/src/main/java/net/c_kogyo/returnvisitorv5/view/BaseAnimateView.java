@@ -53,7 +53,7 @@ public abstract class BaseAnimateView extends FrameLayout {
 
         view = LayoutInflater.from(getContext()).inflate(mResId, this);
 
-        multi = getContext().getResources().getDisplayMetrics().density / 3;
+        multi = getContext().getResources().getDisplayMetrics().density / 1.5f;
 
         setLayoutParams(this);
 
