@@ -597,12 +597,21 @@ public class MapActivity extends AppCompatActivity
     private ImageView logoButton;
     private void initLogoButton() {
         logoButton = (ImageView) findViewById(R.id.logo_button);
+        refreshLogoButton();
     }
 
+    // TODO: 2017/05/06 データ読み込み前は半透明に
     private void refreshLogoButton() {
+
+        float originAlpha, targetAlpha;
+
         if (!isDataLoaded) {
+            originAlpha = 1f;
+            targetAlpha = 0.5f;
             ViewUtil.setOnClickListener(logoButton, null);
         } else {
+            originAlpha = 0.5f;
+            targetAlpha = 1f;
             ViewUtil.setOnClickListener(logoButton, new ViewUtil.OnViewClickListener() {
                 @Override
                 public void onViewClick() {
@@ -610,6 +619,15 @@ public class MapActivity extends AppCompatActivity
                 }
             });
         }
+        ValueAnimator animator = ValueAnimator.ofFloat(originAlpha, targetAlpha);
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                logoButton.setAlpha((float) animation.getAnimatedValue());
+            }
+        });
+        animator.setDuration(300);
+        animator.start();
     }
 
     private void showPlaceDialog(Place place) {
