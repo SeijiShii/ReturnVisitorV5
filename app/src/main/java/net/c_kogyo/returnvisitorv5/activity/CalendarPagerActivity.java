@@ -18,6 +18,7 @@ import net.c_kogyo.returnvisitorv5.fragment.CalendarFragment;
 import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
+import net.c_kogyo.returnvisitorv5.view.CalendarCell;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -279,6 +280,13 @@ public class CalendarPagerActivity extends AppCompatActivity {
         mPager.setCurrentItem(pos, false);
     }
 
+    private void startWorkPagerActivity(Calendar date) {
+        Intent workActivityIntent = new Intent(this, WorkPagerActivity.class);
+        workActivityIntent.putExtra(Constants.DATE_LONG, date.getTimeInMillis());
+        startActivity(workActivityIntent);
+        finish();
+    }
+
     // DONE: 2017/05/06 月で遷移
     // DONE: 2017/05/06 getClosestPosition
 
@@ -290,7 +298,14 @@ public class CalendarPagerActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
-            return CalendarFragment.newInstance(getMonth(position), StartDay.MONDAY);
+            return CalendarFragment.newInstance(getMonth(position),
+                    StartDay.MONDAY,
+                    new CalendarCell.CalendarCellListener() {
+                        @Override
+                        public void onTouch(Calendar date) {
+                            startWorkPagerActivity(date);
+                        }
+                    });
         }
 
         @Override

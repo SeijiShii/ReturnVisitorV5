@@ -22,15 +22,19 @@ public class CalendarRow extends LinearLayout {
 
 
     private Calendar mDateCounter, mFirstDay;
-    CalendarPagerActivity.StartDay mStartDay;
+    private CalendarPagerActivity.StartDay mStartDay;
+    private CalendarCell.CalendarCellListener mListener;
 
-    public CalendarRow(Context context, Calendar firstDay, CalendarPagerActivity.StartDay startDay) {
+    public CalendarRow(Context context, Calendar firstDay,
+                       CalendarPagerActivity.StartDay startDay,
+                       CalendarCell.CalendarCellListener listener) {
         super(context);
 
         mFirstDay = (Calendar) firstDay.clone();
         mDateCounter = (Calendar) firstDay.clone();
 
         mStartDay = startDay;
+        mListener = listener;
 
         initCommon();
     }
@@ -85,7 +89,7 @@ public class CalendarRow extends LinearLayout {
     }
 
     private void addCalendarCell(Calendar date) {
-        CalendarCell cell = new CalendarCell(getContext(), date);
+        CalendarCell cell = new CalendarCell(getContext(), date, mListener);
         LinearLayout.LayoutParams params = new LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT);
         params.weight = 1;
         cell.setLayoutParams(params);

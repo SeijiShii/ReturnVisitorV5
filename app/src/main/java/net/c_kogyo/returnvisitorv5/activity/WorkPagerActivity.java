@@ -82,6 +82,7 @@ public class WorkPagerActivity extends AppCompatActivity {
 
         initDialogOverlay();
 
+
     }
 
     private ViewPager mPager;
@@ -117,7 +118,7 @@ public class WorkPagerActivity extends AppCompatActivity {
 
     }
 
-    // 日付指定で遷移するためのプロセス あったわ…
+    // 日付指定で遷移するためのプロセス
     private Calendar getDate() {
 
         Calendar date = Calendar.getInstance();

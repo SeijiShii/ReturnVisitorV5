@@ -7,7 +7,6 @@ import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -16,6 +15,7 @@ import android.widget.TextView;
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.AggregationOfDay;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
+import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 
 import java.util.Calendar;
 
@@ -26,11 +26,13 @@ import java.util.Calendar;
 public class CalendarCell extends FrameLayout {
 
     private Calendar mDate;
+    private CalendarCellListener mListener;
 
-    public CalendarCell(@NonNull Context context, Calendar date) {
+    public CalendarCell(@NonNull Context context, Calendar date, CalendarCellListener listener) {
         super(context);
 
         mDate = (Calendar) date.clone();
+        mListener = listener;
 
         initCommon();
 
@@ -48,6 +50,8 @@ public class CalendarCell extends FrameLayout {
         initDateNumberTextView();
         initTimeBar();
         initBarContainer();
+
+        setTouchListenerIfNeeded();
 
     }
 
@@ -119,4 +123,20 @@ public class CalendarCell extends FrameLayout {
     }
 
     // TODO: 2017/05/05 タッチリスナの実装
+    private void setTouchListenerIfNeeded() {
+        if (AggregationOfDay.hasWorkOrVisit(mDate)) {
+            ViewUtil.setOnClickListener(this, new ViewUtil.OnViewClickListener() {
+                @Override
+                public void onViewClick() {
+                    if (mListener != null) {
+                        mListener.onTouch(mDate);
+                    }
+                }
+            });
+        }
+    }
+
+    public interface CalendarCellListener {
+        void onTouch(Calendar date);
+    }
 }

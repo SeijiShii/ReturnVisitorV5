@@ -37,10 +37,15 @@ public class CalendarFragment extends Fragment {
 
     private Calendar mMonth, mWeekCounter;
     private CalendarPagerActivity.StartDay mStartDay;
+    private static CalendarCell.CalendarCellListener mCellListener;
 
-    public static CalendarFragment newInstance(Calendar month, CalendarPagerActivity.StartDay startDay) {
+    public static CalendarFragment newInstance(Calendar month,
+                                               CalendarPagerActivity.StartDay startDay,
+                                               CalendarCell.CalendarCellListener listener) {
 
         CalendarFragment calendarFragment = new CalendarFragment();
+
+        mCellListener = listener;
 
         Bundle arg = new Bundle();
         Intent intent = new Intent();
@@ -132,7 +137,7 @@ public class CalendarFragment extends Fragment {
 
         while (CalendarUtil.isSameMonth(mMonth, mWeekCounter)) {
 
-            CalendarRow row = new CalendarRow(getActivity(), mWeekCounter, mStartDay);
+            CalendarRow row = new CalendarRow(getActivity(), mWeekCounter, mStartDay, mCellListener);
             calendarFrame.addView(row);
             calendarFrame.addView(generateBorder());
 
