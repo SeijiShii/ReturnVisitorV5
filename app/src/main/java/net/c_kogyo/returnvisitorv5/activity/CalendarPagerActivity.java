@@ -165,6 +165,9 @@ public class CalendarPagerActivity extends AppCompatActivity {
         animator.start();
     }
 
+    // TODO: 2017/05/06 月で遷移
+    // TODO: 2017/05/06 getClosestPosition
+
     private class CalendarPagerAdapter extends FragmentStatePagerAdapter {
 
         public CalendarPagerAdapter(FragmentManager fm) {
