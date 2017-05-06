@@ -205,6 +205,8 @@ public class MapActivity extends AppCompatActivity
                         // DONE: 2017/03/01 ここにマーカー描画処理を記述する
                         placeMarkers = new PlaceMarkers();
 
+                        refreshLogoButton();
+
                     }
                 });
                 
@@ -594,15 +596,22 @@ public class MapActivity extends AppCompatActivity
         }
     }
 
+    private ImageView logoButton;
     private void initLogoButton() {
-        final ImageView logoButton = (ImageView) findViewById(R.id.logo_button);
-        ViewUtil.setOnClickListener(logoButton, new ViewUtil.OnViewClickListener() {
-            @Override
-            public void onViewClick() {
-                openCloseDrawer();
-            }
-        });
+        logoButton = (ImageView) findViewById(R.id.logo_button);
+    }
 
+    private void refreshLogoButton() {
+        if (!isDataLoaded) {
+            ViewUtil.setOnClickListener(logoButton, null);
+        } else {
+            ViewUtil.setOnClickListener(logoButton, new ViewUtil.OnViewClickListener() {
+                @Override
+                public void onViewClick() {
+                    openCloseDrawer();
+                }
+            });
+        }
     }
 
     private void showPlaceDialog(Place place) {
@@ -1127,7 +1136,7 @@ public class MapActivity extends AppCompatActivity
 
     // DONE: 2017/04/01 集合住宅のマークがでかすぎる
 
-    // TODO: 2017/05/05 データ読み込みまでボタンを押せなくする
+    // DONE: 2017/05/05 データ読み込みまでボタンを押せなくする
     // TODO: 2017/05/05 データがないときにWORKやカレンダーに遷移しないようにする
 
 }
