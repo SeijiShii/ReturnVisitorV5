@@ -50,6 +50,7 @@ public class WorkPagerActivity extends AppCompatActivity {
 
 
     // DONE: 2017/04/05 Dialog Overlay
+    // TODO: 2017/05/06 Pagerの左右ステートが変わったときだけリフレッシュ
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -138,14 +139,35 @@ public class WorkPagerActivity extends AppCompatActivity {
         refreshButtons();
     }
 
+    // DONE: 2017/05/06 ボタンrefreshのアニメーション
+
     private void refreshLeftButton() {
+
+        float originAlpha, targetAlpha;
+
         if (mPager.getCurrentItem() > 0) {
-            leftButton.setVisibility(View.VISIBLE);
+
+            originAlpha = 0f;
+            targetAlpha = 1f;
+
             leftButton.setClickable(true);
         } else {
-            leftButton.setVisibility(View.INVISIBLE);
+
+            originAlpha = 1f;
+            targetAlpha = 0f;
+
             leftButton.setClickable(false);
         }
+
+        ValueAnimator animator = ValueAnimator.ofFloat(originAlpha, targetAlpha);
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                leftButton.setAlpha((float) animation.getAnimatedValue());
+            }
+        });
+        animator.setDuration(300);
+        animator.start();
     }
 
     private ImageView rightButton;
@@ -166,13 +188,32 @@ public class WorkPagerActivity extends AppCompatActivity {
     }
 
     private void refreshRightButton() {
+
+        float originAlpha, targetAlpha;
+
         if (mPager.getCurrentItem() < mDatePagerAdapter.getCount() - 1) {
-            rightButton.setVisibility(View.VISIBLE);
+
+            originAlpha = 0f;
+            targetAlpha = 1f;
+
             rightButton.setClickable(true);
         } else {
-            rightButton.setVisibility(View.INVISIBLE);
+
+            originAlpha = 1f;
+            targetAlpha = 0f;
+
             rightButton.setClickable(false);
         }
+
+        ValueAnimator animator = ValueAnimator.ofFloat(originAlpha, targetAlpha);
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                rightButton.setAlpha((float) animation.getAnimatedValue());
+            }
+        });
+        animator.setDuration(300);
+        animator.start();
     }
 
     private TextView dateText;
