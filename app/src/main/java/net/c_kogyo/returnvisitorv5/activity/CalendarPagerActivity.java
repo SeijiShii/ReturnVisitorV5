@@ -2,6 +2,7 @@ package net.c_kogyo.returnvisitorv5.activity;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -20,9 +21,11 @@ import android.widget.TextView;
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.fragment.CalendarFragment;
+import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 /**
@@ -46,6 +49,8 @@ public class CalendarPagerActivity extends AppCompatActivity {
         initMonthTextView();
         initLeftButton();
         initRightButton();
+
+        scrollToMonth();
     }
 
     private ViewPager mPager;
@@ -165,8 +170,24 @@ public class CalendarPagerActivity extends AppCompatActivity {
         animator.start();
     }
 
-    // TODO: 2017/05/06 月で遷移
-    // TODO: 2017/05/06 getClosestPosition
+    private void scrollToMonth() {
+
+        Calendar month = Calendar.getInstance();
+
+        Intent intent = getIntent();
+        if (intent == null) return;
+
+        long monthLong = intent.getLongExtra(Constants.MONTH_LONG, 0);
+        if (monthLong > 0) {
+            month.setTimeInMillis(monthLong);
+        }
+
+        int pos = mAdapter.getClosestPositionByMonth(month);
+        mPager.setCurrentItem(pos, false);
+    }
+
+    // DONE: 2017/05/06 月で遷移
+    // DONE: 2017/05/06 getClosestPosition
 
     private class CalendarPagerAdapter extends FragmentStatePagerAdapter {
 
@@ -186,6 +207,52 @@ public class CalendarPagerActivity extends AppCompatActivity {
 
         private Calendar getMonth(int position) {
             return RVData.getInstance().getMonthsWithData().get(position);
+        }
+
+        private int getClosestPositionByMonth(Calendar month) {
+
+            int pos;
+            // 指定した月が存在するればそのindexを返す。
+            pos = getPositionByMonth(month);
+            if (pos >= 0) {
+                return pos;
+            }
+
+            // 存在しなければ
+            Calendar forwardCal, backwardCal;
+            forwardCal = (Calendar) month.clone();
+            backwardCal = (Calendar) month.clone();
+
+            while (true) {
+
+                forwardCal.add(Calendar.MONTH, 1);
+                int forwardPos = getPositionByMonth(forwardCal);
+                if (forwardPos >= 0) {
+                    return forwardPos;
+                }
+
+                backwardCal.add(Calendar.MONTH, -1);
+                int backwardPos = getPositionByMonth(backwardCal);
+                if (backwardPos >= 0) {
+                    return backwardPos;
+                }
+
+                if (backwardCal.get(Calendar.YEAR) <= 2000) {
+                    return -1;
+                }
+            }
+        }
+
+        private int getPositionByMonth(Calendar month) {
+            ArrayList<Calendar> monthsWithData = RVData.getInstance().getMonthsWithData();
+
+            for ( int i = 0 ; i < monthsWithData.size() ; i++ ) {
+                if (CalendarUtil.isSameMonth(month, monthsWithData.get(i))) {
+                    return i;
+                }
+            }
+
+            return -1;
         }
     }
  }
