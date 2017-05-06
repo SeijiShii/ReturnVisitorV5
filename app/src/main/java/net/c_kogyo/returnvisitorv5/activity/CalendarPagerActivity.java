@@ -182,6 +182,9 @@ public class CalendarPagerActivity extends AppCompatActivity {
             month.setTimeInMillis(monthLong);
         }
 
+        // Test
+        // month.set(Calendar.MONTH, 10);
+
         int pos = mAdapter.getClosestPositionByMonth(month);
         mPager.setCurrentItem(pos, false);
     }
