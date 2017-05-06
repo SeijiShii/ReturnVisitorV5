@@ -600,7 +600,7 @@ public class MapActivity extends AppCompatActivity
         refreshLogoButton();
     }
 
-    // TODO: 2017/05/06 データ読み込み前は半透明に
+    // DONE: 2017/05/06 データ読み込み前は半透明に
     private void refreshLogoButton() {
 
         float originAlpha, targetAlpha;
