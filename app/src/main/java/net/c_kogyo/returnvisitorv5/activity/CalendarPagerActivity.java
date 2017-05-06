@@ -1,7 +1,6 @@
 package net.c_kogyo.returnvisitorv5.activity;
 
 import android.animation.ValueAnimator;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,11 +9,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.AttributeSet;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -39,6 +33,15 @@ public class CalendarPagerActivity extends AppCompatActivity {
         MONDAY
     }
 
+    private enum PagerState {
+        HAS_RIGHT_AND_NO_LEFT,
+        HAS_LEFT_AND_NO_RIGHT,
+        HAS_BOTH,
+        NO_EITHER
+    }
+
+    private PagerState mPagerState, mOldState;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +52,8 @@ public class CalendarPagerActivity extends AppCompatActivity {
         initMonthTextView();
         initLeftButton();
         initRightButton();
+
+        refreshPagerState();
 
         scrollToMonth();
     }
@@ -68,8 +73,8 @@ public class CalendarPagerActivity extends AppCompatActivity {
             @Override
             public void onPageSelected(int position) {
                 refreshMonthText();
-                refreshLeftButton();
-                refreshRightButton();
+                refreshPagerState();
+                refreshButtons();
             }
 
             @Override
@@ -96,28 +101,31 @@ public class CalendarPagerActivity extends AppCompatActivity {
     private ImageView leftButton;
     private void initLeftButton() {
         leftButton = (ImageView) findViewById(R.id.left_button);
-        refreshLeftButton();
+        if (mPager.getCurrentItem() <= 0) {
+            fadeLeftButton(false);
+        }
     }
 
-    private void refreshLeftButton() {
+    private void fadeLeftButton(boolean fadeIn) {
 
         float originAlpha, targetAlpha;
 
-        if (mPager.getCurrentItem() == 0) {
-            originAlpha = 1f;
-            targetAlpha = 0f;
-            ViewUtil.setOnClickListener(leftButton, null);
-        } else {
+        if (fadeIn) {
+
             originAlpha = 0f;
             targetAlpha = 1f;
             ViewUtil.setOnClickListener(leftButton, new ViewUtil.OnViewClickListener() {
                 @Override
                 public void onViewClick() {
                     mPager.setCurrentItem(mPager.getCurrentItem() - 1, true);
-                    refreshLeftButton();
-                    refreshRightButton();
+                    refreshPagerState();
+                    refreshButtons();
                 }
             });
+        } else {
+            originAlpha = 1f;
+            targetAlpha = 0f;
+            ViewUtil.setOnClickListener(leftButton, null);
         }
 
         ValueAnimator animator = ValueAnimator.ofFloat(originAlpha, targetAlpha);
@@ -135,28 +143,30 @@ public class CalendarPagerActivity extends AppCompatActivity {
     private ImageView rightButton;
     private void initRightButton() {
         rightButton = (ImageView) findViewById(R.id.right_button);
-        refreshRightButton();
+        if (mPager.getCurrentItem() >= mAdapter.getCount() - 1) {
+            fadeRightButton(false);
+        }
     }
 
-    private void refreshRightButton() {
+    private void fadeRightButton(boolean fadeIn) {
 
         float originAlpha, targetAlpha;
 
-        if (mPager.getCurrentItem() >= mAdapter.getCount() - 1) {
-            originAlpha = 1f;
-            targetAlpha = 0f;
-            ViewUtil.setOnClickListener(rightButton, null);
-        } else {
+        if (fadeIn) {
             originAlpha = 0f;
             targetAlpha = 1f;
             ViewUtil.setOnClickListener(rightButton, new ViewUtil.OnViewClickListener() {
                 @Override
                 public void onViewClick() {
                     mPager.setCurrentItem(mPager.getCurrentItem() + 1, true);
-                    refreshLeftButton();
-                    refreshRightButton();
+                    refreshPagerState();
+                    refreshButtons();
                 }
             });
+        } else {
+            originAlpha = 1f;
+            targetAlpha = 0f;
+            ViewUtil.setOnClickListener(rightButton, null);
         }
 
         ValueAnimator animator = ValueAnimator.ofFloat(originAlpha, targetAlpha);
@@ -168,6 +178,86 @@ public class CalendarPagerActivity extends AppCompatActivity {
         });
         animator.setDuration(300);
         animator.start();
+    }
+
+    private void refreshPagerState() {
+
+        mOldState = mPagerState;
+        if (mPager.getCurrentItem() <= 0
+                && mPager.getCurrentItem() >= mAdapter.getCount() - 1) {
+            mPagerState = PagerState.NO_EITHER;
+        } else if (mPager.getCurrentItem() <= 0) {
+            mPagerState = PagerState.HAS_RIGHT_AND_NO_LEFT;
+        } else if (mPager.getCurrentItem() >= mAdapter.getCount() - 1) {
+            mPagerState = PagerState.HAS_LEFT_AND_NO_RIGHT;
+        }else {
+            mPagerState = PagerState.HAS_BOTH;
+        }
+    }
+
+    private void refreshButtons() {
+
+        if (mPagerState == mOldState)
+            return;
+
+        switch (mOldState) {
+            case NO_EITHER:
+                switch (mPagerState) {
+                    case HAS_RIGHT_AND_NO_LEFT:
+                        fadeRightButton(true);
+                        break;
+                    case HAS_LEFT_AND_NO_RIGHT:
+                        fadeLeftButton(true);
+                        break;
+                    case HAS_BOTH:
+                        fadeLeftButton(true);
+                        fadeRightButton(true);
+                        break;
+                }
+                break;
+            case HAS_RIGHT_AND_NO_LEFT:
+                switch (mPagerState) {
+                    case NO_EITHER:
+                        fadeRightButton(false);
+                        break;
+                    case HAS_LEFT_AND_NO_RIGHT:
+                        fadeLeftButton(true);
+                        fadeRightButton(false);
+                        break;
+                    case HAS_BOTH:
+                        fadeLeftButton(true);
+                        break;
+                }
+                break;
+            case HAS_LEFT_AND_NO_RIGHT:
+                switch (mPagerState) {
+                    case NO_EITHER:
+                        fadeLeftButton(false);
+                        break;
+                    case HAS_RIGHT_AND_NO_LEFT:
+                        fadeRightButton(true);
+                        fadeLeftButton(false);
+                        break;
+                    case HAS_BOTH:
+                        fadeRightButton(true);
+                        break;
+                }
+                break;
+            case HAS_BOTH:
+                switch (mPagerState) {
+                    case NO_EITHER:
+                        fadeLeftButton(false);
+                        fadeRightButton(false);
+                        break;
+                    case HAS_RIGHT_AND_NO_LEFT:
+                        fadeLeftButton(false);
+                        break;
+                    case HAS_LEFT_AND_NO_RIGHT:
+                        fadeRightButton(false);
+                        break;
+                }
+                break;
+        }
     }
 
     private void scrollToMonth() {
