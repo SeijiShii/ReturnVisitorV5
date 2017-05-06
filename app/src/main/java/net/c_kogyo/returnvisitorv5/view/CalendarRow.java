@@ -58,7 +58,7 @@ public class CalendarRow extends LinearLayout {
             weekEnd = 8;
         }
 
-        // TODO: 2017/05/04 週の途中始まりだったら空白で埋める
+        // DONE: 2017/05/04 週の途中始まりだったら空白で埋める
         for (int i = weekStart ; i < mFirstDay.get(Calendar.DAY_OF_WEEK) ; i++ ) {
             addBlankCell();
             this.addView(generateBorder());
