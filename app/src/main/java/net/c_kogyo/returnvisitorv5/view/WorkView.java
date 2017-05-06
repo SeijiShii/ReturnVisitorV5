@@ -52,9 +52,11 @@ public class WorkView extends BaseAnimateView {
             if (intent.getAction().equals(TimeCountService.TIME_COUNTING_ACTION_TO_ACTIVITY)) {
 
                 updateDurationText(intent);
+                updateEndTimeText();
 
             } else if (intent.getAction().equals(TimeCountService.STOP_TIME_COUNT_ACTION_TO_ACTIVITY)) {
 
+                updateEndTimeText();
                 refreshEndTimeText();
             }
         }
@@ -166,7 +168,7 @@ public class WorkView extends BaseAnimateView {
 
     private void updateStartTimeText() {
 
-        String startString = DateTimeText.getTimeText(mWork.getStart());
+        String startString = DateTimeText.getTimeText(mWork.getStart(), false);
         startString = mContext.getString(R.string.start_time_text, startString);
 
         startTimeText.setText(startString);
@@ -232,12 +234,7 @@ public class WorkView extends BaseAnimateView {
     private TextView endTimeText;
     private void initEndTimeText() {
         endTimeText = (TextView) getViewById(R.id.end_time_text);
-        ViewUtil.setOnClickListener(endTimeText, new ViewUtil.OnViewClickListener() {
-            @Override
-            public void onViewClick() {
-                showEndTimePickerDialog(mWork.getEnd());
-            }
-        });
+
         refreshEndTimeText();
         updateEndTimeText();
     }
@@ -247,18 +244,29 @@ public class WorkView extends BaseAnimateView {
             if (TimeCountService.getWork().equals(mWork)){
                 endTimeText.setBackground(null);
                 endTimeText.setClickable(false);
+                ViewUtil.setOnClickListener(endTimeText, null);
             }
         } else {
             endTimeText.setBackgroundResource(R.drawable.white_trans_circle);
-            endTimeText.setClickable(true);
+            ViewUtil.setOnClickListener(endTimeText, new ViewUtil.OnViewClickListener() {
+                @Override
+                public void onViewClick() {
+                    showEndTimePickerDialog(mWork.getEnd());
+                }
+            });
         }
     }
 
     private void updateEndTimeText() {
 
-        String endString = DateTimeText.getTimeText(mWork.getEnd());
-        endString = mContext.getString(R.string.end_time_string, endString);
+        String endString;
+        if (isWorkCountingTime()) {
+            endString = DateTimeText.getTimeText(mWork.getEnd(), true);
+        } else {
+            endString = DateTimeText.getTimeText(mWork.getEnd(), false);
+        }
 
+        endString = mContext.getString(R.string.end_time_string, endString);
         endTimeText.setText(endString);
     }
 
@@ -280,7 +288,7 @@ public class WorkView extends BaseAnimateView {
 
         } else {
 
-            String timeString = DateTimeText.getDurationString(mWork.getDuration(), true);
+            String timeString = DateTimeText.getDurationString(mWork.getDuration(), false);
             timeString = mContext.getString(R.string.duration_string, timeString);
             durationText.setText(timeString);
         }
