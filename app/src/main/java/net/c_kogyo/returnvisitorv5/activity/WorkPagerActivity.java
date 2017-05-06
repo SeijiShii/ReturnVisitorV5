@@ -52,6 +52,15 @@ public class WorkPagerActivity extends AppCompatActivity {
     // DONE: 2017/04/05 Dialog Overlay
     // TODO: 2017/05/06 Pagerの左右ステートが変わったときだけリフレッシュ
 
+    enum PagerState {
+        HAS_RIGHT_AND_NO_LEFT,
+        HAS_LEFT_AND_NO_RIGHT,
+        HAS_BOTH,
+        NO_EITHER
+    }
+
+    private PagerState mPagerState, mOldState;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,7 +71,15 @@ public class WorkPagerActivity extends AppCompatActivity {
 
         initHeaderRow();
         initPager();
-        initButtons();
+
+        initLeftButton();
+        initRightButton();
+        initDateText();
+        refreshPagerState();
+
+        initMenuButton();
+        initLogoButton();
+
         initDialogOverlay();
 
     }
@@ -88,6 +105,7 @@ public class WorkPagerActivity extends AppCompatActivity {
             @Override
             public void onPageSelected(int position) {
 
+                refreshPagerState();
                 refreshButtons();
             }
 
@@ -131,7 +149,10 @@ public class WorkPagerActivity extends AppCompatActivity {
                 onClickLeftButton();
             }
         });
-        refreshLeftButton();
+        if (mPager.getCurrentItem() <= 0) {
+            leftButton.setAlpha(0f);
+            leftButton.setClickable(false);
+        }
     }
 
     private void onClickLeftButton() {
@@ -141,11 +162,11 @@ public class WorkPagerActivity extends AppCompatActivity {
 
     // DONE: 2017/05/06 ボタンrefreshのアニメーション
 
-    private void refreshLeftButton() {
+    private void fadeLeftButton(boolean fadeIn) {
 
         float originAlpha, targetAlpha;
 
-        if (mPager.getCurrentItem() > 0) {
+        if (fadeIn) {
 
             originAlpha = 0f;
             targetAlpha = 1f;
@@ -179,7 +200,11 @@ public class WorkPagerActivity extends AppCompatActivity {
                 onClickRightButton();
             }
         });
-        refreshRightButton();
+
+        if (mPager.getCurrentItem() >= mDatePagerAdapter.getCount() - 1) {
+            rightButton.setAlpha(0f);
+            rightButton.setClickable(false);
+        }
     }
 
     private void onClickRightButton() {
@@ -187,11 +212,11 @@ public class WorkPagerActivity extends AppCompatActivity {
         refreshButtons();
     }
 
-    private void refreshRightButton() {
+    private void fadeRightButton(boolean fadeIn) {
 
         float originAlpha, targetAlpha;
 
-        if (mPager.getCurrentItem() < mDatePagerAdapter.getCount() - 1) {
+        if (fadeIn) {
 
             originAlpha = 0f;
             targetAlpha = 1f;
@@ -247,20 +272,86 @@ public class WorkPagerActivity extends AppCompatActivity {
         dateText.setText(dateString);
     }
 
-    private void initButtons() {
+    private void refreshPagerState() {
 
-        initLeftButton();
-        initRightButton();
-        initDateText();
-        initMenuButton();
-        initLogoButton();
-     }
+        mOldState = mPagerState;
+        if (mPager.getCurrentItem() <= 0
+                && mPager.getCurrentItem() >= mDatePagerAdapter.getCount() - 1) {
+            mPagerState = PagerState.NO_EITHER;
+        } else if (mPager.getCurrentItem() <= 0) {
+            mPagerState = PagerState.HAS_RIGHT_AND_NO_LEFT;
+        } else if (mPager.getCurrentItem() >= mDatePagerAdapter.getCount() - 1) {
+            mPagerState = PagerState.HAS_LEFT_AND_NO_RIGHT;
+        }else {
+            mPagerState = PagerState.HAS_BOTH;
+        }
+    }
 
     private void refreshButtons() {
 
-        refreshLeftButton();
-        refreshRightButton();
         refreshDateText();
+
+        if (mPagerState == mOldState)
+            return;
+
+        switch (mOldState) {
+            case NO_EITHER:
+                switch (mPagerState) {
+                    case HAS_RIGHT_AND_NO_LEFT:
+                        fadeRightButton(true);
+                        break;
+                    case HAS_LEFT_AND_NO_RIGHT:
+                        fadeLeftButton(true);
+                        break;
+                    case HAS_BOTH:
+                        fadeLeftButton(true);
+                        fadeRightButton(true);
+                        break;
+                }
+                break;
+            case HAS_RIGHT_AND_NO_LEFT:
+                switch (mPagerState) {
+                    case NO_EITHER:
+                        fadeRightButton(false);
+                        break;
+                    case HAS_LEFT_AND_NO_RIGHT:
+                        fadeLeftButton(true);
+                        fadeRightButton(false);
+                        break;
+                    case HAS_BOTH:
+                        fadeLeftButton(true);
+                        break;
+                }
+                break;
+            case HAS_LEFT_AND_NO_RIGHT:
+                switch (mPagerState) {
+                    case NO_EITHER:
+                        fadeLeftButton(false);
+                        break;
+                    case HAS_RIGHT_AND_NO_LEFT:
+                        fadeRightButton(true);
+                        fadeLeftButton(false);
+                        break;
+                    case HAS_BOTH:
+                        fadeRightButton(true);
+                        break;
+                }
+                break;
+            case HAS_BOTH:
+                switch (mPagerState) {
+                    case NO_EITHER:
+                        fadeLeftButton(false);
+                        fadeRightButton(false);
+                        break;
+                    case HAS_RIGHT_AND_NO_LEFT:
+                        fadeLeftButton(false);
+                        break;
+                    case HAS_LEFT_AND_NO_RIGHT:
+                        fadeRightButton(false);
+                        break;
+                }
+                break;
+        }
     }
 
     private ImageView menuButton;
