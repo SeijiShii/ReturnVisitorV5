@@ -188,7 +188,15 @@ public class WorkPagerActivity extends AppCompatActivity {
     }
 
     private void onClickDateText() {
+        startCalendarActivity(mDatePagerAdapter.getDayItem(mPager.getCurrentItem()));
+    }
 
+    // DONE: 2017/04/05 カレンダーアクティビティと遷移
+    private void startCalendarActivity(Calendar date) {
+        Intent calendarActivityIntent = new Intent(this, CalendarPagerActivity.class);
+        calendarActivityIntent.putExtra(Constants.MONTH_LONG, date.getTimeInMillis());
+        startActivity(calendarActivityIntent);
+        finish();
     }
 
     private void refreshDateText() {
@@ -461,7 +469,6 @@ public class WorkPagerActivity extends AppCompatActivity {
         }
     }
 
-    // TODO: 2017/04/05 カレンダーアクティビティと遷移
 
 //        dateText.setOnClickListener(new View.OnClickListener() {
 //            @Override
