@@ -52,7 +52,7 @@ public class WorkPagerActivity extends AppCompatActivity {
     // DONE: 2017/04/05 Dialog Overlay
     // TODO: 2017/05/06 Pagerの左右ステートが変わったときだけリフレッシュ
 
-    enum PagerState {
+    private enum PagerState {
         HAS_RIGHT_AND_NO_LEFT,
         HAS_LEFT_AND_NO_RIGHT,
         HAS_BOTH,
@@ -150,8 +150,7 @@ public class WorkPagerActivity extends AppCompatActivity {
             }
         });
         if (mPager.getCurrentItem() <= 0) {
-            leftButton.setAlpha(0f);
-            leftButton.setClickable(false);
+            fadeLeftButton(false);
         }
     }
 
@@ -202,8 +201,7 @@ public class WorkPagerActivity extends AppCompatActivity {
         });
 
         if (mPager.getCurrentItem() >= mDatePagerAdapter.getCount() - 1) {
-            rightButton.setAlpha(0f);
-            rightButton.setClickable(false);
+            fadeRightButton(false);
         }
     }
 
