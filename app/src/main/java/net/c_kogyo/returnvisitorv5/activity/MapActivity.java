@@ -43,19 +43,14 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.RVData;
-import net.c_kogyo.returnvisitorv5.data.Tag;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.dialogcontents.HousingComplexDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.MapLongClickDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.PlaceDialog;
-import net.c_kogyo.returnvisitorv5.fragment.CalendarFragment;
 import net.c_kogyo.returnvisitorv5.service.TimeCountService;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
-import net.c_kogyo.returnvisitorv5.view.CalendarCell;
-import net.c_kogyo.returnvisitorv5.view.CalendarRow;
 import net.c_kogyo.returnvisitorv5.view.CountTimeFrame;
-import net.c_kogyo.returnvisitorv5.view.SmallTagView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -175,11 +170,11 @@ public class MapActivity extends AppCompatActivity
 
         loadCameraPosition();
 
-        initDataOnMap();
+        waitForDataLoadedAndRefreshUI();
     }
 
     private PlaceMarkers placeMarkers;
-    private void initDataOnMap() {
+    private void waitForDataLoadedAndRefreshUI() {
         
         final Handler handler = new Handler();
         
@@ -206,7 +201,8 @@ public class MapActivity extends AppCompatActivity
                         placeMarkers = new PlaceMarkers();
 
                         refreshLogoButton();
-
+                        refreshWorkButton();
+                        refreshCalendarButton();
                     }
                 });
                 
@@ -222,6 +218,8 @@ public class MapActivity extends AppCompatActivity
         mapView.onStart();
         isForeground = true;
 
+        refreshWorkButton();
+        refreshCalendarButton();
 
     }
 
@@ -1070,9 +1068,6 @@ public class MapActivity extends AppCompatActivity
                    editor.putString(Constants.SharedPrefTags.COUNTING_WORK_ID, countingWorkId);
                    editor.apply();
                }
-
-
-
            }
         }
     };
@@ -1101,15 +1096,27 @@ public class MapActivity extends AppCompatActivity
 
     }
 
+    private Button workButton;
     private void initWorkButton() {
-        Button workButton = (Button) findViewById(R.id.work_button);
-        workButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onClickWorkButton();
-                openCloseDrawer();
-            }
-        });
+        workButton = (Button) findViewById(R.id.work_button);
+    }
+
+    private void refreshWorkButton() {
+        if (RVData.getInstance().hasWorkOrVisit()) {
+            workButton.setAlpha(1f);
+            workButton.setClickable(true);
+            workButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onClickWorkButton();
+                    openCloseDrawer();
+                }
+            });
+        } else {
+            workButton.setAlpha(0.5f);
+            workButton.setClickable(false);
+            workButton.setOnClickListener(null);
+        }
     }
 
     private void onClickWorkButton() {
@@ -1117,15 +1124,28 @@ public class MapActivity extends AppCompatActivity
         startActivity(workIntent);
     }
 
+    private Button calendarButton;
     private void initCalendarButton() {
-        Button calendarButton = (Button) findViewById(R.id.calendar_button);
-        calendarButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onClickCalendarButton();
-                openCloseDrawer();
-            }
-        });
+        calendarButton = (Button) findViewById(R.id.calendar_button);
+    }
+
+    private void refreshCalendarButton() {
+
+        if (RVData.getInstance().hasWorkOrVisit()) {
+            calendarButton.setAlpha(1f);
+            calendarButton.setClickable(true);
+            calendarButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onClickCalendarButton();
+                    openCloseDrawer();
+                }
+            });
+        } else {
+            calendarButton.setAlpha(0.5f);
+            calendarButton.setClickable(false);
+            calendarButton.setOnClickListener(null);
+        }
     }
 
     private void onClickCalendarButton() {
@@ -1137,6 +1157,5 @@ public class MapActivity extends AppCompatActivity
     // DONE: 2017/04/01 集合住宅のマークがでかすぎる
 
     // DONE: 2017/05/05 データ読み込みまでボタンを押せなくする
-    // TODO: 2017/05/05 データがないときにWORKやカレンダーに遷移しないようにする
-
+    // TODO: 2017/05/05 データがないときにWORKやカレンダーに遷移しないようにする(実装済み、要検証)
 }
