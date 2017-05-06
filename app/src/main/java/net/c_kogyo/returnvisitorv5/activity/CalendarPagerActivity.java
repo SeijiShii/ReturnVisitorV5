@@ -23,6 +23,8 @@ import net.c_kogyo.returnvisitorv5.view.CalendarCell;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import static net.c_kogyo.returnvisitorv5.util.ViewUtil.setOnClickListener;
+
 /**
  * Created by SeijiShii on 2017/05/04.
  */
@@ -57,6 +59,7 @@ public class CalendarPagerActivity extends AppCompatActivity {
         refreshPagerState();
 
         scrollToMonth();
+        initLogoButton();
     }
 
     private ViewPager mPager;
@@ -284,6 +287,23 @@ public class CalendarPagerActivity extends AppCompatActivity {
         Intent workActivityIntent = new Intent(this, WorkPagerActivity.class);
         workActivityIntent.putExtra(Constants.DATE_LONG, date.getTimeInMillis());
         startActivity(workActivityIntent);
+        finish();
+    }
+
+    private void initLogoButton() {
+        ImageView logoButton = (ImageView) findViewById(R.id.logo_button);
+        setOnClickListener(logoButton, new ViewUtil.OnViewClickListener() {
+            @Override
+            public void onViewClick() {
+                returnToMapActivity();
+            }
+        });
+    }
+
+    private void returnToMapActivity() {
+        Intent intent = new Intent(this, MapActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
         finish();
     }
 
