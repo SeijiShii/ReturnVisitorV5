@@ -436,6 +436,7 @@ public class WorkPagerActivity extends AppCompatActivity {
         Intent intent = new Intent(this, MapActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
+        finish();
     }
 
     private void moveToMapWithPosition(Visit visit) {
