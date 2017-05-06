@@ -267,6 +267,7 @@ public class WorkFragment extends Fragment {
         return workView;
     }
 
+    // TODO: 2017/05/06 Add work時のポジションがおかしい
     private int getInsertPosition(Calendar time) {
 
         for ( int i = 0 ; i < container.getChildCount() ; i++ ) {
@@ -475,7 +476,6 @@ public class WorkFragment extends Fragment {
             }
         }
     }
-
 
     private boolean isVisitCellInProperPosition(VisitCell visitCell) {
 
