@@ -307,6 +307,8 @@ public class CalendarPagerActivity extends AppCompatActivity {
         finish();
     }
 
+    // TODO: 2017/05/06 Aggregation Dialog
+
     // DONE: 2017/05/06 月で遷移
     // DONE: 2017/05/06 getClosestPosition
 
