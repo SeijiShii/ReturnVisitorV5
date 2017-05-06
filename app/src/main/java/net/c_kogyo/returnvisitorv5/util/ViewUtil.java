@@ -9,24 +9,29 @@ import android.view.View;
 
 public class ViewUtil {
     public static void setOnClickListener(View view, final OnViewClickListener listener) {
-        view.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        v.setAlpha(0.5f);
-                        return true;
-                    case MotionEvent.ACTION_CANCEL:
-                        v.setAlpha(1f);
-                        return true;
-                    case MotionEvent.ACTION_UP:
-                        v.setAlpha(1f);
-                        listener.onViewClick();
-                        return true;
+
+        if (listener == null) {
+            view.setOnTouchListener(null);
+        } else {
+            view.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    switch (event.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                            v.setAlpha(0.5f);
+                            return true;
+                        case MotionEvent.ACTION_CANCEL:
+                            v.setAlpha(1f);
+                            return true;
+                        case MotionEvent.ACTION_UP:
+                            v.setAlpha(1f);
+                            listener.onViewClick();
+                            return true;
+                    }
+                    return false;
                 }
-                return false;
-            }
-        });
+            });
+        }
     }
 
     public interface OnViewClickListener {
