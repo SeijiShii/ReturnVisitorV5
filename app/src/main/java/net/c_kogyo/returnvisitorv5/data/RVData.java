@@ -361,4 +361,8 @@ public class RVData {
         void onDataLoaded();
     }
 
+    public boolean hasWorkOrVisit() {
+        return visitList.getList().size() > 0 || workList.getList().size() > 0;
+    }
+
 }
