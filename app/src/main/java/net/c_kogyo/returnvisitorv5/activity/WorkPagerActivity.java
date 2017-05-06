@@ -50,7 +50,7 @@ public class WorkPagerActivity extends AppCompatActivity {
 
 
     // DONE: 2017/04/05 Dialog Overlay
-    // TODO: 2017/05/06 Pagerの左右ステートが変わったときだけリフレッシュ
+    // DONE: 2017/05/06 Pagerの左右ステートが変わったときだけリフレッシュ
 
     private enum PagerState {
         HAS_RIGHT_AND_NO_LEFT,
