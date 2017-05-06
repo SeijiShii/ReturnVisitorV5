@@ -43,9 +43,10 @@ public class DateTimeText {
         }
     }
 
-    static public String getTimeText(Calendar calendar) {
+    static public String getTimeText(Calendar calendar, boolean showSec) {
 
         SimpleDateFormat format = new SimpleDateFormat("kk:mm");
+        if (showSec) format = new SimpleDateFormat("kk:mm:ss");
         return format.format(calendar.getTime());
 
     }
@@ -60,6 +61,6 @@ public class DateTimeText {
         DateFormat format = android.text.format.DateFormat.getMediumDateFormat(context);
         String dateString = format.format(calendar.getTime());
 
-        return dateString + " " + getTimeText(calendar);
+        return dateString + " " + getTimeText(calendar, false);
     }
 }

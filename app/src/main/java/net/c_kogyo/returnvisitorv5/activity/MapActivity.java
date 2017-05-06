@@ -1046,7 +1046,7 @@ public class MapActivity extends AppCompatActivity
                long startTime = intent.getLongExtra(TimeCountService.START_TIME, 0);
                Calendar start = Calendar.getInstance();
                start.setTimeInMillis(startTime);
-               String startText = getString(R.string.start_time_text, DateTimeText.getTimeText(start));
+               String startText = getString(R.string.start_time_text, DateTimeText.getTimeText(start, true));
 
                long duration = intent.getLongExtra(TimeCountService.DURATION, 0);
                String durationText = getString(R.string.duration_string, DateTimeText.getDurationString(duration, true));

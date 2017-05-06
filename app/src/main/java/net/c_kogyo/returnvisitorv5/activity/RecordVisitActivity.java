@@ -207,7 +207,7 @@ public class RecordVisitActivity extends AppCompatActivity {
     private TextView timeText;
     private void initTimeText() {
         timeText = (TextView) findViewById(R.id.time_text_view);
-        timeText.setText(DateTimeText.getTimeText(mVisit.getDatetime()));
+        timeText.setText(DateTimeText.getTimeText(mVisit.getDatetime(), false));
         timeText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -218,7 +218,7 @@ public class RecordVisitActivity extends AppCompatActivity {
                                 mVisit.getDatetime().set(Calendar.HOUR_OF_DAY, i);
                                 mVisit.getDatetime().set(Calendar.MINUTE, i1);
 
-                                timeText.setText(DateTimeText.getTimeText(mVisit.getDatetime()));
+                                timeText.setText(DateTimeText.getTimeText(mVisit.getDatetime(), false));
                             }
                         },
                         mVisit.getDatetime().get(Calendar.HOUR_OF_DAY),

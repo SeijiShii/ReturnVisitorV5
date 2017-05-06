@@ -108,7 +108,7 @@ public class AddWorkDialog extends FrameLayout {
     private TextView startTimeText;
     private void initStartTimeText() {
         startTimeText = (TextView) view.findViewById(R.id.start_time_text);
-        startTimeText.setText(DateTimeText.getTimeText(mWork.getStart()));
+        startTimeText.setText(DateTimeText.getTimeText(mWork.getStart(), false));
         ViewUtil.setOnClickListener(startTimeText, new ViewUtil.OnViewClickListener() {
             @Override
             public void onViewClick() {
@@ -124,13 +124,13 @@ public class AddWorkDialog extends FrameLayout {
 
                 mWork.getStart().set(Calendar.HOUR_OF_DAY, hourOfDay);
                 mWork.getStart().set(Calendar.MINUTE, minute);
-                startTimeText.setText(DateTimeText.getTimeText(mWork.getStart()));
+                startTimeText.setText(DateTimeText.getTimeText(mWork.getStart(), false));
 
                 if (mWork.getStart().after(mWork.getEnd())) {
                     mWork.getEnd().set(Calendar.HOUR_OF_DAY, hourOfDay);
                     mWork.getEnd().set(Calendar.MINUTE, minute);
                     mWork.getEnd().add(Calendar.MINUTE, 1);
-                    endTimeText.setText(DateTimeText.getTimeText(mWork.getEnd()));
+                    endTimeText.setText(DateTimeText.getTimeText(mWork.getEnd(), false));
                 }
 
                 refreshDurationText();
@@ -144,7 +144,7 @@ public class AddWorkDialog extends FrameLayout {
     private TextView endTimeText;
     private void initEndTimeText() {
         endTimeText = (TextView) view.findViewById(R.id.end_time_text);
-        endTimeText.setText(DateTimeText.getTimeText(mWork.getEnd()));
+        endTimeText.setText(DateTimeText.getTimeText(mWork.getEnd(), false));
         ViewUtil.setOnClickListener(endTimeText, new ViewUtil.OnViewClickListener() {
             @Override
             public void onViewClick() {
@@ -160,13 +160,13 @@ public class AddWorkDialog extends FrameLayout {
 
                 mWork.getEnd().set(Calendar.HOUR_OF_DAY, hourOfDay);
                 mWork.getEnd().set(Calendar.MINUTE, minute);
-                endTimeText.setText(DateTimeText.getTimeText(mWork.getEnd()));
+                endTimeText.setText(DateTimeText.getTimeText(mWork.getEnd(), false));
 
                 if (mWork.getEnd().before(mWork.getStart())) {
                     mWork.getStart().set(Calendar.HOUR_OF_DAY, hourOfDay);
                     mWork.getStart().set(Calendar.MINUTE, minute);
                     mWork.getStart().add(Calendar.MINUTE, -1);
-                    startTimeText.setText(DateTimeText.getTimeText(mWork.getStart()));
+                    startTimeText.setText(DateTimeText.getTimeText(mWork.getStart(), false));
                 }
                 refreshDurationText();
             }
