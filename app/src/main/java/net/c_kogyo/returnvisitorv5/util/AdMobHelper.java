@@ -20,7 +20,10 @@ public class AdMobHelper {
         MobileAds.initialize(context, context.getString(R.string.ad_id));
 
         AdView mAdView = (AdView) ((Activity)context).findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice("C5307EA79BC0F498809262F1432CF6BC")
+                .build();
+
         mAdView.loadAd(adRequest);
 
     }

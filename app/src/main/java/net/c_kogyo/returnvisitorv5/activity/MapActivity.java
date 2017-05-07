@@ -31,6 +31,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 
+import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -48,6 +49,7 @@ import net.c_kogyo.returnvisitorv5.dialogcontents.HousingComplexDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.MapLongClickDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.PlaceDialog;
 import net.c_kogyo.returnvisitorv5.service.TimeCountService;
+import net.c_kogyo.returnvisitorv5.util.AdMobHelper;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 import net.c_kogyo.returnvisitorv5.view.CountTimeFrame;
@@ -89,6 +91,8 @@ public class MapActivity extends AppCompatActivity
         initLocalBroadcast();
 
         setContentView(R.layout.map_activity);
+
+        AdMobHelper.setAdView(this);
 
         initLogoButton();
         initMapView(savedInstanceState);
@@ -1177,6 +1181,6 @@ public class MapActivity extends AppCompatActivity
 
     // DONE: 2017/05/05 データ読み込みまでボタンを押せなくする
     // TODO: 2017/05/05 データがないときにWORKやカレンダーに遷移しないようにする(実装済み、要検証)
-    // TODO: 2017/05/06 AdView
+    // TODO: 2017/05/06 AdView to Real
 
 }

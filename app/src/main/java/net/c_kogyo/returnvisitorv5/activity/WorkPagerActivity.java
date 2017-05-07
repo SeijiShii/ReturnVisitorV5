@@ -601,7 +601,7 @@ public class WorkPagerActivity extends AppCompatActivity {
     }
 
 
-    // TODO: 2017/05/06 AdView
+    // TODO: 2017/05/06 AdView to Real
 
 //        dateText.setOnClickListener(new View.OnClickListener() {
 //            @Override

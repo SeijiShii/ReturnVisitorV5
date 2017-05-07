@@ -23,6 +23,7 @@ import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.dialogcontents.MonthAggregationDialog;
 import net.c_kogyo.returnvisitorv5.fragment.CalendarFragment;
+import net.c_kogyo.returnvisitorv5.util.AdMobHelper;
 import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
@@ -56,6 +57,8 @@ public class CalendarPagerActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.calendar_pager_activity);
+
+        AdMobHelper.setAdView(this);
 
         initPager();
 
@@ -478,7 +481,7 @@ public class CalendarPagerActivity extends AppCompatActivity {
 
 
     // TODO: 2017/05/07 週の開始日を切り替える
-    // TODO: 2017/05/06 AdView
+    // TODO: 2017/05/06 AdView to Real
 
     private class CalendarPagerAdapter extends FragmentStatePagerAdapter {
 
