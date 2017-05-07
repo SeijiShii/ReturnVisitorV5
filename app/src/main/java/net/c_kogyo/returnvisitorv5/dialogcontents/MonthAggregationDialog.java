@@ -44,6 +44,8 @@ public class MonthAggregationDialog extends FrameLayout {
     private View view;
     private void initCommon() {
         view = LayoutInflater.from(getContext()).inflate(R.layout.month_aggregation_dialog, this);
+
+        initMonthTextView();
         initPlacementCountText();
         initVideoCountText();
         initTimeText();
@@ -51,6 +53,12 @@ public class MonthAggregationDialog extends FrameLayout {
         initStudyCountText();
 
         initCloseButton();
+    }
+
+    private void initMonthTextView() {
+        TextView monthTextView = (TextView) view.findViewById(R.id.month_text);
+        String monthText = DateTimeText.getMonthText(mMonth);
+        monthTextView.setText(monthText);
     }
 
     private void initPlacementCountText() {
