@@ -123,22 +123,6 @@
 
         </RelativeLayout>
 
-        <!-- Wait Screen -->
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/wait_screen"
-            android:background="#8FFF"
-            android:alpha="0"
-            android:visibility="invisible">
-
-            <ProgressBar
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/wait_progress"
-                style="@android:style/Widget.ProgressBar.Small"/>
-
-        </RelativeLayout>
 
     </FrameLayout>
 
