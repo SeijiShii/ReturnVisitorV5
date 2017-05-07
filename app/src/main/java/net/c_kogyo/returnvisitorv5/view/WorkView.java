@@ -129,6 +129,7 @@ public class WorkView extends BaseAnimateView {
 
                         updateStartTimeText();
                         updateEndTimeText();
+                        updateDurationText(null);
                         postChangeWorkTime();
                     }
                 },
@@ -158,6 +159,7 @@ public class WorkView extends BaseAnimateView {
 
                         updateStartTimeText();
                         updateEndTimeText();
+                        updateDurationText(null);
                         postChangeWorkTime();
                     }
                 },
@@ -536,7 +538,7 @@ public class WorkView extends BaseAnimateView {
         void postRemoveVisitCell();
     }
 
-    // TODO: 2017/05/07 時間調整時にDurationが変わらない。
+    // DONE: 2017/05/07 時間調整時にDurationが変わらない。
 
 
 
