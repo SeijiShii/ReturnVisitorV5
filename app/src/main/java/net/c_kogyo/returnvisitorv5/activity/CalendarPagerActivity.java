@@ -21,13 +21,11 @@ import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.RVData;
-import net.c_kogyo.returnvisitorv5.dialogcontents.DayAggregationDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.MonthAggregationDialog;
 import net.c_kogyo.returnvisitorv5.fragment.CalendarFragment;
 import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
-import net.c_kogyo.returnvisitorv5.view.CalendarCell;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -72,6 +70,7 @@ public class CalendarPagerActivity extends AppCompatActivity {
 
         initDialogOverlay();
         initMenuButton();
+        initWaitScreen();
     }
 
     private ViewPager mPager;
@@ -477,7 +476,36 @@ public class CalendarPagerActivity extends AppCompatActivity {
     // DONE: 2017/05/06 月で遷移
     // DONE: 2017/05/06 getClosestPosition
 
-    // TODO: 2017/05/07 遷移待ち画面
+    // DONE: 2017/05/07 遷移待ち画面
+    private RelativeLayout waitScreen;
+    private void initWaitScreen() {
+        waitScreen = (RelativeLayout) findViewById(R.id.wait_screen);
+    }
+
+    private void showWaitScreen() {
+
+        waitScreen.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return true;
+            }
+        });
+
+        waitScreen.setVisibility(View.VISIBLE);
+
+        ValueAnimator screenAnimator = ValueAnimator.ofFloat(0f, 1f);
+        screenAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                waitScreen.setAlpha((float) animation.getAnimatedValue());
+            }
+        });
+        screenAnimator.setDuration(500);
+        screenAnimator.start();
+
+    }
+
+    // TODO: 2017/05/07 週の開始日を切り替える
     // TODO: 2017/05/06 AdView
 
     private class CalendarPagerAdapter extends FragmentStatePagerAdapter {
@@ -490,9 +518,10 @@ public class CalendarPagerActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             return CalendarFragment.newInstance(getMonth(position),
                     StartDay.MONDAY,
-                    new CalendarCell.CalendarCellListener() {
+                    new CalendarFragment.CalendarCellListener() {
                         @Override
                         public void onTouch(Calendar date) {
+                            showWaitScreen();
                             startWorkPagerActivity(date);
                         }
                     });
