@@ -14,6 +14,7 @@ import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.AggregationOfDay;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 
+import java.text.DateFormat;
 import java.util.Calendar;
 
 /**
@@ -41,6 +42,8 @@ public class DayAggregationDialog extends FrameLayout {
     private View view;
     private void initCommon() {
         view = LayoutInflater.from(getContext()).inflate(R.layout.day_aggregation_dialog, this);
+
+        initDateTextView();
         initPlacementCountText();
         initVideoCountText();
         initTimeText();
@@ -48,6 +51,13 @@ public class DayAggregationDialog extends FrameLayout {
         initStudyCountText();
 
         initCloseButton();
+    }
+
+    private void initDateTextView() {
+        TextView dateTextView = (TextView) view.findViewById(R.id.date_text);
+        DateFormat format = android.text.format.DateFormat.getMediumDateFormat(getContext());
+        String dateText = format.format(mDate.getTime());
+        dateTextView.setText(dateText);
     }
 
     private void initPlacementCountText() {
