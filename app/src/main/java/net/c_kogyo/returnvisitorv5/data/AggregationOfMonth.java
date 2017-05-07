@@ -26,6 +26,7 @@ public class AggregationOfMonth {
             if (AggregationOfDay.hasWork(mCal)) {
                 time += AggregationOfDay.time(mCal);
             }
+            mCal.add(Calendar.DAY_OF_MONTH, 1);
         }
         return time;
     }
@@ -40,6 +41,7 @@ public class AggregationOfMonth {
             if (AggregationOfDay.hasVisit(mCal)) {
                 count += AggregationOfDay.placementCount(mCal);
             }
+            mCal.add(Calendar.DAY_OF_MONTH, 1);
         }
         return count;
     }
@@ -54,6 +56,7 @@ public class AggregationOfMonth {
             if (AggregationOfDay.hasVisit(mCal)) {
                 count += AggregationOfDay.showVideoCount(mCal);
             }
+            mCal.add(Calendar.DAY_OF_MONTH, 1);
         }
         return count;
     }
@@ -68,6 +71,7 @@ public class AggregationOfMonth {
             if (AggregationOfDay.hasVisit(mCal)) {
                 count += AggregationOfDay.rvCount(mCal);
             }
+            mCal.add(Calendar.DAY_OF_MONTH, 1);
         }
         return count;
     }

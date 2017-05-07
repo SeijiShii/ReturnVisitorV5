@@ -1,5 +1,6 @@
 package net.c_kogyo.returnvisitorv5.activity;
 
+import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,11 +10,19 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.PopupMenu;
+import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.RVData;
+import net.c_kogyo.returnvisitorv5.dialogcontents.DayAggregationDialog;
+import net.c_kogyo.returnvisitorv5.dialogcontents.MonthAggregationDialog;
 import net.c_kogyo.returnvisitorv5.fragment.CalendarFragment;
 import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
@@ -60,6 +69,9 @@ public class CalendarPagerActivity extends AppCompatActivity {
 
         scrollToMonth();
         initLogoButton();
+
+        initDialogOverlay();
+        initMenuButton();
     }
 
     private ViewPager mPager;
@@ -309,8 +321,163 @@ public class CalendarPagerActivity extends AppCompatActivity {
 
     // TODO: 2017/05/06 Aggregation Dialog
 
+    private ImageView menuButton;
+    private void initMenuButton() {
+        menuButton = (ImageView) findViewById(R.id.work_menu_button);
+        setOnClickListener(menuButton, new ViewUtil.OnViewClickListener() {
+            @Override
+            public void onViewClick() {
+                showPopupMenu();
+            }
+        });
+    }
+
+    private void showPopupMenu() {
+        PopupMenu popupMenu = new PopupMenu(this, menuButton);
+        popupMenu.getMenuInflater().inflate(R.menu.calendar_pager_menu, popupMenu.getMenu());
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.aggregation:
+                        onClickAggregationMenu();
+                        return true;
+                    case R.id.report_mail:
+                        return true;
+                }
+                return false;
+            }
+        });
+        popupMenu.show();
+    }
+
+    private void onClickAggregationMenu() {
+        // DONE: 2017/04/02 Aggregation Action
+        showMonthAggregationDialog();
+    }
+
+    private void showMonthAggregationDialog() {
+        MonthAggregationDialog monthAggregationDialog
+                = new MonthAggregationDialog(this,
+                mAdapter.getMonth(mPager.getCurrentItem()),
+                new MonthAggregationDialog.MonthAggregationDialogListener() {
+            @Override
+            public void onClickCloseButton() {
+
+            }
+
+            @Override
+            public void onClickMailButton(Calendar month) {
+
+            }
+        });
+        dialogFrame.addView(monthAggregationDialog);
+        dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                fadeDialogOverlay(false, null);
+                return true;
+            }
+        });
+        fadeDialogOverlay(true, null);
+    }
+
+    private RelativeLayout dialogOverlay;
+    private void initDialogOverlay() {
+        dialogOverlay = (RelativeLayout) findViewById(R.id.dialog_overlay);
+        initDialogFrame();
+    }
+
+    private FrameLayout dialogFrame;
+    private void initDialogFrame() {
+        dialogFrame = (FrameLayout) findViewById(R.id.dialog_frame);
+    }
+
+    private void fadeDialogOverlay(boolean isFadeIn, @Nullable final WorkPagerActivity.DialogPostAnimationListener listener) {
+
+        if (isFadeIn) {
+            dialogOverlay.setVisibility(View.VISIBLE);
+
+            ValueAnimator fadeInAnimator = ValueAnimator.ofFloat(0f, 1f);
+            fadeInAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                    dialogOverlay.setAlpha((float) valueAnimator.getAnimatedValue());
+                    dialogOverlay.requestLayout();
+                }
+            });
+            fadeInAnimator.setDuration(500);
+
+            if (listener != null) {
+                fadeInAnimator.addListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animator) {
+                        listener.onFinishAnimation();
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animator) {
+
+                    }
+                });
+            }
+
+            fadeInAnimator.start();
+
+        } else {
+            ValueAnimator fadeOutAnimator = ValueAnimator.ofFloat(1f, 0f);
+            fadeOutAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                    dialogOverlay.setAlpha((float) valueAnimator.getAnimatedValue());
+                    dialogOverlay.requestLayout();
+                }
+            });
+            fadeOutAnimator.setDuration(500);
+            fadeOutAnimator.addListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animator) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animator) {
+                    dialogOverlay.setVisibility(View.INVISIBLE);
+                    dialogFrame.removeAllViews();
+                    dialogOverlay.setOnTouchListener(null);
+                    if (listener == null) return;
+                    listener.onFinishAnimation();
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animator) {
+
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animator) {
+
+                }
+            });
+
+            fadeOutAnimator.start();
+        }
+    }
+
     // DONE: 2017/05/06 月で遷移
     // DONE: 2017/05/06 getClosestPosition
+
+
 
     private class CalendarPagerAdapter extends FragmentStatePagerAdapter {
 
