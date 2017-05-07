@@ -601,6 +601,7 @@ public class WorkPagerActivity extends AppCompatActivity {
         }
     }
 
+    // TODO: 2017/05/07 遷移待ち画面
 
 //        dateText.setOnClickListener(new View.OnClickListener() {
 //            @Override

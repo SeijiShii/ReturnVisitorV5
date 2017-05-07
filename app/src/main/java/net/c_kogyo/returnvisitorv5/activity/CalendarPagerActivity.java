@@ -477,6 +477,7 @@ public class CalendarPagerActivity extends AppCompatActivity {
     // DONE: 2017/05/06 月で遷移
     // DONE: 2017/05/06 getClosestPosition
 
+    // TODO: 2017/05/07 遷移待ち画面
 
 
     private class CalendarPagerAdapter extends FragmentStatePagerAdapter {

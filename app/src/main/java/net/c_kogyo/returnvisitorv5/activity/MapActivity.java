@@ -1177,4 +1177,5 @@ public class MapActivity extends AppCompatActivity
     // DONE: 2017/05/05 データ読み込みまでボタンを押せなくする
     // TODO: 2017/05/05 データがないときにWORKやカレンダーに遷移しないようにする(実装済み、要検証)
     // TODO: 2017/05/06 AdView
+    // TODO: 2017/05/07 遷移待ち画面
 }
