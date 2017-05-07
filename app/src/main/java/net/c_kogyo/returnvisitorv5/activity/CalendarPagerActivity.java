@@ -319,7 +319,7 @@ public class CalendarPagerActivity extends AppCompatActivity {
         finish();
     }
 
-    // TODO: 2017/05/06 Aggregation Dialog
+    // DONE: 2017/05/06 Aggregation Dialog
 
     private ImageView menuButton;
     private void initMenuButton() {
@@ -478,7 +478,7 @@ public class CalendarPagerActivity extends AppCompatActivity {
     // DONE: 2017/05/06 getClosestPosition
 
     // TODO: 2017/05/07 遷移待ち画面
-
+    // TODO: 2017/05/06 AdView
 
     private class CalendarPagerAdapter extends FragmentStatePagerAdapter {
 
