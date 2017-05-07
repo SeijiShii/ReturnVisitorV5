@@ -258,7 +258,7 @@ public class CalendarFragment extends Fragment {
             return bar;
         }
 
-        // TODO: 2017/05/05 タッチリスナの実装
+        // DONE: 2017/05/05 タッチリスナの実装
         private void setTouchListenerIfNeeded() {
             if (AggregationOfDay.hasWorkOrVisit(mDate)) {
                 ViewUtil.setOnClickListener(this, new ViewUtil.OnViewClickListener() {
