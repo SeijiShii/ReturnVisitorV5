@@ -106,5 +106,5 @@ public class DayAggregationDialog extends FrameLayout {
         void onClickCloseButton();
     }
 
-    // TODO: 2017/05/07 日付を表示
+    // DONE: 2017/05/07 日付を表示
 }

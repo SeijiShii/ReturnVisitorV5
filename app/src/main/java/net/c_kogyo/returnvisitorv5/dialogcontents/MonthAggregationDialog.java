@@ -109,5 +109,5 @@ public class MonthAggregationDialog extends FrameLayout {
         void onClickMailButton(Calendar month);
     }
 
-    // TODO: 2017/05/07 月名を表示
+    // DONE: 2017/05/07 月名を表示
 }
