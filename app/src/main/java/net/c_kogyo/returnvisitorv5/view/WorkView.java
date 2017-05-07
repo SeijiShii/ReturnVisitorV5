@@ -536,6 +536,8 @@ public class WorkView extends BaseAnimateView {
         void postRemoveVisitCell();
     }
 
+    // TODO: 2017/05/07 時間調整時にDurationが変わらない。
+
 
 
 }
