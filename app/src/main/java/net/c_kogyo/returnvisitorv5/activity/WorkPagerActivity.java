@@ -81,7 +81,7 @@ public class WorkPagerActivity extends AppCompatActivity {
         initLogoButton();
 
         initDialogOverlay();
-
+        initWaitScreen();
 
     }
 
@@ -253,6 +253,7 @@ public class WorkPagerActivity extends AppCompatActivity {
     }
 
     private void onClickDateText() {
+        showWaitScreen();
         startCalendarActivity(mDatePagerAdapter.getDayItem(mPager.getCurrentItem()));
     }
 
@@ -602,6 +603,34 @@ public class WorkPagerActivity extends AppCompatActivity {
     }
 
     // TODO: 2017/05/07 遷移待ち画面
+    private RelativeLayout waitScreen;
+    private void initWaitScreen() {
+        waitScreen = (RelativeLayout) findViewById(R.id.wait_screen);
+    }
+
+    private void showWaitScreen() {
+
+        waitScreen.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return true;
+            }
+        });
+
+        waitScreen.setVisibility(View.VISIBLE);
+
+        ValueAnimator screenAnimator = ValueAnimator.ofFloat(0f, 1f);
+        screenAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                waitScreen.setAlpha((float) animation.getAnimatedValue());
+            }
+        });
+        screenAnimator.setDuration(500);
+        screenAnimator.start();
+
+    }
+
     // TODO: 2017/05/06 AdView
 
 //        dateText.setOnClickListener(new View.OnClickListener() {
