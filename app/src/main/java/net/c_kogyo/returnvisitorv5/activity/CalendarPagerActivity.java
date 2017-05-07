@@ -363,23 +363,23 @@ public class CalendarPagerActivity extends AppCompatActivity {
                 new MonthAggregationDialog.MonthAggregationDialogListener() {
             @Override
             public void onClickCloseButton() {
-
+                fadeDialogOverlay(false);
             }
 
             @Override
             public void onClickMailButton(Calendar month) {
-
+                // TODO: 2017/05/07 Mail Action
             }
         });
         dialogFrame.addView(monthAggregationDialog);
         dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                fadeDialogOverlay(false, null);
+                fadeDialogOverlay(false);
                 return true;
             }
         });
-        fadeDialogOverlay(true, null);
+        fadeDialogOverlay(true);
     }
 
     private RelativeLayout dialogOverlay;
@@ -393,7 +393,7 @@ public class CalendarPagerActivity extends AppCompatActivity {
         dialogFrame = (FrameLayout) findViewById(R.id.dialog_frame);
     }
 
-    private void fadeDialogOverlay(boolean isFadeIn, @Nullable final WorkPagerActivity.DialogPostAnimationListener listener) {
+    private void fadeDialogOverlay(boolean isFadeIn) {
 
         if (isFadeIn) {
             dialogOverlay.setVisibility(View.VISIBLE);
@@ -408,29 +408,29 @@ public class CalendarPagerActivity extends AppCompatActivity {
             });
             fadeInAnimator.setDuration(500);
 
-            if (listener != null) {
-                fadeInAnimator.addListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animator) {
-
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animator animator) {
-                        listener.onFinishAnimation();
-                    }
-
-                    @Override
-                    public void onAnimationCancel(Animator animator) {
-
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animator animator) {
-
-                    }
-                });
-            }
+//            if (listener != null) {
+//                fadeInAnimator.addListener(new Animator.AnimatorListener() {
+//                    @Override
+//                    public void onAnimationStart(Animator animator) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onAnimationEnd(Animator animator) {
+//                        listener.onFinishAnimation();
+//                    }
+//
+//                    @Override
+//                    public void onAnimationCancel(Animator animator) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onAnimationRepeat(Animator animator) {
+//
+//                    }
+//                });
+//            }
 
             fadeInAnimator.start();
 
@@ -455,8 +455,8 @@ public class CalendarPagerActivity extends AppCompatActivity {
                     dialogOverlay.setVisibility(View.INVISIBLE);
                     dialogFrame.removeAllViews();
                     dialogOverlay.setOnTouchListener(null);
-                    if (listener == null) return;
-                    listener.onFinishAnimation();
+//                    if (listener == null) return;
+//                    listener.onFinishAnimation();
                 }
 
                 @Override
