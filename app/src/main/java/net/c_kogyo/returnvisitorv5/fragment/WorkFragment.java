@@ -33,6 +33,7 @@ public class WorkFragment extends Fragment {
     // DONE: 2017/04/05 時間調整後のアニメーション
 
     private Calendar mDate;
+    // TODO: 2017/05/08 Remove worksInDayList 
     private ArrayList<Work> worksInDay;
 //    private ArrayList<Visit> visitsInDayNotInWork;
     private static WorkFragmentListener mWorkFragmentListener;
