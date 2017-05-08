@@ -45,6 +45,8 @@ import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
+import net.c_kogyo.returnvisitorv5.data.Work;
+import net.c_kogyo.returnvisitorv5.dialogcontents.AddWorkDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.HousingComplexDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.MapLongClickDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.PlaceDialog;
@@ -952,6 +954,7 @@ public class MapActivity extends AppCompatActivity
         initCountTimeFrame();
         initWorkButton();
         initCalendarButton();
+        initAddWorkButton();
     }
 
     private void initDrawerLogoButton() {
@@ -1177,6 +1180,57 @@ public class MapActivity extends AppCompatActivity
         startActivity(calendarIntent);
     }
 
+    // TODO: 2017/05/08 Add Work
+    private void initAddWorkButton() {
+        Button addWorkButton = (Button) findViewById(R.id.add_work_button);
+        addWorkButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openCloseDrawer();
+                showAddWorkDialog();
+            }
+        });
+    }
+
+    private void showAddWorkDialog() {
+        AddWorkDialog addWorkDialog
+                = new AddWorkDialog(this,
+                new AddWorkDialog.AddWorkDialogListener() {
+                    @Override
+                    public void onOkClick(Work work) {
+                        startWorkPagerActivityWithNewWork(work);
+                        fadeOutDialogOverlay(normalFadeOutListener);
+                    }
+
+                    @Override
+                    public void onCancelClick() {
+                        fadeOutDialogOverlay(normalFadeOutListener);
+                    }
+                },
+                true,
+                Calendar.getInstance());
+        dialogFrame.addView(addWorkDialog);
+        fadeInDialogOverlay();
+        dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                fadeOutDialogOverlay(normalFadeOutListener);
+                return true;
+            }
+        });
+    }
+
+    private void startWorkPagerActivityWithNewWork(Work work) {
+
+        RVData.getInstance().workList.setOrAdd(work);
+        RVData.getInstance().saveData(this, null);
+
+        Intent withNewWorkIntent = new Intent(this, WorkPagerActivity.class);
+        withNewWorkIntent.setAction(Constants.WorkPagerActivityActions.START_WITH_NEW_WORK);
+        withNewWorkIntent.putExtra(Work.WORK, work.getId());
+        startActivity(withNewWorkIntent);
+    }
+
     // DONE: 2017/04/01 集合住宅のマークがでかすぎる
 
     // DONE: 2017/05/05 データ読み込みまでボタンを押せなくする
@@ -1185,7 +1239,7 @@ public class MapActivity extends AppCompatActivity
     // DONE: 2017/05/08 開始時間に秒はいらない
     // TODO: 2017/05/08 ログイン画面
     // TODO: 2017/05/08 データ同期まわり
-    // TODO: 2017/05/08 Add Work
+
 
 
 }

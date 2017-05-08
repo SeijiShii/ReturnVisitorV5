@@ -69,6 +69,8 @@ public class WorkPagerActivity extends AppCompatActivity {
 
         AdMobHelper.setAdView(this);
 
+        setAddedWork();
+
         initHeaderRow();
         initPager();
 
@@ -90,7 +92,7 @@ public class WorkPagerActivity extends AppCompatActivity {
 
         mPager = (ViewPager) findViewById(R.id.view_pager);
 
-        Calendar date = getDate();
+        Calendar date = getDateToOpen();
         mDatePagerAdapter = new DatePagerAdapter(getSupportFragmentManager());
 
         mPager.setAdapter(mDatePagerAdapter);
@@ -118,16 +120,23 @@ public class WorkPagerActivity extends AppCompatActivity {
     }
 
     // 日付指定で遷移するためのプロセス
-    private Calendar getDate() {
+    private Calendar getDateToOpen() {
 
         Calendar date = Calendar.getInstance();
 
-        long dLong = getIntent().getLongExtra(Constants.DATE_LONG, 0);
-        if (dLong != 0) {
-            date.setTimeInMillis(dLong);
+        if (getIntent().getAction() != null) {
+            if (getIntent().getAction().equals(Constants.WorkPagerActivityActions.START_WITH_NEW_WORK)) {
+                return addedWork.getStart();
+            } else {
+                return date;
+            }
+        } else {
+            long dLong = getIntent().getLongExtra(Constants.DATE_LONG, 0);
+            if (dLong != 0) {
+                date.setTimeInMillis(dLong);
+            }
+            return date;
         }
-        return date;
-
     }
 
     private void initHeaderRow() {
@@ -248,7 +257,7 @@ public class WorkPagerActivity extends AppCompatActivity {
                 onClickDateText();
             }
         });
-        refreshDateText();
+        refreshDateText(null);
     }
 
     private void onClickDateText() {
@@ -263,10 +272,15 @@ public class WorkPagerActivity extends AppCompatActivity {
         finish();
     }
 
-    private void refreshDateText() {
+    private void refreshDateText(@Nullable Calendar date) {
         DateFormat format = android.text.format.DateFormat.getDateFormat(this);
-        String dateString = format.format(mDatePagerAdapter.getDayItem(mPager.getCurrentItem()).getTime());
+        String dateString;
 
+        if (date != null) {
+            dateString = format.format(date.getTime());
+        } else {
+            dateString = format.format(mDatePagerAdapter.getDayItem(mPager.getCurrentItem()).getTime());
+        }
         dateText.setText(dateString);
     }
 
@@ -287,7 +301,7 @@ public class WorkPagerActivity extends AppCompatActivity {
 
     private void refreshButtons() {
 
-        refreshDateText();
+        refreshDateText(null);
 
         if (mPagerState == mOldState)
             return;
@@ -600,81 +614,24 @@ public class WorkPagerActivity extends AppCompatActivity {
         }
     }
 
-
     // TODO: 2017/05/06 AdView to Real
 
-//        dateText.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
+    private Work addedWork;
+    private void setAddedWork() {
+        if (getIntent().getAction() == null)
+            return;
 
-//                CalendarDialog.newInstance(mDatePagerAdapter.getDate(mPager.getCurrentItem())).show(getFragmentManager(), null);
-//                Intent calendarIntent = new Intent(WorkPagerActivity.this, CalendarActivity.class);
-//                calendarIntent.setAction(Constants.CalendarActions.START_CALENDAR_FROM_WORK_ACTION);
-//                calendarIntent.putExtra(Constants.DATE_LONG,
-//                        mDatePagerAdapter.getDayItem(mPager.getCurrentItem()).getDate().getTimeInMillis());
-//
-//                WorkPagerActivity.this.startActivityForResult(calendarIntent, Constants.CalendarActions.START_CALENDAR_REQUEST_CODE);
+        if (!getIntent().getAction().equals(Constants.WorkPagerActivityActions.START_WITH_NEW_WORK))
+            return;
 
+        String workId = getIntent().getStringExtra(Work.WORK);
+        if (workId == null)
+            return;
 
-//                Calendar date = mDatePagerAdapter.getDate(mPager.getCurrentItem());
-//                new DatePickerDialog(WorkPagerActivity.this, new DatePickerDialog.OnDateSetListener() {
-//                    @Override
-//                    public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
-//
-//                        Calendar daySet = Calendar.getInstance();
-//                        daySet.set(Calendar.YEAR, i);
-//                        daySet.set(Calendar.MONTH, i1);
-//                        daySet.set(Calendar.DAY_OF_MONTH, i2);
-//
-//                        if (mDatePagerAdapter.containsDate(daySet)) {
-//
-//                            mPager.setCurrentItem(mDatePagerAdapter.getPosition(daySet), true);
-//                            refreshButtons();
-//                        }
-//                    }
-//                }, date.get(Calendar.YEAR),
-//                        date.get(Calendar.MONTH),
-//                        date.get(Calendar.DAY_OF_MONTH)).show();
-
-//            }
-//        });
-
-
-
-//    private void initAddButton() {
-//
-//        Button addButton = (Button) findViewById(R.id.add_button);
-//        addButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//
-//                AddSelectDialog.newInstance(mDatePagerAdapter.getDayItem(mPager.getCurrentItem()).getDate(),
-//                        new AddWorkDialog.OnWorkSetListener() {
-//                    @Override
-//                    public void onWorkSet(Work work) {
-//
-//                        // ここがUIの一番浅い場所なので原初データをいじる
-//                        RVData.getInstance().workList.addOrSet(work);
-//                        RVData.getInstance().workList.onChangeTime(work);
-//
-//                        mPager.setCurrentItem(mDatePagerAdapter.getPositionForAddedWork(work), true);
-//                        refreshButtons();
-//
-//                        WorkFragment fragment = (WorkFragment) mDatePagerAdapter.instantiateItem(mPager, mDatePagerAdapter.getPosition(work.getStart()));
-//                        fragment.addWorkViewAndExtract(work);
-//
-//                    }
-//                }).show(getFragmentManager(), null);
-//
-//            }
-//        });
-//
-//    }
-
+        addedWork = RVData.getInstance().workList.getById(workId);
+    }
 
     class DatePagerAdapter extends FragmentStatePagerAdapter {
-
-//        private ArrayList<Calendar> mAggregatedDates;
 
         public DatePagerAdapter(FragmentManager fm) {
             super(fm);
@@ -684,7 +641,15 @@ public class WorkPagerActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
 
             return WorkFragment.newInstance(RVData.getInstance().getDatesWithData().get(position),
+                    addedWork,
                     new WorkFragment.WorkFragmentListener() {
+
+                        @Override
+                        public void postRemoveWorkView(Work work) {
+                            RVData.getInstance().workList.deleteById(work.getId());
+                            RVData.getInstance().saveData(WorkPagerActivity.this, null);
+                            notifyDataSetChanged();
+                        }
 
                         @Override
                         public void onAllItemRemoved(Calendar date) {
@@ -746,12 +711,11 @@ public class WorkPagerActivity extends AppCompatActivity {
             return datePos;
         }
 
-        public int getClosestPosition(Calendar date) {
-
-            if (getCount() <= 0) return 0;
+        private Calendar getClosestDate(Calendar date) {
+            if (getCount() <= 0) return date ;
 
             if (getPosition(date) >= 0) {
-                return getPosition(date);
+                return date;
             }
 
             Calendar dateFuture = (Calendar) date.clone();
@@ -763,27 +727,30 @@ public class WorkPagerActivity extends AppCompatActivity {
                 datePast.add(Calendar.DAY_OF_MONTH, -1);
 
                 if (getPosition(datePast) >= 0) {
-                    return getPosition(datePast);
+                    return datePast;
                 }
 
                 if (getPosition(dateFuture) >= 0) {
-                    return getPosition(dateFuture);
+                    return dateFuture;
                 }
 
             }
         }
 
+        public int getClosestPosition(Calendar date) {
+
+            return getPosition(getClosestDate(date));
+
+        }
+
         private void removeDay(Calendar date) {
 
             // TODO: 2017/05/04 挙動要検証
-//            for (AggregationOfDay day : mAggregationOfDays) {
-//                if (CalendarUtil.isSameDay(date, day.getDate())){
-//                    mAggregationOfDays.remove(day);
-//                    break;
-//                }
-//            }
+
             notifyDataSetChanged();
             mPager.setCurrentItem(getClosestPosition(date), true);
+            refreshDateText(getClosestDate(date));
+            refreshPagerState();
             refreshButtons();
         }
 

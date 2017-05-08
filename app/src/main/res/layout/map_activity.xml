@@ -80,6 +80,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
+                <!-- App Title -->
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -110,6 +111,7 @@
                     android:layout_marginRight="5dp"
                     android:layout_marginLeft="5dp"/>
 
+                <!-- Count Time -->
                 <net.c_kogyo.returnvisitorv5.view.CountTimeFrame
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
@@ -122,6 +124,7 @@
                     android:layout_marginRight="5dp"
                     android:layout_marginLeft="5dp"/>
 
+                <!-- Work Button -->
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/ui_height_small">
@@ -146,6 +149,32 @@
                     android:layout_marginRight="5dp"
                     android:layout_marginLeft="5dp"/>
 
+                <!-- Add Work Button -->
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/ui_height_small">
+
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:id="@+id/add_work_button"
+                        android:textColor="@color/colorPrimaryDark"
+                        android:background="@drawable/trans_blue_selector"
+                        android:text="@string/add_work"
+                        android:paddingLeft="5dp"
+                        android:paddingRight="5dp"
+                        android:layout_centerInParent="true"/>
+
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/textColorGray"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginLeft="5dp"/>
+
+                <!-- Calendar Button -->
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/ui_height_small">

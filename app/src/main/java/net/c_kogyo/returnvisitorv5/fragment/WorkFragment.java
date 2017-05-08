@@ -3,6 +3,7 @@ package net.c_kogyo.returnvisitorv5.fragment;
 import android.animation.Animator;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -17,6 +18,7 @@ import net.c_kogyo.returnvisitorv5.activity.RecordVisitActivity;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.Work;
+import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
 import net.c_kogyo.returnvisitorv5.view.BaseAnimateView;
 import net.c_kogyo.returnvisitorv5.view.VisitCell;
 import net.c_kogyo.returnvisitorv5.view.WorkView;
@@ -33,13 +35,16 @@ public class WorkFragment extends Fragment {
     // DONE: 2017/04/05 時間調整後のアニメーション
 
     private Calendar mDate;
-    // TODO: 2017/05/08 Remove worksInDayList 
+    // TODO: 2017/05/08 Remove worksInDayList
     private ArrayList<Work> worksInDay;
 //    private ArrayList<Visit> visitsInDayNotInWork;
     private static WorkFragmentListener mWorkFragmentListener;
     private int mVisitCellHeight;
+    private Work mNewAddedWork;
 
-    public static WorkFragment newInstance(Calendar date, WorkFragmentListener workFragmentListener) {
+    public static WorkFragment newInstance(Calendar date,
+                                           @Nullable Work newAddedWork,
+                                           WorkFragmentListener workFragmentListener) {
 
         // DONE: 2017/04/14 getItemで取得したとき初期化されない pagerAdapter.instantiate()が正しい
 
@@ -49,8 +54,13 @@ public class WorkFragment extends Fragment {
 
         Bundle arg = new Bundle();
         Intent intent = new Intent();
+
         intent.putExtra(Constants.DATE_LONG, date.getTimeInMillis());
-        arg.putParcelable(Constants.DATE_LONG, intent);
+        if (newAddedWork != null) {
+            intent.putExtra(Work.WORK, newAddedWork.getId());
+        }
+
+        arg.putParcelable(Constants.WORK_FRAGMENT_ARGUMENT, intent);
         workFragment.setArguments(arg);
 
         return workFragment;
@@ -62,7 +72,7 @@ public class WorkFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        setDate();
+        setParcelableData();
 
         view = inflater.inflate(R.layout.work_fragment, container, false);
 
@@ -73,21 +83,32 @@ public class WorkFragment extends Fragment {
 
         initContainer();
 
+        insertNewWorkViewPostDrawnIfExists();
+
         return view;
     }
 
-    private void setDate() {
+    private void setParcelableData() {
 
         mDate = Calendar.getInstance();
 
-        Intent intent = getArguments().getParcelable(Constants.DATE_LONG);
+        Intent intent = getArguments().getParcelable(Constants.WORK_FRAGMENT_ARGUMENT);
 
         if (intent == null) return;
+
         Long dLong =  intent.getLongExtra(Constants.DATE_LONG, 0);
 
-        if (dLong == 0) return;
-        mDate.setTimeInMillis(dLong);
+        if (dLong != 0) {
+            mDate.setTimeInMillis(dLong);
+        }
 
+        String workId = intent.getStringExtra(Work.WORK);
+        if (workId != null) {
+            Work work = RVData.getInstance().workList.getById(workId);
+            if (CalendarUtil.isSameDay(work.getStart(), mDate)) {
+                mNewAddedWork = work;
+            }
+        }
     }
 
     private LinearLayout container;
@@ -110,7 +131,10 @@ public class WorkFragment extends Fragment {
 
             } else {
 
-                addWorkView(worksInDay.get(workCounter), false);
+                if (!worksInDay.get(workCounter).equals(mNewAddedWork)) {
+                    // 他アクティビティで追加したWorkなら描画後に挿入
+                    addWorkView(worksInDay.get(workCounter), false);
+                }
                 workCounter++;
             }
         }
@@ -237,9 +261,9 @@ public class WorkFragment extends Fragment {
                     @Override
                     public void onDeleteWork(WorkView workView) {
                         Work deletedWork = workView.getWork();
-                        RVData.getInstance().workList.deleteById(deletedWork.getId());
+//                        RVData.getInstance().workList.deleteById(deletedWork.getId());
                         removeWorkView(deletedWork);
-                        RVData.getInstance().saveData(getContext(), null);
+//                        RVData.getInstance().saveData(getContext(), null);
                     }
 
                     @Override
@@ -527,7 +551,7 @@ public class WorkFragment extends Fragment {
         return null;
     }
 
-    private void removeWorkView(Work work) {
+    private void removeWorkView(final Work work) {
         final WorkView workView = getWorkView(work.getId());
         if (workView == null) return;
 
@@ -540,6 +564,10 @@ public class WorkFragment extends Fragment {
             @Override
             public void onAnimationEnd(Animator animation) {
                 container.removeView(workView);
+                if (mWorkFragmentListener != null) {
+                    mWorkFragmentListener.postRemoveWorkView(work);
+                }
+                verifyItemRemains();
             }
 
             @Override
@@ -631,7 +659,37 @@ public class WorkFragment extends Fragment {
 
     }
 
+    private void insertNewWorkViewPostDrawnIfExists() {
+
+        if (mNewAddedWork == null) {
+            return;
+        }
+
+        final Handler handler = new Handler();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (container.getWidth() <= 0) {
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        //
+                    }
+                }
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        addWorkViewAndExtract(mNewAddedWork);
+                    }
+                });
+            }
+        }).start();
+    }
+
     public interface WorkFragmentListener {
+
+        void postRemoveWorkView(Work work);
+
         void onAllItemRemoved(Calendar date);
 
         void moveToMap(Visit visit);

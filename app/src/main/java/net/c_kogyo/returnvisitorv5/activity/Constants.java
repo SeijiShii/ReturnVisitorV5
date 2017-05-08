@@ -59,10 +59,12 @@ public class Constants {
     };
 
     public static final String DATE_LONG = "date_long";
+    public static final String WORK_FRAGMENT_ARGUMENT = "work_fragment_argument";
 
     public static final String MONTH_LONG = "month_long";
     public static final String START_DAY = "start_day";
     public static final String CALENDAR_FRAGMENT_ARGUMENT = "calendar_fragment_argument";
+
 
     public static final String REQUEST_CODE = "Request Code";
 
@@ -116,12 +118,9 @@ public class Constants {
 //        public static final int PRESS_DATE_RESULT_CODE = 5010;
 //    }
 //
-    public class WorkActivityActions {
+    public class WorkPagerActivityActions {
 
-        public static final String SHOW_GENERAL_WORKS = "show_general_works";
-        public static final String POST_DELETE_VISIT = "post_delete_visit";
-        public static final String MOVE_TO_MAP_ACTION = "_move_to_map_action";
-
+        public static final String START_WITH_NEW_WORK = "start_with_new_work";
     }
 
 }
