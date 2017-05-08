@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -633,16 +634,27 @@ public class WorkPagerActivity extends AppCompatActivity {
 
     class DatePagerAdapter extends FragmentStatePagerAdapter {
 
+        String TAG = "DatePagerAdapter_TAG";
+
+        private boolean toExtractAddedWorkView;
         public DatePagerAdapter(FragmentManager fm) {
             super(fm);
+            toExtractAddedWorkView = true;
         }
 
         @Override
         public Fragment getItem(int position) {
 
+//            Log.d(TAG, "Get Work Fragment, position: " + position);
             return WorkFragment.newInstance(RVData.getInstance().getDatesWithData().get(position),
                     addedWork,
+                    toExtractAddedWorkView,
                     new WorkFragment.WorkFragmentListener() {
+
+                        @Override
+                        public void postExtractAddedWorkView() {
+                            toExtractAddedWorkView = false;
+                        }
 
                         @Override
                         public void postRemoveWorkView(Work work) {

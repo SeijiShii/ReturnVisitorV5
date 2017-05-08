@@ -58,9 +58,14 @@ public class Constants {
             R.mipmap.square_marker_orange
     };
 
-    public static final String DATE_LONG = "date_long";
-    public static final String WORK_FRAGMENT_ARGUMENT = "work_fragment_argument";
+    public class WorkFragmentConstants{
+        public static final String WORK_FRAGMENT_ARGUMENT = "work_fragment_argument";
+        public static final String ADDED_WORK_ID = "added_work_id";
+        public static final String TO_EXTRACT_WORK_VIEW = "to_extract_work_view";
 
+    }
+
+    public static final String DATE_LONG = "date_long";
     public static final String MONTH_LONG = "month_long";
     public static final String START_DAY = "start_day";
     public static final String CALENDAR_FRAGMENT_ARGUMENT = "calendar_fragment_argument";
