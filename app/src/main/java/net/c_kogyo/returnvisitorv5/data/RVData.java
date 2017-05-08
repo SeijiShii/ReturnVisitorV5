@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import net.c_kogyo.returnvisitorv5.data.list.DataList;
 import net.c_kogyo.returnvisitorv5.data.list.NoteCompList;
 import net.c_kogyo.returnvisitorv5.data.list.PlaceList;
+import net.c_kogyo.returnvisitorv5.data.list.TagList;
 import net.c_kogyo.returnvisitorv5.data.list.VisitList;
 import net.c_kogyo.returnvisitorv5.data.list.WorkList;
 import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
@@ -43,7 +44,7 @@ public class RVData {
     public PlaceList placeList;
     public DataList<Person> personList;
     public VisitList visitList;
-    public DataList<Tag> tagList;
+    public TagList tagList;
     public NoteCompList noteCompList;
     public DataList<Publication> pubList;
     public WorkList workList;
@@ -55,7 +56,7 @@ public class RVData {
         personList = new DataList<>();
         visitList = new VisitList();
 
-        tagList = new DataList<>();
+        tagList = new TagList();
         noteCompList = new NoteCompList();
         pubList = new DataList<>();
 

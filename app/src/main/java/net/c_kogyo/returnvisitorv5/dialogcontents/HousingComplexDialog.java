@@ -41,7 +41,7 @@ import java.util.ArrayList;
 
 public class HousingComplexDialog extends FrameLayout {
 
-    // TODO: 2017/05/08 部屋名ソート
+    // DONE: 2017/05/08 部屋名ソート
     private Place mHousingComplex;
     private HousingComplexDialogListener mListener;
     private ArrayList<Place> addedRooms;
