@@ -318,6 +318,7 @@ public class WorkFragment extends Fragment {
     }
 
     // TODO: 2017/05/06 Add work時のポジションがおかしい
+    // DONE: 2017/05/08 workViewが二つ挿入される
     private int getInsertPosition(Calendar time) {
 
         for ( int i = 0 ; i < container.getChildCount() ; i++ ) {
@@ -671,6 +672,9 @@ public class WorkFragment extends Fragment {
     public void addWorkViewAndExtract(Work work) {
 
         int pos = getInsertPosition(work.getStart());
+
+        Log.d(TAG, "addWorkViewAndExtract Called! pos: " + pos);
+
 //        addWorkView(work, true);
         container.addView(generateWorkView(work, true), pos);
 

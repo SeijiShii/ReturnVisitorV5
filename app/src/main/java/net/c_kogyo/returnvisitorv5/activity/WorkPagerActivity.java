@@ -595,7 +595,7 @@ public class WorkPagerActivity extends AppCompatActivity {
         ArrayList<Work> worksRemoved = RVData.getInstance().workList.onChangeTime(work);
         ArrayList<Visit> visitsSwallowed = RVData.getInstance().visitList.getVisitsInWork(work);
 
-        int pos = mDatePagerAdapter.getPositionForAddedWork(work);
+        int pos = mDatePagerAdapter.getPosition(work.getStart());
         mPager.setCurrentItem(pos);
 
         WorkFragment fragment = (WorkFragment) mDatePagerAdapter.instantiateItem(mPager, pos);
@@ -700,28 +700,10 @@ public class WorkPagerActivity extends AppCompatActivity {
         }
 
 
-        public int getPositionForAddedWork(Work work) {
-
-            notifyDataSetChanged();
-
-            // Workが追加された時点ですでにmDatesにある日付かどうか
-            int datePos = getPosition(work.getStart());
-
-//            if (datePos >= 0) {
-//                // 日付がすでにある
+//        public int getPositionForAddedWork(Work work) {
 //
-//            } else {
-//                // 日付が存在しない(その日にはまだ何のデータもなかった)
-//                // この日には削除されるWorkも存在しない
-//                setDays();
-//
-//                // 気を取り直して…
-//                datePos = getPosition(work.getStart());
-//                notifyDataSetChanged();
-//            }
-
-            return datePos;
-        }
+//            return getPosition(work.getStart());
+//        }
 
         private Calendar getClosestDate(Calendar date) {
             if (getCount() <= 0) return date ;
