@@ -14,6 +14,7 @@ import android.widget.TimePicker;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.service.TimeCountService;
+import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 
 import java.util.Calendar;
 
@@ -80,23 +81,10 @@ public class CountTimeFrame extends BaseAnimateView {
     private TextView startTimeText;
     private void initStartTimeText() {
         startTimeText = (TextView) getViewById(R.id.start_time_text);
-        startTimeText.setOnTouchListener(new OnTouchListener() {
+        ViewUtil.setOnClickListener(startTimeText, new ViewUtil.OnViewClickListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        startTimeText.setAlpha(0.5f);
-                        return true;
-                    case MotionEvent.ACTION_UP:
-                        startTimeText.setAlpha(1f);
-                        showTimePickerDialog();
-                        return true;
-                    case MotionEvent.ACTION_CANCEL:
-                        startTimeText.setAlpha(1f);
-                        return true;
-                }
-                return false;
+            public void onViewClick() {
+                showTimePickerDialog();
             }
         });
     }

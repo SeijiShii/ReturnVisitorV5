@@ -1075,7 +1075,7 @@ public class MapActivity extends AppCompatActivity
                long startTime = intent.getLongExtra(TimeCountService.START_TIME, 0);
                Calendar start = Calendar.getInstance();
                start.setTimeInMillis(startTime);
-               String startText = getString(R.string.start_time_text, DateTimeText.getTimeText(start, true));
+               String startText = getString(R.string.start_time_text, DateTimeText.getTimeText(start, false));
 
                long duration = intent.getLongExtra(TimeCountService.DURATION, 0);
                String durationText = getString(R.string.duration_string, DateTimeText.getDurationString(duration, true));
@@ -1183,7 +1183,7 @@ public class MapActivity extends AppCompatActivity
     // TODO: 2017/05/05 データがないときにWORKやカレンダーに遷移しないようにする(実装済み、要検証)
     // TODO: 2017/05/06 AdView to Real
     // TODO: 2017/05/08 開始時間に秒はいらない
-    // TODO: 2017/05/08 ログイン画面 
+    // TODO: 2017/05/08 ログイン画面
 
 
 }
