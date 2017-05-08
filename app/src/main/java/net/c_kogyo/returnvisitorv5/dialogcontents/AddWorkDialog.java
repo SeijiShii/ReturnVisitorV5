@@ -28,7 +28,7 @@ import java.util.Calendar;
 
 public class AddWorkDialog extends FrameLayout {
 
-    // TODO: 2017/05/08 日付を設定できるかできないか
+    // DONE: 2017/05/08 日付を設定できるかできないか
     private AddWorkDialogListener mListener;
     private boolean mIsDateChangeable;
     private Work mWork;

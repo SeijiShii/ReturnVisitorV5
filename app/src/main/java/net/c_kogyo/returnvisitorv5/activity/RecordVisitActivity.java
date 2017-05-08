@@ -795,6 +795,6 @@ public class RecordVisitActivity extends AppCompatActivity {
     // DONE: 2017/03/26 PriorityRaterの挙動がいまいち
     // DONE: 2017/04/05 Activity起動時にスクロール位置が一番上にない
     // TODO: 2017/05/06 再訪問時に人visit detailが閉じているようにしたい。
-    // TODO: 2017/05/08 場所無し訪問機能 
+    // TODO: 2017/05/08 場所無し訪問機能
 
 }
