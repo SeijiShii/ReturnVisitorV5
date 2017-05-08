@@ -44,6 +44,15 @@ public class PlaceList extends DataList<Place> {
                 roomList.add(place);
             }
         }
+
+        // 名前でソート
+        Collections.sort(roomList, new Comparator<Place>() {
+            @Override
+            public int compare(Place o1, Place o2) {
+                return o1.getName().compareTo(o2.getName());
+            }
+        });
+
         return roomList;
     }
 
