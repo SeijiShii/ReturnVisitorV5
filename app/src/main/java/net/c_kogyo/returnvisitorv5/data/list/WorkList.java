@@ -132,4 +132,14 @@ public class WorkList extends DataList<Work> {
         }
         return null;
     }
+
+    public ArrayList<Work> getWorksInMonth(Calendar month) {
+        ArrayList<Work> works = new ArrayList<>();
+        for (Work work : getList()) {
+            if (CalendarUtil.isSameMonth(work.getStart(), month)) {
+                works.add(work);
+            }
+        }
+        return works;
+    }
 }

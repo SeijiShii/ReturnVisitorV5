@@ -19,6 +19,8 @@ public class Constants {
         public static final String COUNTING_WORK_ID = "counting_work_id";
         public static final String IS_COUNTING_TIME = "is_counting_time";
 
+        public static final String USER_NAME = "user_name";
+
     }
 
     public static final String LATITUDE = "latitude";

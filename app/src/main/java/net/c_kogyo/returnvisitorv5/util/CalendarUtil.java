@@ -32,7 +32,6 @@ public class CalendarUtil {
         return year1 == year2 && month1 == month2;
     }
 
-
     public static boolean oneIsBeforeTwo(Calendar month1, Calendar month2) {
 
         int year1 = month1.get(Calendar.YEAR);
@@ -41,6 +40,6 @@ public class CalendarUtil {
         int year2 = month2.get(Calendar.YEAR);
         int mMonth2 = month2.get(Calendar.MONTH);
 
-        return (year1 < year2) || ( year1 == year2 && mMonth1 <= mMonth2);
+        return (year1 < year2) || ( year1 == year2 && mMonth1 < mMonth2);
     }
 }

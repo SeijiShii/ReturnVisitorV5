@@ -57,7 +57,7 @@ public class MonthAggregationDialog extends FrameLayout {
 
     private void initMonthTextView() {
         TextView monthTextView = (TextView) view.findViewById(R.id.month_text);
-        String monthText = DateTimeText.getMonthText(mMonth);
+        String monthText = DateTimeText.getMonthText(mMonth, getContext());
         monthTextView.setText(monthText);
     }
 
@@ -75,8 +75,8 @@ public class MonthAggregationDialog extends FrameLayout {
 
     private void initTimeText() {
         TextView timeText = (TextView) view.findViewById(R.id.time_text);
-        long time = AggregationOfMonth.time(mMonth);
-        timeText.setText(DateTimeText.getDurationString(time, false));
+        int time = AggregationOfMonth.hour(mMonth);
+        timeText.setText(String.valueOf(time));
     }
 
     private void initRVCountText() {
@@ -109,5 +109,6 @@ public class MonthAggregationDialog extends FrameLayout {
         void onClickMailButton(Calendar month);
     }
 
+    // TODO: 2017/05/08 Mail Action 
     // DONE: 2017/05/07 月名を表示
 }

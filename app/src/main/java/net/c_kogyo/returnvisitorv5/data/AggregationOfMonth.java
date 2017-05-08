@@ -16,7 +16,13 @@ public class AggregationOfMonth {
 //    int showVideoCount;
 //    int rvCount;
 
-    public static long time(Calendar month) {
+    public static int hour(Calendar month) {
+        long oneHour = 1000 * 60 * 60;
+        int hour = (int) (time(month) / oneHour);
+        return hour;
+    }
+
+    private static long time(Calendar month) {
 
         Calendar mCal = (Calendar) month.clone();
         long time = 0;
@@ -27,6 +33,33 @@ public class AggregationOfMonth {
                 time += AggregationOfDay.time(mCal);
             }
             mCal.add(Calendar.DAY_OF_MONTH, 1);
+        }
+
+        //次の月に進んでしまっているので前月にするには2つ戻す。
+        mCal.add(Calendar.MONTH, -2);
+        long timeUpToLastMonth = getTimeUpToThisMonth(mCal);
+
+        time += getFractionMinute(timeUpToLastMonth);
+        return time;
+    }
+
+    private static long getFractionMinute(long time) {
+        long minute = 60 * 1000;
+        long hour = minute * 60;
+        return time - (time / hour * hour);
+    }
+
+    private static long getTimeUpToThisMonth(Calendar month) {
+
+        long time = 0;
+
+        Calendar nextMonth = (Calendar) month.clone();
+        nextMonth.add(Calendar.MONTH, 1);
+
+        for (Work work : RVData.getInstance().workList) {
+            if (CalendarUtil.oneIsBeforeTwo(work.getStart(), nextMonth)) {
+                time += work.getDuration();
+            }
         }
         return time;
     }

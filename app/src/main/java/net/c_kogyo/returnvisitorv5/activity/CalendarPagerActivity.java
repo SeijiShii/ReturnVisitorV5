@@ -26,6 +26,7 @@ import net.c_kogyo.returnvisitorv5.fragment.CalendarFragment;
 import net.c_kogyo.returnvisitorv5.util.AdMobHelper;
 import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
+import net.c_kogyo.returnvisitorv5.util.MailReport;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 
 import java.util.ArrayList;
@@ -112,7 +113,7 @@ public class CalendarPagerActivity extends AppCompatActivity {
     private void refreshMonthText() {
 
         Calendar currentMonth = mAdapter.getMonth(mPager.getCurrentItem());
-        String monthText = DateTimeText.getMonthText(currentMonth);
+        String monthText = DateTimeText.getMonthText(currentMonth, this);
         monthTextView.setText(monthText);
     }
 
@@ -371,6 +372,8 @@ public class CalendarPagerActivity extends AppCompatActivity {
             @Override
             public void onClickMailButton(Calendar month) {
                 // TODO: 2017/05/07 Mail Action
+                fadeDialogOverlay(false);
+                MailReport.exportToMail(CalendarPagerActivity.this, month);
             }
         });
         dialogFrame.addView(monthAggregationDialog);
