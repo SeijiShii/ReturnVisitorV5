@@ -115,8 +115,10 @@ public class WorkFragment extends Fragment {
         String workId = intent.getStringExtra(Constants.WorkFragmentConstants.ADDED_WORK_ID);
         if (workId != null) {
             Work work = RVData.getInstance().workList.getById(workId);
-            if (CalendarUtil.isSameDay(work.getStart(), mDate)) {
-                mNewAddedWork = work;
+            if (work != null) {
+                if (CalendarUtil.isSameDay(work.getStart(), mDate)) {
+                    mNewAddedWork = work;
+                }
             }
         }
 

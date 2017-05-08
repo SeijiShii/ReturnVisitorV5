@@ -60,15 +60,15 @@ public class WorkList extends DataList<Work> {
 
     /**
      *
-     * @param work 時間の変更された
+     * @param workChanged 時間の変更された
      * @return 調整の結果削除されたWorkのリスト
      */
-    public ArrayList<Work> onChangeTime(Work work) {
+    public ArrayList<Work> onChangeTime(Work workChanged) {
 
         ArrayList<Work> worksRemoved = new ArrayList<>();
 
         // 念のため存在チェック
-        if (!getList().contains(work)) return worksRemoved;
+        if (!getList().contains(workChanged)) return worksRemoved;
 
         // すべてのリストを開始時間で整列
         Collections.sort(getList(), new Comparator<Work>() {
@@ -79,18 +79,21 @@ public class WorkList extends DataList<Work> {
         });
 
         // 対象の要素のindexを取得
-        int index = getList().indexOf(work);
+        int index = getList().indexOf(workChanged);
 
         // 過去に向かってさかのぼり
         for ( int i = index - 1 ; i >= 0 ; i-- ) {
 
-            Work work1 = getList().get(i);
+            Work work = getList().get(i);
 
-            if (work.getStart().before(work1.getStart())) {
-                worksRemoved.add(work1);
-            } else if (work.getStart().before(work1.getEnd())) {
-                work.setStart(work1.getStart());
-                worksRemoved.add(work1);
+            if(work.equals(workChanged))
+                break;
+
+            if (workChanged.getStart().before(work.getStart())) {
+                worksRemoved.add(work);
+            } else if (workChanged.getStart().before(work.getEnd())) {
+                workChanged.setStart(work.getStart());
+                worksRemoved.add(work);
             } else {
                 break;
             }
@@ -99,13 +102,16 @@ public class WorkList extends DataList<Work> {
         // 未来にむかって!!
         for (int i = index + 1 ; i < getList().size() ; i++ ) {
 
-            Work work1 = getList().get(i);
+            Work work = getList().get(i);
 
-            if (work.getEnd().after(work1.getEnd())) {
-                worksRemoved.add(work1);
-            } else if (work.getEnd().after(work1.getStart())) {
-                work.setEnd(work1.getEnd());
-                worksRemoved.add(work1);
+            if(work.equals(workChanged))
+                break;
+
+            if (workChanged.getEnd().after(work.getEnd())) {
+                worksRemoved.add(work);
+            } else if (workChanged.getEnd().after(work.getStart())) {
+                workChanged.setEnd(work.getEnd());
+                worksRemoved.add(work);
             } else {
                 break;
             }
