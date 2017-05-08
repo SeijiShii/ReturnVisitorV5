@@ -32,6 +32,7 @@ import java.util.ArrayList;
 
 public class TagDialog extends FrameLayout {
 
+    // TODO: 2017/05/08 名前でソート
     private VisitDetail mVisitDetail;
     private OnButtonsClickListener mButtonsClickListener;
 
