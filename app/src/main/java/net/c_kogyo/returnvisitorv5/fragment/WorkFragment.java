@@ -39,9 +39,7 @@ public class WorkFragment extends Fragment {
     private static final String TAG = "WorkFragmentDebugTag";
 
     private Calendar mDate;
-    // TODO: 2017/05/08 Remove worksInDayList
-//    private ArrayList<Work> worksInDay;
-//    private ArrayList<Visit> visitsInDayNotInWork;
+    // DONE: 2017/05/08 Remove worksInDayList
     private static WorkFragmentListener mWorkFragmentListener;
     private int mVisitCellHeight;
     private Work mNewAddedWork;
