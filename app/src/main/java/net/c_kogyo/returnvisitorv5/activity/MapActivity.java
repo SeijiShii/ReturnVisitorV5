@@ -1180,7 +1180,7 @@ public class MapActivity extends AppCompatActivity
         startActivity(calendarIntent);
     }
 
-    // TODO: 2017/05/08 Add Work
+    // DONE: 2017/05/08 Add Work
     private void initAddWorkButton() {
         Button addWorkButton = (Button) findViewById(R.id.add_work_button);
         addWorkButton.setOnClickListener(new View.OnClickListener() {
@@ -1234,6 +1234,7 @@ public class MapActivity extends AppCompatActivity
     // DONE: 2017/04/01 集合住宅のマークがでかすぎる
 
     // DONE: 2017/05/05 データ読み込みまでボタンを押せなくする
+    // TODO: 2017/05/08 データ読み込みwait画面
     // TODO: 2017/05/05 データがないときにWORKやカレンダーに遷移しないようにする(実装済み、要検証)
     // TODO: 2017/05/06 AdView to Real
     // DONE: 2017/05/08 開始時間に秒はいらない
