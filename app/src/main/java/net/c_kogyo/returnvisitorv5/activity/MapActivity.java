@@ -1184,6 +1184,7 @@ public class MapActivity extends AppCompatActivity
     // TODO: 2017/05/06 AdView to Real
     // DONE: 2017/05/08 開始時間に秒はいらない
     // TODO: 2017/05/08 ログイン画面
+    // TODO: 2017/05/08 データ同期まわり
 
 
 }
