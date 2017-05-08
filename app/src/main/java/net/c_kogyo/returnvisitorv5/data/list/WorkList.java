@@ -71,7 +71,8 @@ public class WorkList extends DataList<Work> {
         if (!getList().contains(workChanged)) return worksRemoved;
 
         // すべてのリストを開始時間で整列
-        Collections.sort(getList(), new Comparator<Work>() {
+        ArrayList<Work> sortedList = getList();
+        Collections.sort(sortedList, new Comparator<Work>() {
             @Override
             public int compare(Work work, Work t1) {
                 return work.getStart().compareTo(t1.getStart());
@@ -79,12 +80,12 @@ public class WorkList extends DataList<Work> {
         });
 
         // 対象の要素のindexを取得
-        int index = getList().indexOf(workChanged);
+        int index = sortedList.indexOf(workChanged);
 
         // 過去に向かってさかのぼり
         for ( int i = index - 1 ; i >= 0 ; i-- ) {
 
-            Work work = getList().get(i);
+            Work work = sortedList.get(i);
 
             if(work.equals(workChanged))
                 break;
@@ -100,9 +101,9 @@ public class WorkList extends DataList<Work> {
         }
 
         // 未来にむかって!!
-        for (int i = index + 1 ; i < getList().size() ; i++ ) {
+        for (int i = index + 1 ; i < sortedList.size() ; i++ ) {
 
-            Work work = getList().get(i);
+            Work work = sortedList.get(i);
 
             if(work.equals(workChanged))
                 break;

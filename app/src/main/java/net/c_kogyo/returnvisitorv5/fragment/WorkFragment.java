@@ -317,7 +317,7 @@ public class WorkFragment extends Fragment {
         return workView;
     }
 
-    // TODO: 2017/05/06 Add work時のポジションがおかしい
+    // DONE: 2017/05/06 Add work時のポジションがおかしい
     // DONE: 2017/05/08 workViewが二つ挿入される
     private int getInsertPosition(Calendar time) {
 
