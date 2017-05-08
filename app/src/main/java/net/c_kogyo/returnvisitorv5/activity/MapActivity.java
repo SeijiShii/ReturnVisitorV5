@@ -96,6 +96,7 @@ public class MapActivity extends AppCompatActivity
 
         AdMobHelper.setAdView(this);
 
+        initWaitScreen();
         initLogoButton();
         initMapView(savedInstanceState);
         initDialogOverlay();
@@ -209,6 +210,7 @@ public class MapActivity extends AppCompatActivity
                         refreshLogoButton();
                         refreshWorkButton();
                         refreshCalendarButton();
+                        fadeoutWaitScreen();
                     }
                 });
                 
@@ -1234,7 +1236,55 @@ public class MapActivity extends AppCompatActivity
     // DONE: 2017/04/01 集合住宅のマークがでかすぎる
 
     // DONE: 2017/05/05 データ読み込みまでボタンを押せなくする
-    // TODO: 2017/05/08 データ読み込みwait画面
+    // DONE: 2017/05/08 データ読み込みwait画面
+    private RelativeLayout waitScreen;
+    private void initWaitScreen() {
+        waitScreen = (RelativeLayout) findViewById(R.id.wait_screen);
+        waitScreen.setVisibility(View.VISIBLE);
+        waitScreen.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return true;
+            }
+        });
+    }
+
+    private void fadeoutWaitScreen() {
+
+        ValueAnimator animator = ValueAnimator.ofFloat(1f, 0f);
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                waitScreen.setAlpha((float) animation.getAnimatedValue());
+            }
+        });
+        animator.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                waitScreen.setVisibility(View.INVISIBLE);
+                waitScreen.setOnTouchListener(null);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        animator.setDuration(500);
+        animator.start();
+    }
+
+
     // TODO: 2017/05/05 データがないときにWORKやカレンダーに遷移しないようにする(実装済み、要検証)
     // TODO: 2017/05/06 AdView to Real
     // DONE: 2017/05/08 開始時間に秒はいらない

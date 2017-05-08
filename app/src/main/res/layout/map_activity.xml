@@ -203,6 +203,23 @@
 
         </ScrollView>
 
+        <!-- Wait Screen -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/wait_screen"
+            android:background="#8FFF"
+            android:visibility="invisible">
+
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@android:style/Widget.ProgressBar.Large"
+                android:id="@+id/wait_progress"
+                android:layout_centerInParent="true"/>
+
+        </RelativeLayout>
+
     </FrameLayout>
 
     <!-- Ad Frame -->
