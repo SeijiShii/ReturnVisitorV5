@@ -314,6 +314,11 @@ public class WorkFragment extends Fragment {
                             mWorkFragmentListener.moveToMap(visit);
                         }
                     }
+
+                    @Override
+                    public void postAddVisitCell(VisitCell cell) {
+                        ViewUtil.scrollToView(scrollView, cell);
+                    }
                 }) {
                     @Override
                     public void setLayoutParams(BaseAnimateView view) {

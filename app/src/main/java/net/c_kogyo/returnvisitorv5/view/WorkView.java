@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.PopupMenu;
@@ -312,7 +313,30 @@ public class WorkView extends BaseAnimateView {
         // 挿入ポジションを特定
         // TODO: 2017/04/15 挿入ポジションが微妙に残念な件
         int pos = getProperPositionOfVisit(visit);
-        visitCellContainer.addView(generateVisitCell(visit, 0), pos);
+        final VisitCell cell = generateVisitCell(visit, 0);
+        visitCellContainer.addView(cell, pos);
+
+        final Handler handler = new Handler();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (cell.getWidth() <= 0) {
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        //
+                    }
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if(mListener != null) {
+                                mListener.postAddVisitCell(cell);
+                            }
+                        }
+                    });
+                }
+            }
+        }).start();
 
     }
 
@@ -537,6 +561,8 @@ public class WorkView extends BaseAnimateView {
         void onClickEditVisit(Visit visit);
 
         void onClickToMap(Visit visit);
+
+        void postAddVisitCell(VisitCell cell);
     }
 
     public interface PostRemoveVisitCellListener {
