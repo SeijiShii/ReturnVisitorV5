@@ -22,7 +22,7 @@ public class AggregationOfMonth {
         return hour;
     }
 
-    private static long time(Calendar month) {
+    public static long time(Calendar month) {
 
         Calendar mCal = (Calendar) month.clone();
         long time = 0;
@@ -39,11 +39,11 @@ public class AggregationOfMonth {
         mCal.add(Calendar.MONTH, -2);
         long timeUpToLastMonth = getTimeUpToThisMonth(mCal);
 
-        time += getFractionMinute(timeUpToLastMonth);
+        time += getCarryOver(timeUpToLastMonth);
         return time;
     }
 
-    private static long getFractionMinute(long time) {
+    public static long getCarryOver(long time) {
         long minute = 60 * 1000;
         long hour = minute * 60;
         return time - (time / hour * hour);

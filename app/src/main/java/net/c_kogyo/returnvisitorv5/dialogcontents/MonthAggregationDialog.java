@@ -51,6 +51,7 @@ public class MonthAggregationDialog extends FrameLayout {
         initTimeText();
         initRVCountText();
         initStudyCountText();
+        initCarryOverText();
 
         initCloseButton();
         initMailButton();
@@ -114,6 +115,15 @@ public class MonthAggregationDialog extends FrameLayout {
                 }
             }
         });
+    }
+
+    private void initCarryOverText() {
+        TextView carryOverTextView = (TextView) view.findViewById(R.id.carry_over_text);
+        long carryOver = AggregationOfMonth.getCarryOver(AggregationOfMonth.time(mMonth));
+        int minute = (int)(carryOver / (60 * 1000));
+
+        String carryOverText = getContext().getString(R.string.carry_over, String.valueOf(minute));
+        carryOverTextView.setText(carryOverText);
     }
 
     public interface MonthAggregationDialogListener {

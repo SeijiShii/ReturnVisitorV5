@@ -239,6 +239,15 @@
 
     </LinearLayout>
 
+    <!-- Carry Over -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_height_small"
+        android:gravity="center"
+        android:textColor="@color/textColorGray"
+        android:textSize="@dimen/text_size_middle"
+        android:id="@+id/carry_over_text"/>
+
     <!-- Mail button -->
     <RelativeLayout
         android:layout_width="match_parent"
@@ -255,7 +264,6 @@
             android:layout_alignParentRight="true"/>
 
     </RelativeLayout>
-
 
     <!-- Close button -->
     <RelativeLayout
