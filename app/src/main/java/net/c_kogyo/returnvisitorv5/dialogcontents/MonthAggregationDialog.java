@@ -53,6 +53,7 @@ public class MonthAggregationDialog extends FrameLayout {
         initStudyCountText();
 
         initCloseButton();
+        initMailButton();
     }
 
     private void initMonthTextView() {
@@ -103,12 +104,25 @@ public class MonthAggregationDialog extends FrameLayout {
         });
     }
 
+    private void initMailButton() {
+        Button mailButton = (Button) view.findViewById(R.id.mail_button);
+        mailButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mListener != null) {
+                    mListener.onClickMailButton(mMonth);
+                }
+            }
+        });
+    }
+
     public interface MonthAggregationDialogListener {
         void onClickCloseButton();
 
         void onClickMailButton(Calendar month);
     }
 
-    // TODO: 2017/05/08 Mail Action 
+    // DONE: 2017/05/08 Mail Action
     // DONE: 2017/05/07 月名を表示
+    // Fraction minute
 }
