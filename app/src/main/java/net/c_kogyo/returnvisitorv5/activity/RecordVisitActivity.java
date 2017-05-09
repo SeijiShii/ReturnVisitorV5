@@ -836,9 +836,8 @@ public class RecordVisitActivity extends AppCompatActivity {
         mMapView.onCreate(bundle);
     }
 
-
     private void showSetPlaceDialog() {
-        SetPlaceDialog setPlaceDialog = new SetPlaceDialog(this,
+        final SetPlaceDialog setPlaceDialog = new SetPlaceDialog(this,
                 new SetPlaceDialog.SetPlaceDialogListener() {
                     @Override
                     public void onSetPlace(Place place) {
@@ -852,7 +851,8 @@ public class RecordVisitActivity extends AppCompatActivity {
 
                     @Override
                     public void onSetLatLng(LatLng latLng) {
-
+                        fadeDialogOverlay(false, null);
+                        setPlace(new Place(latLng, Place.Category.HOUSE));
                     }
 
                     @Override
@@ -909,17 +909,26 @@ public class RecordVisitActivity extends AppCompatActivity {
 
         Calendar oldDateTime = (Calendar) mVisit.getDatetime().clone();
 
-        mVisit = new Visit(RVData.getInstance().visitList.getLatestVisitToPlace(place.getId()));
+        Visit lastVisit = RVData.getInstance().visitList.getLatestVisitToPlace(place.getId());
+        if (lastVisit != null) {
+            mVisit = new Visit(lastVisit);
+
+            for (VisitDetail visitDetail : mVisit.getVisitDetails()) {
+                Person person = RVData.getInstance().personList.getById(visitDetail.getPersonId());
+                if (person != null) {
+                    addVisitDetailView(visitDetail, person, false);
+                }
+            }
+
+            visitPriorityRater.setPriority(mVisit.getPriority());
+        }
         mVisit.setDatetime(oldDateTime);
 
-        for (VisitDetail visitDetail : mVisit.getVisitDetails()) {
-            Person person = RVData.getInstance().personList.getById(visitDetail.getPersonId());
-            if (person != null) {
-                addVisitDetailView(visitDetail, person, false);
-            }
-        }
 
-        visitPriorityRater.setPriority(mVisit.getPriority());
+    }
+
+    private void onHousingComplexSelected() {
+
     }
 
     // DONE: 2017/03/26 PriorityRaterの挙動がいまいち
