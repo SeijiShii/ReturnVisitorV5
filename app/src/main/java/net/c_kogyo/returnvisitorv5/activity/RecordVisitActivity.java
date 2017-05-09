@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -25,6 +26,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.model.LatLng;
 
 import net.c_kogyo.returnvisitorv5.R;
@@ -36,6 +38,7 @@ import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
 import net.c_kogyo.returnvisitorv5.dialogcontents.PersonDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.PlacementDialog;
+import net.c_kogyo.returnvisitorv5.dialogcontents.SetPlaceDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.TagDialog;
 import net.c_kogyo.returnvisitorv5.service.FetchAddressIntentService;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
@@ -51,6 +54,7 @@ import java.util.Calendar;
 
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.EDIT_VISIT_ACTION;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_HOUSE_ACTION;
+import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_VISIT_ACTION_NO_PLACE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_VISIT_ACTION_WITH_PLACE;
 import static net.c_kogyo.returnvisitorv5.data.Place.PLACE;
 import static net.c_kogyo.returnvisitorv5.data.Visit.VISIT;
@@ -77,6 +81,8 @@ public class RecordVisitActivity extends AppCompatActivity {
         initBroadcastManager();
 
         setContentView(R.layout.record_visit_activity);
+
+        initMapViewForDialog(savedInstanceState);
 
         initAddressText();
         initPlaceNameText();
@@ -148,6 +154,14 @@ public class RecordVisitActivity extends AppCompatActivity {
                     mVisit = new Visit(mPlace);
                 }
                 break;
+
+            case NEW_VISIT_ACTION_NO_PLACE:
+
+                mVisit = new Visit();
+
+                // Place = null;
+
+                break;
         }
     }
 
@@ -157,10 +171,23 @@ public class RecordVisitActivity extends AppCompatActivity {
         addressText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                placeNameText.extract();
+                if (mPlace == null) {
+                    onSetPlaceClick();
+                } else {
+                    placeNameText.extract();
+                }
             }
         });
+
+        if (mPlace == null) {
+            addressText.setHint(R.string.set_place);
+
+        } else {
+            refreshAddressText();
+        }
+    }
+
+    private void refreshAddressText() {
         if (mPlace.getAddress() != null && !mPlace.getAddress().equals("")) {
             addressText.setText(mPlace.getAddress());
         } else {
@@ -171,6 +198,12 @@ public class RecordVisitActivity extends AppCompatActivity {
     private ClearEditText placeNameText;
     private void initPlaceNameText() {
         placeNameText = (ClearEditText) findViewById(R.id.place_name_text_view);
+        if (mPlace != null) {
+           refreshPlaceNameText();
+        }
+    }
+
+    private void refreshPlaceNameText() {
         if (mPlace.getName() != null && !mPlace.getName().equals("")) {
             placeNameText.setText(mPlace.getName());
             placeNameText.extract();
@@ -792,9 +825,106 @@ public class RecordVisitActivity extends AppCompatActivity {
         finish();
     }
 
+    // TODO: 2017/05/08 場所無し訪問機能
+    private void onSetPlaceClick() {
+        showSetPlaceDialog();
+    }
+
+    private MapView mMapView;
+    private void initMapViewForDialog(Bundle bundle) {
+        mMapView = new MapView(this);
+        mMapView.onCreate(bundle);
+    }
+
+
+    private void showSetPlaceDialog() {
+        SetPlaceDialog setPlaceDialog = new SetPlaceDialog(this,
+                new SetPlaceDialog.SetPlaceDialogListener() {
+                    @Override
+                    public void onSetPlace(Place place) {
+                        if (place.getCategory() == Place.Category.HOUSE) {
+                            setPlace(place);
+                            fadeDialogOverlay(false, null);
+                        } else if (place.getCategory() == Place.Category.HOUSING_COMPLEX) {
+
+                        }
+                    }
+
+                    @Override
+                    public void onSetLatLng(LatLng latLng) {
+
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        fadeDialogOverlay(false, null);
+                    }
+                },
+                mMapView);
+        dialogFrame.addView(setPlaceDialog);
+        dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                fadeDialogOverlay(false, null);
+                return true;
+            }
+        });
+        fadeDialogOverlay(true, null);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mMapView.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mMapView.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mMapView.onDestroy();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mMapView.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mMapView.onResume();
+    }
+
+    private void setPlace(Place place) {
+        mPlace = place;
+        refreshAddressText();
+        refreshPlaceNameText();
+
+        Calendar oldDateTime = (Calendar) mVisit.getDatetime().clone();
+
+        mVisit = new Visit(RVData.getInstance().visitList.getLatestVisitToPlace(place.getId()));
+        mVisit.setDatetime(oldDateTime);
+
+        for (VisitDetail visitDetail : mVisit.getVisitDetails()) {
+            Person person = RVData.getInstance().personList.getById(visitDetail.getPersonId());
+            if (person != null) {
+                addVisitDetailView(visitDetail, person, false);
+            }
+        }
+
+        visitPriorityRater.setPriority(mVisit.getPriority());
+    }
+
     // DONE: 2017/03/26 PriorityRaterの挙動がいまいち
     // DONE: 2017/04/05 Activity起動時にスクロール位置が一番上にない
     // TODO: 2017/05/06 再訪問時に人visit detailが閉じているようにしたい。
-    // TODO: 2017/05/08 場所無し訪問機能
+
 
 }

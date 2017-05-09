@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
+import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -65,6 +66,11 @@ public class Visit extends DataItem implements Cloneable{
 
     }
 
+    public Visit() {
+        super(VISIT);
+        initCommon(null);
+    }
+
     public Visit(Place place) {
         super(VISIT);
 
@@ -96,7 +102,7 @@ public class Visit extends DataItem implements Cloneable{
         this(record.getDataJSON());
     }
 
-    private void initCommon(Place place) {
+    private void initCommon(@Nullable Place place) {
         this.datetime = Calendar.getInstance();
         if (place == null) {
             this.placeId = null;
@@ -332,5 +338,9 @@ public class Visit extends DataItem implements Cloneable{
 
     public int getBSCount() {
         return getBSVisitDetails().size();
+    }
+
+    public void setDatetime(Calendar datetime) {
+        this.datetime = datetime;
     }
 }

@@ -55,7 +55,7 @@ public class Place extends DataItem {
 
     private LatLng latLng;
     private String address;
-    private String markerId;
+//    private String markerId;
     private Category category;
     private String parentId;
 
@@ -97,7 +97,7 @@ public class Place extends DataItem {
     private void initCommon() {
         this.latLng = new LatLng(0, 0);
         this.address = "";
-        this.markerId = null;
+//        this.markerId = null;
         this.parentId = null;
         this.category = Category.HOUSE;
     }
@@ -107,13 +107,13 @@ public class Place extends DataItem {
         return name + " " + address;
     }
 
-    public String getMarkerId() {
-        return markerId;
-    }
-
-    public void setMarkerId(String markerId) {
-        this.markerId = markerId;
-    }
+//    public String getMarkerId() {
+//        return markerId;
+//    }
+//
+//    public void setMarkerId(String markerId) {
+//        this.markerId = markerId;
+//    }
 
     @Override
     public JSONObject jsonObject() {
@@ -264,7 +264,7 @@ public class Place extends DataItem {
 
         clonedPlace.latLng = new LatLng(this.latLng.latitude, this.latLng.longitude);
         clonedPlace.address = this.address;
-        clonedPlace.markerId = this.markerId;
+//        clonedPlace.markerId = this.markerId;
 
         return clonedPlace;
     }
@@ -280,4 +280,6 @@ public class Place extends DataItem {
     public Category getCategory() {
         return category;
     }
+
+
 }

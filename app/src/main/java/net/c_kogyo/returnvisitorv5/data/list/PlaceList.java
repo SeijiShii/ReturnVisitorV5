@@ -14,17 +14,6 @@ import java.util.Comparator;
 
 public class PlaceList extends DataList<Place> {
 
-    @Nullable
-    public Place getByMarkerId(String markerId) {
-
-        for (Place place : this) {
-            if (place.getMarkerId() != null && place.getMarkerId().equals(markerId)) {
-                return place;
-            }
-        }
-        return null;
-    }
-
     public ArrayList<Place> getListByIds(ArrayList<String> ids) {
         ArrayList<Place> list = new ArrayList<>();
         for (String id : ids) {

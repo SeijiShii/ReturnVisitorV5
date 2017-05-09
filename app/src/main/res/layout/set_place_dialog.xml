@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/map_frame"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Dialog title Bar-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/ui_height_small"
+            android:orientation="horizontal"
+            android:background="#8000"
+            android:layout_alignParentTop="true">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:textColor="#fff"
+                android:textSize="@dimen/text_size_large"
+                android:gravity="center"
+                android:text="@string/set_place"/>
+
+            <RelativeLayout
+                android:layout_width="25dp"
+                android:layout_height="match_parent"
+                android:layout_marginRight="5dp"
+                android:layout_marginLeft="5dp">
+
+                <ImageView
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:id="@+id/close_button"
+                    android:background="@drawable/white_square_close"
+                    android:layout_centerInParent="true"/>
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <!-- Message -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/ui_height_small"
+            android:textColor="#fff"
+            android:textSize="@dimen/text_size_middle"
+            android:gravity="center"
+            android:text="@string/click_marker_or_long_click_map"
+            android:background="#8000"
+            android:layout_alignParentBottom="true"/>
+
+    </RelativeLayout>
+
+
+
+
+
+</FrameLayout>

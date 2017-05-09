@@ -43,6 +43,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.Place;
+import net.c_kogyo.returnvisitorv5.data.PlaceMarkers;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.Work;
@@ -144,7 +145,7 @@ public class MapActivity extends AppCompatActivity
         mapView.getMapAsync(this);
     }
 
-    private static final String MY_LOCATION_TAG = "my_location";
+    public static final String MY_LOCATION_TAG = "my_location";
     private GoogleMap mMap;
     @Override
     public void onMapReady(GoogleMap map) {
@@ -205,7 +206,7 @@ public class MapActivity extends AppCompatActivity
                         mMap.setOnMarkerDragListener(MapActivity.this);
 
                         // DONE: 2017/03/01 ここにマーカー描画処理を記述する
-                        placeMarkers = new PlaceMarkers();
+                        placeMarkers = new PlaceMarkers(mMap);
 
                         refreshLogoButton();
                         refreshWorkButton();
@@ -483,7 +484,7 @@ public class MapActivity extends AppCompatActivity
     @Override
     public boolean onMarkerClick(Marker marker) {
 
-        Place place = RVData.getInstance().placeList.getByMarkerId(marker.getId());
+        Place place = placeMarkers.getPlace(marker);
         if (place == null) return false;
 
         if (place.getCategory() == Place.Category.HOUSE) {
@@ -506,7 +507,7 @@ public class MapActivity extends AppCompatActivity
 
     @Override
     public void onMarkerDragEnd(Marker marker) {
-        Place place = RVData.getInstance().placeList.getByMarkerId(marker.getId());
+        Place place = placeMarkers.getPlace(marker);
 
         if (place == null) return;
 
@@ -811,75 +812,6 @@ public class MapActivity extends AppCompatActivity
         }
     };
 
-    private class PlaceMarkers {
-        private ArrayList<Marker> markers;
-
-        public PlaceMarkers() {
-            this.markers = new ArrayList<>();
-            mMap.clear();
-            for (Place place : RVData.getInstance().placeList) {
-
-                if (place.getCategory() != Place.Category.ROOM) {
-                    addMarker(place);
-                }
-            }
-        }
-
-        private void addMarker(Place place) {
-
-            if (place.getCategory() == Place.Category.ROOM)
-                return;
-
-            MarkerOptions options = new MarkerOptions()
-                    .position(place.getLatLng())
-                    .draggable(true);
-            if (place.getCategory() == Place.Category.HOUSE) {
-                options.icon(BitmapDescriptorFactory.fromResource(Constants.markerRes[place.getPriority().num()]));
-            } else if (place.getCategory() == Place.Category.HOUSING_COMPLEX) {
-                options.icon(BitmapDescriptorFactory.fromResource(Constants.complexRes[place.getPriority().num()]));
-            }
-
-            Marker marker = mMap.addMarker(options);
-            place.setMarkerId(marker.getId());
-            markers.add(marker);
-        }
-
-        private void refreshMarker(Place place) {
-            Marker marker = getMarkerByPlace(place);
-            if (marker != null) {
-                if (place.getCategory() == Place.Category.HOUSE) {
-                    marker.setIcon(BitmapDescriptorFactory.fromResource(Constants.markerRes[place.getPriority().num()]));
-                } else if (place.getCategory() == Place.Category.HOUSING_COMPLEX) {
-                    marker.setIcon(BitmapDescriptorFactory.fromResource(Constants.complexRes[place.getPriority().num()]));
-                }
-            } else {
-                addMarker(place);
-            }
-        }
-
-        private Marker getMarkerByPlace(Place place) {
-
-            if (place.getMarkerId() == null)
-                return null;
-
-            for (Marker marker : markers) {
-                String markerId = marker.getId();
-                if (place.getMarkerId().equals(markerId)) {
-                    return marker;
-                }
-            }
-            return null;
-        }
-
-        private void removeByPlace(Place place) {
-            Marker marker = getMarkerByPlace(place);
-            if (marker == null) return;
-
-            markers.remove(marker);
-            marker.remove();
-        }
-
-    }
 
     private void hideSoftKeyboard() {
         InputMethodManager inputMethodManager = (InputMethodManager)  this.getSystemService(Activity.INPUT_METHOD_SERVICE);
@@ -957,6 +889,7 @@ public class MapActivity extends AppCompatActivity
         initWorkButton();
         initCalendarButton();
         initAddWorkButton();
+        initAddVisitButton();
     }
 
     private void initDrawerLogoButton() {
@@ -1284,6 +1217,22 @@ public class MapActivity extends AppCompatActivity
         animator.start();
     }
 
+    private void initAddVisitButton() {
+        Button addVisitButton = (Button) findViewById(R.id.add_visit_button);
+        addVisitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startRecordVisitActivityNoPlace();
+                openCloseDrawer();
+            }
+        });
+    }
+
+    private void startRecordVisitActivityNoPlace() {
+        Intent intent = new Intent(this, RecordVisitActivity.class);
+        intent.setAction(Constants.RecordVisitActions.NEW_VISIT_ACTION_NO_PLACE);
+        startActivity(intent);
+    }
 
     // TODO: 2017/05/05 データがないときにWORKやカレンダーに遷移しないようにする(実装済み、要検証)
     // TODO: 2017/05/06 AdView to Real
