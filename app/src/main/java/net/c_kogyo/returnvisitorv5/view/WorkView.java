@@ -311,7 +311,7 @@ public class WorkView extends BaseAnimateView {
     public void insertVisitCellToProperPosition(Visit visit) {
 
         // 挿入ポジションを特定
-        // TODO: 2017/04/15 挿入ポジションが微妙に残念な件
+        // DONE: 2017/04/15 挿入ポジションが微妙に残念な件
         int pos = getProperPositionOfVisit(visit);
         final VisitCell cell = generateVisitCell(visit, 0);
         visitCellContainer.addView(cell, pos);
@@ -347,7 +347,7 @@ public class WorkView extends BaseAnimateView {
         Collections.sort(visitsInWork, new Comparator<Visit>() {
             @Override
             public int compare(Visit o1, Visit o2) {
-                // TODO: 2017/04/01 ソートの順番が正しいか検証
+                // DONE: 2017/04/01 ソートの順番が正しいか検証
                 return o1.getDatetime().compareTo(o2.getDatetime());
             }
         });
