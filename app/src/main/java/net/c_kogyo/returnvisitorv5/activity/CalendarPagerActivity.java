@@ -377,7 +377,7 @@ public class CalendarPagerActivity extends AppCompatActivity {
 
             @Override
             public void onClickMailButton(Calendar month) {
-                // TODO: 2017/05/07 Mail Action
+                // DONE: 2017/05/07 Mail Action
                 fadeDialogOverlay(false);
                 MailReport.exportToMail(CalendarPagerActivity.this, month);
             }
