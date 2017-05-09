@@ -21,6 +21,8 @@ import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.RVData;
+import net.c_kogyo.returnvisitorv5.data.Work;
+import net.c_kogyo.returnvisitorv5.dialogcontents.AddWorkDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.MonthAggregationDialog;
 import net.c_kogyo.returnvisitorv5.fragment.CalendarFragment;
 import net.c_kogyo.returnvisitorv5.util.AdMobHelper;
@@ -348,6 +350,9 @@ public class CalendarPagerActivity extends AppCompatActivity {
                     case R.id.report_mail:
                         onClickMailReport();
                         return true;
+                    case R.id.add_work:
+                        showAddWorkDialog();
+                        return true;
                 }
                 return false;
             }
@@ -388,6 +393,7 @@ public class CalendarPagerActivity extends AppCompatActivity {
         fadeDialogOverlay(true);
     }
 
+    // DONE: 2017/05/09 mail action
     private void onClickMailReport() {
         MailReport.exportToMail(this, mAdapter.getMonth(mPager.getCurrentItem()));
     }
@@ -490,8 +496,45 @@ public class CalendarPagerActivity extends AppCompatActivity {
 
     // TODO: 2017/05/07 週の開始日を切り替える
     // TODO: 2017/05/06 AdView to Real
-    // TODO: 2017/05/08 Add Work
-    // DONE: 2017/05/09 mail action
+    // DONE: 2017/05/08 Add Work
+    private void showAddWorkDialog() {
+        AddWorkDialog addWorkDialog
+                = new AddWorkDialog(this, new AddWorkDialog.AddWorkDialogListener() {
+                    @Override
+                    public void onOkClick(Work work) {
+                        startWorkPagerActivityWithNewWork(work);
+                    }
+
+                    @Override
+                    public void onCancelClick() {
+                        fadeDialogOverlay(false);
+                    }
+                },
+                true,
+                Calendar.getInstance());
+        dialogFrame.addView(addWorkDialog);
+        dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                fadeDialogOverlay(false);
+                return true;
+            }
+        });
+        fadeDialogOverlay(true);
+    }
+
+    private void startWorkPagerActivityWithNewWork(Work work) {
+
+        RVData.getInstance().workList.setOrAdd(work);
+        RVData.getInstance().saveData(this, null);
+
+        Intent withNewWorkIntent = new Intent(this, WorkPagerActivity.class);
+        withNewWorkIntent.setAction(Constants.WorkPagerActivityActions.START_WITH_NEW_WORK);
+        withNewWorkIntent.putExtra(Work.WORK, work.getId());
+        startActivity(withNewWorkIntent);
+
+        finish();
+    }
 
     private class CalendarPagerAdapter extends FragmentStatePagerAdapter {
 
