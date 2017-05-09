@@ -3,4 +3,9 @@
     <declare-styleable name="BaseAnimateView">
         <attr name="initialHeight" format="dimension"/>
     </declare-styleable>
+
+    <declare-styleable name="RightTextSwitch">
+        <attr name="checked_text" format="string"/>
+        <attr name="unchecked_text" format="string"/>
+    </declare-styleable>
 </resources>

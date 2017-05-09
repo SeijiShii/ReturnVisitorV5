@@ -23,7 +23,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Date text -->
+            <!-- Date mText -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/ui_height_small"
@@ -34,7 +34,7 @@
                 android:background="@drawable/gray_trans_circle"
                 android:layout_margin="5dp"/>
 
-            <!-- Start time text -->
+            <!-- Start time mText -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/ui_height_small"
@@ -45,7 +45,7 @@
                 android:background="@drawable/gray_trans_circle"
                 android:layout_margin="5dp"/>
 
-            <!-- End time text -->
+            <!-- End time mText -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/ui_height_small"
@@ -56,7 +56,7 @@
                 android:background="@drawable/gray_trans_circle"
                 android:layout_margin="5dp"/>
 
-            <!-- Duration text -->
+            <!-- Duration mText -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/ui_height_small"
