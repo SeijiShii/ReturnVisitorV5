@@ -2,7 +2,6 @@ package net.c_kogyo.returnvisitorv5.view;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.SwitchCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -13,6 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -23,6 +23,7 @@ import net.c_kogyo.returnvisitorv5.data.Publication;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
+import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 
 import java.util.ArrayList;
 
@@ -34,23 +35,32 @@ public class VisitDetailView extends BaseAnimateView {
 
     private VisitDetail mVisitDetail;
     private Person mPerson;
-    private OnButtonClickListener mButtonClickListener;
-    private boolean mExtracted;
+    private VisitDetailViewListener mListener;
+    private DrawCondition mCondition;
 
     private int mCollapseHeight,
 //            mExtractHeight,
             fixedHeight, noteLineHeight;
 
+    public enum DrawCondition{
+        EXTRACT_POST_DRAWN_FROM_0,
+        COLLAPSE,
+        EXTRACT
+    }
+
     public VisitDetailView(Context context,
                            VisitDetail visitDetail,
                            Person person,
-                           boolean extracted) {
+                           DrawCondition condition,
+                           VisitDetailViewListener listener) {
         super(context,
                 0,
                 R.layout.visit_detail_view);
         mVisitDetail = visitDetail;
         mPerson = person;
-        mExtracted = extracted;
+
+        mListener = listener;
+        mCondition = condition;
 
         initCommon();
     }
@@ -70,6 +80,7 @@ public class VisitDetailView extends BaseAnimateView {
         mCollapseHeight = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small)
                 + (int) (getContext().getResources().getDisplayMetrics().density * 5);
 
+        initFirstRow();
         initDataText();
         initOpenCloseButton();
         initSeenSwitch();
@@ -85,32 +96,28 @@ public class VisitDetailView extends BaseAnimateView {
         initTagFrame();
         setPlacementCells();
 
-        if (mExtracted) {
-            this.getLayoutParams().height = getExtractHeight();
-        } else {
-            extractPostDrawn(getExtractHeight(), null);
+        switch (mCondition) {
+            case EXTRACT_POST_DRAWN_FROM_0:
+                isViewOpen = true;
+                extractPostDrawn(getExtractHeight(), null);
+                break;
+            case EXTRACT:
+                isViewOpen = true;
+                this.getLayoutParams().height = getExtractHeight();
+                break;
+            case COLLAPSE:
+                isViewOpen = false;
+                this.getLayoutParams().height = mCollapseHeight;
+                break;
         }
 
     }
 
-    public void setOnButtonClickListener(OnButtonClickListener listener) {
-        this.mButtonClickListener = listener;
-    }
-
-    private TextView dataText;
-    private void initDataText() {
-        dataText = (TextView) getViewById(R.id.data_text);
-        dataText.setText(mPerson.toString(getContext()));
-
-    }
-
-    private Button openCloseButton;
-    private boolean isViewOpen;
-    private void initOpenCloseButton() {
-        openCloseButton = (Button) getViewById(R.id.open_close_button);
-        openCloseButton.setOnClickListener(new OnClickListener() {
+    private void initFirstRow() {
+        LinearLayout firstRow = (LinearLayout) getViewById(R.id.first_row);
+        ViewUtil.setOnClickListener(firstRow, new ViewUtil.OnViewClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onViewClick() {
                 // 開閉アニメーション DONE
                 if (isViewOpen) {
                     VisitDetailView.this.changeViewHeight(mCollapseHeight, true, null, null);
@@ -123,6 +130,19 @@ public class VisitDetailView extends BaseAnimateView {
                 isViewOpen = !isViewOpen;
             }
         });
+    }
+
+    private TextView dataText;
+    private void initDataText() {
+        dataText = (TextView) getViewById(R.id.data_text);
+        dataText.setText(mPerson.toString(getContext()));
+
+    }
+
+    private ImageView openCloseButton;
+    private boolean isViewOpen;
+    private void initOpenCloseButton() {
+        openCloseButton = (ImageView) getViewById(R.id.open_close_button);
     }
 
     private void rotateOpenCloseButton() {
@@ -142,31 +162,18 @@ public class VisitDetailView extends BaseAnimateView {
         animator.start();
     }
     
-    private SwitchCompat seenSwitch;
-    private TextView seenText;
+//    private SwitchCompat seenSwitch;
+//    private TextView seenText;
     private void initSeenSwitch() {
-        seenSwitch = (SwitchCompat) getViewById(R.id.seen_switch);
-        seenText = (TextView) getViewById(R.id.seen_text);
-        seenSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        RightTextSwitch seenSwitch = (RightTextSwitch) getViewById(R.id.seen_switch);
+        seenSwitch.setChecked(mVisitDetail.isSeen());
+        seenSwitch.setOnCheckChangeListener(new RightTextSwitch.RightTextSwitchOnCheckChangeListener() {
             @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                mVisitDetail.setSeen(b);
-                if (b) {
-                    seenText.setText(R.string.seen);
-                    seenText.setTextColor(getContext().getResources().getColor(R.color.colorPrimary));
-                } else {
-                    seenText.setText(R.string.not_seen);
-                    seenText.setTextColor(getContext().getResources().getColor(R.color.textHintGray));
-                }
+            public void onCheckChange(boolean checked) {
+                mVisitDetail.setSeen(checked);
             }
         });
-        seenSwitch.setChecked(mVisitDetail.isSeen());
-//        seenText.setOnClickListener(new OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                seenSwitch.;
-//            }
-//        });
+
     }
 
     private Button editPersonButton;
@@ -176,8 +183,8 @@ public class VisitDetailView extends BaseAnimateView {
             @Override
             public void onClick(View view) {
                 // DONE: 2017/02/27 人編集ダイアログへの遷移
-                if (mButtonClickListener != null){
-                    mButtonClickListener.onEditPersonClick(mPerson);
+                if (mListener != null){
+                    mListener.onEditPersonClick(mPerson);
                 }
             }
         });
@@ -190,8 +197,8 @@ public class VisitDetailView extends BaseAnimateView {
             @Override
             public void onClick(View view) {
                 // DONE: 2017/02/27 placementDialogへの遷移
-                if (mButtonClickListener != null) {
-                    mButtonClickListener.onPlacementButtonClick(mVisitDetail);
+                if (mListener != null) {
+                    mListener.onPlacementButtonClick(mVisitDetail);
                 }
             }
         });
@@ -239,8 +246,8 @@ public class VisitDetailView extends BaseAnimateView {
             @Override
             public void onClick(View view) {
                 // DONE: 2017/02/27 tagDialogへの遷移
-                if (mButtonClickListener != null) {
-                    mButtonClickListener.onTagButtonClick(mVisitDetail);
+                if (mListener != null) {
+                    mListener.onTagButtonClick(mVisitDetail);
                 }
             }
         });
@@ -254,8 +261,8 @@ public class VisitDetailView extends BaseAnimateView {
             @Override
             public void onPrioritySet(Visit.Priority priority) {
                 mVisitDetail.setPriority(priority);
-                if (mButtonClickListener != null) {
-                    mButtonClickListener.onPrioritySet(priority);
+                if (mListener != null) {
+                    mListener.onPrioritySet(priority);
                 }
             }
         });
@@ -304,26 +311,24 @@ public class VisitDetailView extends BaseAnimateView {
         VisitDetailView.this.changeViewHeight(getExtractHeight(), true, null, null);
     }
 
-    private SwitchCompat rvSwitch;
     private void initRVSwitch() {
-        rvSwitch = (SwitchCompat) getViewById(R.id.rv_switch);
+        RightTextSwitch rvSwitch = (RightTextSwitch) getViewById(R.id.rv_switch);
         rvSwitch.setChecked(mVisitDetail.isRV());
-        rvSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        rvSwitch.setOnCheckChangeListener(new RightTextSwitch.RightTextSwitchOnCheckChangeListener() {
             @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                mVisitDetail.setIsRv(b);
+            public void onCheckChange(boolean checked) {
+                mVisitDetail.setIsRv(checked);
             }
         });
     }
 
-    private SwitchCompat studySwitch;
     private void initStudySwitch() {
-        studySwitch = (SwitchCompat) getViewById(R.id.study_switch);
+        RightTextSwitch studySwitch = (RightTextSwitch) getViewById(R.id.study_switch);
         studySwitch.setChecked(mVisitDetail.isStudy());
-        studySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        studySwitch.setOnCheckChangeListener(new RightTextSwitch.RightTextSwitchOnCheckChangeListener() {
             @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                mVisitDetail.setIsStudy(b);
+            public void onCheckChange(boolean checked) {
+                mVisitDetail.setIsStudy(checked);
             }
         });
     }
@@ -337,8 +342,8 @@ public class VisitDetailView extends BaseAnimateView {
             @Override
             public void onClickFrame() {
 
-                if (mButtonClickListener != null) {
-                    mButtonClickListener.onTagButtonClick(mVisitDetail);
+                if (mListener != null) {
+                    mListener.onTagButtonClick(mVisitDetail);
                 }
             }
         }, 40);
@@ -379,7 +384,7 @@ public class VisitDetailView extends BaseAnimateView {
 
     }
 
-    public interface OnButtonClickListener {
+    public interface VisitDetailViewListener {
 
         void onEditPersonClick(Person person);
 
@@ -388,6 +393,8 @@ public class VisitDetailView extends BaseAnimateView {
         void onPlacementButtonClick(VisitDetail visitDetail);
 
         void onPrioritySet(Visit.Priority priority);
+
+        void postExtractView(VisitDetailView visitDetailView);
     }
 
     // DONE: 2017/03/20 mExtractによる振り分け
@@ -396,6 +403,8 @@ public class VisitDetailView extends BaseAnimateView {
 
     @Override
     public void postViewExtract(BaseAnimateView view) {
-
+        if (mListener!= null) {
+            mListener.postExtractView((VisitDetailView) view);
+        }
     }
 }

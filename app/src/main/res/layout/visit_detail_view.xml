@@ -6,11 +6,12 @@
     android:layout_height="wrap_content"
     android:background="@drawable/gray_white_circle">
 
-    <!-- First Line -->
+    <!-- First Row -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/ui_height_small"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:id="@+id/first_row">
 
         <!-- Person Data -->
         <TextView
@@ -18,6 +19,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:id="@+id/data_text"
+            android:gravity="center"
             android:textColor="@color/textColorGray"
             android:textSize="@dimen/text_size_middle" />
 
@@ -26,7 +28,7 @@
             android:layout_width="@dimen/ui_height_small"
             android:layout_height="@dimen/ui_height_small">
 
-            <Button
+            <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:id="@+id/open_close_button"
@@ -41,29 +43,13 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/ui_height_small">
 
-        <LinearLayout
+        <net.c_kogyo.returnvisitorv5.view.RightTextSwitch
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
+            android:layout_height="@dimen/ui_height_small"
+            android:id="@+id/seen_switch"
+            app:checked_text="@string/seen"
+            app:unchecked_text="@string/not_seen"/>
 
-            <android.support.v7.widget.SwitchCompat
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:id="@+id/seen_switch"
-                android:gravity="right|center_vertical"
-                android:layout_margin="@dimen/ui_margin_normal"
-                android:checked="true"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:id="@+id/seen_text"
-                android:textColor="@color/colorPrimary"
-                android:text="@string/seen"
-                android:gravity="left|center_vertical"
-                android:layout_margin="@dimen/ui_margin_normal"/>
-
-        </LinearLayout>
     </RelativeLayout>
 
     <!-- Edit Person Button -->
@@ -161,28 +147,12 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/ui_height_small">
 
-        <LinearLayout
+        <net.c_kogyo.returnvisitorv5.view.RightTextSwitch
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:orientation="horizontal">
+            android:id="@+id/rv_switch"
+            app:checked_text="@string/count_as_rv"/>
 
-            <android.support.v7.widget.SwitchCompat
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:id="@+id/rv_switch"
-                android:gravity="right|center_vertical"
-                android:layout_margin="@dimen/ui_margin_normal"
-                android:checked="true"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:textColor="@color/textColorGray"
-                android:text="@string/count_as_rv"
-                android:gravity="left|center_vertical"
-                android:layout_margin="@dimen/ui_margin_normal"/>
-
-        </LinearLayout>
     </RelativeLayout>
 
     <!-- Is Study -->
@@ -190,28 +160,13 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/ui_height_small">
 
-        <LinearLayout
+        <net.c_kogyo.returnvisitorv5.view.RightTextSwitch
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:orientation="horizontal">
+            android:layout_alignParentLeft="true"
+            android:id="@+id/study_switch"
+            app:checked_text="@string/count_as_study"/>
 
-            <android.support.v7.widget.SwitchCompat
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:id="@+id/study_switch"
-                android:gravity="right|center_vertical"
-                android:layout_margin="@dimen/ui_margin_normal"
-                android:checked="true"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:textColor="@color/textColorGray"
-                android:text="@string/count_as_study"
-                android:gravity="left|center_vertical"
-                android:layout_margin="@dimen/ui_margin_normal"/>
-
-        </LinearLayout>
     </RelativeLayout>
 
 </LinearLayout>

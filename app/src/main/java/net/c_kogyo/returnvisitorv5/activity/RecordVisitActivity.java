@@ -301,7 +301,9 @@ public class RecordVisitActivity extends AppCompatActivity {
                             @Override
                             public void onFinishAnimation() {
                                 // Person Dialogが消えたら実行するアニメーション
-                                addVisitDetailView(visitDetail, person, false);
+                                addVisitDetailView(visitDetail,
+                                        person,
+                                        VisitDetailView.DrawCondition.EXTRACT_POST_DRAWN_FROM_0);
                             }
                         });
                     }
@@ -468,44 +470,55 @@ public class RecordVisitActivity extends AppCompatActivity {
         for (VisitDetail visitDetail : mVisit.getVisitDetails()) {
             Person person = RVData.getInstance().personList.getById(visitDetail.getPersonId());
             if (person != null) {
-                addVisitDetailView(visitDetail, person, true);
+                addVisitDetailView(visitDetail,
+                        person,
+                        VisitDetailView.DrawCondition.COLLAPSE);
             }
         }
     }
 
-    private void addVisitDetailView(VisitDetail visitDetail, Person person, boolean extracted){
+    private void addVisitDetailView(VisitDetail visitDetail,
+                                    Person person,
+                                    final VisitDetailView.DrawCondition condition){
 
         // Personが削除されていたら表示しない
         if (person == null) return;
 
         VisitDetailView detailView
                 = new VisitDetailView(this,
-                                visitDetail,
-                                person,
-                                extracted);
-        visitDetailFrame.addView(detailView);
-        detailView.setOnButtonClickListener(new VisitDetailView.OnButtonClickListener() {
-            @Override
-            public void onPrioritySet(Visit.Priority priority) {
-                mVisit.refreshPriority();
-                visitPriorityRater.setPriority(mVisit.getPriority());
-            }
+                visitDetail,
+                person,
+                condition,
+                new VisitDetailView.VisitDetailViewListener() {
+                    @Override
+                    public void onPrioritySet(Visit.Priority priority) {
+                        mVisit.refreshPriority();
+                        visitPriorityRater.setPriority(mVisit.getPriority());
+                    }
 
-            @Override
-            public void onEditPersonClick(Person person) {
-                showPersonDialogForEdit(person);
-            }
+                    @Override
+                    public void onEditPersonClick(Person person) {
+                        showPersonDialogForEdit(person);
+                    }
 
-            @Override
-            public void onTagButtonClick(VisitDetail visitDetail1) {
-                showTagDialog(visitDetail1);
-            }
+                    @Override
+                    public void onTagButtonClick(VisitDetail visitDetail1) {
+                        showTagDialog(visitDetail1);
+                    }
 
-            @Override
-            public void onPlacementButtonClick(VisitDetail visitDetail) {
+                    @Override
+                    public void onPlacementButtonClick(VisitDetail visitDetail) {
                 showPlacementDialog(visitDetail.getId());
             }
-        });
+
+                    @Override
+                    public void postExtractView(VisitDetailView visitDetailView) {
+                        if (condition == VisitDetailView.DrawCondition.EXTRACT_POST_DRAWN_FROM_0) {
+                            ViewUtil.scrollToView(scrollView, visitDetailView);
+                        }
+                    }
+                });
+        visitDetailFrame.addView(detailView);
     }
 
     private void showPersonDialogForEdit(Person person) {
@@ -805,8 +818,9 @@ public class RecordVisitActivity extends AppCompatActivity {
         }
     }
 
+    private ScrollView scrollView;
     private void initScrollView() {
-        final ScrollView scrollView = (ScrollView) findViewById(R.id.scroll_view);
+        scrollView = (ScrollView) findViewById(R.id.scroll_view);
         scrollView.post(new Runnable() {
             @Override
             public void run() {
@@ -923,7 +937,9 @@ public class RecordVisitActivity extends AppCompatActivity {
             for (VisitDetail visitDetail : mVisit.getVisitDetails()) {
                 Person person = RVData.getInstance().personList.getById(visitDetail.getPersonId());
                 if (person != null) {
-                    addVisitDetailView(visitDetail, person, false);
+                    addVisitDetailView(visitDetail,
+                            person,
+                            VisitDetailView.DrawCondition.EXTRACT_POST_DRAWN_FROM_0);
                 }
             }
 
