@@ -139,4 +139,9 @@ public class PlacementCell extends BaseAnimateView {
 
         void postCompress(PlacementCell cell);
     }
+
+    @Override
+    public void postViewExtract(BaseAnimateView view) {
+
+    }
 }

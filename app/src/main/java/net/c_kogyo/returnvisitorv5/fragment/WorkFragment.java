@@ -2,6 +2,7 @@ package net.c_kogyo.returnvisitorv5.fragment;
 
 import android.animation.Animator;
 import android.content.Intent;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.activity.Constants;
@@ -21,6 +23,7 @@ import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.Work;
 import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
+import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 import net.c_kogyo.returnvisitorv5.view.BaseAnimateView;
 import net.c_kogyo.returnvisitorv5.view.VisitCell;
 import net.c_kogyo.returnvisitorv5.view.WorkView;
@@ -89,6 +92,7 @@ public class WorkFragment extends Fragment {
 //        worksInDay = RVData.getInstance().workList.getWorksInDay(mDate);
 //        visitsInDayNotInWork = RVData.getInstance().visitList.getVisitsInDayNotInWork(mDate);
 
+        initScrollView();
         initContainer();
 
         insertNewWorkViewPostDrawnIfExists();
@@ -186,6 +190,7 @@ public class WorkFragment extends Fragment {
         }
 
         VisitCell cell = new VisitCell(getContext(), visit, initHeight,new VisitCell.VisitCellListener() {
+
             @Override
             public void onDeleteVisit(final VisitCell visitCell1) {
                 visitCell1.changeViewHeight(0, true, null, new Animator.AnimatorListener() {
@@ -228,10 +233,17 @@ public class WorkFragment extends Fragment {
                 }
             }
 
+
+
         }, VisitCell.HeaderContent.BOTH) {
             @Override
             public void setLayoutParams(BaseAnimateView view) {
                 view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0));
+            }
+
+            @Override
+            public void postViewExtract(BaseAnimateView view) {
+                ViewUtil.scrollToView(scrollView, view);
             }
         };
         if (fromZero) {
@@ -675,7 +687,8 @@ public class WorkFragment extends Fragment {
         Log.d(TAG, "addWorkViewAndExtract Called! pos: " + pos);
 
 //        addWorkView(work, true);
-        container.addView(generateWorkView(work, true), pos);
+        WorkView workView = generateWorkView(work, true);
+        container.addView(workView, pos);
 
     }
 
@@ -686,10 +699,50 @@ public class WorkFragment extends Fragment {
             WorkView workView = getWorkView(work.getId());
             if (workView != null) {
                 workView.insertVisitCellToProperPosition(visit);
+                VisitCell cell = workView.getVisitCell(visit.getId());
+                if (cell != null) {
+                }
             }
         } else {
-            container.addView(generateVisitCell(visit, true));
+            VisitCell cell = generateVisitCell(visit, true);
+            container.addView(cell);
         }
+    }
+
+    /**
+     * Used to scroll to the given view.
+     *
+     * @param targetView View to which we need to scroll.
+     */
+    private ScrollView scrollView;
+    private void initScrollView() {
+
+        scrollView = (ScrollView) view.findViewById(R.id.scroll_view);
+
+
+    }
+
+    /**
+     * Used to get deep child offset.
+     * <p/>
+     * 1. We need to scroll to child in scrollview, but the child may not the direct child to scrollview.
+     * 2. So to get correct child position to scroll, we need to iterate through all of its parent views till the main parent.
+     *
+     * @param parent            Parent.
+     * @param child             Child.
+     * @param accumulatedOffset Accumalated Offset.
+     */
+    private void getDeepChildOffset(ViewParent parent,
+                                    View child,
+                                    final Point accumulatedOffset) {
+        ViewGroup parentGroup = (ViewGroup) parent;
+        int height = ((ViewGroup) parent).getHeight();
+        accumulatedOffset.x += child.getLeft();
+        accumulatedOffset.y += child.getTop();
+        if (parentGroup.equals(scrollView)) {
+            return;
+        }
+        getDeepChildOffset(parentGroup.getParent(), parentGroup, accumulatedOffset);
     }
 
     private void verifyItemRemains() {

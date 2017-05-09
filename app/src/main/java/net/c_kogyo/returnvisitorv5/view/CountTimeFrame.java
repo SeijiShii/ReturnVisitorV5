@@ -174,4 +174,9 @@ public class CountTimeFrame extends BaseAnimateView {
 
         void onChangeStart(Calendar calendar);
     }
+
+    @Override
+    public void postViewExtract(BaseAnimateView view) {
+
+    }
 }

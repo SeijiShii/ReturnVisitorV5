@@ -81,4 +81,8 @@ public class ClearEditText extends BaseAnimateView{
         this.editText.setText(text);
     }
 
+    @Override
+    public void postViewExtract(BaseAnimateView view) {
+
+    }
 }

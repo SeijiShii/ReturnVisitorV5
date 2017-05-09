@@ -416,6 +416,11 @@ public class WorkView extends BaseAnimateView {
             public void setLayoutParams(BaseAnimateView view) {
                 view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0));
             }
+
+            @Override
+            public void postViewExtract(BaseAnimateView view) {
+
+            }
         };
         visitCell.setHeightUpdateListener(new HeightUpdateListener() {
             @Override
@@ -541,5 +546,8 @@ public class WorkView extends BaseAnimateView {
     // DONE: 2017/05/07 時間調整時にDurationが変わらない。
 
 
+    @Override
+    public void postViewExtract(BaseAnimateView view) {
 
+    }
 }

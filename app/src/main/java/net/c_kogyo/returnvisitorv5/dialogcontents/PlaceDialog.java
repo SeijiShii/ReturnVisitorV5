@@ -195,6 +195,11 @@ public class PlaceDialog extends FrameLayout {
                     public void setLayoutParams(BaseAnimateView view) {
                         view.setLayoutParams(new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0));
                     }
+
+                    @Override
+                    public void postViewExtract(BaseAnimateView view) {
+
+                    }
                 };
             } else {
                 ((VisitCell) view).refreshVisit((Visit) getItem(i));

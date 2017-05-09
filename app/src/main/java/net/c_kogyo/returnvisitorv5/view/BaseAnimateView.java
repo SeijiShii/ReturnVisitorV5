@@ -9,7 +9,6 @@ import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import net.c_kogyo.returnvisitorv5.R;
@@ -136,7 +135,32 @@ public abstract class BaseAnimateView extends FrameLayout {
             int duration =  (int) (Math.abs(targetHeight - originHeight) * multi);
             animator.setDuration(duration);
 
-            if (animatorListener != null) animator.addListener(animatorListener);
+            if (animatorListener != null)
+                animator.addListener(animatorListener);
+
+            if (targetHeight > 0) {
+                animator.addListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        postViewExtract(BaseAnimateView.this);
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+
+                    }
+                });
+            }
 
             animator.start();
         }
@@ -148,4 +172,6 @@ public abstract class BaseAnimateView extends FrameLayout {
     }
 
     public abstract void setLayoutParams(BaseAnimateView view);
+
+    public abstract void postViewExtract(BaseAnimateView view);
 }

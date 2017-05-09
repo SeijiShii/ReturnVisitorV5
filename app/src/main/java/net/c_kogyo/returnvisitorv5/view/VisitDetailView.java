@@ -393,4 +393,9 @@ public class VisitDetailView extends BaseAnimateView {
     // DONE: 2017/03/20 mExtractによる振り分け
     // TODO: 2017/05/06 描画時に高さ0, collapse, extractを選べるようにする
 
+
+    @Override
+    public void postViewExtract(BaseAnimateView view) {
+
+    }
 }
