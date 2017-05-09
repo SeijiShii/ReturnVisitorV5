@@ -346,6 +346,7 @@ public class CalendarPagerActivity extends AppCompatActivity {
                         onClickAggregationMenu();
                         return true;
                     case R.id.report_mail:
+                        onClickMailReport();
                         return true;
                 }
                 return false;
@@ -385,6 +386,10 @@ public class CalendarPagerActivity extends AppCompatActivity {
             }
         });
         fadeDialogOverlay(true);
+    }
+
+    private void onClickMailReport() {
+        MailReport.exportToMail(this, mAdapter.getMonth(mPager.getCurrentItem()));
     }
 
     private RelativeLayout dialogOverlay;
@@ -486,6 +491,7 @@ public class CalendarPagerActivity extends AppCompatActivity {
     // TODO: 2017/05/07 週の開始日を切り替える
     // TODO: 2017/05/06 AdView to Real
     // TODO: 2017/05/08 Add Work
+    // DONE: 2017/05/09 mail action
 
     private class CalendarPagerAdapter extends FragmentStatePagerAdapter {
 
