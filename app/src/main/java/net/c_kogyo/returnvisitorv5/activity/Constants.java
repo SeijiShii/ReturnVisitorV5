@@ -21,6 +21,8 @@ public class Constants {
 
         public static final String USER_NAME = "user_name";
 
+        public static final String WEEK_START_DAY = "week_start_day";
+
     }
 
     public static final String LATITUDE = "latitude";

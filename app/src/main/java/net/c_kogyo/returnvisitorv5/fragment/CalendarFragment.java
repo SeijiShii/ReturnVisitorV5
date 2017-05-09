@@ -122,6 +122,7 @@ public class CalendarFragment extends Fragment {
             dayTextView.setTextColor(Color.WHITE);
             dayTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f);
             dayTextView.setText(dayText);
+            dayTextView.setGravity(Gravity.CENTER);
 
             dayRow.addView(dayTextView);
 

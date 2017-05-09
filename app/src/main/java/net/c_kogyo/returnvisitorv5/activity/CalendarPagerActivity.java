@@ -3,6 +3,7 @@ package net.c_kogyo.returnvisitorv5.activity;
 import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -55,6 +56,7 @@ public class CalendarPagerActivity extends AppCompatActivity {
     }
 
     private PagerState mPagerState, mOldState;
+    private StartDay mStartDay;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -63,6 +65,7 @@ public class CalendarPagerActivity extends AppCompatActivity {
 
         AdMobHelper.setAdView(this);
 
+        loadPrefs();
         initPager();
 
         initMonthTextView();
@@ -77,6 +80,12 @@ public class CalendarPagerActivity extends AppCompatActivity {
         initDialogOverlay();
         initMenuButton();
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        savePrefs();
     }
 
     private ViewPager mPager;
@@ -337,9 +346,18 @@ public class CalendarPagerActivity extends AppCompatActivity {
         });
     }
 
+    private PopupMenu popupMenu;
     private void showPopupMenu() {
-        PopupMenu popupMenu = new PopupMenu(this, menuButton);
+        popupMenu = new PopupMenu(this, menuButton);
         popupMenu.getMenuInflater().inflate(R.menu.calendar_pager_menu, popupMenu.getMenu());
+
+        if (mStartDay == StartDay.MONDAY) {
+            popupMenu.getMenu().getItem(3).setTitle(R.string.to_sunday_start);
+        } else {
+            popupMenu.getMenu().getItem(3).setTitle(R.string.to_monday_start);
+        }
+
+
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -352,6 +370,9 @@ public class CalendarPagerActivity extends AppCompatActivity {
                         return true;
                     case R.id.add_work:
                         showAddWorkDialog();
+                        return true;
+                    case R.id.change_start_day:
+                        onClickChangeStartDay();
                         return true;
                 }
                 return false;
@@ -490,11 +511,38 @@ public class CalendarPagerActivity extends AppCompatActivity {
         }
     }
 
+    private void loadPrefs() {
+        SharedPreferences preferences
+                = getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
+        mStartDay = StartDay.valueOf(preferences.getString(Constants.SharedPrefTags.WEEK_START_DAY, StartDay.MONDAY.toString()));
+    }
+
+    private void savePrefs() {
+        SharedPreferences preferences
+                = getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(Constants.SharedPrefTags.WEEK_START_DAY, mStartDay.toString());
+        editor.apply();
+    }
+
+    // DONE: 2017/05/07 週の開始日を切り替える
+    private void onClickChangeStartDay() {
+        if (mStartDay == StartDay.MONDAY) {
+            mStartDay = StartDay.SUNDAY;
+            popupMenu.getMenu().getItem(3).setTitle(R.string.to_sunday_start);
+        } else if (mStartDay == StartDay.SUNDAY) {
+            mStartDay = StartDay.MONDAY;
+            popupMenu.getMenu().getItem(3).setTitle(R.string.to_monday_start);
+        }
+
+        mAdapter.notifyDataSetChanged();
+
+    }
+
     // DONE: 2017/05/06 月で遷移
     // DONE: 2017/05/06 getClosestPosition
 
 
-    // TODO: 2017/05/07 週の開始日を切り替える
     // TODO: 2017/05/06 AdView to Real
     // DONE: 2017/05/08 Add Work
     private void showAddWorkDialog() {
@@ -545,7 +593,7 @@ public class CalendarPagerActivity extends AppCompatActivity {
         @Override
         public Fragment getItem(int position) {
             return CalendarFragment.newInstance(getMonth(position),
-                    StartDay.MONDAY,
+                    mStartDay,
                     new CalendarFragment.CalendarCellListener() {
                         @Override
                         public void onTouch(Calendar date) {
@@ -607,6 +655,11 @@ public class CalendarPagerActivity extends AppCompatActivity {
             }
 
             return -1;
+        }
+
+        @Override
+        public int getItemPosition(Object object) {
+            return POSITION_NONE;
         }
     }
  }
