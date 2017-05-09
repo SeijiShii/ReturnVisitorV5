@@ -684,7 +684,7 @@ public class WorkFragment extends Fragment {
         return mDate;
     }
 
-    // TODO: 2017/05/09 WorkView追加時に表示するまでスクロールする
+    // DONE: 2017/05/09 WorkView追加時に表示するまでスクロールする
     public void addWorkViewAndExtract(Work work) {
 
         int pos = getInsertPosition(work.getStart());
