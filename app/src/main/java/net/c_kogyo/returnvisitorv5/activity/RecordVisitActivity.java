@@ -36,6 +36,7 @@ import net.c_kogyo.returnvisitorv5.data.Placement;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
+import net.c_kogyo.returnvisitorv5.dialogcontents.HousingComplexDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.PersonDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.PlacementDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.SetPlaceDialog;
@@ -825,7 +826,7 @@ public class RecordVisitActivity extends AppCompatActivity {
         finish();
     }
 
-    // TODO: 2017/05/08 場所無し訪問機能
+    // DONE: 2017/05/08 場所無し訪問機能
     private void onSetPlaceClick() {
         showSetPlaceDialog();
     }
@@ -845,7 +846,7 @@ public class RecordVisitActivity extends AppCompatActivity {
                             setPlace(place);
                             fadeDialogOverlay(false, null);
                         } else if (place.getCategory() == Place.Category.HOUSING_COMPLEX) {
-
+                            onHousingComplexSelected(place);
                         }
                     }
 
@@ -927,7 +928,58 @@ public class RecordVisitActivity extends AppCompatActivity {
 
     }
 
-    private void onHousingComplexSelected() {
+    private void onHousingComplexSelected(final Place housingComplex) {
+        fadeDialogOverlay(false, new DialogPostAnimationListener() {
+            @Override
+            public void onFinishAnimation() {
+                showHousingComplexDialog(housingComplex);
+            }
+        });
+    }
+
+    private void showHousingComplexDialog(Place housingComplex) {
+
+        HousingComplexDialog housingComplexDialog
+                = new HousingComplexDialog(this,
+                housingComplex,
+                new HousingComplexDialog.HousingComplexDialogListener() {
+                    @Override
+                    public void onClickAddRoomButton(Place newRoom) {
+                        fadeDialogOverlay(false, null);
+                        setPlace(newRoom);
+                    }
+
+                    @Override
+                    public void onClickRoomCell(final Place room) {
+                        fadeDialogOverlay(false, null);
+                        setPlace(room);
+                    }
+
+                    @Override
+                    public void onClickOkButton(Place housingComplex) {
+//
+                    }
+
+                    @Override
+                    public void onClickCancelButton() {
+                        fadeDialogOverlay(false, null);
+                    }
+
+                    @Override
+                    public void onDeleteHousingComplex(Place housingComplex) {
+
+                    }
+                }, false, false);
+        dialogFrame.addView(housingComplexDialog);
+        fadeDialogOverlay(true, null);
+        dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                hideSoftKeyboard();
+                fadeDialogOverlay(false, null);
+                return true;
+            }
+        });
 
     }
 

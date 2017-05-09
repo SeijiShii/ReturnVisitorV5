@@ -773,7 +773,7 @@ public class MapActivity extends AppCompatActivity
                                 RVData.getInstance().placeList.deleteById(housingComplex.getId());
                                 RVData.getInstance().saveData(MapActivity.this, null);
                             }
-                        });
+                        }, true, true);
         dialogFrame.addView(housingComplexDialog);
         fadeInDialogOverlay();
         dialogOverlay.setOnTouchListener(new View.OnTouchListener() {

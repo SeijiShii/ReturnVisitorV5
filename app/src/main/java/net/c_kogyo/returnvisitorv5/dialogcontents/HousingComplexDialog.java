@@ -24,6 +24,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
@@ -46,13 +47,20 @@ public class HousingComplexDialog extends FrameLayout {
     private HousingComplexDialogListener mListener;
     private ArrayList<Place> addedRooms;
     private ArrayList<Place> removedRooms;
+    private boolean mShowDeleteButton, mShowOkButton;
 
     public HousingComplexDialog(@NonNull Context context,
                                 Place housingComplex,
-                                HousingComplexDialogListener listener) {
+                                HousingComplexDialogListener listener,
+                                boolean showDeleteButton,
+                                boolean showOkButton) {
         super(context);
         this.mHousingComplex = housingComplex;
         this.mListener = listener;
+
+        mShowDeleteButton = showDeleteButton;
+        mShowOkButton = showOkButton;
+
         initCommon();
     }
 
@@ -91,31 +99,36 @@ public class HousingComplexDialog extends FrameLayout {
 
     private void initMenuButton() {
         final Button menuButton = (Button) view.findViewById(R.id.menu_button);
-        menuButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PopupMenu popupMenu = new PopupMenu(getContext(), menuButton);
-                popupMenu.getMenuInflater().inflate(R.menu.delete_menu, popupMenu.getMenu());
-                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        if (item.getItemId() == R.id.delete) {
-                            ConfirmDialog.confirmAndDeletePlace(getContext(), new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    if (mListener != null) {
-                                        mListener.onDeleteHousingComplex(mHousingComplex);
+        if (mShowDeleteButton) {
+            menuButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    PopupMenu popupMenu = new PopupMenu(getContext(), menuButton);
+                    popupMenu.getMenuInflater().inflate(R.menu.delete_menu, popupMenu.getMenu());
+                    popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            if (item.getItemId() == R.id.delete) {
+                                ConfirmDialog.confirmAndDeletePlace(getContext(), new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        if (mListener != null) {
+                                            mListener.onDeleteHousingComplex(mHousingComplex);
+                                        }
                                     }
-                                }
-                            });
-                            return true;
+                                });
+                                return true;
+                            }
+                            return false;
                         }
-                        return false;
-                    }
-                });
-                popupMenu.show();
-            }
-        });
+                    });
+                    popupMenu.show();
+                }
+            });
+        } else {
+            menuButton.setLayoutParams(new RelativeLayout.LayoutParams(0, 0));
+        }
+
     }
 
     private EditText addressText;
@@ -212,15 +225,21 @@ public class HousingComplexDialog extends FrameLayout {
 
     private void initOKButton() {
         Button okButton = (Button) view.findViewById(R.id.ok_button);
-        okButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                confirmEdit();
-                if (mListener != null) {
-                    mListener.onClickOkButton(mHousingComplex);
+
+        if (mShowOkButton) {
+            okButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    confirmEdit();
+                    if (mListener != null) {
+                        mListener.onClickOkButton(mHousingComplex);
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            okButton.setLayoutParams(new RelativeLayout.LayoutParams(0, 0));
+        }
+
     }
 
     private void initCancelButton() {
