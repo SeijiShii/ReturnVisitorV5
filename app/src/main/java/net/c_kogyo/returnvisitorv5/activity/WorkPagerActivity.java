@@ -417,7 +417,7 @@ public class WorkPagerActivity extends AppCompatActivity {
     }
 
     private void onClickAddVisitMenu() {
-        // TODO: 2017/04/02 Record Visit Action with no Place
+        // DONE: 2017/04/02 Record Visit Action with no Place
         Calendar date = Calendar.getInstance();
         Calendar pagerDate = mDatePagerAdapter.getDayItem(mPager.getCurrentItem());
 
