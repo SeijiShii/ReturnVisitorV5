@@ -12,7 +12,6 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -39,6 +38,7 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import static net.c_kogyo.returnvisitorv5.activity.Constants.DATE_LONG;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.LATITUDE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.LONGITUDE;
 import static net.c_kogyo.returnvisitorv5.util.ViewUtil.setOnClickListener;
@@ -398,8 +398,8 @@ public class WorkPagerActivity extends AppCompatActivity {
                     case R.id.add_work:
                         onClickAddWorkMenu();
                         return true;
-                    case R.id.record_visit:
-                        onClickRecordVisitMenu();
+                    case R.id.add_visit:
+                        onClickAddVisitMenu();
                         return true;
                     case R.id.aggregation:
                         onClickAggregationMenu();
@@ -416,8 +416,21 @@ public class WorkPagerActivity extends AppCompatActivity {
         showAddWorkDialog();
     }
 
-    private void onClickRecordVisitMenu() {
+    private void onClickAddVisitMenu() {
         // TODO: 2017/04/02 Record Visit Action with no Place
+        Calendar date = Calendar.getInstance();
+        Calendar pagerDate = mDatePagerAdapter.getDayItem(mPager.getCurrentItem());
+
+        date.set(Calendar.YEAR, pagerDate.get(Calendar.YEAR));
+        date.set(Calendar.MONTH, pagerDate.get(Calendar.MONTH));
+        date.set(Calendar.DAY_OF_MONTH, pagerDate.get(Calendar.DAY_OF_MONTH));
+
+        Intent intent = new Intent(this, RecordVisitActivity.class);
+        intent.setAction(Constants.RecordVisitActions.NEW_VISIT_ACTION_NO_PLACE_WITH_DATE);
+        intent.putExtra(DATE_LONG, date.getTimeInMillis());
+
+        startActivityForResult(intent, Constants.RecordVisitActions.NEW_VISIT_REQUEST_CODE);
+
     }
 
     private void onClickAggregationMenu() {
@@ -630,6 +643,28 @@ public class WorkPagerActivity extends AppCompatActivity {
             return;
 
         addedWork = RVData.getInstance().workList.getById(workId);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == Constants.RecordVisitActions.NEW_VISIT_REQUEST_CODE) {
+            if (resultCode == Constants.RecordVisitActions.VISIT_ADDED_RESULT_CODE) {
+                String visitId = data.getStringExtra(Visit.VISIT);
+                if (visitId != null) {
+                    Visit visit = RVData.getInstance().visitList.getById(visitId);
+                    if (visit != null) {
+                        getCurrentFragment().insertVisitCell(visit);
+                    }
+                }
+            }
+        }
+    }
+
+    private WorkFragment getCurrentFragment() {
+        int pos = mPager.getCurrentItem();
+        return (WorkFragment) mDatePagerAdapter.instantiateItem(mPager, pos);
     }
 
     class DatePagerAdapter extends FragmentStatePagerAdapter {

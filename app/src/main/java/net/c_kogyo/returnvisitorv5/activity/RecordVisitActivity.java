@@ -56,6 +56,7 @@ import java.util.Calendar;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.EDIT_VISIT_ACTION;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_HOUSE_ACTION;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_VISIT_ACTION_NO_PLACE;
+import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_VISIT_ACTION_NO_PLACE_WITH_DATE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_VISIT_ACTION_WITH_PLACE;
 import static net.c_kogyo.returnvisitorv5.data.Place.PLACE;
 import static net.c_kogyo.returnvisitorv5.data.Visit.VISIT;
@@ -162,6 +163,15 @@ public class RecordVisitActivity extends AppCompatActivity {
 
                 // Place = null;
 
+                break;
+
+            case NEW_VISIT_ACTION_NO_PLACE_WITH_DATE:
+
+                mVisit = new Visit();
+                long dLong = getIntent().getLongExtra(Constants.DATE_LONG, 0);
+                if (dLong > 0) {
+                    mVisit.getDatetime().setTimeInMillis(dLong);
+                }
                 break;
         }
     }
@@ -611,8 +621,10 @@ public class RecordVisitActivity extends AppCompatActivity {
                 RVData.getInstance().personList.addList(mAddedPersons);
                 RVData.getInstance().personList.removeList(mRemovedPersons);
 
-                mPlace.setName(placeNameText.getText());
-                RVData.getInstance().placeList.setOrAdd(mPlace);
+                if (mPlace != null) {
+                    mPlace.setName(placeNameText.getText());
+                    RVData.getInstance().placeList.setOrAdd(mPlace);
+                }
 
                 // PENDING: 2017/03/08 要動作検証 noteがAutoCompListについかされたかどうか
                 for (VisitDetail visitDetail : mVisit.getVisitDetails()) {
@@ -621,6 +633,9 @@ public class RecordVisitActivity extends AppCompatActivity {
 
                 switch (getIntent().getAction()) {
                     case NEW_HOUSE_ACTION:
+                    case NEW_VISIT_ACTION_WITH_PLACE:
+                    case NEW_VISIT_ACTION_NO_PLACE:
+                    case NEW_VISIT_ACTION_NO_PLACE_WITH_DATE:
 
                         Intent newPlaceReturnIntent = new Intent();
                         newPlaceReturnIntent.putExtra(VISIT, mVisit.getId());
@@ -636,15 +651,6 @@ public class RecordVisitActivity extends AppCompatActivity {
                         setResult(Constants.RecordVisitActions.VISIT_EDITED_RESULT_CODE, editVisitReturnIntent);
 
                         break;
-
-                    case NEW_VISIT_ACTION_WITH_PLACE:
-
-                        Intent newVisitReturnIntent = new Intent();
-                        newVisitReturnIntent.putExtra(VISIT, mVisit.getId());
-                        setResult(Constants.RecordVisitActions.VISIT_ADDED_RESULT_CODE, newVisitReturnIntent);
-
-                        break;
-
                 }
 
                 RVData.getInstance().saveData(getApplicationContext(), null);

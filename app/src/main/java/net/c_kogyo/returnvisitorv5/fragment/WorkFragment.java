@@ -679,6 +679,19 @@ public class WorkFragment extends Fragment {
 
     }
 
+    public void insertVisitCell(Visit visit) {
+        // DONE: 2017/05/09  insertVisitCell
+        Work work = RVData.getInstance().workList.getByVisit(visit);
+        if (work != null) {
+            WorkView workView = getWorkView(work.getId());
+            if (workView != null) {
+                workView.insertVisitCellToProperPosition(visit);
+            }
+        } else {
+            container.addView(generateVisitCell(visit, true));
+        }
+    }
+
     private void verifyItemRemains() {
 
         if (container.getChildCount() <= 0) {

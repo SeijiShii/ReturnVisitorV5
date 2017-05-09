@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:title="@string/add_work_menu" android:id="@+id/add_work"/>
-    <item android:title="@string/record_new_visit_menu" android:id="@+id/record_visit"/>
+    <item android:title="@string/add_visit" android:id="@+id/add_visit"/>
     <item
         android:id="@+id/aggregation"
         android:title="@string/aggregation_menu" />

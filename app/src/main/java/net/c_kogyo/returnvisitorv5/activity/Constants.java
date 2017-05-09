@@ -107,6 +107,7 @@ public class Constants {
         public static final String NEW_VISIT_ACTION_WITH_PLACE  = "new_visit_action_with_place";
         public static final String EDIT_VISIT_ACTION            = "edit_visit_action";
         public static final String NEW_VISIT_ACTION_NO_PLACE    = "new_visit_action_no_place";
+        public static final String NEW_VISIT_ACTION_NO_PLACE_WITH_DATE    = "new_visit_action_no_place_with_date";
 
         public static final int EDIT_VISIT_REQUEST_CODE = 4000;
         public static final int NEW_VISIT_REQUEST_CODE = 4001;
