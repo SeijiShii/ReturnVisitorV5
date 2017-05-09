@@ -193,18 +193,6 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/visit_priority_rater"/>
 
-                <!-- Record Not home button 2-->
-                <Button
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/ui_height_small"
-                    android:id="@+id/record_not_home_button2"
-                    android:background="@drawable/sea_blue_selector"
-                    android:layout_margin="@dimen/ui_margin_normal"
-                    android:textColor="#FFF"
-                    android:textSize="@dimen/text_size_small"
-                    android:gravity="center"
-                    android:text="@string/record_not_home2"/>
-
             </LinearLayout>
 
             <!-- OK -->
