@@ -774,7 +774,7 @@ public class WorkPagerActivity extends AppCompatActivity {
 
         private void removeDay(Calendar date) {
 
-            // TODO: 2017/05/04 挙動要検証
+            // DONE: 2017/05/04 挙動要検証
 
             notifyDataSetChanged();
             mPager.setCurrentItem(getClosestPosition(date), true);
