@@ -43,6 +43,7 @@ import net.c_kogyo.returnvisitorv5.dialogcontents.SetPlaceDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.TagDialog;
 import net.c_kogyo.returnvisitorv5.service.FetchAddressIntentService;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
+import net.c_kogyo.returnvisitorv5.util.InputUtil;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 import net.c_kogyo.returnvisitorv5.view.ClearEditText;
 import net.c_kogyo.returnvisitorv5.view.PlacementCell;
@@ -290,7 +291,7 @@ public class RecordVisitActivity extends AppCompatActivity {
                 new PersonDialog.OnButtonsClickListener() {
                     @Override
                     public void onOkClick(final Person person) {
-                        hideSoftKeyboard();
+                        InputUtil.hideSoftKeyboard(RecordVisitActivity.this);
                         // とりあえずアクティビティ内のアレイリストに追加
                         mAddedPersons.add(person);
                         final VisitDetail visitDetail = new VisitDetail(person.getId(), mVisit.getId());
@@ -336,7 +337,7 @@ public class RecordVisitActivity extends AppCompatActivity {
 
     private void fadeDialogOverlay(boolean isFadeIn, final DialogPostAnimationListener listener) {
 
-        hideSoftKeyboard();
+        InputUtil.hideSoftKeyboard(this);
 
         if (isFadeIn) {
             dialogOverlay.setVisibility(View.VISIBLE);
@@ -611,15 +612,6 @@ public class RecordVisitActivity extends AppCompatActivity {
             }
         });
 
-    }
-
-    private void hideSoftKeyboard() {
-        InputMethodManager inputMethodManager = (InputMethodManager)  this.getSystemService(Activity.INPUT_METHOD_SERVICE);
-
-        View view = this.getCurrentFocus();
-        if (view != null) {
-            inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
-        }
     }
 
     private Button okButton;
@@ -997,7 +989,7 @@ public class RecordVisitActivity extends AppCompatActivity {
         dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                hideSoftKeyboard();
+                InputUtil.hideSoftKeyboard(RecordVisitActivity.this);
                 fadeDialogOverlay(false, null);
                 return true;
             }
