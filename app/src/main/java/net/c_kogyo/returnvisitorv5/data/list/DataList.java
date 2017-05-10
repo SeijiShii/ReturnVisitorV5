@@ -3,6 +3,7 @@ package net.c_kogyo.returnvisitorv5.data.list;
 import android.content.Context;
 
 import net.c_kogyo.returnvisitorv5.data.DataItem;
+import net.c_kogyo.returnvisitorv5.data.RVData;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -16,6 +17,7 @@ import java.util.List;
 public class DataList<T extends DataItem> implements Iterable<T>{
 
     // DONE: 2017/03/16 さくじょしたものが拾われないようにする
+    // DONE: 2017/05/10 削除フラグの撤去に伴う変更
     private ArrayList<T> list;
 
     public DataList() {
@@ -43,21 +45,11 @@ public class DataList<T extends DataItem> implements Iterable<T>{
         this.list.removeAll(list);
     }
 
-    private ArrayList<T> safeList() {
-        ArrayList<T> safeList = new ArrayList<>();
-        for (T data : list) {
-            if (!data.isDeleted()) {
-                safeList.add(data);
-            }
-        }
-        return safeList;
-    }
-
     public int indexOf(T data) {
 
-        for (int i = 0; i < safeList().size() ; i++ ) {
+        for (int i = 0; i < list.size() ; i++ ) {
 
-            T data1 = safeList().get(i);
+            T data1 = list.get(i);
 
             if (data.equals(data1)) {
                 return i;
@@ -72,7 +64,7 @@ public class DataList<T extends DataItem> implements Iterable<T>{
 
     public T getById(String id) {
 
-        for ( T data : safeList() ) {
+        for ( T data : list ) {
             if (data.getId().equals(id)) {
                 return data;
             }
@@ -81,7 +73,9 @@ public class DataList<T extends DataItem> implements Iterable<T>{
     }
 
     private void delete(T data) {
-        data.setDeleted(true);
+        list.remove(data);
+        // DONE: 2017/05/10 DeleteListへの追加
+        RVData.getInstance().deletedList.onDelete(data);
     }
 
     public void deleteAll(ArrayList<T> dataList) {
@@ -108,13 +102,13 @@ public class DataList<T extends DataItem> implements Iterable<T>{
 
     @Override
     public Iterator<T> iterator() {
-        return safeList().iterator();
+        return list.iterator();
     }
 
     public ArrayList<T> getList(ArrayList<String> ids) {
 
         ArrayList<T> arrayList = new ArrayList<>();
-        for ( T item : safeList() ) {
+        for ( T item : list ) {
 
             if (ids.contains(item.getId())) {
                 arrayList.add(item);
@@ -124,7 +118,7 @@ public class DataList<T extends DataItem> implements Iterable<T>{
     }
 
     public ArrayList<T> getList() {
-        return safeList();
+        return list;
     }
 
     private void add(T item) {
@@ -133,16 +127,16 @@ public class DataList<T extends DataItem> implements Iterable<T>{
 
     public int size() {
 
-        return safeList().size();
+        return list.size();
     }
 
     public T get(int index) {
-        return safeList().get(index);
+        return list.get(index);
     }
 
     public boolean containsDataWithName(String data) {
 
-        for (T item : safeList()) {
+        for (T item : list) {
             if (item.getName().equals(data)) {
                 return true;
             }
@@ -154,7 +148,7 @@ public class DataList<T extends DataItem> implements Iterable<T>{
 
         String[] words = searchWord.split(" ");
 
-        ArrayList<T> searchResultItems = safeList();
+        ArrayList<T> searchResultItems = list;
 
         for (String word : words) {
             List<T> listToRemove = new ArrayList<>();

@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 
 import net.c_kogyo.returnvisitorv5.data.list.DataList;
+import net.c_kogyo.returnvisitorv5.data.list.DeletedList;
 import net.c_kogyo.returnvisitorv5.data.list.NoteCompList;
 import net.c_kogyo.returnvisitorv5.data.list.PlaceList;
 import net.c_kogyo.returnvisitorv5.data.list.TagList;
@@ -49,6 +50,8 @@ public class RVData {
     public DataList<Publication> pubList;
     public WorkList workList;
 
+    public DeletedList deletedList;
+
     private static RVData instance = new RVData();
     private RVData() {
 
@@ -61,6 +64,8 @@ public class RVData {
         pubList = new DataList<>();
 
         workList = new WorkList();
+
+        deletedList = new DeletedList();
 
     }
 
@@ -175,6 +180,9 @@ public class RVData {
                             case "Work":
                                 workList.setOrAdd(new Work(record));
                                 break;
+                            case "DeletedData":
+                                deletedList.onLoadData(record);
+                                break;
                         }
                     }
                 }
@@ -253,6 +261,10 @@ public class RVData {
 
             for (Work work : workList) {
                 array.put(new Record(work).getFullJSON());
+            }
+
+            for (DeletedData deletedData : deletedList) {
+                array.put(new Record(deletedData).getFullJSON());
             }
 
             try {

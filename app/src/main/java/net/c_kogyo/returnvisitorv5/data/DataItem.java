@@ -28,8 +28,6 @@ public class DataItem implements Cloneable{
     protected Calendar updatedAt;
 
     protected String idHeader;
-    // TODO: 2017/04/16 要不要要検証
-    protected boolean isDeleted;
 
     public DataItem(){}
 
@@ -80,7 +78,6 @@ public class DataItem implements Cloneable{
         this.id = generateNewId();
         this.name = "";
         this.note = "";
-        this.isDeleted = false;
     }
 
     public JSONObject jsonObject() {
@@ -136,14 +133,6 @@ public class DataItem implements Cloneable{
         return name;
     }
 
-    public boolean isDeleted() {
-        return isDeleted;
-    }
-
-    public void setDeleted(boolean deleted) {
-        isDeleted = deleted;
-    }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -165,7 +154,6 @@ public class DataItem implements Cloneable{
         item.name = this.name;
         item.note = this.note;
         item.updatedAt = (Calendar) this.updatedAt.clone();
-        item.isDeleted = this.isDeleted;
 
         return item;
     }
@@ -185,12 +173,7 @@ public class DataItem implements Cloneable{
     }
 
     public <T extends DataItem> boolean equals(T o) {
-        return this.getId().equals(o.getId()) && !this.isDeleted;
-        // 削除されていたら反応しない
-    }
-
-    public void delete(boolean toDelete) {
-        this.isDeleted = toDelete;
+        return this.getId().equals(o.getId());
     }
 
     public static DataItem setJSON(DataItem item, JSONObject object) {
