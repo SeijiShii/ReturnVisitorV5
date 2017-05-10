@@ -42,6 +42,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import net.c_kogyo.returnvisitorv5.R;
+import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.PlaceMarkers;
 import net.c_kogyo.returnvisitorv5.data.RVData;
@@ -90,6 +91,13 @@ public class MapActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        RVCloudSync.getInstance().setCallback(new RVCloudSync.RVCloudSyncCallback() {
+            @Override
+            public void onSuccessLogin(String userId, String password) {
+                isLoggedIn = true;
+            }
+        });
 
         // 初期化のために一回ゲットする
         RVData.getInstance().loadData(this, this);
@@ -469,8 +477,7 @@ public class MapActivity extends AppCompatActivity
                 fadeOutDialogOverlay(normalFadeOutListener);
             }
         });
-        dialogFrame.addView(mapLongClickDialog);
-        fadeInDialogOverlay();
+        fadeInDialogOverlay(mapLongClickDialog);
 
         dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -527,7 +534,11 @@ public class MapActivity extends AppCompatActivity
         initDialogFrame();
     }
 
-    private void fadeInDialogOverlay() {
+    private void fadeInDialogOverlay(View dialogView) {
+
+        if (dialogOverlay.getVisibility() == View.VISIBLE) return;
+
+        dialogFrame.addView(dialogView);
 
         dialogOverlay.setVisibility(View.VISIBLE);
         ValueAnimator animator = ValueAnimator.ofFloat(0f, 1f);
@@ -675,9 +686,7 @@ public class MapActivity extends AppCompatActivity
                                 startRecordVisitActivityToEditVisit(visit);
                             }
                         });
-        dialogFrame.addView(placeDialog);
-
-        fadeInDialogOverlay();
+        fadeInDialogOverlay(placeDialog);
         dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -777,8 +786,7 @@ public class MapActivity extends AppCompatActivity
                                 RVData.getInstance().saveData(MapActivity.this, null);
                             }
                         }, true, true);
-        dialogFrame.addView(housingComplexDialog);
-        fadeInDialogOverlay();
+        fadeInDialogOverlay(housingComplexDialog);
         dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -1148,8 +1156,7 @@ public class MapActivity extends AppCompatActivity
                 },
                 true,
                 Calendar.getInstance());
-        dialogFrame.addView(addWorkDialog);
-        fadeInDialogOverlay();
+        fadeInDialogOverlay(addWorkDialog);
         dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -1265,7 +1272,6 @@ public class MapActivity extends AppCompatActivity
                 fadeOutDialogOverlay(normalFadeOutListener);
             }
         });
-        dialogFrame.addView(loginDialog);
         dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -1273,7 +1279,7 @@ public class MapActivity extends AppCompatActivity
                 return true;
             }
         });
-        fadeInDialogOverlay();
+        fadeInDialogOverlay(loginDialog);
     }
 
     // TODO: 2017/05/05 データがないときにWORKやカレンダーに遷移しないようにする(実装済み、要検証)

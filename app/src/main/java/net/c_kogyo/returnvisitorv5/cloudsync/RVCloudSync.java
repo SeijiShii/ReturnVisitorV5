@@ -22,15 +22,20 @@ public class RVCloudSync {
     private RVCloudSync() {
     }
 
-    public void inquireLogin(String userId, String password) {
-
+    public void inquireLogin(String userId, String password) throws RVCloudSyncException{
+        if (mCallback == null)
+            throw new RVCloudSyncException();
     }
-
-
 
     public interface RVCloudSyncCallback {
 
-        void onSuccessLogin();
+        void onSuccessLogin(String userId, String password);
 
+    }
+
+    public class RVCloudSyncException extends Exception {
+        private RVCloudSyncException() {
+            super("RVCloudSyncCallback not set!");
+        }
     }
 }

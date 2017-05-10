@@ -1,115 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Dialog title -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/ui_height_small"
-        android:textColor="@color/textColorGray"
-        android:textSize="@dimen/text_size_large"
-        android:gravity="center"
-        android:text="@string/login_title"/>
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-    <!-- User ID Text -->
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/ui_height_small"
-        android:background="@drawable/gray_trans_circle"
-        android:textSize="@dimen/text_size_middle"
-        android:textColor="@color/textColorGray"
-        android:id="@+id/user_id_text"
-        android:hint="@string/user_id"
-        android:layout_margin="5dp"
-        android:gravity="center_vertical|left"/>
-
-    <!-- Password Text -->
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/ui_height_small"
-        android:background="@drawable/gray_trans_circle"
-        android:textSize="@dimen/text_size_middle"
-        android:textColor="@color/textColorGray"
-        android:id="@+id/password_text"
-        android:hint="@string/password"
-        android:layout_margin="5dp"
-        android:gravity="center_vertical|left"/>
-
-    <!-- Show Password Switch -->
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/ui_height_small">
-
-        <net.c_kogyo.returnvisitorv5.view.RightTextSwitch
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:id="@+id/show_password_switch"
-            app:checked_text="@string/show_password"/>
-
-    </RelativeLayout>
-
-    <!-- Message Frame -->
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
+        <!-- Dialog title -->
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/message_text"
+            android:layout_height="@dimen/ui_height_small"
             android:textColor="@color/textColorGray"
-            android:textSize="@dimen/text_size_middle"
-            android:gravity="center"/>
+            android:textSize="@dimen/text_size_large"
+            android:gravity="center"
+            android:text="@string/login_title"/>
 
+        <!-- User ID Text -->
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/ui_height_small"
+            android:background="@drawable/gray_trans_circle"
+            android:textSize="@dimen/text_size_middle"
+            android:textColor="@color/textColorGray"
+            android:id="@+id/user_id_text"
+            android:hint="@string/user_id"
+            android:layout_margin="5dp"
+            android:gravity="center_vertical|left"/>
+
+        <!-- Password Text -->
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/ui_height_small"
+            android:background="@drawable/gray_trans_circle"
+            android:textSize="@dimen/text_size_middle"
+            android:textColor="@color/textColorGray"
+            android:id="@+id/password_text"
+            android:hint="@string/password"
+            android:layout_margin="5dp"
+            android:gravity="center_vertical|left"/>
+
+        <!-- Show Password Switch -->
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="@dimen/ui_height_small">
 
-            <ProgressBar
+            <net.c_kogyo.returnvisitorv5.view.RightTextSwitch
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:id="@+id/progress_bar"
-                style="@android:style/Widget.ProgressBar.Small"/>
+                android:layout_height="match_parent"
+                android:id="@+id/show_password_switch"
+                app:checked_text="@string/show_password"/>
 
         </RelativeLayout>
-    </FrameLayout>
 
-    <!-- Login Button -->
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/ui_height_small">
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <Button
-            android:layout_width="150dp"
-            android:layout_height="match_parent"
-            android:id="@+id/login_button"
-            android:background="@drawable/trans_blue_selector"
-            android:textColor="@color/colorPrimaryDark"
-            android:text="@string/login_button"
-            android:textSize="@dimen/text_size_middle"
-            android:layout_alignParentRight="true"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/message_text"
+                android:textColor="@color/textColorGray"
+                android:textSize="@dimen/text_size_middle"
+                android:gravity="center"/>
 
-    </RelativeLayout>
+            <ProgressBar
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/ui_height_small"
+                android:id="@+id/progress_bar"
+                style="@android:style/Widget.ProgressBar.Small" />
 
-    <!-- Cancel Button -->
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/ui_height_small">
+        </FrameLayout>
 
-        <Button
-            android:layout_width="150dp"
-            android:layout_height="match_parent"
-            android:id="@+id/cancel_button"
-            android:background="@drawable/trans_orange_selector"
-            android:textColor="@color/colorAccent"
-            android:text="@string/cancel"
-            android:textSize="@dimen/text_size_middle"
-            android:layout_alignParentRight="true"/>
+        <!-- Login Button -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/ui_height_small">
 
-    </RelativeLayout>
+            <Button
+                android:layout_width="150dp"
+                android:layout_height="match_parent"
+                android:id="@+id/login_button"
+                android:background="@drawable/trans_blue_selector"
+                android:textColor="@color/colorPrimaryDark"
+                android:text="@string/login_button"
+                android:textSize="@dimen/text_size_middle"
+                android:layout_alignParentRight="true"/>
 
-</LinearLayout>
+        </RelativeLayout>
+
+        <!-- Cancel Button -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/ui_height_small">
+
+            <Button
+                android:layout_width="150dp"
+                android:layout_height="match_parent"
+                android:id="@+id/cancel_button"
+                android:background="@drawable/trans_orange_selector"
+                android:textColor="@color/colorAccent"
+                android:text="@string/cancel"
+                android:textSize="@dimen/text_size_middle"
+                android:layout_alignParentRight="true"/>
+
+        </RelativeLayout>
+    </LinearLayout>
+</ScrollView>
