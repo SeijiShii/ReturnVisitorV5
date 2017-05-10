@@ -111,6 +111,31 @@
                     android:layout_marginRight="5dp"
                     android:layout_marginLeft="5dp"/>
 
+                <!-- Login Button -->
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/ui_height_small">
+
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:id="@+id/login_button"
+                        android:textColor="@color/colorPrimaryDark"
+                        android:background="@drawable/trans_blue_selector"
+                        android:text="@string/login_button"
+                        android:paddingLeft="5dp"
+                        android:paddingRight="5dp"
+                        android:layout_centerInParent="true"/>
+
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/textColorGray"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginLeft="5dp"/>
+
                 <!-- Count Time -->
                 <net.c_kogyo.returnvisitorv5.view.CountTimeFrame
                     android:layout_width="match_parent"

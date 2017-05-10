@@ -49,6 +49,7 @@ import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.Work;
 import net.c_kogyo.returnvisitorv5.dialogcontents.AddWorkDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.HousingComplexDialog;
+import net.c_kogyo.returnvisitorv5.dialogcontents.LoginDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.MapLongClickDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.PlaceDialog;
 import net.c_kogyo.returnvisitorv5.service.TimeCountService;
@@ -82,7 +83,9 @@ public class MapActivity extends AppCompatActivity
                                         RVData.RVDataStoreCallback{
 
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
+
     private static boolean isForeground;
+    private boolean isLoggedIn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -885,6 +888,7 @@ public class MapActivity extends AppCompatActivity
             }
         });
 
+        initLoginButton();
         initCountTimeFrame();
         initWorkButton();
         initCalendarButton();
@@ -1232,6 +1236,44 @@ public class MapActivity extends AppCompatActivity
         Intent intent = new Intent(this, RecordVisitActivity.class);
         intent.setAction(Constants.RecordVisitActions.NEW_VISIT_ACTION_NO_PLACE);
         startActivity(intent);
+    }
+
+    private Button loginButton;
+    private void initLoginButton() {
+        loginButton = (Button) findViewById(R.id.login_button);
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isLoggedIn) {
+
+                } else {
+                    openCloseDrawer();
+                    onLoginClicked();
+                }
+            }
+        });
+    }
+
+    private void onLoginClicked() {
+        showLoginDialog();
+    }
+
+    private void showLoginDialog() {
+        LoginDialog loginDialog = new LoginDialog(this, new LoginDialog.LoginDialogListener() {
+            @Override
+            public void onCancel() {
+                fadeOutDialogOverlay(normalFadeOutListener);
+            }
+        });
+        dialogFrame.addView(loginDialog);
+        dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                fadeOutDialogOverlay(normalFadeOutListener);
+                return true;
+            }
+        });
+        fadeInDialogOverlay();
     }
 
     // TODO: 2017/05/05 データがないときにWORKやカレンダーに遷移しないようにする(実装済み、要検証)
