@@ -31,15 +31,12 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 
-import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
@@ -59,7 +56,6 @@ import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 import net.c_kogyo.returnvisitorv5.view.CountTimeFrame;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 
 import static net.c_kogyo.returnvisitorv5.activity.Constants.LATITUDE;
@@ -94,8 +90,16 @@ public class MapActivity extends AppCompatActivity
 
         RVCloudSync.getInstance().setCallback(new RVCloudSync.RVCloudSyncCallback() {
             @Override
-            public void onSuccessLogin(String userId, String password) {
-                isLoggedIn = true;
+            public void onLoginResponse(RVCloudSync.LoginStatusCode code, String userId, String password) {
+
+                switch (code) {
+                    case LOGIN_SUCCESS:
+                        isLoggedIn = true;
+                        break;
+                    case LOGIN_FAILED:
+                        isLoggedIn = false;
+                        break;
+                }
             }
         });
 

@@ -3,6 +3,9 @@ package net.c_kogyo.returnvisitorv5.cloudsync;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,6 +19,14 @@ import java.net.URL;
  */
 
 public class RVCloudSync {
+
+    private final String USER_ID = "user_id";
+    private final String PASSWORD = "password";
+
+    public enum LoginStatusCode {
+        LOGIN_SUCCESS,
+        LOGIN_FAILED
+    }
 
     private final String ROOT_URL = "http://192.168.3.3:1337";
 
@@ -39,20 +50,16 @@ public class RVCloudSync {
         if (mCallback == null)
             throw new RVCloudSyncException();
 
-        try {
-            URL url = new URL(ROOT_URL + "/users/?user_name=" + userId + "&password=" + password);
-            new DoHttpRequest().execute(url);
+        UserDataPair dataPair = new UserDataPair(userId, password);
+        new DoHttpLoginRequest().execute(dataPair);
 
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
     }
 
 
 
     public interface RVCloudSyncCallback {
 
-        void onSuccessLogin(String userId, String password);
+        void onLoginResponse(LoginStatusCode code, String userId, String password);
 
     }
 
@@ -62,21 +69,34 @@ public class RVCloudSync {
         }
     }
 
-    class DoHttpRequest extends AsyncTask<URL, Void, String> {
+    class DoHttpLoginRequest extends AsyncTask<UserDataPair, Void, Void> {
 
         @Override
-        protected String doInBackground(URL... params) {
+        protected Void doInBackground(UserDataPair... params) {
 
+            UserDataPair dataPairSent = params[0];
             HttpURLConnection urlConnection = null;
             try {
-                urlConnection = (HttpURLConnection) params[0].openConnection();
+
+                URL url = new URL(ROOT_URL + "/users/?user_name=" +dataPairSent.userId + "&password=" + dataPairSent.password);
+                urlConnection = (HttpURLConnection) url.openConnection();
 
                 urlConnection.setDoInput(true);
 //                urlConnection.setDoOutput(true);
 
-                InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
+                int status = urlConnection.getResponseCode();
+                if (status == 200) {
+                    InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
+                    String s = readInputStream(inputStream);
+                    JSONObject object = toJSON(s);
+                    UserDataPair dataPairReturned = new UserDataPair(object);
+                    if (mCallback != null) {
+                        mCallback.onLoginResponse(LoginStatusCode.LOGIN_SUCCESS, dataPairReturned.userId, dataPairReturned.password);
+                    }
 
-                return readInputStream(inputStream);
+                } else if (status == 404) {
+
+                }
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -89,6 +109,7 @@ public class RVCloudSync {
             return null;
         }
 
+
         private String readInputStream(InputStream inputStream) throws IOException{
             // TODO: 2017/05/11 バッファサイズを検証。不具合はないか
             byte[] buffer = new byte[1024];
@@ -98,10 +119,39 @@ public class RVCloudSync {
             return new String(buffer);
         }
 
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-        }
+
     }
 
+    private JSONObject toJSON(String s) {
+        JSONObject object = null;
+
+        try {
+            object = new JSONObject(s);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return object;
+    }
+
+    private class UserDataPair {
+        String userId, password;
+
+        private UserDataPair(String userId, String password) {
+            this.userId = userId;
+            this.password = password;
+        }
+
+        private UserDataPair(JSONObject object) {
+
+            try {
+                if (object.has(USER_ID))
+                    this.userId = object.getString(USER_ID);
+                if (object.has(PASSWORD))
+                    this.password = object.getString(PASSWORD);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
 }
