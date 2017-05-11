@@ -177,4 +177,9 @@ public class RVCloudSync {
 
         }
     }
+
+    // TODO: 2017/05/11 401 UNAUTHORIZED
+    // TODO: 2017/05/11 ユーザの作成を提案
+    // TODO: 2017/05/11 400 BAD REQUEST エラー内容で切り分け　バックエンド側
+
 }
