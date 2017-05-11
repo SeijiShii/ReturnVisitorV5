@@ -131,18 +131,25 @@ public class LoginDialog extends FrameLayout {
         String userId = userIdTextView.getText().toString();
         String password = passwordTextView.getText().toString();
 
-        if (validateTexts(userId, password)) {
-            try {
-                RVCloudSync.getInstance().inquireLogin(userId, password);
-                messageTextView.setText(R.string.start_login);
-                progressBar.setVisibility(VISIBLE);
-                loginButton.setClickable(false);
-                loginButton.setAlpha(0.5f);
-                view.requestLayout();
-            } catch (RVCloudSync.RVCloudSyncException e) {
-                e.printStackTrace();
-            }
+        // test
+        try {
+            RVCloudSync.getInstance().inquireLogin("seijishii", "hogehoge");
+        } catch (RVCloudSync.RVCloudSyncException e) {
+            e.printStackTrace();
         }
+
+//        if (validateTexts(userId, password)) {
+//            try {
+//                RVCloudSync.getInstance().inquireLogin(userId, password);
+//                messageTextView.setText(R.string.start_login);
+//                progressBar.setVisibility(VISIBLE);
+//                loginButton.setClickable(false);
+//                loginButton.setAlpha(0.5f);
+//                view.requestLayout();
+//            } catch (RVCloudSync.RVCloudSyncException e) {
+//                e.printStackTrace();
+//            }
+//        }
     }
 
     private boolean validateTexts(String userId, String password) {
