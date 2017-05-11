@@ -133,7 +133,7 @@ public class LoginDialog extends FrameLayout {
 
         // test
         try {
-            RVCloudSync.getInstance().inquireLogin("seijishii", "hogehoge");
+            RVCloudSync.getInstance().inquireLogin("seijishii", "fugafuga");
         } catch (RVCloudSync.RVCloudSyncException e) {
             e.printStackTrace();
         }

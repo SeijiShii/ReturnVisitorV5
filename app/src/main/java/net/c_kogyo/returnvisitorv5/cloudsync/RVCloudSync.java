@@ -1,7 +1,9 @@
 package net.c_kogyo.returnvisitorv5.cloudsync;
 
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,7 +27,8 @@ public class RVCloudSync {
 
     public enum LoginStatusCode {
         LOGIN_SUCCESS,
-        LOGIN_FAILED
+        LOGIN_FAILED,
+        REQUEST_TIME_OUT
     }
 
     private final String ROOT_URL = "http://192.168.3.3:1337";
@@ -59,7 +62,9 @@ public class RVCloudSync {
 
     public interface RVCloudSyncCallback {
 
-        void onLoginResponse(LoginStatusCode code, String userId, String password);
+        void onLoginResponse(LoginStatusCode code,
+                             @Nullable String userId,
+                             @Nullable String password);
 
     }
 
@@ -69,7 +74,9 @@ public class RVCloudSync {
         }
     }
 
-    class DoHttpLoginRequest extends AsyncTask<UserDataPair, Void, Void> {
+    private class DoHttpLoginRequest extends AsyncTask<UserDataPair, Void, Void> {
+
+        private boolean isResponded;
 
         @Override
         protected Void doInBackground(UserDataPair... params) {
@@ -81,21 +88,38 @@ public class RVCloudSync {
                 URL url = new URL(ROOT_URL + "/users/?user_name=" +dataPairSent.userId + "&password=" + dataPairSent.password);
                 urlConnection = (HttpURLConnection) url.openConnection();
 
+                isResponded = false;
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep(30000);
+                        } catch (InterruptedException e) {
+                            //
+                        }
+                        if (!isResponded) {
+                            mCallback.onLoginResponse(LoginStatusCode.REQUEST_TIME_OUT, null, null);
+                        }
+                    }
+                }).start();
+
                 urlConnection.setDoInput(true);
 //                urlConnection.setDoOutput(true);
 
                 int status = urlConnection.getResponseCode();
+                isResponded = true;
+
                 if (status == 200) {
                     InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
                     String s = readInputStream(inputStream);
                     JSONObject object = toJSON(s);
                     UserDataPair dataPairReturned = new UserDataPair(object);
-                    if (mCallback != null) {
-                        mCallback.onLoginResponse(LoginStatusCode.LOGIN_SUCCESS, dataPairReturned.userId, dataPairReturned.password);
-                    }
+
+                    mCallback.onLoginResponse(LoginStatusCode.LOGIN_SUCCESS, dataPairReturned.userId, dataPairReturned.password);
 
                 } else if (status == 404) {
 
+                    mCallback.onLoginResponse(LoginStatusCode.LOGIN_FAILED, null, null);
                 }
 
             } catch (IOException e) {
@@ -108,7 +132,6 @@ public class RVCloudSync {
 
             return null;
         }
-
 
         private String readInputStream(InputStream inputStream) throws IOException{
             // TODO: 2017/05/11 バッファサイズを検証。不具合はないか

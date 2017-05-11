@@ -99,6 +99,9 @@ public class MapActivity extends AppCompatActivity
                     case LOGIN_FAILED:
                         isLoggedIn = false;
                         break;
+                    case REQUEST_TIME_OUT:
+                        isLoggedIn = false;
+                        break;
                 }
             }
         });
