@@ -91,7 +91,7 @@ public class DayAggregationDialog extends FrameLayout {
     }
 
     private void initCloseButton() {
-        Button closeButton = (Button) view.findViewById(R.id.close_button);
+        Button closeButton = (Button) view.findViewById(R.id.cancel_button);
         closeButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {

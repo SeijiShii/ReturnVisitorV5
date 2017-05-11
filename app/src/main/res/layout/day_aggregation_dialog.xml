@@ -248,7 +248,7 @@
         <Button
             android:layout_width="150dp"
             android:layout_height="match_parent"
-            android:id="@+id/close_button"
+            android:id="@+id/cancel_button"
             android:text="@string/close"
             android:textColor="@color/colorPrimaryDark"
             android:background="@drawable/trans_blue_selector"

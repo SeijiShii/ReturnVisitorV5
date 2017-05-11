@@ -38,7 +38,7 @@
                 <ImageView
                     android:layout_width="25dp"
                     android:layout_height="25dp"
-                    android:id="@+id/close_button"
+                    android:id="@+id/cancel_button"
                     android:background="@drawable/white_square_close"
                     android:layout_centerInParent="true"/>
 

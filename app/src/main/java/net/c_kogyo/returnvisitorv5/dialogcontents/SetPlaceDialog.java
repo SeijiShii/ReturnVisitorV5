@@ -25,10 +25,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
 import net.c_kogyo.returnvisitorv5.R;
-import net.c_kogyo.returnvisitorv5.activity.MapActivity;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.PlaceMarkers;
-import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -206,7 +204,7 @@ public class SetPlaceDialog extends FrameLayout
     }
 
     private void initCloseButton() {
-        ImageView closeButton = (ImageView) view.findViewById(R.id.close_button);
+        ImageView closeButton = (ImageView) view.findViewById(R.id.cancel_button);
         ViewUtil.setOnClickListener(closeButton, new ViewUtil.OnViewClickListener() {
             @Override
             public void onViewClick() {

@@ -11,7 +11,6 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
-import net.c_kogyo.returnvisitorv5.data.AggregationOfDay;
 import net.c_kogyo.returnvisitorv5.data.AggregationOfMonth;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 
@@ -94,7 +93,7 @@ public class MonthAggregationDialog extends FrameLayout {
     }
 
     private void initCloseButton() {
-        Button closeButton = (Button) view.findViewById(R.id.close_button);
+        Button closeButton = (Button) view.findViewById(R.id.cancel_button);
         closeButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
