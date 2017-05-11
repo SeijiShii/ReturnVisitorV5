@@ -18,15 +18,15 @@
             android:gravity="center"
             android:text="@string/login_title"/>
 
-        <!-- User ID Text -->
+        <!-- User Name Text -->
         <EditText
             android:layout_width="match_parent"
             android:layout_height="@dimen/ui_height_small"
             android:background="@drawable/gray_trans_circle"
             android:textSize="@dimen/text_size_middle"
             android:textColor="@color/textColorGray"
-            android:id="@+id/user_id_text"
-            android:hint="@string/user_id"
+            android:id="@+id/user_name_text"
+            android:hint="@string/user_name_hint"
             android:layout_margin="5dp"
             android:gravity="center_vertical|left"/>
 
@@ -38,7 +38,7 @@
             android:textSize="@dimen/text_size_middle"
             android:textColor="@color/textColorGray"
             android:id="@+id/password_text"
-            android:hint="@string/password"
+            android:hint="@string/password_hint"
             android:layout_margin="5dp"
             android:gravity="center_vertical|left"/>
 
@@ -100,10 +100,10 @@
             <Button
                 android:layout_width="150dp"
                 android:layout_height="match_parent"
-                android:id="@+id/cancel_button"
+                android:id="@+id/close_button"
                 android:background="@drawable/trans_orange_selector"
                 android:textColor="@color/colorAccent"
-                android:text="@string/cancel"
+                android:text="@string/close"
                 android:textSize="@dimen/text_size_middle"
                 android:layout_alignParentRight="true"/>
 
