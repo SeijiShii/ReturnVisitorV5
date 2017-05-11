@@ -4,9 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.Editable;
 import android.text.InputType;
-import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -54,12 +52,12 @@ public class LoginDialog extends FrameLayout {
         initMessageText();
         initProgressBar();
         initLoginButton();
-        initCancelButton();
+        initCloseButton();
     }
 
-    private EditText userIdTextView;
+    private EditText userNameTextView;
     private void initUserIdText() {
-        userIdTextView = (EditText) view.findViewById(R.id.user_id_text);
+        userNameTextView = (EditText) view.findViewById(R.id.user_name_text);
     }
 
     private EditText passwordTextView;
@@ -111,14 +109,15 @@ public class LoginDialog extends FrameLayout {
         });
     }
 
-    private Button cancelButton;
-    private void initCancelButton() {
-        cancelButton = (Button) view.findViewById(R.id.cancel_button);
-        cancelButton.setOnClickListener(new OnClickListener() {
+    private Button closeButton;
+    private void initCloseButton() {
+        closeButton = (Button) view.findViewById(R.id.close_button);
+        // TODO: 2017/05/11 change layout to CLOSE
+        closeButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mListener != null) {
-                    mListener.onCancel();
+                    mListener.onClickClose();
                 }
             }
         });
@@ -128,35 +127,40 @@ public class LoginDialog extends FrameLayout {
 
         InputUtil.hideSoftKeyboard((Activity) getContext());
 
-        String userId = userIdTextView.getText().toString();
+        String userName = userNameTextView.getText().toString();
         String password = passwordTextView.getText().toString();
 
         // test
-        try {
-            RVCloudSync.getInstance().inquireLogin("seijishii", "fugafuga");
-        } catch (RVCloudSync.RVCloudSyncException e) {
-            e.printStackTrace();
-        }
-
-//        if (validateTexts(userId, password)) {
-//            try {
-//                RVCloudSync.getInstance().inquireLogin(userId, password);
-//                messageTextView.setText(R.string.start_login);
-//                progressBar.setVisibility(VISIBLE);
-//                loginButton.setClickable(false);
-//                loginButton.setAlpha(0.5f);
-//                view.requestLayout();
-//            } catch (RVCloudSync.RVCloudSyncException e) {
-//                e.printStackTrace();
-//            }
+//        try {
+//            RVCloudSync.getInstance().inquireLogin("seijishii", "fugafuga");
+//        } catch (RVCloudSync.RVCloudSyncException e) {
+//            e.printStackTrace();
 //        }
+
+        if (validateTexts(userName, password)) {
+            try {
+                RVCloudSync.getInstance().inquireLogin(userName, password);
+                messageTextView.setText(R.string.start_login);
+
+                if (mListener != null) {
+                    mListener.onStartLogin();
+
+                    progressBar.setVisibility(VISIBLE);
+                    loginButton.setClickable(false);
+                    loginButton.setAlpha(0.5f);
+                    view.requestLayout();
+                }
+            } catch (RVCloudSync.RVCloudSyncException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
-    private boolean validateTexts(String userId, String password) {
+    private boolean validateTexts(String userName, String password) {
 
         StringBuilder builder = new StringBuilder();
 
-        if (userId.length() < TEXT_LENGTH ) {
+        if (userName.length() < TEXT_LENGTH ) {
             builder.append(getContext().getString(R.string.short_user_id_message));
 
             if (password.length() < TEXT_LENGTH) {
@@ -173,11 +177,21 @@ public class LoginDialog extends FrameLayout {
         return true;
     }
 
+
+
     public interface LoginDialogListener {
 
-        void onCancel();
+        void onStartLogin();
+
+        void onClickClose();
+
     }
 
+    void onLoginResult(RVCloudSync.LoginStatusCode statusCode){
+        // TODO: 2017/05/11  onLoginResult(RVCloudSync.LoginStatusCode statusCode)
+    }
+
+    // TODO: 2017/05/11 userName to userName 
 
 
 }

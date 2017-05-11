@@ -1272,10 +1272,17 @@ public class MapActivity extends AppCompatActivity
         showLoginDialog();
     }
 
+    private LoginDialog loginDialog;
     private void showLoginDialog() {
-        LoginDialog loginDialog = new LoginDialog(this, new LoginDialog.LoginDialogListener() {
+        loginDialog = new LoginDialog(this, new LoginDialog.LoginDialogListener() {
+
             @Override
-            public void onCancel() {
+            public void onStartLogin() {
+                // TODO: 2017/05/11  onStartLogin()
+            }
+
+            @Override
+            public void onClickClose() {
                 fadeOutDialogOverlay(normalFadeOutListener);
             }
         });
