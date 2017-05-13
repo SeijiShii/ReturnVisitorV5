@@ -7,6 +7,7 @@ import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -17,6 +18,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -83,6 +85,8 @@ public class MapActivity extends AppCompatActivity
 
     private static boolean isForeground;
     private boolean isLoggedIn;
+    private String userName;
+    private String password;
     private Handler loginDialogHandler;
 
     @Override
@@ -97,6 +101,8 @@ public class MapActivity extends AppCompatActivity
                 switch (code) {
                     case AUTHENTICATED_202:
                         isLoggedIn = true;
+                        MapActivity.this.userName = userName;
+                        MapActivity.this.password = password;
                         break;
                     case UNAUTHORIZED_401:
                         isLoggedIn = false;
@@ -111,6 +117,14 @@ public class MapActivity extends AppCompatActivity
                     @Override
                     public void run() {
                         loginDialog.onLoginResult(userName, code);
+                        dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
+                            @Override
+                            public boolean onTouch(View v, MotionEvent event) {
+                                fadeOutDialogOverlay(normalFadeOutListener);
+                                return true;
+                            }
+                        });
+                        refreshLoginButton();
                     }
                 });
 
@@ -1267,17 +1281,29 @@ public class MapActivity extends AppCompatActivity
     private Button loginButton;
     private void initLoginButton() {
         loginButton = (Button) findViewById(R.id.login_button);
+
+        refreshLoginButton();
+
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (isLoggedIn) {
-
+                    confirmLogout();
                 } else {
                     openCloseDrawer();
                     onLoginClicked();
                 }
             }
         });
+    }
+
+    private void refreshLoginButton() {
+        if (isLoggedIn) {
+            String s = getString(R.string.logout_button, userName);
+            loginButton.setText(s);
+        } else {
+            loginButton.setText(R.string.login_button);
+        }
     }
 
     private void onLoginClicked() {
@@ -1315,6 +1341,7 @@ public class MapActivity extends AppCompatActivity
             @Override
             public void onLogoutClick() {
                 // TODO: 2017/05/13 onLogoutClick
+                confirmLogout();
             }
         });
         dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
@@ -1325,6 +1352,27 @@ public class MapActivity extends AppCompatActivity
             }
         });
         fadeInDialogOverlay(loginDialog);
+    }
+
+    private void confirmLogout() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.logout_title);
+        builder.setMessage(R.string.logout_message);
+        builder.setPositiveButton(R.string.logout_button_small, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                logout();
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, null);
+        builder.create().show();
+    }
+
+    private void logout() {
+        isLoggedIn = false;
+        userName = null;
+        password = null;
+        refreshLoginButton();
     }
 
     // TODO: 2017/05/05 データがないときにWORKやカレンダーに遷移しないようにする(実装済み、要検証)
