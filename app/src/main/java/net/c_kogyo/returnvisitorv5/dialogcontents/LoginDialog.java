@@ -2,6 +2,7 @@ package net.c_kogyo.returnvisitorv5.dialogcontents;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.InputType;
@@ -27,11 +28,17 @@ public class LoginDialog extends FrameLayout {
 
     private LoginDialogListener mListener;
     private static final int TEXT_LENGTH = 8;
+    private boolean mIsLoggedIn;
+    private Handler handler;
 
-    public LoginDialog(@NonNull Context context, LoginDialogListener listener) {
+    public LoginDialog(@NonNull Context context,
+                       boolean isLoggedIn,
+                       LoginDialogListener listener) {
         super(context);
 
+        mIsLoggedIn = isLoggedIn;
         mListener = listener;
+        handler = new Handler();
 
         initCommon();
     }
@@ -52,6 +59,7 @@ public class LoginDialog extends FrameLayout {
         initMessageText();
         initProgressBar();
         initLoginButton();
+        initCreateAccountButton();
         initCloseButton();
     }
 
@@ -101,12 +109,57 @@ public class LoginDialog extends FrameLayout {
     private Button loginButton;
     private void initLoginButton() {
         loginButton = (Button) view.findViewById(R.id.login_button);
+        refreshLoginButton();
         loginButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                onLogInClick();
+                if (mIsLoggedIn) {
+                    onClickLogout();
+                } else {
+                    onLogInClick();
+                }
             }
         });
+    }
+
+    private void refreshLoginButton() {
+        if (mIsLoggedIn) {
+            loginButton.setText(R.string.logout_button_small);
+        } else {
+            loginButton.setText(R.string.login_button);
+        }
+    }
+
+    private void enableLoginButton(boolean enabled) {
+        if (enabled) {
+            loginButton.setClickable(true);
+            loginButton.setAlpha(1f);
+        } else {
+            loginButton.setClickable(false);
+            loginButton.setAlpha(0.5f);
+        }
+    }
+
+    private Button createAccountButton;
+    private void initCreateAccountButton() {
+        createAccountButton = (Button) view.findViewById(R.id.create_account_button);
+
+        createAccountButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                onClickCreateAccount();
+            }
+        });
+    }
+
+    private void enableAccountButton(boolean enabled) {
+        if (enabled) {
+            createAccountButton.setClickable(true);
+            createAccountButton.setAlpha(1f);
+        } else {
+            createAccountButton.setClickable(false);
+            createAccountButton.setAlpha(0.5f);
+        }
     }
 
     private Button closeButton;
@@ -123,6 +176,16 @@ public class LoginDialog extends FrameLayout {
         });
     }
 
+    private void enableCloseButton(boolean enabled) {
+        if (enabled) {
+            closeButton.setClickable(true);
+            closeButton.setAlpha(1f);
+        } else {
+            closeButton.setClickable(false);
+            closeButton.setAlpha(0.5f);
+        }
+    }
+
     private void onLogInClick() {
 
         InputUtil.hideSoftKeyboard((Activity) getContext());
@@ -132,23 +195,58 @@ public class LoginDialog extends FrameLayout {
 
         // test
 //        try {
-//            RVCloudSync.getInstance().inquireLogin("seijishii", "fugafuga");
+//            RVCloudSync.getInstance().startLogin("seijishii", "fugafuga");
 //        } catch (RVCloudSync.RVCloudSyncException e) {
 //            e.printStackTrace();
 //        }
 
         if (validateTexts(userName, password)) {
             try {
-                RVCloudSync.getInstance().inquireLogin(userName, password);
+                RVCloudSync.getInstance().startLogin(userName, password);
                 messageTextView.setText(R.string.start_login);
 
                 if (mListener != null) {
                     mListener.onStartLogin();
 
                     progressBar.setVisibility(VISIBLE);
-                    loginButton.setClickable(false);
-                    loginButton.setAlpha(0.5f);
-                    view.requestLayout();
+
+                    enableLoginButton(false);
+                    enableAccountButton(false);
+                    enableCloseButton(false);
+
+                }
+            } catch (RVCloudSync.RVCloudSyncException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void onClickCreateAccount() {
+        InputUtil.hideSoftKeyboard((Activity) getContext());
+
+        String userName = userNameTextView.getText().toString();
+        String password = passwordTextView.getText().toString();
+
+        // test
+//        try {
+//            RVCloudSync.getInstance().startLogin("seijishii", "fugafuga");
+//        } catch (RVCloudSync.RVCloudSyncException e) {
+//            e.printStackTrace();
+//        }
+
+        if (validateTexts(userName, password)) {
+            try {
+                RVCloudSync.getInstance().startLogin(userName, password);
+                messageTextView.setText(R.string.start_create_account);
+
+                if (mListener != null) {
+                    mListener.onStartCreateAccount();
+
+                    progressBar.setVisibility(VISIBLE);
+
+                    enableLoginButton(false);
+                    enableAccountButton(false);
+                    enableCloseButton(false);
                 }
             } catch (RVCloudSync.RVCloudSyncException e) {
                 e.printStackTrace();
@@ -177,21 +275,66 @@ public class LoginDialog extends FrameLayout {
         return true;
     }
 
-
-
     public interface LoginDialogListener {
 
         void onStartLogin();
+
+        void onStartCreateAccount();
+
+        void onLogoutClick();
 
         void onClickClose();
 
     }
 
-    void onLoginResult(RVCloudSync.LoginStatusCode statusCode){
+    public void onLoginResult(String userName, RVCloudSync.LoginStatusCode statusCode){
         // TODO: 2017/05/11  onLoginResult(RVCloudSync.LoginStatusCode statusCode)
+
+        progressBar.setVisibility(INVISIBLE);
+        enableCloseButton(true);
+
+        String message = "";
+        switch (statusCode) {
+            case AUTHENTICATED_202:
+                mIsLoggedIn = true;
+                message = getContext().getString(R.string.login_success, userName);
+                break;
+
+            case UNAUTHORIZED_401:
+                mIsLoggedIn = false;
+                message = getContext().getString(R.string.login_failed) + "\n"
+                        + getContext().getString(R.string.wrong_password, userName);
+                break;
+
+            case NOT_FOUND_404:
+                mIsLoggedIn = false;
+                message = getContext().getString(R.string.login_failed) + "\n"
+                        + getContext().getString(R.string.account_not_found, userName);
+                break;
+
+            case REQUEST_TIME_OUT:
+                mIsLoggedIn = false;
+                message = getContext().getString(R.string.login_failed) + "\n"
+                        + getContext().getString(R.string.request_time_out);
+                break;
+
+            default:
+        }
+
+        messageTextView.setText(message);
+        refreshLoginButton();
+        enableLoginButton(true);
     }
 
-    // TODO: 2017/05/11 userName to userName 
+    private void onClickLogout() {
+        if (mListener != null) {
+            mListener.onLogoutClick();
+        }
+    }
+
+
+
+    // DONE: 2017/05/11 userName to userName
 
 
 }

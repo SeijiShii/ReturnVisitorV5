@@ -55,17 +55,19 @@
 
         </RelativeLayout>
 
+        <!-- Status -->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <!-- Message Text -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/message_text"
                 android:textColor="@color/textColorGray"
                 android:textSize="@dimen/text_size_middle"
-                android:gravity="center"/>
+                android:gravity="left|center_horizontal"/>
 
             <ProgressBar
                 android:layout_width="match_parent"

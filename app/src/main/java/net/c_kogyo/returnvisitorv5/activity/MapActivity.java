@@ -83,26 +83,37 @@ public class MapActivity extends AppCompatActivity
 
     private static boolean isForeground;
     private boolean isLoggedIn;
+    private Handler loginDialogHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        loginDialogHandler = new Handler();
         RVCloudSync.getInstance().setCallback(new RVCloudSync.RVCloudSyncCallback() {
             @Override
-            public void onLoginResult(RVCloudSync.LoginStatusCode code, String userId, String password) {
+            public void onLoginResult(final RVCloudSync.LoginStatusCode code, final String userName, final String password) {
 
                 switch (code) {
-                    case LOGIN_SUCCESS:
+                    case AUTHENTICATED_202:
                         isLoggedIn = true;
                         break;
-                    case LOGIN_FAILED:
+                    case UNAUTHORIZED_401:
                         isLoggedIn = false;
                         break;
                     case REQUEST_TIME_OUT:
                         isLoggedIn = false;
                         break;
                 }
+
+                // AsyncTaskから呼ばれるコールバックなので
+                loginDialogHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        loginDialog.onLoginResult(userName, code);
+                    }
+                });
+
             }
         });
 
@@ -1275,16 +1286,35 @@ public class MapActivity extends AppCompatActivity
 
     private LoginDialog loginDialog;
     private void showLoginDialog() {
-        loginDialog = new LoginDialog(this, new LoginDialog.LoginDialogListener() {
+        loginDialog = new LoginDialog(this,
+                isLoggedIn,
+                new LoginDialog.LoginDialogListener() {
 
             @Override
             public void onStartLogin() {
                 // TODO: 2017/05/11  onStartLogin()
+                // TODO: 2017/05/13 ログイン通信中はダイアログを消せないようにする
+                dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        return true;
+                    }
+                });
+            }
+
+            @Override
+            public void onStartCreateAccount() {
+
             }
 
             @Override
             public void onClickClose() {
                 fadeOutDialogOverlay(normalFadeOutListener);
+            }
+
+            @Override
+            public void onLogoutClick() {
+                // TODO: 2017/05/13 onLogoutClick
             }
         });
         dialogOverlay.setOnTouchListener(new View.OnTouchListener() {

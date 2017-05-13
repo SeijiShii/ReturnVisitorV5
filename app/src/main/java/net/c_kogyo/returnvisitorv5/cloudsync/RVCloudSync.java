@@ -19,7 +19,7 @@ import java.net.URL;
 
 public class RVCloudSync {
 
-    private final String USER_ID = "user_id";
+    private final String USER_NAME = "user_name";
     private final String PASSWORD = "password";
 
     public enum LoginStatusCode {
@@ -58,21 +58,20 @@ public class RVCloudSync {
 
     }
 
-    public void inquireLogin(String userId, String password) throws RVCloudSyncException{
+    public void startLogin(String userName, String password) throws RVCloudSyncException{
         if (mCallback == null)
             throw new RVCloudSyncException();
 
-        UserDataPair dataPair = new UserDataPair(userId, password);
+        UserDataPair dataPair = new UserDataPair(userName, password);
         new DoHttpLoginRequest().execute(dataPair);
 
     }
 
 
-
     public interface RVCloudSyncCallback {
 
         void onLoginResult(LoginStatusCode code,
-                           @Nullable String userId,
+                           @Nullable String userName,
                            @Nullable String password);
 
     }
@@ -94,7 +93,7 @@ public class RVCloudSync {
             HttpURLConnection urlConnection = null;
             try {
 
-                URL url = new URL(ROOT_URL + "/users/?user_name=" +dataPairSent.userId + "&password=" + dataPairSent.password);
+                URL url = new URL(ROOT_URL + "/users/?user_name=" +dataPairSent.userName + "&password=" + dataPairSent.password);
                 urlConnection = (HttpURLConnection) url.openConnection();
 
                 isResponded = false;
@@ -125,7 +124,7 @@ public class RVCloudSync {
                         JSONObject object = toJSON(s);
                         UserDataPair dataPairReturned = new UserDataPair(object);
 
-                        mCallback.onLoginResult(LoginStatusCode.AUTHENTICATED_202, dataPairReturned.userId, dataPairReturned.password);
+                        mCallback.onLoginResult(LoginStatusCode.AUTHENTICATED_202, dataPairReturned.userName, dataPairReturned.password);
                         break;
 
                     case UNAUTHORIZED:
@@ -172,18 +171,18 @@ public class RVCloudSync {
     }
 
     private class UserDataPair {
-        String userId, password;
+        String userName, password;
 
-        private UserDataPair(String userId, String password) {
-            this.userId = userId;
+        private UserDataPair(String userName, String password) {
+            this.userName = userName;
             this.password = password;
         }
 
         private UserDataPair(JSONObject object) {
 
             try {
-                if (object.has(USER_ID))
-                    this.userId = object.getString(USER_ID);
+                if (object.has(USER_NAME))
+                    this.userName = object.getString(USER_NAME);
                 if (object.has(PASSWORD))
                     this.password = object.getString(PASSWORD);
             } catch (JSONException e) {
@@ -193,7 +192,7 @@ public class RVCloudSync {
         }
     }
 
-    // TODO: 2017/05/11 401 UNAUTHORIZED
+    // DONE: 2017/05/11 401 UNAUTHORIZED
     // TODO: 2017/05/11 ユーザの作成を提案
     // TODO: 2017/05/11 400 BAD REQUEST エラー内容で切り分け　バックエンド側
 
