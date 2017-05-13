@@ -90,7 +90,7 @@ public class MapActivity extends AppCompatActivity
 
         RVCloudSync.getInstance().setCallback(new RVCloudSync.RVCloudSyncCallback() {
             @Override
-            public void onLoginResponse(RVCloudSync.LoginStatusCode code, String userId, String password) {
+            public void onLoginResult(RVCloudSync.LoginStatusCode code, String userId, String password) {
 
                 switch (code) {
                     case LOGIN_SUCCESS:

@@ -1,7 +1,6 @@
 package net.c_kogyo.returnvisitorv5.cloudsync;
 
 import android.os.AsyncTask;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -11,9 +10,7 @@ import org.json.JSONObject;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -26,10 +23,22 @@ public class RVCloudSync {
     private final String PASSWORD = "password";
 
     public enum LoginStatusCode {
-        LOGIN_SUCCESS,
-        LOGIN_FAILED,
+
+        CREATED_201,
+        AUTHENTICATED_202,
+        BAD_REQUEST_400_SHORT_USER_NAME(),
+        BAD_REQUEST_400_SHORT_PASSWORD,
+        BAD_REQUEST_400_DEPULICATE_USER_NAME,
+        UNAUTHORIZED_401,
+        NOT_FOUND_404,
         REQUEST_TIME_OUT
     }
+
+    public static final int CREATED         = 201;
+    public static final int AUTHENTICATED   = 202;
+    public static final int BAD_REQUEST     = 400;
+    public static final int UNAUTHORIZED    = 401;
+    public static final int NOT_FOUND       = 404;
 
     private final String ROOT_URL = "http://192.168.3.3:1337";
 
@@ -62,9 +71,9 @@ public class RVCloudSync {
 
     public interface RVCloudSyncCallback {
 
-        void onLoginResponse(LoginStatusCode code,
-                             @Nullable String userId,
-                             @Nullable String password);
+        void onLoginResult(LoginStatusCode code,
+                           @Nullable String userId,
+                           @Nullable String password);
 
     }
 
@@ -98,7 +107,7 @@ public class RVCloudSync {
                             //
                         }
                         if (!isResponded) {
-                            mCallback.onLoginResponse(LoginStatusCode.REQUEST_TIME_OUT, null, null);
+                            mCallback.onLoginResult(LoginStatusCode.REQUEST_TIME_OUT, null, null);
                         }
                     }
                 }).start();
@@ -109,17 +118,23 @@ public class RVCloudSync {
                 int status = urlConnection.getResponseCode();
                 isResponded = true;
 
-                if (status == 200) {
-                    InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
-                    String s = readInputStream(inputStream);
-                    JSONObject object = toJSON(s);
-                    UserDataPair dataPairReturned = new UserDataPair(object);
+                switch (status) {
+                    case AUTHENTICATED:
+                        InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
+                        String s = readInputStream(inputStream);
+                        JSONObject object = toJSON(s);
+                        UserDataPair dataPairReturned = new UserDataPair(object);
 
-                    mCallback.onLoginResponse(LoginStatusCode.LOGIN_SUCCESS, dataPairReturned.userId, dataPairReturned.password);
+                        mCallback.onLoginResult(LoginStatusCode.AUTHENTICATED_202, dataPairReturned.userId, dataPairReturned.password);
+                        break;
 
-                } else if (status == 404) {
+                    case UNAUTHORIZED:
+                        mCallback.onLoginResult(LoginStatusCode.UNAUTHORIZED_401, null, null);
+                        break;
 
-                    mCallback.onLoginResponse(LoginStatusCode.LOGIN_FAILED, null, null);
+                    case NOT_FOUND:
+                        mCallback.onLoginResult(LoginStatusCode.NOT_FOUND_404, null, null);
+                        break;
                 }
 
             } catch (IOException e) {
