@@ -53,7 +53,7 @@ public class LoginDialog extends FrameLayout {
 
         mShowPassword = false;
 
-        initUserIdText();
+        initUserNameText();
         initShowPasswordSwitch();
         initPasswordTextView();
         initMessageText();
@@ -64,8 +64,20 @@ public class LoginDialog extends FrameLayout {
     }
 
     private EditText userNameTextView;
-    private void initUserIdText() {
+    private void initUserNameText() {
         userNameTextView = (EditText) view.findViewById(R.id.user_name_text);
+    }
+
+    private void enableUserNameText(boolean enabled) {
+        if (enabled) {
+//            userNameTextView.setFocusable(true);
+            userNameTextView.setAlpha(1f);
+            userNameTextView.setEnabled(true);
+        } else {
+//            userNameTextView.setFocusable(false);
+            userNameTextView.setAlpha(0.5f);
+            userNameTextView.setEnabled(false);
+        }
     }
 
     private EditText passwordTextView;
@@ -78,9 +90,37 @@ public class LoginDialog extends FrameLayout {
         }
     }
 
+    private void enablePasswordText(boolean enabled) {
+        if (enabled) {
+//            passwordTextView.setFocusable(true);
+            passwordTextView.setAlpha(1f);
+            passwordTextView.setEnabled(true);
+
+            showPasswordSwitch.setClickable(true);
+            showPasswordSwitch.setAlpha(1f);
+
+            if (mShowPassword) {
+                passwordTextView.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+            } else {
+                passwordTextView.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            }
+
+        } else {
+//            passwordTextView.setFocusable(false);
+            passwordTextView.setAlpha(0.5f);
+            passwordTextView.setEnabled(false);
+
+            showPasswordSwitch.setClickable(false);
+            showPasswordSwitch.setAlpha(0.5f);
+
+            passwordTextView.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        }
+    }
+
     private boolean mShowPassword;
+    private RightTextSwitch showPasswordSwitch;
     private void initShowPasswordSwitch() {
-        RightTextSwitch showPasswordSwitch = (RightTextSwitch) view.findViewById(R.id.show_password_switch);
+        showPasswordSwitch = (RightTextSwitch) view.findViewById(R.id.show_password_switch);
         showPasswordSwitch.setOnCheckChangeListener(new RightTextSwitch.RightTextSwitchOnCheckChangeListener() {
             @Override
             public void onCheckChange(boolean checked) {
@@ -214,6 +254,9 @@ public class LoginDialog extends FrameLayout {
                     enableAccountButton(false);
                     enableCloseButton(false);
 
+                    enableUserNameText(false);
+                    enablePasswordText(false);
+
                 }
             } catch (RVCloudSync.RVCloudSyncException e) {
                 e.printStackTrace();
@@ -304,6 +347,8 @@ public class LoginDialog extends FrameLayout {
                 mIsLoggedIn = false;
                 message = getContext().getString(R.string.login_failed) + "\n"
                         + getContext().getString(R.string.wrong_password, userName);
+                enableUserNameText(true);
+                enablePasswordText(true);
                 break;
 
             case NOT_FOUND_404:
@@ -311,12 +356,17 @@ public class LoginDialog extends FrameLayout {
                 message = getContext().getString(R.string.login_failed) + "\n"
                         + getContext().getString(R.string.account_not_found, userName);
                 enableAccountButton(true);
+                enableUserNameText(true);
+                enablePasswordText(true);
                 break;
 
             case REQUEST_TIME_OUT:
                 mIsLoggedIn = false;
                 message = getContext().getString(R.string.login_failed) + "\n"
                         + getContext().getString(R.string.request_time_out);
+                enableAccountButton(true);
+                enableUserNameText(true);
+                enablePasswordText(true);
                 break;
 
             default:
@@ -335,6 +385,7 @@ public class LoginDialog extends FrameLayout {
 
     // DONE: 2017/05/11 userName to userName
     // TODO: 2017/05/13 ログインダイアログのUIの動きについてはまだいろいろ考える必要がある。
+    // TODO: 2017/05/13  editTextの活性
 
 
 }

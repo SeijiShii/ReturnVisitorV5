@@ -3,7 +3,6 @@ package net.c_kogyo.returnvisitorv5.view;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.ActionBarOverlayLayout;
 import android.support.v7.widget.SwitchCompat;
 import android.util.AttributeSet;
 import android.util.TypedValue;
@@ -11,9 +10,7 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.LinearLayout;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
@@ -53,30 +50,47 @@ public class RightTextSwitch extends LinearLayout {
 
     private void initCommon() {
 
+        this.mIsClickable = true;
+
         this.setOrientation(HORIZONTAL);
         this.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
         initSwitch();
         initTextView();
 
-        this.setOnTouchListener(new OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        RightTextSwitch.this.setAlpha(0.5f);
-                        return true;
-                    case MotionEvent.ACTION_UP:
-                        RightTextSwitch.this.setAlpha(1f);
-                        setChecked(!mIsChecked);
-                        return true;
-                    case MotionEvent.ACTION_CANCEL:
-                        RightTextSwitch.this.setAlpha(1f);
-                        return true;
+        refreshClickable();
+
+    }
+
+    private boolean mIsClickable;
+    private void refreshClickable() {
+        if (mIsClickable) {
+            this.setOnTouchListener(new OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    switch (event.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                            RightTextSwitch.this.setAlpha(0.5f);
+                            return true;
+                        case MotionEvent.ACTION_UP:
+                            RightTextSwitch.this.setAlpha(1f);
+                            setChecked(!mIsChecked);
+                            return true;
+                        case MotionEvent.ACTION_CANCEL:
+                            RightTextSwitch.this.setAlpha(1f);
+                            return true;
+                    }
+                    return true;
                 }
-                return true;
-            }
-        });
+            });
+        } else {
+            this.setOnTouchListener(new OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    return true;
+                }
+            });
+        }
     }
 
     public void setChecked(boolean checked) {
@@ -135,5 +149,11 @@ public class RightTextSwitch extends LinearLayout {
 
     public interface RightTextSwitchOnCheckChangeListener{
         void onCheckChange(boolean checked);
+    }
+
+    @Override
+    public void setClickable(boolean clickable) {
+        mIsClickable = clickable;
+        refreshClickable();
     }
 }
