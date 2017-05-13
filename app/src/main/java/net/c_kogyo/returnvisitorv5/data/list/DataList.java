@@ -148,7 +148,7 @@ public class DataList<T extends DataItem> implements Iterable<T>{
 
         String[] words = searchWord.split(" ");
 
-        ArrayList<T> searchResultItems = list;
+        ArrayList<T> searchResultItems = new ArrayList<>(list);
 
         for (String word : words) {
             List<T> listToRemove = new ArrayList<>();
