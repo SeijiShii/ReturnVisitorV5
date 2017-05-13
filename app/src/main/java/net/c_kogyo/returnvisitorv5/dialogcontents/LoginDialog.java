@@ -70,11 +70,9 @@ public class LoginDialog extends FrameLayout {
 
     private void enableUserNameText(boolean enabled) {
         if (enabled) {
-//            userNameTextView.setFocusable(true);
             userNameTextView.setAlpha(1f);
             userNameTextView.setEnabled(true);
         } else {
-//            userNameTextView.setFocusable(false);
             userNameTextView.setAlpha(0.5f);
             userNameTextView.setEnabled(false);
         }
@@ -92,7 +90,6 @@ public class LoginDialog extends FrameLayout {
 
     private void enablePasswordText(boolean enabled) {
         if (enabled) {
-//            passwordTextView.setFocusable(true);
             passwordTextView.setAlpha(1f);
             passwordTextView.setEnabled(true);
 
@@ -106,7 +103,6 @@ public class LoginDialog extends FrameLayout {
             }
 
         } else {
-//            passwordTextView.setFocusable(false);
             passwordTextView.setAlpha(0.5f);
             passwordTextView.setEnabled(false);
 
@@ -381,6 +377,18 @@ public class LoginDialog extends FrameLayout {
         if (mListener != null) {
             mListener.onLogoutClick();
         }
+    }
+
+    public void postLogout() {
+        enableUserNameText(true);
+        enablePasswordText(true);
+        enableLoginButton(true);
+        enableAccountButton(true);
+        enableCloseButton(true);
+
+        userNameTextView.setText("");
+        passwordTextView.setText("");
+        messageTextView.setText("");
     }
 
     // DONE: 2017/05/11 userName to userName

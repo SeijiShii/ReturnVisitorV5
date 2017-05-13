@@ -1373,6 +1373,9 @@ public class MapActivity extends AppCompatActivity
         userName = null;
         password = null;
         refreshLoginButton();
+        if (loginDialog != null) {
+            loginDialog.postLogout();
+        }
     }
 
     // TODO: 2017/05/05 データがないときにWORKやカレンダーに遷移しないようにする(実装済み、要検証)
