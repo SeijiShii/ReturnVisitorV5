@@ -183,7 +183,7 @@ public class LoginDialog extends FrameLayout {
         createAccountButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-//                onClickCreateAccount();
+                onClickCreateAccount();
             }
         });
     }
@@ -326,31 +326,31 @@ public class LoginDialog extends FrameLayout {
 
     }
 
-    public void onLoginResult(String userName, RVCloudSync.LoginStatusCode statusCode){
+    public void onLoginResult(RVCloudSync.LoginResult result){
         // DONE: 2017/05/11  onLoginResult(RVCloudSync.LoginStatusCode statusCode)
 
         progressBar.setVisibility(INVISIBLE);
         enableCloseButton(true);
 
         String message = "";
-        switch (statusCode) {
-            case AUTHENTICATED_202:
+        switch (result.statusCode) {
+            case STATUS_202_AUTHENTICATED:
                 mIsLoggedIn = true;
-                message = getContext().getString(R.string.login_success, userName);
+                message = getContext().getString(R.string.login_success, result.userData.userName);
                 break;
 
-            case UNAUTHORIZED_401:
+            case STATUS_401_UNAUTHORIZED:
                 mIsLoggedIn = false;
                 message = getContext().getString(R.string.login_failed) + "\n"
-                        + getContext().getString(R.string.wrong_password, userName);
+                        + getContext().getString(R.string.wrong_password, result.userData.userName);
                 enableUserNameText(true);
                 enablePasswordText(true);
                 break;
 
-            case NOT_FOUND_404:
+            case STATUS_404_NOT_FOUND:
                 mIsLoggedIn = false;
                 message = getContext().getString(R.string.login_failed) + "\n"
-                        + getContext().getString(R.string.account_not_found, userName);
+                        + getContext().getString(R.string.account_not_found, result.userData.userName);
                 enableAccountButton(true);
                 enableUserNameText(true);
                 enablePasswordText(true);

@@ -71,6 +71,9 @@ import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.VISIT_EDITED_RESULT_CODE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.SharedPrefTags.ZOOM_LEVEL;
+import static net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync.LoginStatusCode.REQUEST_TIME_OUT;
+import static net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync.LoginStatusCode.STATUS_202_AUTHENTICATED;
+import static net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync.LoginStatusCode.STATUS_401_UNAUTHORIZED;
 import static net.c_kogyo.returnvisitorv5.data.Place.PLACE;
 import static net.c_kogyo.returnvisitorv5.data.Visit.VISIT;
 
@@ -87,24 +90,24 @@ public class MapActivity extends AppCompatActivity
     private boolean isLoggedIn;
     private String userName;
     private String password;
-    private Handler loginDialogHandler;
+//    private Handler loginDialogHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        loginDialogHandler = new Handler();
+//        loginDialogHandler = new Handler();
         RVCloudSync.getInstance().setCallback(new RVCloudSync.RVCloudSyncCallback() {
             @Override
-            public void onLoginResult(final RVCloudSync.LoginStatusCode code, final String userName, final String password) {
+            public void onLoginResult(RVCloudSync.LoginResult result) {
 
-                switch (code) {
-                    case AUTHENTICATED_202:
+                switch (result.statusCode) {
+                    case STATUS_202_AUTHENTICATED:
                         isLoggedIn = true;
-                        MapActivity.this.userName = userName;
-                        MapActivity.this.password = password;
+                        MapActivity.this.userName = result.userData.userName;
+                        MapActivity.this.password = result.userData.password;
                         break;
-                    case UNAUTHORIZED_401:
+                    case STATUS_401_UNAUTHORIZED:
                         isLoggedIn = false;
                         break;
                     case REQUEST_TIME_OUT:
@@ -112,24 +115,19 @@ public class MapActivity extends AppCompatActivity
                         break;
                 }
 
-                // AsyncTaskから呼ばれるコールバックなので
-                loginDialogHandler.post(new Runnable() {
+                loginDialog.onLoginResult(result);
+                dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
                     @Override
-                    public void run() {
-                        loginDialog.onLoginResult(userName, code);
-                        dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
-                            @Override
-                            public boolean onTouch(View v, MotionEvent event) {
-                                fadeOutDialogOverlay(normalFadeOutListener);
-                                return true;
-                            }
-                        });
-                        refreshLoginButton();
+                    public boolean onTouch(View v, MotionEvent event) {
+                        fadeOutDialogOverlay(normalFadeOutListener);
+                        return true;
                     }
                 });
+                refreshLoginButton();
+
 
             }
-        });
+        }, new Handler());
 
         // 初期化のために一回ゲットする
         RVData.getInstance().loadData(this, this);
