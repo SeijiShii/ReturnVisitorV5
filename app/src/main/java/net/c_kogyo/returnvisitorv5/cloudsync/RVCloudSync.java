@@ -19,6 +19,8 @@ import java.net.URL;
 
 public class RVCloudSync {
 
+    private final String USER_DATA = "user";
+    private final String LOGIN_STATE = "state";
     private final String USER_NAME = "user_name";
     private final String PASSWORD = "password";
 
@@ -62,7 +64,7 @@ public class RVCloudSync {
         if (mCallback == null)
             throw new RVCloudSyncException();
 
-        UserDataPair dataPair = new UserDataPair(userName, password);
+        UserData dataPair = new UserData(userName, password);
         new DoHttpLoginRequest().execute(dataPair);
 
     }
@@ -82,14 +84,14 @@ public class RVCloudSync {
         }
     }
 
-    private class DoHttpLoginRequest extends AsyncTask<UserDataPair, Void, Void> {
+    private class DoHttpLoginRequest extends AsyncTask<UserData, Void, Void> {
 
         private boolean isResponded;
 
         @Override
-        protected Void doInBackground(UserDataPair... params) {
+        protected Void doInBackground(UserData... params) {
 
-            UserDataPair dataPairSent = params[0];
+            UserData dataPairSent = params[0];
             HttpURLConnection urlConnection = null;
             try {
 
@@ -117,25 +119,49 @@ public class RVCloudSync {
                 int status = urlConnection.getResponseCode();
                 isResponded = true;
 
-                switch (status) {
-                    case AUTHENTICATED:
-                        InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
-                        String s = readInputStream(inputStream);
-                        JSONObject object = toJSON(s);
-                        UserDataPair dataPairReturned = new UserDataPair(object);
+                InputStream errorStream = urlConnection.getErrorStream();
+                if (errorStream == null) {
+                    InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
+                    String s = readInputStream(inputStream);
 
-                        mCallback.onLoginResult(LoginStatusCode.AUTHENTICATED_202, dataPairReturned.userName, dataPairReturned.password);
-                        break;
+                    JSONObject object = toJSON(s);
+                    LoginResult result = new LoginResult(object);
+                    String userName = result.userData.userName;
+                    String password = result.userData.password;
 
-                    case UNAUTHORIZED:
-                        mCallback.onLoginResult(LoginStatusCode.UNAUTHORIZED_401, null, null);
-                        break;
+                    switch (status) {
+                        case AUTHENTICATED:
 
-                    case NOT_FOUND:
-                        mCallback.onLoginResult(LoginStatusCode.NOT_FOUND_404, null, null);
-                        break;
+                            mCallback.onLoginResult(LoginStatusCode.AUTHENTICATED_202, userName, password);
+                            break;
+
+//                        case UNAUTHORIZED:
+//                            mCallback.onLoginResult(LoginStatusCode.UNAUTHORIZED_401, userName, null);
+//                            break;
+//
+//                        case NOT_FOUND:
+//                            mCallback.onLoginResult(LoginStatusCode.NOT_FOUND_404, userName, null);
+//                            break;
+                    }
+                } else {
+
+                    String s = readInputStream(errorStream);
+
+                    JSONObject object = toJSON(s);
+                    LoginResult result = new LoginResult(object);
+                    String userName = result.userData.userName;
+                    String password = result.userData.password;
+
+                    switch (status) {
+                        case UNAUTHORIZED:
+                            mCallback.onLoginResult(LoginStatusCode.UNAUTHORIZED_401, userName, null);
+                            break;
+
+                        case NOT_FOUND:
+                            mCallback.onLoginResult(LoginStatusCode.NOT_FOUND_404, userName, null);
+                            break;
+                    }
                 }
-
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
@@ -170,15 +196,15 @@ public class RVCloudSync {
         return object;
     }
 
-    private class UserDataPair {
+    private class UserData {
         String userName, password;
 
-        private UserDataPair(String userName, String password) {
+        private UserData(String userName, String password) {
             this.userName = userName;
             this.password = password;
         }
 
-        private UserDataPair(JSONObject object) {
+        private UserData(JSONObject object) {
 
             try {
                 if (object.has(USER_NAME))
@@ -188,12 +214,28 @@ public class RVCloudSync {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
         }
     }
 
+    private class LoginResult {
+        UserData userData;
+        String state;
+
+        private LoginResult(JSONObject object) {
+            try {
+                if (object.has(USER_DATA))
+                    this.userData = new UserData(object.getJSONObject(USER_DATA));
+                if (object.has(LOGIN_STATE))
+                    this.state = object.getString(LOGIN_STATE);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
     // DONE: 2017/05/11 401 UNAUTHORIZED
-    // TODO: 2017/05/11 ユーザの作成を提案
-    // TODO: 2017/05/11 400 BAD REQUEST エラー内容で切り分け　バックエンド側
+    // DONE: 2017/05/11 ユーザの作成を提案
+    // DONE: 2017/05/11 400 BAD REQUEST エラー内容で切り分け　バックエンド側
 
 }

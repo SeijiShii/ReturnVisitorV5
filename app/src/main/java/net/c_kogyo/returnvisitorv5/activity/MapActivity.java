@@ -1318,8 +1318,8 @@ public class MapActivity extends AppCompatActivity
 
             @Override
             public void onStartLogin() {
-                // TODO: 2017/05/11  onStartLogin()
-                // TODO: 2017/05/13 ログイン通信中はダイアログを消せないようにする
+                // DONE: 2017/05/11  onStartLogin()
+                // DONE: 2017/05/13 ログイン通信中はダイアログを消せないようにする
                 dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
@@ -1340,7 +1340,7 @@ public class MapActivity extends AppCompatActivity
 
             @Override
             public void onLogoutClick() {
-                // TODO: 2017/05/13 onLogoutClick
+                // DONE: 2017/05/13 onLogoutClick
                 confirmLogout();
             }
         });
@@ -1378,7 +1378,7 @@ public class MapActivity extends AppCompatActivity
     // TODO: 2017/05/05 データがないときにWORKやカレンダーに遷移しないようにする(実装済み、要検証)
     // TODO: 2017/05/06 AdView to Real
     // DONE: 2017/05/08 開始時間に秒はいらない
-    // TODO: 2017/05/08 ログイン画面
+    // DONE: 2017/05/08 ログイン画面
     // TODO: 2017/05/08 データ同期まわり
 
 

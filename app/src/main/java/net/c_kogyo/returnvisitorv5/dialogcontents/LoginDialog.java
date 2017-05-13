@@ -165,7 +165,7 @@ public class LoginDialog extends FrameLayout {
     private Button closeButton;
     private void initCloseButton() {
         closeButton = (Button) view.findViewById(R.id.close_button);
-        // TODO: 2017/05/11 change layout to CLOSE
+        // DONE: 2017/05/11 change layout to CLOSE
         closeButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -288,7 +288,7 @@ public class LoginDialog extends FrameLayout {
     }
 
     public void onLoginResult(String userName, RVCloudSync.LoginStatusCode statusCode){
-        // TODO: 2017/05/11  onLoginResult(RVCloudSync.LoginStatusCode statusCode)
+        // DONE: 2017/05/11  onLoginResult(RVCloudSync.LoginStatusCode statusCode)
 
         progressBar.setVisibility(INVISIBLE);
         enableCloseButton(true);
@@ -310,6 +310,7 @@ public class LoginDialog extends FrameLayout {
                 mIsLoggedIn = false;
                 message = getContext().getString(R.string.login_failed) + "\n"
                         + getContext().getString(R.string.account_not_found, userName);
+                enableAccountButton(true);
                 break;
 
             case REQUEST_TIME_OUT:
@@ -332,9 +333,8 @@ public class LoginDialog extends FrameLayout {
         }
     }
 
-
-
     // DONE: 2017/05/11 userName to userName
+    // TODO: 2017/05/13 ログインダイアログのUIの動きについてはまだいろいろ考える必要がある。
 
 
 }
