@@ -757,6 +757,7 @@ public class MapActivity extends AppCompatActivity
 
                                     @Override
                                     public void onAnimationEnd(Animator animation) {
+                                        dialogOverlay.setVisibility(View.INVISIBLE);
                                         dialogFrame.removeAllViews();
                                         showPlaceDialog(room);
                                     }
