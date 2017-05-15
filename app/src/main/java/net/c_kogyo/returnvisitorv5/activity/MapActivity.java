@@ -71,9 +71,6 @@ import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.
 import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.VISIT_EDITED_RESULT_CODE;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS;
 import static net.c_kogyo.returnvisitorv5.activity.Constants.SharedPrefTags.ZOOM_LEVEL;
-import static net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync.LoginStatusCode.REQUEST_TIME_OUT;
-import static net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync.LoginStatusCode.STATUS_202_AUTHENTICATED;
-import static net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync.LoginStatusCode.STATUS_401_UNAUTHORIZED;
 import static net.c_kogyo.returnvisitorv5.data.Place.PLACE;
 import static net.c_kogyo.returnvisitorv5.data.Visit.VISIT;
 

@@ -1,34 +1,43 @@
 package net.c_kogyo.returnvisitorv5.cloudsync;
 
-import android.os.AsyncTask;
 import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.util.Log;
+
+import com.neovisionaries.ws.client.WebSocket;
+import com.neovisionaries.ws.client.WebSocketAdapter;
+import com.neovisionaries.ws.client.WebSocketException;
+import com.neovisionaries.ws.client.WebSocketFactory;
+import com.neovisionaries.ws.client.WebSocketFrame;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedInputStream;
-import java.io.EOFException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InterruptedIOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by SeijiShii on 2017/05/10.
  */
 
-public class RVCloudSync {
+public class RVCloudSync extends WebSocketAdapter{
+
+    private final String TAG = "WebSocket";
 
     private final String USER_DATA = "user";
     private final String LOGIN_STATE = "state";
     private final String USER_NAME = "user_name";
     private final String PASSWORD = "password";
 
-    public enum LoginStatusCode {
+    private final String METHOD = "method";
+    private final String LOGIN_METHOD = "login";
+    private final String CREATE_USER_METHOD = "create_user";
+    private final String SYNC_METHOD = "sync";
+
+    private final String STATE = "state";
+
+    public enum LoginStatus {
 
         STATUS_200_OK,
         STATUS_201_CREATED,
@@ -41,17 +50,20 @@ public class RVCloudSync {
         REQUEST_TIME_OUT
     }
 
-    public static final int CREATED         = 201;
-    public static final int AUTHENTICATED   = 202;
-    public static final int BAD_REQUEST     = 400;
-    public static final int UNAUTHORIZED    = 401;
-    public static final int NOT_FOUND       = 404;
+//    public static final int CREATED         = 201;
+//    public static final int AUTHENTICATED   = 202;
+//    public static final int BAD_REQUEST     = 400;
+//    public static final int UNAUTHORIZED    = 401;
+//    public static final int NOT_FOUND       = 404;
 
-    private final String ROOT_URL = "http://192.168.3.3:13375";
+    private final String ROOT_URL = "http://192.168.3.4:1337";
 
     private static RVCloudSync instance = new RVCloudSync();
     private RVCloudSyncCallback mCallback;
     private Handler mHandler;
+
+    private UserData userData;
+    private String methodName;
 
     public static RVCloudSync getInstance() {
         return instance;
@@ -62,6 +74,7 @@ public class RVCloudSync {
         mHandler = handler;
     }
 
+    private WebSocket webSocket;
     private RVCloudSync() {
 
 
@@ -71,26 +84,86 @@ public class RVCloudSync {
         if (mCallback == null)
             throw new RVCloudSyncException();
 
-        UserData dataPair = new UserData(userName, password);
-        final DoHttpLoginRequest loginRequest = new DoHttpLoginRequest();
-        loginRequest.execute(dataPair);
+        final WebSocketFactory factory = new WebSocketFactory();
+        try {
+            webSocket = factory.createSocket(ROOT_URL, 5000);
+            webSocket.addListener(RVCloudSync.this);
 
-        new Handler().postDelayed(new Runnable() {
+        } catch (IOException e ) {
+            Log.e(TAG, e.getMessage());
+        }
+
+        methodName = LOGIN_METHOD;
+        userData = new UserData(userName, password);
+
+        if (webSocket == null)
+            return;
+
+        new Thread(new Runnable() {
             @Override
             public void run() {
-                loginRequest.cancel(true);
+                try {
+                    webSocket.connect();
+                } catch (WebSocketException e) {
+                    Log.e(TAG, e.getMessage());
+                }
             }
-        }, 5000);
+        }).start();
+
     }
 
+    @Override
+    public void onConnected(WebSocket websocket, Map<String, List<String>> headers) throws Exception {
+        super.onConnected(websocket, headers);
 
-    public void startCreateAccount(String userName, String password) throws RVCloudSyncException {
-        if (mCallback == null)
-            throw new RVCloudSyncException();
-
-        UserData dataPair = new UserData(userName, password);
+        JSONObject object = new JSONObject();
+        try {
+            object.put(METHOD, LOGIN_METHOD);
+            object.put(USER_DATA, userData.jsonObject());
+        } catch (JSONException e) {
+            Log.e(TAG, e.getMessage());
+        }
+        websocket.sendText(object.toString());
     }
 
+    @Override
+    public void onTextFrame(WebSocket websocket, WebSocketFrame frame) throws Exception {
+        super.onTextFrame(websocket, frame);
+
+        String data = frame.getPayloadText();
+        JSONObject object = new JSONObject(data);
+
+        String method;
+        LoginStatus status;
+        try {
+            method = object.getString(METHOD);
+            status = LoginStatus.valueOf(object.getString(STATE));
+
+            final LoginResult result = new LoginResult(userData, status);
+
+            switch (method) {
+                case LOGIN_METHOD:
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mCallback.onLoginResult(result);
+                        }
+                    });
+                    break;
+
+                case CREATE_USER_METHOD:
+                    break;
+
+                case SYNC_METHOD:
+                    break;
+            }
+        } catch (JSONException e) {
+            Log.e(TAG, e.getMessage());
+        }
+
+
+
+    }
 
     public interface RVCloudSyncCallback {
 
@@ -104,103 +177,6 @@ public class RVCloudSync {
         }
     }
 
-    private class DoHttpLoginRequest extends AsyncTask<UserData, Void, Void> {
-
-        private boolean isResponded = false;
-
-        @Override
-        protected Void doInBackground (UserData... params) {
-
-            UserData dataPairSent = params[0];
-            HttpURLConnection urlConnection = null;
-
-            try {
-
-                mHandler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (!isResponded)
-                            mCallback.onLoginResult(new LoginResult(null, LoginStatusCode.REQUEST_TIME_OUT));
-                    }
-                }, 5000);
-
-                URL url = new URL(ROOT_URL + "/users/?user_name=" +dataPairSent.userName + "&password=" + dataPairSent.password);
-                urlConnection = (HttpURLConnection) url.openConnection();
-
-                urlConnection.setDoInput(true);
-//                urlConnection.setDoOutput(true);
-
-                int status = urlConnection.getResponseCode();
-                InputStream errorStream = urlConnection.getErrorStream();
-                isResponded = true;
-                if (errorStream == null) {
-                    InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
-                    String s = readInputStream(inputStream);
-
-                    JSONObject object = toJSON(s);
-                    LoginResult result = new LoginResult(object);
-                    String userName = result.userData.userName;
-                    String password = result.userData.password;
-
-                    switch (status) {
-                        case AUTHENTICATED:
-
-                            mCallback.onLoginResult(new LoginResult(new UserData(userName, password), LoginStatusCode.STATUS_202_AUTHENTICATED));
-                            break;
-
-//                        case UNAUTHORIZED:
-//                            mCallback.onLoginResult(LoginStatusCode.UNAUTHORIZED_401, userName, null);
-//                            break;
-//
-//                        case NOT_FOUND:
-//                            mCallback.onLoginResult(LoginStatusCode.NOT_FOUND_404, userName, null);
-//                            break;
-                    }
-                } else {
-
-                    String s = readInputStream(errorStream);
-
-                    JSONObject object = toJSON(s);
-                    LoginResult loginResult = new LoginResult(object);
-
-                    switch (status) {
-                        case UNAUTHORIZED:
-                            loginResult.statusCode = LoginStatusCode.STATUS_401_UNAUTHORIZED;
-                            mCallback.onLoginResult(loginResult);
-                            break;
-
-                        case NOT_FOUND:
-                            loginResult.statusCode = LoginStatusCode.STATUS_404_NOT_FOUND;
-                            mCallback.onLoginResult(loginResult);
-                            break;
-                    }
-                }
-            } catch (IOException e) {
-                if (e instanceof EOFException) {
-                    mCallback.onLoginResult(new LoginResult(null, LoginStatusCode.REQUEST_TIME_OUT));
-
-                }
-                e.printStackTrace();
-            } finally {
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
-            }
-
-            return null;
-        }
-
-    }
-
-    private String readInputStream(InputStream inputStream) throws IOException{
-        // TODO: 2017/05/11 バッファサイズを検証。不具合はないか
-        byte[] buffer = new byte[1024];
-        inputStream.read(buffer);
-        inputStream.close();
-
-        return new String(buffer);
-    }
-
     private JSONObject toJSON(String s) {
         JSONObject object = null;
 
@@ -211,6 +187,7 @@ public class RVCloudSync {
         }
         return object;
     }
+
 
     public class UserData {
         public String userName, password;
@@ -231,13 +208,25 @@ public class RVCloudSync {
                 e.printStackTrace();
             }
         }
+
+        private JSONObject jsonObject() {
+
+            JSONObject object = new JSONObject();
+            try {
+                object.put(USER_NAME, userName);
+                object.put(PASSWORD, password);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return object;
+        }
     }
 
     public class LoginResult {
         public UserData userData;
-        public LoginStatusCode statusCode;
+        public LoginStatus statusCode;
 
-        public LoginResult(UserData userData, LoginStatusCode statusCode) {
+        public LoginResult(UserData userData, LoginStatus statusCode) {
             this.userData = userData;
             this.statusCode = statusCode;
         }
@@ -247,28 +236,10 @@ public class RVCloudSync {
                 if (object.has(USER_DATA))
                     this.userData = new UserData(object.getJSONObject(USER_DATA));
                 if (object.has(LOGIN_STATE))
-                    this.statusCode = LoginStatusCode.valueOf(object.getString(LOGIN_STATE));
+                    this.statusCode = LoginStatus.valueOf(object.getString(LOGIN_STATE));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-        }
-    }
-
-    private class DoHttpCreateAccountRequest extends AsyncTask<UserData, Void, LoginResult> {
-
-        @Override
-        protected LoginResult doInBackground(UserData... params) {
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(LoginResult result) {
-            super.onPostExecute(result);
-        }
-
-        @Override
-        protected void onCancelled() {
-            super.onCancelled();
         }
     }
 

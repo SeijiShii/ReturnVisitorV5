@@ -327,7 +327,7 @@ public class LoginDialog extends FrameLayout {
     }
 
     public void onLoginResult(RVCloudSync.LoginResult result){
-        // DONE: 2017/05/11  onLoginResult(RVCloudSync.LoginStatusCode statusCode)
+        // DONE: 2017/05/11  onLoginResult(RVCloudSync.LoginStatus statusCode)
 
         progressBar.setVisibility(INVISIBLE);
         enableCloseButton(true);
