@@ -174,7 +174,7 @@ public class LoginDialog extends FrameLayout {
 
     private Button createAccountButton;
     private void initCreateAccountButton() {
-        createAccountButton = (Button) view.findViewById(R.id.create_account_button);
+        createAccountButton = (Button) view.findViewById(R.id.create_user_button);
 
         createAccountButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -278,7 +278,7 @@ public class LoginDialog extends FrameLayout {
                         startSendingUserData(userName,
                                                 password,
                                                 RVCloudSync.RVCloudSyncMethod.CREATE_USER);
-                messageTextView.setText(R.string.start_create_account);
+                messageTextView.setText(R.string.start_create_user);
 
                 if (mListener != null) {
                     mListener.onStartCreateAccount();
@@ -352,7 +352,7 @@ public class LoginDialog extends FrameLayout {
             case STATUS_404_NOT_FOUND:
                 MapActivity.setIsLoggedIn(false);
                 message = getContext().getString(R.string.login_failed) + "\n"
-                        + getContext().getString(R.string.account_not_found, result.userData.userName);
+                        + getContext().getString(R.string.user_not_found, result.userData.userName);
                 enableAccountButton(true);
                 enableUserNameText(true);
                 enablePasswordText(true);

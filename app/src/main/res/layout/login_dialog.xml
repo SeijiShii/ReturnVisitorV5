@@ -102,10 +102,10 @@
             <Button
                 android:layout_width="150dp"
                 android:layout_height="match_parent"
-                android:id="@+id/create_account_button"
+                android:id="@+id/create_user_button"
                 android:background="@drawable/trans_blue_selector"
                 android:textColor="@color/colorPrimaryDark"
-                android:text="@string/create_account_button"
+                android:text="@string/create_user_button"
                 android:textSize="@dimen/text_size_middle"
                 android:layout_alignParentRight="true"/>
 
