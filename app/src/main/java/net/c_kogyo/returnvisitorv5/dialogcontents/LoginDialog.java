@@ -16,6 +16,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
+import net.c_kogyo.returnvisitorv5.activity.MapActivity;
 import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
 import net.c_kogyo.returnvisitorv5.util.InputUtil;
 import net.c_kogyo.returnvisitorv5.view.RightTextSwitch;
@@ -28,17 +29,12 @@ public class LoginDialog extends FrameLayout {
 
     private LoginDialogListener mListener;
     private static final int TEXT_LENGTH = 8;
-    private boolean mIsLoggedIn;
-    private Handler handler;
 
     public LoginDialog(@NonNull Context context,
-                       boolean isLoggedIn,
                        LoginDialogListener listener) {
         super(context);
 
-        mIsLoggedIn = isLoggedIn;
         mListener = listener;
-        handler = new Handler();
 
         initCommon();
     }
@@ -149,7 +145,7 @@ public class LoginDialog extends FrameLayout {
         loginButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mIsLoggedIn) {
+                if (MapActivity.isLoggedIn()) {
                     onClickLogout();
                 } else {
                     onLogInClick();
@@ -159,7 +155,7 @@ public class LoginDialog extends FrameLayout {
     }
 
     private void refreshLoginButton() {
-        if (mIsLoggedIn) {
+        if (MapActivity.isLoggedIn()) {
             loginButton.setText(R.string.logout_button_small);
         } else {
             loginButton.setText(R.string.login_button);
@@ -304,16 +300,16 @@ public class LoginDialog extends FrameLayout {
         StringBuilder builder = new StringBuilder();
 
         if (userName.length() < TEXT_LENGTH ) {
-            builder.append(getContext().getString(R.string.short_user_id_message));
+            builder.append(getContext().getString(R.string.short_user_name, userName));
 
             if (password.length() < TEXT_LENGTH) {
-                builder.append("\n").append(getContext().getString(R.string.short_password_message));
+                builder.append("\n").append(getContext().getString(R.string.short_password));
             }
             messageTextView.setText(builder.toString());
             return false;
 
         } else if (password.length() < TEXT_LENGTH) {
-            builder.append(getContext().getString(R.string.short_password_message));
+            builder.append(getContext().getString(R.string.short_password));
             messageTextView.setText(builder.toString());
             return false;
         }
@@ -341,12 +337,12 @@ public class LoginDialog extends FrameLayout {
         String message = "";
         switch (result.statusCode) {
             case STATUS_202_AUTHENTICATED:
-                mIsLoggedIn = true;
+                MapActivity.setIsLoggedIn(true);
                 message = getContext().getString(R.string.login_success, result.userData.userName);
                 break;
 
             case STATUS_401_UNAUTHORIZED:
-                mIsLoggedIn = false;
+                MapActivity.setIsLoggedIn(false);
                 message = getContext().getString(R.string.login_failed) + "\n"
                         + getContext().getString(R.string.wrong_password, result.userData.userName);
                 enableUserNameText(true);
@@ -354,7 +350,7 @@ public class LoginDialog extends FrameLayout {
                 break;
 
             case STATUS_404_NOT_FOUND:
-                mIsLoggedIn = false;
+                MapActivity.setIsLoggedIn(false);
                 message = getContext().getString(R.string.login_failed) + "\n"
                         + getContext().getString(R.string.account_not_found, result.userData.userName);
                 enableAccountButton(true);
@@ -362,8 +358,40 @@ public class LoginDialog extends FrameLayout {
                 enablePasswordText(true);
                 break;
 
+            case STATUS_201_CREATED:
+                MapActivity.setIsLoggedIn(true);
+                message = getContext().getString(R.string.create_user_success, result.userData.userName);
+                break;
+
+            case STATUS_400_DUPLICATE_USER_NAME:
+                MapActivity.setIsLoggedIn(false);
+                message = getContext().getString(R.string.create_user_failed) + "\n"
+                        + getContext().getString(R.string.duplicate_user, result.userData.userName);
+                enableAccountButton(true);
+                enableUserNameText(true);
+                enablePasswordText(true);
+                break;
+
+            case STATUS_400_SHORT_PASSWORD:
+                MapActivity.setIsLoggedIn(false);
+                message = getContext().getString(R.string.create_user_failed) + "\n"
+                        + getContext().getString(R.string.short_password);
+                enableAccountButton(true);
+                enableUserNameText(true);
+                enablePasswordText(true);
+                break;
+
+            case STATUS_400_SHORT_USER_NAME:
+                MapActivity.setIsLoggedIn(false);
+                message = getContext().getString(R.string.create_user_failed) + "\n"
+                        + getContext().getString(R.string.short_user_name, result.userData.userName);
+                enableAccountButton(true);
+                enableUserNameText(true);
+                enablePasswordText(true);
+                break;
+
             case REQUEST_TIME_OUT:
-                mIsLoggedIn = false;
+                MapActivity.setIsLoggedIn(false);
                 message = getContext().getString(R.string.login_failed) + "\n"
                         + getContext().getString(R.string.request_time_out);
                 enableAccountButton(true);
@@ -389,6 +417,7 @@ public class LoginDialog extends FrameLayout {
         enableUserNameText(true);
         enablePasswordText(true);
         enableLoginButton(true);
+        refreshLoginButton();
         enableAccountButton(true);
         enableCloseButton(true);
 

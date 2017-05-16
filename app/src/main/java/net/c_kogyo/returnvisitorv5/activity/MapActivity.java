@@ -84,7 +84,7 @@ public class MapActivity extends AppCompatActivity
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
 
     private static boolean isForeground;
-    private boolean isLoggedIn;
+    private static boolean mIsLoggedIn;
     private String userName;
     private String password;
 
@@ -99,15 +99,22 @@ public class MapActivity extends AppCompatActivity
 
                 switch (result.statusCode) {
                     case STATUS_202_AUTHENTICATED:
-                        isLoggedIn = true;
+                    case STATUS_201_CREATED:
+                        mIsLoggedIn = true;
                         MapActivity.this.userName = result.userData.userName;
                         MapActivity.this.password = result.userData.password;
                         break;
+
                     case STATUS_401_UNAUTHORIZED:
-                        isLoggedIn = false;
+                    case STATUS_404_NOT_FOUND:
+                    case STATUS_400_DUPLICATE_USER_NAME:
+                    case STATUS_400_SHORT_PASSWORD:
+                    case STATUS_400_SHORT_USER_NAME:
+                        mIsLoggedIn = false;
                         break;
+
                     case REQUEST_TIME_OUT:
-                        isLoggedIn = false;
+                        mIsLoggedIn = false;
                         break;
                 }
 
@@ -1281,7 +1288,7 @@ public class MapActivity extends AppCompatActivity
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isLoggedIn) {
+                if (mIsLoggedIn) {
                     confirmLogout();
                 } else {
                     openCloseDrawer();
@@ -1292,7 +1299,7 @@ public class MapActivity extends AppCompatActivity
     }
 
     private void refreshLoginButton() {
-        if (isLoggedIn) {
+        if (mIsLoggedIn) {
             String s = getString(R.string.logout_button, userName);
             loginButton.setText(s);
         } else {
@@ -1307,7 +1314,6 @@ public class MapActivity extends AppCompatActivity
     private LoginDialog loginDialog;
     private void showLoginDialog() {
         loginDialog = new LoginDialog(this,
-                isLoggedIn,
                 new LoginDialog.LoginDialogListener() {
 
             @Override
@@ -1363,13 +1369,21 @@ public class MapActivity extends AppCompatActivity
     }
 
     private void logout() {
-        isLoggedIn = false;
+        mIsLoggedIn = false;
         userName = null;
         password = null;
         refreshLoginButton();
         if (loginDialog != null) {
             loginDialog.postLogout();
         }
+    }
+
+    public static boolean isLoggedIn() {
+        return mIsLoggedIn;
+    }
+
+    public static void setIsLoggedIn(boolean login) {
+        mIsLoggedIn = login;
     }
 
     // TODO: 2017/05/05 データがないときにWORKやカレンダーに遷移しないようにする(実装済み、要検証)

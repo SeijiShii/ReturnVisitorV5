@@ -167,15 +167,13 @@ public class RVCloudSync extends WebSocketAdapter{
 
             switch (method) {
                 case LOGIN:
+                case CREATE_USER:
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
                             mCallback.onLoginResult(result);
                         }
                     });
-                    break;
-
-                case CREATE_USER:
                     break;
 
                 case SYNC_DATA:
