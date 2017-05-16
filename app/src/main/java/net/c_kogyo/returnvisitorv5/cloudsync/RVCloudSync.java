@@ -63,7 +63,6 @@ public class RVCloudSync extends WebSocketAdapter{
     private Handler mHandler;
 
     private UserData userData;
-    private String methodName;
 
     public static RVCloudSync getInstance() {
         return instance;
@@ -75,55 +74,78 @@ public class RVCloudSync extends WebSocketAdapter{
     }
 
     private WebSocket webSocket;
-    private RVCloudSync() {
-
-
-    }
+    private RVCloudSync() {}
 
     public void startLogin(String userName, String password) throws RVCloudSyncException{
         if (mCallback == null)
             throw new RVCloudSyncException();
 
-        final WebSocketFactory factory = new WebSocketFactory();
-        try {
-            webSocket = factory.createSocket(ROOT_URL, 5000);
-            webSocket.addListener(RVCloudSync.this);
-
-        } catch (IOException e ) {
-            Log.e(TAG, e.getMessage());
-        }
-
-        methodName = LOGIN_METHOD;
-        userData = new UserData(userName, password);
+        createWebSocketIfNeeded();
 
         if (webSocket == null)
             return;
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    webSocket.connect();
-                } catch (WebSocketException e) {
-                    Log.e(TAG, e.getMessage());
-                }
-            }
-        }).start();
+        userData = new UserData(userName, password);
 
+        if (webSocket.isOpen()) {
+            sendUserData(LOGIN_METHOD);
+        } else {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        webSocket.connect();
+
+                        while (!webSocket.isOpen()) {
+                            try {
+                                Thread.sleep(50);
+                            } catch (InterruptedException e ) {
+                                Log.e(TAG, e.getMessage());
+                            }
+                        }
+                        sendUserData(LOGIN_METHOD);
+                    }catch (WebSocketException e) {
+                        Log.e(TAG, e.getMessage());
+                    }
+                }
+            }).start();
+
+        }
+    }
+
+    private void sendUserData(String methodName) { {
+
+        final JSONObject object = new JSONObject();
+        try {
+            object.put(METHOD, methodName);
+            object.put(USER_DATA, userData.jsonObject());
+        } catch (JSONException e) {
+            Log.e(TAG, e.getMessage());
+        }
+        webSocket.sendText(object.toString());
+    }
+
+    }
+    private void createWebSocketIfNeeded() {
+        if (webSocket == null) {
+            final WebSocketFactory factory = new WebSocketFactory();
+            try {
+                webSocket = factory.createSocket(ROOT_URL, 5000);
+                webSocket.addListener(RVCloudSync.this);
+
+            } catch (IOException e ) {
+                Log.e(TAG, e.getMessage());
+            }
+        }
     }
 
     @Override
     public void onConnected(WebSocket websocket, Map<String, List<String>> headers) throws Exception {
         super.onConnected(websocket, headers);
 
-        JSONObject object = new JSONObject();
-        try {
-            object.put(METHOD, LOGIN_METHOD);
-            object.put(USER_DATA, userData.jsonObject());
-        } catch (JSONException e) {
-            Log.e(TAG, e.getMessage());
-        }
-        websocket.sendText(object.toString());
+        webSocket = websocket;
+
+
     }
 
     @Override
@@ -160,9 +182,6 @@ public class RVCloudSync extends WebSocketAdapter{
         } catch (JSONException e) {
             Log.e(TAG, e.getMessage());
         }
-
-
-
     }
 
     public interface RVCloudSyncCallback {
@@ -176,18 +195,6 @@ public class RVCloudSync extends WebSocketAdapter{
             super("RVCloudSyncCallback not set!");
         }
     }
-
-    private JSONObject toJSON(String s) {
-        JSONObject object = null;
-
-        try {
-            object = new JSONObject(s);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return object;
-    }
-
 
     public class UserData {
         public String userName, password;
