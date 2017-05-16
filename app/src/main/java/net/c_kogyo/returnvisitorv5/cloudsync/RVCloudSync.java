@@ -2,6 +2,7 @@ package net.c_kogyo.returnvisitorv5.cloudsync;
 
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.neovisionaries.ws.client.WebSocket;
@@ -23,7 +24,7 @@ import java.util.Map;
 
 public class RVCloudSync extends WebSocketAdapter{
 
-    private final String TAG = "WebSocket";
+    public static final String TAG = "RVCloudSync";
 
     private final String USER_DATA = "user";
     private final String LOGIN_STATE = "state";
@@ -79,9 +80,12 @@ public class RVCloudSync extends WebSocketAdapter{
     private WebSocket webSocket;
     private RVCloudSync() {}
 
-    public void startSendingUserData(String userName,
-                                     String password,
+    public void startSendingUserData(@Nullable String userName,
+                                     @Nullable String password,
                                      final RVCloudSyncMethod method) throws RVCloudSyncException{
+        if (userName == null || password == null)
+            return;
+
         if (mCallback == null)
             throw new RVCloudSyncException();
 

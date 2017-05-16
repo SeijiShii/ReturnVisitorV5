@@ -1,14 +1,13 @@
 package net.c_kogyo.returnvisitorv5.data;
 
 import android.support.annotation.Nullable;
-import android.support.v4.util.Pair;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import net.c_kogyo.returnvisitorv5.activity.Constants;
+import net.c_kogyo.returnvisitorv5.Constants;
 
 import java.util.ArrayList;
 

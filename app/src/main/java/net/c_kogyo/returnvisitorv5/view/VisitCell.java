@@ -2,14 +2,12 @@ package net.c_kogyo.returnvisitorv5.view;
 
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.widget.PopupMenu;
 import android.util.AttributeSet;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -17,7 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
-import net.c_kogyo.returnvisitorv5.activity.Constants;
+import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.activity.MapActivity;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.RVData;

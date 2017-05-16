@@ -22,6 +22,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.RVData;
@@ -38,9 +39,9 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import static net.c_kogyo.returnvisitorv5.activity.Constants.DATE_LONG;
-import static net.c_kogyo.returnvisitorv5.activity.Constants.LATITUDE;
-import static net.c_kogyo.returnvisitorv5.activity.Constants.LONGITUDE;
+import static net.c_kogyo.returnvisitorv5.Constants.DATE_LONG;
+import static net.c_kogyo.returnvisitorv5.Constants.LATITUDE;
+import static net.c_kogyo.returnvisitorv5.Constants.LONGITUDE;
 import static net.c_kogyo.returnvisitorv5.util.ViewUtil.setOnClickListener;
 
 /**

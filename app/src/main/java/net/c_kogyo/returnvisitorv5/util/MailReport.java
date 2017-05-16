@@ -6,7 +6,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 
 import net.c_kogyo.returnvisitorv5.R;
-import net.c_kogyo.returnvisitorv5.activity.Constants;
+import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.data.AggregationOfMonth;
 
 import java.util.Calendar;
@@ -22,7 +22,7 @@ public class MailReport {
     public static void exportToMail(Context context, Calendar month) {
 
         SharedPreferences prefs = context.getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
-        String name = prefs.getString(Constants.SharedPrefTags.USER_NAME, "");
+        String name = prefs.getString(Constants.SharedPrefTags.PUBLISHER_NAME, "");
 
         String subject = context.getString(R.string.service_report) + ": " + DateTimeText.getMonthText(month, context);
 

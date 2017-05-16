@@ -13,10 +13,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
-import net.c_kogyo.returnvisitorv5.activity.Constants;
+import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 
-import static net.c_kogyo.returnvisitorv5.activity.Constants.buttonRes;
+import static net.c_kogyo.returnvisitorv5.Constants.buttonRes;
 
 /**
  * Created by SeijiShii on 2017/03/06.

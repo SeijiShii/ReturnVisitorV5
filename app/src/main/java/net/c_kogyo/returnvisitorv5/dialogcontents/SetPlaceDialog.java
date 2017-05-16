@@ -30,10 +30,10 @@ import net.c_kogyo.returnvisitorv5.data.PlaceMarkers;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 
 import static android.content.Context.MODE_PRIVATE;
-import static net.c_kogyo.returnvisitorv5.activity.Constants.LATITUDE;
-import static net.c_kogyo.returnvisitorv5.activity.Constants.LONGITUDE;
-import static net.c_kogyo.returnvisitorv5.activity.Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS;
-import static net.c_kogyo.returnvisitorv5.activity.Constants.SharedPrefTags.ZOOM_LEVEL;
+import static net.c_kogyo.returnvisitorv5.Constants.LATITUDE;
+import static net.c_kogyo.returnvisitorv5.Constants.LONGITUDE;
+import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS;
+import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.ZOOM_LEVEL;
 import static net.c_kogyo.returnvisitorv5.activity.MapActivity.MY_LOCATION_TAG;
 
 /**

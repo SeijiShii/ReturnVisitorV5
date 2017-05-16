@@ -17,8 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import static net.c_kogyo.returnvisitorv5.activity.Constants.LATITUDE;
-import static net.c_kogyo.returnvisitorv5.activity.Constants.LONGITUDE;
+import static net.c_kogyo.returnvisitorv5.Constants.LATITUDE;
+import static net.c_kogyo.returnvisitorv5.Constants.LONGITUDE;
 
 /**
  * Created by SeijiShii on 2017/02/23.

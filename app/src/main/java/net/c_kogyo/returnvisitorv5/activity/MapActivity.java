@@ -40,6 +40,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
+import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
 import net.c_kogyo.returnvisitorv5.data.Place;
@@ -60,17 +61,20 @@ import net.c_kogyo.returnvisitorv5.view.CountTimeFrame;
 
 import java.util.Calendar;
 
-import static net.c_kogyo.returnvisitorv5.activity.Constants.LATITUDE;
-import static net.c_kogyo.returnvisitorv5.activity.Constants.LONGITUDE;
-import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.EDIT_VISIT_ACTION;
-import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.EDIT_VISIT_REQUEST_CODE;
-import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_HOUSE_ACTION;
-import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_VISIT_ACTION_WITH_PLACE;
-import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.NEW_VISIT_REQUEST_CODE;
-import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.VISIT_ADDED_RESULT_CODE;
-import static net.c_kogyo.returnvisitorv5.activity.Constants.RecordVisitActions.VISIT_EDITED_RESULT_CODE;
-import static net.c_kogyo.returnvisitorv5.activity.Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS;
-import static net.c_kogyo.returnvisitorv5.activity.Constants.SharedPrefTags.ZOOM_LEVEL;
+import static net.c_kogyo.returnvisitorv5.Constants.LATITUDE;
+import static net.c_kogyo.returnvisitorv5.Constants.LONGITUDE;
+import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.EDIT_VISIT_ACTION;
+import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.EDIT_VISIT_REQUEST_CODE;
+import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.NEW_HOUSE_ACTION;
+import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.NEW_VISIT_ACTION_WITH_PLACE;
+import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.NEW_VISIT_REQUEST_CODE;
+import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.VISIT_ADDED_RESULT_CODE;
+import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.VISIT_EDITED_RESULT_CODE;
+import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.IS_LOGGED_IN;
+import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.PASSWORD;
+import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS;
+import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.USER_NAME;
+import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.ZOOM_LEVEL;
 import static net.c_kogyo.returnvisitorv5.data.Place.PLACE;
 import static net.c_kogyo.returnvisitorv5.data.Visit.VISIT;
 
@@ -118,14 +122,17 @@ public class MapActivity extends AppCompatActivity
                         break;
                 }
 
-                loginDialog.onLoginResult(result);
-                dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        fadeOutDialogOverlay(normalFadeOutListener);
-                        return true;
-                    }
-                });
+                if (loginDialog != null) {
+                    loginDialog.onLoginResult(result);
+                    dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
+                        @Override
+                        public boolean onTouch(View v, MotionEvent event) {
+                            fadeOutDialogOverlay(normalFadeOutListener);
+                            return true;
+                        }
+                    });
+                }
+
                 refreshLoginButton();
 
 
@@ -146,6 +153,8 @@ public class MapActivity extends AppCompatActivity
         initMapView(savedInstanceState);
         initDialogOverlay();
         initDrawerOverlay();
+
+        loadLoginState();
 
     }
 
@@ -308,8 +317,7 @@ public class MapActivity extends AppCompatActivity
         mapView.onPause();
 
         saveCameraPosition();
-
-
+        saveLoginState();
     }
 
     @Override
@@ -323,6 +331,7 @@ public class MapActivity extends AppCompatActivity
         super.onResume();
         mapView.onResume();
         restartTimeCountIfNeeded();
+
     }
 
     private void loadCameraPosition() {
@@ -844,6 +853,7 @@ public class MapActivity extends AppCompatActivity
             hideSoftKeyboard();
             dialogOverlay.setVisibility(View.INVISIBLE);
             dialogFrame.removeAllViews();
+            loginDialog = null;
         }
 
         @Override
@@ -1391,6 +1401,38 @@ public class MapActivity extends AppCompatActivity
     // DONE: 2017/05/08 開始時間に秒はいらない
     // DONE: 2017/05/08 ログイン画面
     // TODO: 2017/05/08 データ同期まわり
+
+    // TODO: 2017/05/16 save login state
+
+    private void saveLoginState() {
+
+        SharedPreferences prefs
+                = getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean(IS_LOGGED_IN, mIsLoggedIn);
+        editor.putString(USER_NAME, userName);
+        editor.putString(PASSWORD, password);
+
+        editor.apply();
+    }
+
+    private void loadLoginState() {
+
+        SharedPreferences prefs
+                = getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
+        mIsLoggedIn = prefs.getBoolean(IS_LOGGED_IN, false);
+        userName = prefs.getString(USER_NAME, null);
+        password = prefs.getString(PASSWORD, null);
+
+        if (mIsLoggedIn){
+            try {
+                RVCloudSync.getInstance().startSendingUserData(userName, password, RVCloudSync.RVCloudSyncMethod.LOGIN);
+            } catch (RVCloudSync.RVCloudSyncException e){
+                Log.e(RVCloudSync.TAG, e.getMessage());
+            }
+        }
+
+    }
 
 
 
