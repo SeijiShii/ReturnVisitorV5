@@ -87,7 +87,6 @@ public class MapActivity extends AppCompatActivity
     private boolean isLoggedIn;
     private String userName;
     private String password;
-//    private Handler loginDialogHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

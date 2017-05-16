@@ -231,14 +231,17 @@ public class LoginDialog extends FrameLayout {
 
         // test
 //        try {
-//            RVCloudSync.getInstance().startLogin("seijishii", "fugafuga");
+//            RVCloudSync.getInstance().startSendingUserData("seijishii", "fugafuga");
 //        } catch (RVCloudSync.RVCloudSyncException e) {
 //            e.printStackTrace();
 //        }
 
         if (validateTexts(userName, password)) {
             try {
-                RVCloudSync.getInstance().startLogin(userName, password);
+                RVCloudSync.getInstance()
+                        .startSendingUserData(userName,
+                                                password,
+                                                RVCloudSync.RVCloudSyncMethod.LOGIN);
                 messageTextView.setText(R.string.start_login);
 
                 if (mListener != null) {
@@ -268,14 +271,17 @@ public class LoginDialog extends FrameLayout {
 
         // test
 //        try {
-//            RVCloudSync.getInstance().startLogin("seijishii", "fugafuga");
+//            RVCloudSync.getInstance().startSendingUserData("seijishii", "fugafuga");
 //        } catch (RVCloudSync.RVCloudSyncException e) {
 //            e.printStackTrace();
 //        }
 
         if (validateTexts(userName, password)) {
             try {
-                RVCloudSync.getInstance().startLogin(userName, password);
+                RVCloudSync.getInstance().
+                        startSendingUserData(userName,
+                                                password,
+                                                RVCloudSync.RVCloudSyncMethod.CREATE_USER);
                 messageTextView.setText(R.string.start_create_account);
 
                 if (mListener != null) {

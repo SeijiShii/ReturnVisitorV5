@@ -31,11 +31,14 @@ public class RVCloudSync extends WebSocketAdapter{
     private final String PASSWORD = "password";
 
     private final String METHOD = "method";
-    private final String LOGIN_METHOD = "login";
-    private final String CREATE_USER_METHOD = "create_user";
-    private final String SYNC_METHOD = "sync";
 
     private final String STATE = "state";
+
+    public enum RVCloudSyncMethod {
+        LOGIN,
+        CREATE_USER,
+        SYNC_DATA,
+    }
 
     public enum LoginStatus {
 
@@ -62,7 +65,7 @@ public class RVCloudSync extends WebSocketAdapter{
     private RVCloudSyncCallback mCallback;
     private Handler mHandler;
 
-    private UserData userData;
+//    private UserData userData;
 
     public static RVCloudSync getInstance() {
         return instance;
@@ -76,7 +79,9 @@ public class RVCloudSync extends WebSocketAdapter{
     private WebSocket webSocket;
     private RVCloudSync() {}
 
-    public void startLogin(String userName, String password) throws RVCloudSyncException{
+    public void startSendingUserData(String userName,
+                                     String password,
+                                     final RVCloudSyncMethod method) throws RVCloudSyncException{
         if (mCallback == null)
             throw new RVCloudSyncException();
 
@@ -85,10 +90,10 @@ public class RVCloudSync extends WebSocketAdapter{
         if (webSocket == null)
             return;
 
-        userData = new UserData(userName, password);
+        final UserData userData = new UserData(userName, password);
 
         if (webSocket.isOpen()) {
-            sendUserData(LOGIN_METHOD);
+            sendUserData(userData, method);
         } else {
             new Thread(new Runnable() {
                 @Override
@@ -103,7 +108,7 @@ public class RVCloudSync extends WebSocketAdapter{
                                 Log.e(TAG, e.getMessage());
                             }
                         }
-                        sendUserData(LOGIN_METHOD);
+                        sendUserData(userData, method);
                     }catch (WebSocketException e) {
                         Log.e(TAG, e.getMessage());
                     }
@@ -113,11 +118,11 @@ public class RVCloudSync extends WebSocketAdapter{
         }
     }
 
-    private void sendUserData(String methodName) { {
+    private void sendUserData(UserData userData, RVCloudSyncMethod method) { {
 
         final JSONObject object = new JSONObject();
         try {
-            object.put(METHOD, methodName);
+            object.put(METHOD, method.toString());
             object.put(USER_DATA, userData.jsonObject());
         } catch (JSONException e) {
             Log.e(TAG, e.getMessage());
@@ -144,8 +149,6 @@ public class RVCloudSync extends WebSocketAdapter{
         super.onConnected(websocket, headers);
 
         webSocket = websocket;
-
-
     }
 
     @Override
@@ -155,16 +158,15 @@ public class RVCloudSync extends WebSocketAdapter{
         String data = frame.getPayloadText();
         JSONObject object = new JSONObject(data);
 
-        String method;
-        LoginStatus status;
         try {
-            method = object.getString(METHOD);
-            status = LoginStatus.valueOf(object.getString(STATE));
+            RVCloudSyncMethod method = RVCloudSyncMethod.valueOf(object.getString(METHOD));
+            LoginStatus status = LoginStatus.valueOf(object.getString(STATE));
+            UserData userData = new UserData(object.getJSONObject(USER_DATA));
 
             final LoginResult result = new LoginResult(userData, status);
 
             switch (method) {
-                case LOGIN_METHOD:
+                case LOGIN:
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
@@ -173,10 +175,10 @@ public class RVCloudSync extends WebSocketAdapter{
                     });
                     break;
 
-                case CREATE_USER_METHOD:
+                case CREATE_USER:
                     break;
 
-                case SYNC_METHOD:
+                case SYNC_DATA:
                     break;
             }
         } catch (JSONException e) {
