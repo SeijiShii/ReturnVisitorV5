@@ -163,6 +163,16 @@ public class DataList<T extends DataItem> implements Iterable<T>{
         return searchResultItems;
     }
 
+    public ArrayList<T> getListLaterThanTime(long dataTimeInMills) {
+        ArrayList<T> laterList = new ArrayList<>();
+        for ( T data : list ) {
+            if (data.getUpdatedAt().getTimeInMillis() >= dataTimeInMills) {
+                laterList.add(data);
+            }
+        }
+        return laterList;
+    }
+
 
 }
 

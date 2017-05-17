@@ -114,10 +114,9 @@ public class MapActivity extends AppCompatActivity
                     case STATUS_400_DUPLICATE_USER_NAME:
                     case STATUS_400_SHORT_PASSWORD:
                     case STATUS_400_SHORT_USER_NAME:
-                        mIsLoggedIn = false;
-                        break;
 
                     case REQUEST_TIME_OUT:
+                    case SERVER_NOT_AVAILABLE:
                         mIsLoggedIn = false;
                         break;
                 }

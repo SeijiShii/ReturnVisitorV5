@@ -1,5 +1,7 @@
 package net.c_kogyo.returnvisitorv5.cloudsync;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -11,10 +13,13 @@ import com.neovisionaries.ws.client.WebSocketException;
 import com.neovisionaries.ws.client.WebSocketFactory;
 import com.neovisionaries.ws.client.WebSocketFrame;
 
+import net.c_kogyo.returnvisitorv5.Constants;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.List;
 import java.util.Map;
 
@@ -51,7 +56,8 @@ public class RVCloudSync extends WebSocketAdapter{
         STATUS_400_SHORT_PASSWORD,
         STATUS_401_UNAUTHORIZED,
         STATUS_404_NOT_FOUND,
-        REQUEST_TIME_OUT
+        REQUEST_TIME_OUT,
+        SERVER_NOT_AVAILABLE
     }
 
 //    public static final int CREATED         = 201;
@@ -105,21 +111,37 @@ public class RVCloudSync extends WebSocketAdapter{
                     try {
                         webSocket.connect();
 
+                        int timeCounter = 0;
                         while (!webSocket.isOpen()) {
                             try {
                                 Thread.sleep(50);
+                                timeCounter += 50;
+                                if (timeCounter > 50000) {
+                                    postErrorResult(LoginStatus.REQUEST_TIME_OUT);
+                                    return;
+                                }
                             } catch (InterruptedException e ) {
                                 Log.e(TAG, e.getMessage());
                             }
                         }
                         sendUserData(userData, method);
                     }catch (WebSocketException e) {
+                        postErrorResult(LoginStatus.SERVER_NOT_AVAILABLE);
                         Log.e(TAG, e.getMessage());
                     }
                 }
             }).start();
 
         }
+    }
+
+    private void postErrorResult(final LoginStatus status) {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mCallback.onLoginResult(new LoginResult(new UserData(null, null), status));
+            }
+        });
     }
 
     private void sendUserData(UserData userData, RVCloudSyncMethod method) { {
@@ -139,10 +161,14 @@ public class RVCloudSync extends WebSocketAdapter{
         if (webSocket == null) {
             final WebSocketFactory factory = new WebSocketFactory();
             try {
+
                 webSocket = factory.createSocket(ROOT_URL, 5000);
                 webSocket.addListener(RVCloudSync.this);
 
-            } catch (IOException e ) {
+            } catch (SocketTimeoutException  e ) {
+                Log.e(TAG, e.getMessage());
+                postErrorResult(LoginStatus.REQUEST_TIME_OUT);
+            } catch (IOException e) {
                 Log.e(TAG, e.getMessage());
             }
         }
@@ -187,6 +213,7 @@ public class RVCloudSync extends WebSocketAdapter{
             Log.e(TAG, e.getMessage());
         }
     }
+
 
     public interface RVCloudSyncCallback {
 
@@ -254,6 +281,12 @@ public class RVCloudSync extends WebSocketAdapter{
         }
     }
 
+    public void startDataSync(@Nullable String userName, @Nullable String password, Context context) {
+
+        SharedPreferences prefs
+                = context.getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, Context.MODE_PRIVATE);
+        long lastSyncTime = prefs.getLong(Constants.SharedPrefTags.LAST_DEVICE_SYNC_TIME, 0);
+    }
 
     // DONE: 2017/05/11 401 UNAUTHORIZED
     // DONE: 2017/05/11 ユーザの作成を提案

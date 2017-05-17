@@ -2,7 +2,6 @@ package net.c_kogyo.returnvisitorv5.dialogcontents;
 
 import android.app.Activity;
 import android.content.Context;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.InputType;
@@ -394,6 +393,15 @@ public class LoginDialog extends FrameLayout {
                 MapActivity.setIsLoggedIn(false);
                 message = getContext().getString(R.string.login_failed) + "\n"
                         + getContext().getString(R.string.request_time_out);
+                enableAccountButton(true);
+                enableUserNameText(true);
+                enablePasswordText(true);
+                break;
+
+            case SERVER_NOT_AVAILABLE:
+                MapActivity.setIsLoggedIn(false);
+                message = getContext().getString(R.string.login_failed) + "\n"
+                        + getContext().getString(R.string.server_not_available);
                 enableAccountButton(true);
                 enableUserNameText(true);
                 enablePasswordText(true);

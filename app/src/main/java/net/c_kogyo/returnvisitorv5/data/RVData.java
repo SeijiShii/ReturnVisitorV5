@@ -3,6 +3,7 @@ package net.c_kogyo.returnvisitorv5.data;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import net.c_kogyo.returnvisitorv5.data.list.DataList;
 import net.c_kogyo.returnvisitorv5.data.list.DeletedList;
@@ -37,6 +38,8 @@ public class RVData {
     public static final String RV_DIR_NAME = "return_visitor_data_dir";
     public static final String RV_FILE_NAME = "return_visitor_data_file";
     public static final String RV_DATA_LIST = "rv_data_list";
+
+    private final String TAG = "RVData";
 
 //    public static final String TAG_LIST = "tag_list";
 //    public static final String NOTE_COMP_LIST = "note_comp_list";
@@ -149,47 +152,53 @@ public class RVData {
             if (object == null) return;
 
             try {
-
                 if (object.has(RV_DATA_LIST)) {
                     JSONArray array = object.getJSONArray(RV_DATA_LIST);
-
-                    for ( int i = 0 ; i < array.length() ; i++ ) {
-
-                        JSONObject recordObject = array.getJSONObject(i);
-                        Record record = new Record(recordObject);
-
-                        switch (record.getClassName()) {
-                            case "Place":
-                                placeList.setOrAdd(new Place(record));
-                                break;
-                            case "Person":
-                                personList.setOrAdd(new Person(record));
-                                break;
-                            case "Visit":
-                                visitList.setOrAdd(new Visit(record));
-                                break;
-                            case "Tag":
-                                tagList.setOrAdd(new Tag(record));
-                                break;
-                            case "NoteCompItem":
-                                noteCompList.setOrAdd(new NoteCompItem(record));
-                                break;
-                            case "Publication":
-                                pubList.setOrAdd(new Publication(record));
-                                break;
-                            case "Work":
-                                workList.setOrAdd(new Work(record));
-                                break;
-                            case "DeletedData":
-                                deletedList.onLoadData(record);
-                                break;
-                        }
-                    }
+                    setFromRecordArray(array);
                 }
-
             }catch (JSONException e) {
-                e.printStackTrace();
+                Log.e(TAG, e.getMessage());
             }
+        }
+    }
+
+    private void setFromRecordArray(JSONArray jsonArray) {
+        for ( int i = 0 ; i < jsonArray.length() ; i++ ) {
+
+            try {
+                JSONObject recordObject = jsonArray.getJSONObject(i);
+                Record record = new Record(recordObject);
+
+                switch (record.getClassName()) {
+                    case "Place":
+                        placeList.setOrAdd(new Place(record));
+                        break;
+                    case "Person":
+                        personList.setOrAdd(new Person(record));
+                        break;
+                    case "Visit":
+                        visitList.setOrAdd(new Visit(record));
+                        break;
+                    case "Tag":
+                        tagList.setOrAdd(new Tag(record));
+                        break;
+                    case "NoteCompItem":
+                        noteCompList.setOrAdd(new NoteCompItem(record));
+                        break;
+                    case "Publication":
+                        pubList.setOrAdd(new Publication(record));
+                        break;
+                    case "Work":
+                        workList.setOrAdd(new Work(record));
+                        break;
+                    case "DeletedData":
+                        deletedList.onLoadData(record);
+                        break;
+                }
+            } catch (JSONException e) {
+                Log.e(TAG, e.getMessage());
+            }
+
         }
     }
 
@@ -376,6 +385,49 @@ public class RVData {
 
     public boolean hasWorkOrVisit() {
         return visitList.getList().size() > 0 || workList.getList().size() > 0;
+    }
+
+    public final String DATA_LIST_LATER_THAN_TIME = "data_list_later_than_time";
+    public JSONObject getJSONDataLaterThanTime(long dateTimeInMills) {
+
+        JSONArray array = new JSONArray();
+
+        for (Place place : placeList.getListLaterThanTime(dateTimeInMills)) {
+            array.put(new Record(place).getFullJSON());
+        }
+
+        for (Person person : personList.getListLaterThanTime(dateTimeInMills)) {
+            array.put(new Record(person).getFullJSON());
+        }
+
+        for (Visit visit : visitList.getListLaterThanTime(dateTimeInMills)) {
+            array.put(new Record(visit).getFullJSON());
+        }
+
+        for (Tag tag : tagList.getListLaterThanTime(dateTimeInMills)) {
+            array.put(new Record(tag).getFullJSON());
+        }
+
+        for (Publication publication : pubList.getListLaterThanTime(dateTimeInMills)) {
+            array.put(new Record(publication).getFullJSON());
+        }
+
+        for (Work work : workList.getListLaterThanTime(dateTimeInMills)) {
+            array.put(new Record(work).getFullJSON());
+        }
+
+        for (DataItem item : noteCompList.getListLaterThanTime(dateTimeInMills)) {
+            array.put(new Record(item).getFullJSON());
+        }
+
+        JSONObject object = new JSONObject();
+
+        try {
+            object.put(DATA_LIST_LATER_THAN_TIME, array);
+        } catch (JSONException e) {
+            Log.e(TAG, e.getMessage());
+        }
+        return object;
     }
 
 }
