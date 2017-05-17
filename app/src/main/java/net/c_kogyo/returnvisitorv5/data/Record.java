@@ -15,16 +15,17 @@ public class Record {
 
     public static final String DATA = "data";
     public static final String CLASS_NAME = "class_name";
+    public static final String DOUBLE_QUOTES = "*double_quotes*";
 
-    private String id;
+    private String dataId;
     private Calendar updatedAt;
     private String data;
     private String className;
 
     public <T extends DataItem> Record(T item) {
-        this.id = item.id;
+        this.dataId = item.id;
         this.updatedAt = (Calendar) item.getUpdatedAt().clone();
-        this.data = item.jsonObject().toString();
+        this.data = item.jsonObject().toString().replace("\"", DOUBLE_QUOTES);
         this.className = item.getClass().getSimpleName();
     }
 
@@ -32,13 +33,14 @@ public class Record {
 
         try {
             if (object.has(DataItem.ID))
-                this.id = object.getString(DataItem.ID);
+                this.dataId = object.getString(DataItem.ID);
             if (object.has(DataItem.UPDATED_AT)){
                 this.updatedAt = Calendar.getInstance();
                 this.updatedAt.setTimeInMillis(object.getLong(DataItem.UPDATED_AT));
             }
             if (object.has(DATA))
                 this.data = object.getString(DATA);
+                this.data = this.data.replace(DOUBLE_QUOTES, "\"");
             if (object.has(CLASS_NAME))
                 this.className = object.getString(CLASS_NAME);
 
@@ -118,7 +120,7 @@ public class Record {
         JSONObject object = new JSONObject();
 
         try {
-            object.put(DataItem.ID, id);
+            object.put(DataItem.ID, dataId);
             object.put(DataItem.UPDATED_AT, updatedAt.getTimeInMillis());
             object.put(DATA, data);
             object.put(CLASS_NAME, className);

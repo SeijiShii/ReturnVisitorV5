@@ -14,7 +14,9 @@ import com.neovisionaries.ws.client.WebSocketFactory;
 import com.neovisionaries.ws.client.WebSocketFrame;
 
 import net.c_kogyo.returnvisitorv5.Constants;
+import net.c_kogyo.returnvisitorv5.data.RVData;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -22,6 +24,10 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.List;
 import java.util.Map;
+
+import static net.c_kogyo.returnvisitorv5.Constants.DATA_ARRAY_LATER_THAN_TIME;
+import static net.c_kogyo.returnvisitorv5.Constants.LOADED_DATA_ARRAY;
+import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.LAST_DEVICE_SYNC_TIME;
 
 /**
  * Created by SeijiShii on 2017/05/10.
@@ -154,9 +160,53 @@ public class RVCloudSync extends WebSocketAdapter{
             Log.e(TAG, e.getMessage());
         }
         webSocket.sendText(object.toString());
+        }
     }
 
+    public void startDataSync(@Nullable String userName, @Nullable String password, Context context) {
+
+        SharedPreferences prefs
+                = context.getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, Context.MODE_PRIVATE);
+        long lastSyncTime = prefs.getLong(LAST_DEVICE_SYNC_TIME, 0);
+
+        final SyncData syncData
+                = new SyncData(new UserData(userName, password),
+                lastSyncTime,
+                RVData.getInstance().getJSONArrayLaterThanTime(lastSyncTime));
+
+        if (webSocket.isOpen()) {
+            webSocket.sendText(syncData.jsonObject().toString());
+        } else {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        webSocket.connect();
+
+                        int timeCounter = 0;
+                        while (!webSocket.isOpen()) {
+                            try {
+                                Thread.sleep(50);
+                                timeCounter += 50;
+                                if (timeCounter > 50000) {
+                                    postErrorResult(LoginStatus.REQUEST_TIME_OUT);
+                                    return;
+                                }
+                            } catch (InterruptedException e) {
+                                Log.e(TAG, e.getMessage());
+                            }
+                        }
+                        webSocket.sendText(syncData.jsonObject().toString());
+                    } catch (WebSocketException e) {
+                        postErrorResult(LoginStatus.SERVER_NOT_AVAILABLE);
+                        Log.e(TAG, e.getMessage());
+                    }
+                }
+            }).start();
+        }
     }
+
+
     private void createWebSocketIfNeeded() {
         if (webSocket == null) {
             final WebSocketFactory factory = new WebSocketFactory();
@@ -189,9 +239,14 @@ public class RVCloudSync extends WebSocketAdapter{
         JSONObject object = new JSONObject(data);
 
         try {
+
             RVCloudSyncMethod method = RVCloudSyncMethod.valueOf(object.getString(METHOD));
             LoginStatus status = LoginStatus.valueOf(object.getString(STATE));
             UserData userData = new UserData(object.getJSONObject(USER_DATA));
+
+            JSONArray loadedArray = new JSONArray();
+            if (object.has(LOADED_DATA_ARRAY))
+                loadedArray = object.getJSONArray(Constants.LOADED_DATA_ARRAY);
 
             final LoginResult result = new LoginResult(userData, status);
 
@@ -207,6 +262,8 @@ public class RVCloudSync extends WebSocketAdapter{
                     break;
 
                 case SYNC_DATA:
+                    RVData.getInstance().setFromRecordArray(loadedArray);
+                    mCallback.postDataSynchronized();
                     break;
             }
         } catch (JSONException e) {
@@ -214,10 +271,11 @@ public class RVCloudSync extends WebSocketAdapter{
         }
     }
 
-
     public interface RVCloudSyncCallback {
 
         void onLoginResult(LoginResult result);
+
+        void postDataSynchronized();
 
     }
 
@@ -264,29 +322,40 @@ public class RVCloudSync extends WebSocketAdapter{
         public UserData userData;
         public LoginStatus statusCode;
 
-        public LoginResult(UserData userData, LoginStatus statusCode) {
+        private LoginResult(UserData userData, LoginStatus statusCode) {
             this.userData = userData;
             this.statusCode = statusCode;
         }
 
-        private LoginResult(JSONObject object) {
+    }
+
+    private class SyncData {
+        private UserData userData;
+        private long lastDeviceSyncTime;
+        private JSONArray laterDataArray;
+
+        private SyncData(UserData userData, long lastDeviceSyncTime, JSONArray laterDataArray) {
+            this.userData = userData;
+            this.lastDeviceSyncTime = lastDeviceSyncTime;
+            this.laterDataArray = laterDataArray;
+        }
+
+        public JSONObject jsonObject() {
+            JSONObject object = new JSONObject();
             try {
-                if (object.has(USER_DATA))
-                    this.userData = new UserData(object.getJSONObject(USER_DATA));
-                if (object.has(LOGIN_STATE))
-                    this.statusCode = LoginStatus.valueOf(object.getString(LOGIN_STATE));
+                object.put(USER_DATA, userData.jsonObject());
+                object.put(LAST_DEVICE_SYNC_TIME, lastDeviceSyncTime);
+                object.put(DATA_ARRAY_LATER_THAN_TIME, laterDataArray);
+                object.put(METHOD, RVCloudSyncMethod.SYNC_DATA.toString());
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e(TAG, e.getMessage());
             }
+            return object;
         }
     }
 
-    public void startDataSync(@Nullable String userName, @Nullable String password, Context context) {
 
-        SharedPreferences prefs
-                = context.getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, Context.MODE_PRIVATE);
-        long lastSyncTime = prefs.getLong(Constants.SharedPrefTags.LAST_DEVICE_SYNC_TIME, 0);
-    }
+
 
     // DONE: 2017/05/11 401 UNAUTHORIZED
     // DONE: 2017/05/11 ユーザの作成を提案

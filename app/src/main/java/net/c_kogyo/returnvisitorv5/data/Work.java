@@ -14,9 +14,9 @@ import java.util.Calendar;
 public class Work extends TimePeriodItem {
 
     public static final String WORK = "work";
-    public static final String INTERVALS = "intervals";
+//    public static final String INTERVALS = "intervals";
 
-    private ArrayList<TimePeriodItem> intervals;
+//    private ArrayList<TimePeriodItem> intervals;
 
     public Work(Calendar time) {
         super(WORK, time);
@@ -24,7 +24,7 @@ public class Work extends TimePeriodItem {
         this.end = (Calendar) this.start.clone();
         this.end.add(Calendar.MINUTE, 5);
 
-        this.intervals = new ArrayList<>();
+//        this.intervals = new ArrayList<>();
     }
 
     public Work(Record record) {
@@ -33,44 +33,44 @@ public class Work extends TimePeriodItem {
 
     public Work(JSONObject object) {
         super(object);
-        this.intervals = new ArrayList<>();
+//        this.intervals = new ArrayList<>();
         setJSON(this, object);
     }
 
     @Override
     public JSONObject jsonObject() {
 
-        JSONObject object = super.jsonObject();
+        return super.jsonObject();
 
-        JSONArray intervalArray = new JSONArray();
-        for (TimePeriodItem item : intervals) {
-            intervalArray.put(item.jsonObject());
-        }
+//        JSONArray intervalArray = new JSONArray();
+//        for (TimePeriodItem item : intervals) {
+//            intervalArray.put(item.jsonObject());
+//        }
 
-        try {
-            object.put(INTERVALS, intervalArray);
-        } catch (JSONException  e) {
-            e.printStackTrace();
-        }
+//        try {
+//            object.put(INTERVALS, intervalArray);
+//        } catch (JSONException  e) {
+//            e.printStackTrace();
+//        }
 
-        return object;
+//        return object;
     }
 
     public static void setJSON(Work work, JSONObject object) {
 
-//        TimePeriodItem.setJSON(work, object);
+        TimePeriodItem.setJSON(work, object);
 
-        try {
-            if (object.has(INTERVALS)) {
-                JSONArray array = object.getJSONArray(INTERVALS);
-                work.intervals = new ArrayList<>();
-                for ( int i = 0 ; i < array.length() ; i++ ) {
-                    work.intervals.add(new TimePeriodItem(array.getJSONObject(i)));
-                }
-             }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            if (object.has(INTERVALS)) {
+//                JSONArray array = object.getJSONArray(INTERVALS);
+//                work.intervals = new ArrayList<>();
+//                for ( int i = 0 ; i < array.length() ; i++ ) {
+//                    work.intervals.add(new TimePeriodItem(array.getJSONObject(i)));
+//                }
+//             }
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
 
     }
 
@@ -119,12 +119,12 @@ public class Work extends TimePeriodItem {
 
     @Override
     public long getDuration() {
-        long duration = super.getDuration();
+        return super.getDuration();
 
-        for (TimePeriodItem item : intervals) {
-            duration = duration - item.getDuration();
-        }
-        return duration;
+//        for (TimePeriodItem item : intervals) {
+//            duration = duration - item.getDuration();
+//        }
+//        return duration;
     }
 
     public void setDate(Calendar date) {

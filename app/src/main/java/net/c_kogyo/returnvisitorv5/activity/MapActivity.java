@@ -107,6 +107,7 @@ public class MapActivity extends AppCompatActivity
                         mIsLoggedIn = true;
                         MapActivity.this.userName = result.userData.userName;
                         MapActivity.this.password = result.userData.password;
+                        RVCloudSync.getInstance().startDataSync(userName, password, MapActivity.this);
                         break;
 
                     case STATUS_401_UNAUTHORIZED:
@@ -133,8 +134,12 @@ public class MapActivity extends AppCompatActivity
                 }
 
                 refreshLoginButton();
+            }
 
-
+            @Override
+            public void postDataSynchronized() {
+                // TODO: 2017/05/17  postDataSynchronized
+                RVData.getInstance().saveData(MapActivity.this, null);
             }
         }, new Handler());
 

@@ -26,7 +26,7 @@ public class DataList<T extends DataItem> implements Iterable<T>{
 
     }
 
-    public void setOrAdd(T data) {
+    synchronized public void setOrAdd(T data) {
 
         if (contains(data)) {
             list.set(indexOf(data), data);
@@ -35,13 +35,13 @@ public class DataList<T extends DataItem> implements Iterable<T>{
         }
     }
 
-    public void addList(ArrayList<T> list) {
+    synchronized public void addList(ArrayList<T> list) {
         for (T item : list) {
             setOrAdd(item);
         }
     }
 
-    public void removeList(ArrayList<T> list) {
+    synchronized public void removeList(ArrayList<T> list) {
         this.list.removeAll(list);
     }
 
@@ -78,7 +78,7 @@ public class DataList<T extends DataItem> implements Iterable<T>{
         RVData.getInstance().deletedList.onDelete(data);
     }
 
-    public void deleteAll(ArrayList<T> dataList) {
+    synchronized public void deleteAll(ArrayList<T> dataList) {
         for ( T data : dataList ) {
             delete(data);
         }
@@ -121,10 +121,6 @@ public class DataList<T extends DataItem> implements Iterable<T>{
         return list;
     }
 
-    private void add(T item) {
-        list.add(item);
-    }
-
     public int size() {
 
         return list.size();
@@ -163,7 +159,7 @@ public class DataList<T extends DataItem> implements Iterable<T>{
         return searchResultItems;
     }
 
-    public ArrayList<T> getListLaterThanTime(long dataTimeInMills) {
+    synchronized public ArrayList<T> getListLaterThanTime(long dataTimeInMills) {
         ArrayList<T> laterList = new ArrayList<>();
         for ( T data : list ) {
             if (data.getUpdatedAt().getTimeInMillis() >= dataTimeInMills) {

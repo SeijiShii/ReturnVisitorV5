@@ -162,7 +162,7 @@ public class RVData {
         }
     }
 
-    private void setFromRecordArray(JSONArray jsonArray) {
+    public void setFromRecordArray(JSONArray jsonArray) {
         for ( int i = 0 ; i < jsonArray.length() ; i++ ) {
 
             try {
@@ -387,8 +387,7 @@ public class RVData {
         return visitList.getList().size() > 0 || workList.getList().size() > 0;
     }
 
-    public final String DATA_LIST_LATER_THAN_TIME = "data_list_later_than_time";
-    public JSONObject getJSONDataLaterThanTime(long dateTimeInMills) {
+    public JSONArray getJSONArrayLaterThanTime(long dateTimeInMills) {
 
         JSONArray array = new JSONArray();
 
@@ -420,14 +419,7 @@ public class RVData {
             array.put(new Record(item).getFullJSON());
         }
 
-        JSONObject object = new JSONObject();
-
-        try {
-            object.put(DATA_LIST_LATER_THAN_TIME, array);
-        } catch (JSONException e) {
-            Log.e(TAG, e.getMessage());
-        }
-        return object;
+        return array;
     }
 
 }
