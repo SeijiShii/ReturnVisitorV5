@@ -271,6 +271,8 @@ public class RVCloudSync extends WebSocketAdapter{
         }
     }
 
+
+
     public interface RVCloudSyncCallback {
 
         void onLoginResult(LoginResult result);

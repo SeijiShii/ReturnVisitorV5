@@ -140,6 +140,8 @@ public class MapActivity extends AppCompatActivity
             public void postDataSynchronized() {
                 // TODO: 2017/05/17  postDataSynchronized
                 RVData.getInstance().saveData(MapActivity.this, null);
+                saveLastSyncTime();
+
             }
         }, new Handler());
 
@@ -160,6 +162,14 @@ public class MapActivity extends AppCompatActivity
 
         loadLoginState();
 
+    }
+
+    private void saveLastSyncTime() {
+        SharedPreferences prefs
+                = getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putLong(Constants.SharedPrefTags.LAST_DEVICE_SYNC_TIME, Calendar.getInstance().getTimeInMillis());
+        editor.apply();
     }
 
     private boolean isDataLoaded = false;
