@@ -7,12 +7,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.neovisionaries.ws.client.WebSocket;
-import com.neovisionaries.ws.client.WebSocketAdapter;
-import com.neovisionaries.ws.client.WebSocketException;
-import com.neovisionaries.ws.client.WebSocketFactory;
-import com.neovisionaries.ws.client.WebSocketFrame;
-
 import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 
@@ -22,6 +16,8 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +29,7 @@ import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.LAST_DEVICE_S
  * Created by SeijiShii on 2017/05/10.
  */
 
-public class RVCloudSync extends WebSocketAdapter{
+public class RVCloudSync {
 
     public static final String TAG = "RVCloudSync";
 
@@ -78,6 +74,7 @@ public class RVCloudSync extends WebSocketAdapter{
     private RVCloudSyncCallback mCallback;
     private Handler mHandler;
 
+    private RVWebSocketClient socketClient;
 //    private UserData userData;
 
     public static RVCloudSync getInstance() {
@@ -89,54 +86,92 @@ public class RVCloudSync extends WebSocketAdapter{
         mHandler = handler;
     }
 
-    private WebSocket webSocket;
+//    private WebSocket webSocket;
     private RVCloudSync() {}
 
     public void startSendingUserData(@Nullable String userName,
                                      @Nullable String password,
-                                     final RVCloudSyncMethod method) throws RVCloudSyncException{
+                                     final RVCloudSyncMethod method,
+                                     Context context) throws RVCloudSyncException{
         if (userName == null || password == null)
             return;
 
         if (mCallback == null)
             throw new RVCloudSyncException();
 
-        createWebSocketIfNeeded();
+        try {
+            if (socketClient == null) {
+                socketClient = new RVWebSocketClient(new URI(ROOT_URL), context) {
+                    @Override
+                    public void onMessage(String s) {
 
-        if (webSocket == null)
+                        try {
+                            JSONObject object = new JSONObject(s);
+                            RVCloudSyncMethod method = RVCloudSyncMethod.valueOf(object.getString(METHOD));
+                            LoginStatus status = LoginStatus.valueOf(object.getString(STATE));
+                            UserData userData = new UserData(object.getJSONObject(USER_DATA));
+
+                            JSONArray loadedArray = new JSONArray();
+                            if (object.has(LOADED_DATA_ARRAY))
+                                loadedArray = object.getJSONArray(Constants.LOADED_DATA_ARRAY);
+
+                            final LoginResult result = new LoginResult(userData, status);
+
+                            switch (method) {
+                                case LOGIN:
+                                case CREATE_USER:
+                                    mHandler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            mCallback.onLoginResult(result);
+                                        }
+                                    });
+                                    break;
+
+                                case SYNC_DATA:
+                                    RVData.getInstance().setFromRecordArray(loadedArray);
+                                    mCallback.postDataSynchronized();
+                                    break;
+                            }
+                        } catch (JSONException e) {
+                            Log.e(TAG, e.getMessage());
+                        }
+                    }
+                };
+            }
+        } catch (URISyntaxException e) {
+            Log.e(TAG, e.getMessage());
+        }
+
+        if (socketClient == null)
             return;
+
 
         final UserData userData = new UserData(userName, password);
 
-        if (webSocket.isOpen()) {
-            sendUserData(userData, method);
+        if (socketClient.isOpen()) {
+            sendUserData(userData, RVCloudSyncMethod.LOGIN);
         } else {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    try {
-                        webSocket.connect();
-
-                        int timeCounter = 0;
-                        while (!webSocket.isOpen()) {
-                            try {
-                                Thread.sleep(50);
-                                timeCounter += 50;
-                                if (timeCounter > 50000) {
-                                    postErrorResult(LoginStatus.REQUEST_TIME_OUT);
-                                    return;
-                                }
-                            } catch (InterruptedException e ) {
-                                Log.e(TAG, e.getMessage());
+                    int timeCounter = 0;
+                    while (!socketClient.isOpen()) {
+                        try {
+                            Thread.sleep(50);
+                            timeCounter += 50;
+                            if (timeCounter > 50000) {
+                                postErrorResult(LoginStatus.REQUEST_TIME_OUT);
+                                return;
                             }
+                        } catch (InterruptedException e ) {
+                            Log.e(TAG, e.getMessage());
                         }
-                        sendUserData(userData, method);
-                    }catch (WebSocketException e) {
-                        postErrorResult(LoginStatus.SERVER_NOT_AVAILABLE);
-                        Log.e(TAG, e.getMessage());
                     }
+                    sendUserData(userData, RVCloudSyncMethod.LOGIN);
                 }
             }).start();
+            socketClient.connect();
 
         }
     }
@@ -159,7 +194,7 @@ public class RVCloudSync extends WebSocketAdapter{
         } catch (JSONException e) {
             Log.e(TAG, e.getMessage());
         }
-        webSocket.sendText(object.toString());
+            socketClient.send(object.toString());
         }
     }
 
@@ -174,102 +209,32 @@ public class RVCloudSync extends WebSocketAdapter{
                 lastSyncTime,
                 RVData.getInstance().getJSONArrayLaterThanTime(lastSyncTime));
 
-        if (webSocket.isOpen()) {
-            webSocket.sendText(syncData.jsonObject().toString());
+        if (socketClient.isOpen()) {
+            socketClient.send(syncData.jsonObject().toString());
         } else {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    try {
-                        webSocket.connect();
-
-                        int timeCounter = 0;
-                        while (!webSocket.isOpen()) {
-                            try {
-                                Thread.sleep(50);
-                                timeCounter += 50;
-                                if (timeCounter > 50000) {
-                                    postErrorResult(LoginStatus.REQUEST_TIME_OUT);
-                                    return;
-                                }
-                            } catch (InterruptedException e) {
-                                Log.e(TAG, e.getMessage());
+                    int timeCounter = 0;
+                    while (!socketClient.isOpen()) {
+                        try {
+                            Thread.sleep(50);
+                            timeCounter += 50;
+                            if (timeCounter > 50000) {
+                                postErrorResult(LoginStatus.REQUEST_TIME_OUT);
+                                return;
                             }
+                        } catch (InterruptedException e ) {
+                            Log.e(TAG, e.getMessage());
                         }
-                        webSocket.sendText(syncData.jsonObject().toString());
-                    } catch (WebSocketException e) {
-                        postErrorResult(LoginStatus.SERVER_NOT_AVAILABLE);
-                        Log.e(TAG, e.getMessage());
                     }
+                    socketClient.send(syncData.jsonObject().toString());
                 }
             }).start();
+            socketClient.connect();
         }
     }
 
-
-    private void createWebSocketIfNeeded() {
-        if (webSocket == null) {
-            final WebSocketFactory factory = new WebSocketFactory();
-            try {
-
-                webSocket = factory.createSocket(ROOT_URL, 5000);
-                webSocket.addListener(RVCloudSync.this);
-
-            } catch (SocketTimeoutException  e ) {
-                Log.e(TAG, e.getMessage());
-                postErrorResult(LoginStatus.REQUEST_TIME_OUT);
-            } catch (IOException e) {
-                Log.e(TAG, e.getMessage());
-            }
-        }
-    }
-
-    @Override
-    public void onConnected(WebSocket websocket, Map<String, List<String>> headers) throws Exception {
-        super.onConnected(websocket, headers);
-
-        webSocket = websocket;
-    }
-
-    @Override
-    public void onTextFrame(WebSocket websocket, WebSocketFrame frame) throws Exception {
-        super.onTextFrame(websocket, frame);
-
-        String data = frame.getPayloadText();
-        JSONObject object = new JSONObject(data);
-
-        try {
-
-            RVCloudSyncMethod method = RVCloudSyncMethod.valueOf(object.getString(METHOD));
-            LoginStatus status = LoginStatus.valueOf(object.getString(STATE));
-            UserData userData = new UserData(object.getJSONObject(USER_DATA));
-
-            JSONArray loadedArray = new JSONArray();
-            if (object.has(LOADED_DATA_ARRAY))
-                loadedArray = object.getJSONArray(Constants.LOADED_DATA_ARRAY);
-
-            final LoginResult result = new LoginResult(userData, status);
-
-            switch (method) {
-                case LOGIN:
-                case CREATE_USER:
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mCallback.onLoginResult(result);
-                        }
-                    });
-                    break;
-
-                case SYNC_DATA:
-                    RVData.getInstance().setFromRecordArray(loadedArray);
-                    mCallback.postDataSynchronized();
-                    break;
-            }
-        } catch (JSONException e) {
-            Log.e(TAG, e.getMessage());
-        }
-    }
 
 
 
