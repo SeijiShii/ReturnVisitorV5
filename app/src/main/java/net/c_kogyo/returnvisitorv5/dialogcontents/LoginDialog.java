@@ -236,8 +236,7 @@ public class LoginDialog extends FrameLayout {
                 RVCloudSync.getInstance()
                         .startSendingUserData(userName,
                                                 password,
-                                                RVCloudSync.RVCloudSyncMethod.LOGIN,
-                                                getContext());
+                                                RVCloudSync.RVCloudSyncMethod.LOGIN);
                 messageTextView.setText(R.string.start_login);
 
                 if (mListener != null) {
@@ -277,8 +276,7 @@ public class LoginDialog extends FrameLayout {
                 RVCloudSync.getInstance().
                         startSendingUserData(userName,
                                                 password,
-                                                RVCloudSync.RVCloudSyncMethod.CREATE_USER,
-                                                getContext());
+                                                RVCloudSync.RVCloudSyncMethod.CREATE_USER);
                 messageTextView.setText(R.string.start_create_user);
 
                 if (mListener != null) {

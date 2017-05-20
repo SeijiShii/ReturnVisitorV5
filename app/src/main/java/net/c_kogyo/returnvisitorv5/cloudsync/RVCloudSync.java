@@ -15,36 +15,15 @@ import com.neovisionaries.ws.client.WebSocketFrame;
 
 import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.data.RVData;
-import net.c_kogyo.returnvisitorv5.util.KeyStoreUtil;
-import net.c_kogyo.returnvisitorv5.util.NaiveSSLContext;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Map;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLEngine;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509ExtendedTrustManager;
-import javax.net.ssl.X509TrustManager;
 
 import static net.c_kogyo.returnvisitorv5.Constants.DATA_ARRAY_LATER_THAN_TIME;
 import static net.c_kogyo.returnvisitorv5.Constants.LOADED_DATA_ARRAY;
@@ -93,7 +72,7 @@ public class RVCloudSync extends WebSocketAdapter{
 //    public static final int UNAUTHORIZED    = 401;
 //    public static final int NOT_FOUND       = 404;
 
-    private final String ROOT_URL = "https://192.168.3.4:1337";
+    private final String ROOT_URL = "http://192.168.3.4:1337";
 
     private static RVCloudSync instance = new RVCloudSync();
     private RVCloudSyncCallback mCallback;
@@ -115,15 +94,14 @@ public class RVCloudSync extends WebSocketAdapter{
 
     public void startSendingUserData(@Nullable String userName,
                                      @Nullable String password,
-                                     final RVCloudSyncMethod method,
-                                     Context context) throws RVCloudSyncException{
+                                     final RVCloudSyncMethod method) throws RVCloudSyncException{
         if (userName == null || password == null)
             return;
 
         if (mCallback == null)
             throw new RVCloudSyncException();
 
-        createWebSocketIfNeeded(context);
+        createWebSocketIfNeeded();
 
         if (webSocket == null)
             return;
@@ -191,8 +169,6 @@ public class RVCloudSync extends WebSocketAdapter{
                 = context.getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, Context.MODE_PRIVATE);
         long lastSyncTime = prefs.getLong(LAST_DEVICE_SYNC_TIME, 0);
 
-        createWebSocketIfNeeded(context);
-
         final SyncData syncData
                 = new SyncData(new UserData(userName, password),
                 lastSyncTime,
@@ -231,22 +207,10 @@ public class RVCloudSync extends WebSocketAdapter{
     }
 
 
-    private void createWebSocketIfNeeded(Context context) {
+    private void createWebSocketIfNeeded() {
         if (webSocket == null) {
             final WebSocketFactory factory = new WebSocketFactory();
-
             try {
-
-                TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-                KeyStore keyStore = KeyStoreUtil.getEmptyKeyStore();
-                KeyStoreUtil.loadX509Certificate(keyStore, context.getAssets().open("server.crt"));
-                trustManagerFactory.init(keyStore);
-                SSLContext sslContext = SSLContext.getInstance("TLS");
-                sslContext.init(null, trustManagerFactory.getTrustManagers(), new SecureRandom());
-
-//                SSLContext sslContext = NaiveSSLContext.getInstance("TLS");
-
-                factory.setSSLContext(sslContext);
 
                 webSocket = factory.createSocket(ROOT_URL, 5000);
                 webSocket.addListener(RVCloudSync.this);
@@ -254,12 +218,7 @@ public class RVCloudSync extends WebSocketAdapter{
             } catch (SocketTimeoutException  e ) {
                 Log.e(TAG, e.getMessage());
                 postErrorResult(LoginStatus.REQUEST_TIME_OUT);
-            } catch (IOException
-                    | NoSuchAlgorithmException
-                    | CertificateException
-                    | KeyStoreException
-                    | KeyManagementException
-                    e) {
+            } catch (IOException e) {
                 Log.e(TAG, e.getMessage());
             }
         }

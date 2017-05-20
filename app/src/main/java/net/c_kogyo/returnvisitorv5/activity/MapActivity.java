@@ -1440,10 +1440,7 @@ public class MapActivity extends AppCompatActivity
 
         if (mIsLoggedIn){
             try {
-                RVCloudSync.getInstance().startSendingUserData(userName,
-                        password,
-                        RVCloudSync.RVCloudSyncMethod.LOGIN,
-                        this);
+                RVCloudSync.getInstance().startSendingUserData(userName, password, RVCloudSync.RVCloudSyncMethod.LOGIN);
             } catch (RVCloudSync.RVCloudSyncException e){
                 Log.e(RVCloudSync.TAG, e.getMessage());
             }
