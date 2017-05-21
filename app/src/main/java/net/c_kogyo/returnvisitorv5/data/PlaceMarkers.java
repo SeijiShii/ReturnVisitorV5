@@ -34,15 +34,16 @@ public class PlaceMarkers {
     public PlaceMarkers(GoogleMap map) {
 
         this.mMap = map;
-        this.markers = new ArrayList<>();
 
         drawAllMarkers();
     }
 
     public void drawAllMarkers() {
 
-        for (PlaceMarker marker : this.markers) {
-            marker.marker.remove();
+        if (this.markers != null) {
+            for (PlaceMarker marker : this.markers) {
+                marker.marker.remove();
+            }
         }
 
         this.markers = new ArrayList<>();
@@ -110,8 +111,8 @@ public class PlaceMarkers {
         PlaceMarker marker = getPlaceMarkerByPlace(place);
         if (marker == null) return;
 
-        markers.remove(marker);
         marker.marker.remove();
+        markers.remove(marker);
     }
 
 }
