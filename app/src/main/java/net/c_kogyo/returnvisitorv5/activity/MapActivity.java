@@ -1514,6 +1514,7 @@ public class MapActivity extends AppCompatActivity
 
             case STATUS_200_SYNC_OK:
                 saveLastSyncTime();
+                placeMarkers.drawAllMarkers();
                 break;
 
             case STATUS_202_AUTHENTICATED:

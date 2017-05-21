@@ -33,10 +33,20 @@ public class PlaceMarkers {
 
     public PlaceMarkers(GoogleMap map) {
 
-        this.markers = new ArrayList<>();
         this.mMap = map;
+        this.markers = new ArrayList<>();
 
-        mMap.clear();
+        drawAllMarkers();
+    }
+
+    public void drawAllMarkers() {
+
+        for (PlaceMarker marker : this.markers) {
+            marker.marker.remove();
+        }
+
+        this.markers = new ArrayList<>();
+
         for (Place place : RVData.getInstance().placeList) {
 
             if (place.getCategory() != Place.Category.ROOM) {
