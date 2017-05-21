@@ -202,7 +202,7 @@ public class WorkFragment extends Fragment {
                     @Override
                     public void onAnimationEnd(Animator animation) {
                         RVData.getInstance().visitList.deleteById(visitCell1.getVisit().getId());
-                        RVData.getInstance().saveData(getContext(), null);
+                        RVData.getInstance().saveData(getContext());
                         container.removeView(visitCell1);
                     }
 
@@ -288,7 +288,7 @@ public class WorkFragment extends Fragment {
                         removeVisitCells(visitsAdded);
                         addVisitCells(visitsRemoved);
 
-                        RVData.getInstance().saveData(getContext(), null);
+                        RVData.getInstance().saveData(getContext());
 
                     }
 

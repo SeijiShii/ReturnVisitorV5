@@ -32,6 +32,7 @@ import android.widget.LinearLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -83,7 +84,8 @@ public class MapActivity extends AppCompatActivity
                                         GoogleMap.OnMapLongClickListener,
                                         GoogleMap.OnMarkerClickListener,
                                         GoogleMap.OnMarkerDragListener,
-                                        RVData.RVDataStoreCallback{
+                                        RVData.RVDataCallback,
+                                        RVCloudSync.RVCloudSyncCallback {
 
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
 
@@ -96,66 +98,21 @@ public class MapActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setContentView(R.layout.map_activity);
+        initWaitScreen();
+        initLogoButton();
+
 //        loginDialogHandler = new Handler();
-        RVCloudSync.getInstance().setCallback(new RVCloudSync.RVCloudSyncCallback() {
-            @Override
-            public void onLoginResult(RVCloudSync.LoginResult result) {
-
-                switch (result.statusCode) {
-                    case STATUS_202_AUTHENTICATED:
-                    case STATUS_201_CREATED:
-                        mIsLoggedIn = true;
-                        MapActivity.this.userName = result.userData.userName;
-                        MapActivity.this.password = result.userData.password;
-                        RVCloudSync.getInstance().startDataSync(userName, password, MapActivity.this);
-                        break;
-
-                    case STATUS_401_UNAUTHORIZED:
-                    case STATUS_404_NOT_FOUND:
-                    case STATUS_400_DUPLICATE_USER_NAME:
-                    case STATUS_400_SHORT_PASSWORD:
-                    case STATUS_400_SHORT_USER_NAME:
-
-                    case REQUEST_TIME_OUT:
-                    case SERVER_NOT_AVAILABLE:
-                        mIsLoggedIn = false;
-                        break;
-                }
-
-                if (loginDialog != null) {
-                    loginDialog.onLoginResult(result);
-                    dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
-                        @Override
-                        public boolean onTouch(View v, MotionEvent event) {
-                            fadeOutDialogOverlay(normalFadeOutListener);
-                            return true;
-                        }
-                    });
-                }
-
-                refreshLoginButton();
-            }
-
-            @Override
-            public void postDataSynchronized() {
-                // TODO: 2017/05/17  postDataSynchronized
-                RVData.getInstance().saveData(MapActivity.this, null);
-                saveLastSyncTime();
-
-            }
-        }, new Handler());
+        RVCloudSync.getInstance().setCallback(this, new Handler());
 
         // 初期化のために一回ゲットする
-        RVData.getInstance().loadData(this, this);
+        RVData.getInstance().setRVDataCallback(this, new Handler());
+        RVData.getInstance().loadData(this);
 
         initLocalBroadcast();
 
-        setContentView(R.layout.map_activity);
-
         AdMobHelper.setAdView(this);
 
-        initWaitScreen();
-        initLogoButton();
         initMapView(savedInstanceState);
         initDialogOverlay();
         initDrawerOverlay();
@@ -173,15 +130,6 @@ public class MapActivity extends AppCompatActivity
     }
 
     private boolean isDataLoaded = false;
-    @Override
-    public void onDataLoaded() {
-        isDataLoaded = true;
-    }
-
-    @Override
-    public void onDataSaved() {
-
-    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -580,7 +528,7 @@ public class MapActivity extends AppCompatActivity
         place.setLatLng(marker.getPosition());
         place.setAddress(null);
 
-        RVData.getInstance().saveData(this, null);
+        RVData.getInstance().saveData(this);
 
     }
 
@@ -733,7 +681,7 @@ public class MapActivity extends AppCompatActivity
                                 fadeOutDialogOverlay(normalFadeOutListener);
                                 placeMarkers.removeByPlace(place);
                                 RVData.getInstance().placeList.deleteById(place.getId());
-                                RVData.getInstance().saveData(MapActivity.this, null);
+                                RVData.getInstance().saveData(MapActivity.this);
                             }
 
                             @Override
@@ -840,7 +788,7 @@ public class MapActivity extends AppCompatActivity
                                 fadeOutDialogOverlay(normalFadeOutListener);
                                 placeMarkers.removeByPlace(housingComplex);
                                 RVData.getInstance().placeList.deleteById(housingComplex.getId());
-                                RVData.getInstance().saveData(MapActivity.this, null);
+                                RVData.getInstance().saveData(MapActivity.this);
                             }
                         }, true, true);
         fadeInDialogOverlay(housingComplexDialog);
@@ -896,7 +844,7 @@ public class MapActivity extends AppCompatActivity
         visit.setPriority(Visit.Priority.NOT_HOME);
         RVData.getInstance().placeList.setOrAdd(place);
         RVData.getInstance().visitList.setOrAdd(visit);
-        RVData.getInstance().saveData(this, null);
+        RVData.getInstance().saveData(this);
 
         placeMarkers.addMarker(place);
     }
@@ -1227,7 +1175,7 @@ public class MapActivity extends AppCompatActivity
     private void startWorkPagerActivityWithNewWork(Work work) {
 
         RVData.getInstance().workList.setOrAdd(work);
-        RVData.getInstance().saveData(this, null);
+        RVData.getInstance().saveData(this);
 
         Intent withNewWorkIntent = new Intent(this, WorkPagerActivity.class);
         withNewWorkIntent.setAction(Constants.WorkPagerActivityActions.START_WITH_NEW_WORK);
@@ -1242,13 +1190,67 @@ public class MapActivity extends AppCompatActivity
     private RelativeLayout waitScreen;
     private void initWaitScreen() {
         waitScreen = (RelativeLayout) findViewById(R.id.wait_screen);
-        waitScreen.setVisibility(View.VISIBLE);
-        waitScreen.setOnTouchListener(new View.OnTouchListener() {
+        waitScreen.setAlpha(0f);
+        initWaitMessageText();
+    }
+
+    private void enableWaitScreen(final boolean enabled) {
+
+        float origin, target;
+
+        if (enabled) {
+            origin = 0f;
+            target = 1f;
+            waitScreen.setVisibility(View.VISIBLE);
+            waitScreen.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    return true;
+                }
+            });
+        } else {
+            origin = 1f;
+            target = 0f;
+            waitScreen.setOnTouchListener(null);
+        }
+
+        ValueAnimator animator = ValueAnimator.ofFloat(origin, target);
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return true;
+            public void onAnimationUpdate(ValueAnimator animation) {
+                waitScreen.setAlpha((float) animation.getAnimatedValue());
             }
         });
+        animator.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                if (!enabled) {
+                    waitScreen.setVisibility(View.INVISIBLE);
+                }
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        animator.setDuration(500);
+        animator.start();
+    }
+
+    private TextView waitMessageText;
+    private void initWaitMessageText() {
+        waitMessageText = (TextView) findViewById(R.id.wait_message_text);
     }
 
     private void fadeoutWaitScreen() {
@@ -1451,6 +1453,103 @@ public class MapActivity extends AppCompatActivity
 
     }
 
+    // TODO: 2017/05/21 データロード中、同期中の表示
+    // TODO: 2017/05/21 同期結果の表示
 
+    // RVDataCallback implementation
+    @Override
+    public void onStartSavingData() {
+        enableWaitScreen(true);
+        waitMessageText.setText(R.string.saving);
+    }
 
+    @Override
+    public void onFinishSavingData() {
+        enableWaitScreen(false);
+        waitMessageText.setText("");
+    }
+
+    @Override
+    public void onStartLoadingData() {
+        enableWaitScreen(true);
+        waitMessageText.setText(R.string.loading);
+    }
+
+    @Override
+    public void onFinishLoadingData() {
+        refreshLogoButton();
+        isDataLoaded = true;
+        enableWaitScreen(false);
+        waitMessageText.setText("");
+    }
+
+    // RVCloudSync Implementation
+    @Override
+    public void onStartRequest(RVCloudSync.RVCloudSyncMethod method) {
+        if (loginDialog != null) {
+            enableWaitScreen(true);
+            switch (method) {
+                case LOGIN:
+                    waitMessageText.setText(R.string.start_login);
+                    break;
+                case CREATE_USER:
+                    waitMessageText.setText(R.string.creating_user);
+                    break;
+                case SYNC_DATA:
+                    waitMessageText.setText(R.string.on_sync);
+                    break;
+            }
+        }
+    }
+
+    @Override
+    public void onRequestResult(RVCloudSync.RequestResult result) {
+
+        if (loginDialog != null) {
+            enableWaitScreen(false);
+        }
+        waitMessageText.setText("");
+
+        switch (result.statusCode) {
+
+            case STATUS_200_SYNC_OK:
+                saveLastSyncTime();
+                break;
+
+            case STATUS_202_AUTHENTICATED:
+            case STATUS_201_CREATED:
+                mIsLoggedIn = true;
+                MapActivity.this.userName = result.userData.userName;
+                MapActivity.this.password = result.userData.password;
+                RVCloudSync.getInstance().startDataSync(userName, password, MapActivity.this);
+                break;
+
+            case STATUS_401_UNAUTHORIZED:
+            case STATUS_404_NOT_FOUND:
+            case STATUS_400_DUPLICATE_USER_NAME:
+            case STATUS_400_SHORT_PASSWORD:
+            case STATUS_400_SHORT_USER_NAME:
+
+            case REQUEST_TIME_OUT:
+            case SERVER_NOT_AVAILABLE:
+                mIsLoggedIn = false;
+                break;
+        }
+
+        if (loginDialog != null) {
+            loginDialog.onLoginResult(result);
+            dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    fadeOutDialogOverlay(normalFadeOutListener);
+                    return true;
+                }
+            });
+        }
+
+        refreshLoginButton();
+        refreshWorkButton();
+        refreshCalendarButton();
+
+    }
 }

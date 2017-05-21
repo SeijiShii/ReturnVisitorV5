@@ -657,7 +657,7 @@ public class RecordVisitActivity extends AppCompatActivity {
                         break;
                 }
 
-                RVData.getInstance().saveData(getApplicationContext(), null);
+                RVData.getInstance().saveData(getApplicationContext());
                 finish();
 
             }

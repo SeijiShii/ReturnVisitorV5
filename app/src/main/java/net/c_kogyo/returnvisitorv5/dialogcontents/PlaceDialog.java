@@ -154,7 +154,7 @@ public class PlaceDialog extends FrameLayout {
                                     @Override
                                     public void onAnimationEnd(Animator animation) {
                                         RVData.getInstance().visitList.deleteById(visitCell.getVisit().getId());
-                                        RVData.getInstance().saveData(getContext(), null);
+                                        RVData.getInstance().saveData(getContext());
                                         notifyDataSetChanged();
 
                                     }

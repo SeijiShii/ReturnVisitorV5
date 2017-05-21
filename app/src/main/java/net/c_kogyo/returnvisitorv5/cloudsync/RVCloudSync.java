@@ -14,12 +14,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Map;
 
 import static net.c_kogyo.returnvisitorv5.Constants.DATA_ARRAY_LATER_THAN_TIME;
 import static net.c_kogyo.returnvisitorv5.Constants.LOADED_DATA_ARRAY;
@@ -48,9 +44,9 @@ public class RVCloudSync {
         SYNC_DATA,
     }
 
-    public enum LoginStatus {
+    public enum ResultStatus {
 
-        STATUS_200_OK,
+        STATUS_200_SYNC_OK,
         STATUS_201_CREATED,
         STATUS_202_AUTHENTICATED,
         STATUS_400_DUPLICATE_USER_NAME,
@@ -99,6 +95,8 @@ public class RVCloudSync {
         if (mCallback == null)
             throw new RVCloudSyncException();
 
+        mCallback.onStartRequest(method);
+
         try {
             if (socketClient == null) {
                 socketClient = new RVWebSocketClient(new URI(ROOT_URL), context) {
@@ -108,14 +106,14 @@ public class RVCloudSync {
                         try {
                             JSONObject object = new JSONObject(s);
                             RVCloudSyncMethod method = RVCloudSyncMethod.valueOf(object.getString(METHOD));
-                            LoginStatus status = LoginStatus.valueOf(object.getString(STATE));
+                            ResultStatus status = ResultStatus.valueOf(object.getString(STATE));
                             UserData userData = new UserData(object.getJSONObject(USER_DATA));
 
                             JSONArray loadedArray = new JSONArray();
                             if (object.has(LOADED_DATA_ARRAY))
                                 loadedArray = object.getJSONArray(Constants.LOADED_DATA_ARRAY);
 
-                            final LoginResult result = new LoginResult(userData, status);
+                            final RequestResult result = new RequestResult(userData, status);
 
                             switch (method) {
                                 case LOGIN:
@@ -123,14 +121,19 @@ public class RVCloudSync {
                                     mHandler.post(new Runnable() {
                                         @Override
                                         public void run() {
-                                            mCallback.onLoginResult(result);
+                                            mCallback.onRequestResult(result);
                                         }
                                     });
                                     break;
 
                                 case SYNC_DATA:
                                     RVData.getInstance().setFromRecordArray(loadedArray);
-                                    mCallback.postDataSynchronized();
+                                    mHandler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            mCallback.onRequestResult(result);
+                                        }
+                                    });
                                     break;
                             }
                         } catch (JSONException e) {
@@ -161,7 +164,7 @@ public class RVCloudSync {
                             Thread.sleep(50);
                             timeCounter += 50;
                             if (timeCounter > 50000) {
-                                postErrorResult(LoginStatus.REQUEST_TIME_OUT);
+                                postErrorResult(ResultStatus.REQUEST_TIME_OUT);
                                 return;
                             }
                         } catch (InterruptedException e ) {
@@ -176,11 +179,11 @@ public class RVCloudSync {
         }
     }
 
-    private void postErrorResult(final LoginStatus status) {
+    private void postErrorResult(final ResultStatus status) {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                mCallback.onLoginResult(new LoginResult(new UserData(null, null), status));
+                mCallback.onRequestResult(new RequestResult(new UserData(null, null), status));
             }
         });
     }
@@ -199,6 +202,8 @@ public class RVCloudSync {
     }
 
     public void startDataSync(@Nullable String userName, @Nullable String password, Context context) {
+
+        mCallback.onStartRequest(RVCloudSyncMethod.SYNC_DATA);
 
         SharedPreferences prefs
                 = context.getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, Context.MODE_PRIVATE);
@@ -221,7 +226,7 @@ public class RVCloudSync {
                             Thread.sleep(50);
                             timeCounter += 50;
                             if (timeCounter > 50000) {
-                                postErrorResult(LoginStatus.REQUEST_TIME_OUT);
+                                postErrorResult(ResultStatus.REQUEST_TIME_OUT);
                                 return;
                             }
                         } catch (InterruptedException e ) {
@@ -235,14 +240,11 @@ public class RVCloudSync {
         }
     }
 
-
-
-
     public interface RVCloudSyncCallback {
 
-        void onLoginResult(LoginResult result);
+        void onStartRequest(RVCloudSyncMethod method);
 
-        void postDataSynchronized();
+        void onRequestResult(RequestResult result);
 
     }
 
@@ -285,11 +287,11 @@ public class RVCloudSync {
         }
     }
 
-    public class LoginResult {
+    public class RequestResult {
         public UserData userData;
-        public LoginStatus statusCode;
+        public ResultStatus statusCode;
 
-        private LoginResult(UserData userData, LoginStatus statusCode) {
+        private RequestResult(UserData userData, ResultStatus statusCode) {
             this.userData = userData;
             this.statusCode = statusCode;
         }

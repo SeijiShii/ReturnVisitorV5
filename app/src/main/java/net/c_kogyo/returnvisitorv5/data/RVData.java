@@ -2,6 +2,8 @@ package net.c_kogyo.returnvisitorv5.data;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import net.c_kogyo.returnvisitorv5.data.list.DataList;
@@ -55,6 +57,7 @@ public class RVData {
     public DeletedList deletedList;
 
     private RVDataCallback mCallback;
+    private Handler mHandler;
 
     private static RVData instance = new RVData();
     private RVData() {
@@ -75,8 +78,9 @@ public class RVData {
 
     public static RVData getInstance() {return instance;}
 
-    public void setRVDataCallback(RVDataCallback rvDataCallback) {
+    public void setRVDataCallback(@NonNull RVDataCallback rvDataCallback, @NonNull Handler handler) {
         mCallback = rvDataCallback;
+        mHandler = handler;
     }
 
     public void saveData(Context context){
@@ -98,13 +102,33 @@ public class RVData {
         protected Void doInBackground(Void... voids) {
 
             if (mCallback != null) {
-                mCallback.onStartLoadingData();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mCallback.onStartLoadingData();
+                            }
+                        });
+                    }
+                }).start();
             }
 
             jsonToData(stringToJson(loadStringFromFile()));
 
             if (mCallback != null) {
-                mCallback.onFinishLoadingData();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mCallback.onFinishLoadingData();
+                            }
+                        });
+                    }
+                }).start();
             }
 
             return null;
@@ -221,7 +245,17 @@ public class RVData {
         protected Void doInBackground(Void... voids) {
 
             if (mCallback != null) {
-                mCallback.onStartSavingData();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mCallback.onStartSavingData();
+                            }
+                        });
+                    }
+                }).start();
             }
 
             // 他のインスタンスがデータの書き込み中だったら待つ
@@ -243,7 +277,17 @@ public class RVData {
             isDataSaving = false;
 
             if (mCallback != null) {
-                mCallback.onFinishSavingData();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mCallback.onFinishSavingData();
+                            }
+                        });
+                    }
+                }).start();
             }
             return null;
         }

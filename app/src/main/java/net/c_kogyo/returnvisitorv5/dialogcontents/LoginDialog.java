@@ -279,7 +279,7 @@ public class LoginDialog extends FrameLayout {
                                                 password,
                                                 RVCloudSync.RVCloudSyncMethod.CREATE_USER,
                                                 getContext());
-                messageTextView.setText(R.string.start_create_user);
+                messageTextView.setText(R.string.creating_user);
 
                 if (mListener != null) {
                     mListener.onStartCreateAccount();
@@ -329,8 +329,8 @@ public class LoginDialog extends FrameLayout {
 
     }
 
-    public void onLoginResult(RVCloudSync.LoginResult result){
-        // DONE: 2017/05/11  onLoginResult(RVCloudSync.LoginStatus statusCode)
+    public void onLoginResult(RVCloudSync.RequestResult result){
+        // DONE: 2017/05/11  onRequestResult(RVCloudSync.ResultStatus statusCode)
 
         progressBar.setVisibility(INVISIBLE);
         enableCloseButton(true);

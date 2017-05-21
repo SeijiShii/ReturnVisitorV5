@@ -151,7 +151,7 @@ public class TagDialog extends FrameLayout {
                 mAdapter.notifyDataSetChanged();
                 setListViewHeight();
 
-                RVData.getInstance().saveData(getContext(), null);
+                RVData.getInstance().saveData(getContext());
             }
         });
     }
@@ -276,7 +276,7 @@ public class TagDialog extends FrameLayout {
 
                     setListViewHeight();
 
-                    RVData.getInstance().saveData(getContext(), null);
+                    RVData.getInstance().saveData(getContext());
                 }
             });
             return view;

@@ -575,7 +575,7 @@ public class CalendarPagerActivity extends AppCompatActivity {
     private void startWorkPagerActivityWithNewWork(Work work) {
 
         RVData.getInstance().workList.setOrAdd(work);
-        RVData.getInstance().saveData(this, null);
+        RVData.getInstance().saveData(this);
 
         Intent withNewWorkIntent = new Intent(this, WorkPagerActivity.class);
         withNewWorkIntent.setAction(Constants.WorkPagerActivityActions.START_WITH_NEW_WORK);

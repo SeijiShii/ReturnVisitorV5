@@ -617,7 +617,7 @@ public class WorkPagerActivity extends AppCompatActivity {
         fragment.removeVisitCells(visitsSwallowed);
         fragment.addWorkViewAndExtract(work);
 
-        RVData.getInstance().saveData(WorkPagerActivity.this, null);
+        RVData.getInstance().saveData(WorkPagerActivity.this);
     }
 
     private void hideSoftKeyboard() {
@@ -695,7 +695,7 @@ public class WorkPagerActivity extends AppCompatActivity {
                         @Override
                         public void postRemoveWorkView(Work work) {
                             RVData.getInstance().workList.deleteById(work.getId());
-                            RVData.getInstance().saveData(WorkPagerActivity.this, null);
+                            RVData.getInstance().saveData(WorkPagerActivity.this);
                             notifyDataSetChanged();
                         }
 

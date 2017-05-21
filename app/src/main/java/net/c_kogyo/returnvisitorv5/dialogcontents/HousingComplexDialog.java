@@ -324,7 +324,7 @@ public class HousingComplexDialog extends FrameLayout {
         RVData.getInstance().placeList.setOrAdd(mHousingComplex);
         RVData.getInstance().placeList.addList(addedRooms);
         RVData.getInstance().placeList.removeList(removedRooms);
-        RVData.getInstance().saveData(getContext(), null);
+        RVData.getInstance().saveData(getContext());
     }
 
     private void hideSoftKeyboard() {
