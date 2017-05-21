@@ -9,22 +9,28 @@ import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.io.IOException;
+import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.Principal;
+import java.security.PrivateKey;
 import java.security.SecureRandom;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
+import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509KeyManager;
 import javax.net.ssl.X509TrustManager;
 
 
@@ -36,18 +42,10 @@ public abstract class RVWebSocketClient extends WebSocketClient{
 
     private final String TAG = "RVWebSocketClient";
 
-    public RVWebSocketClient(URI uri, Context context) {
+    public RVWebSocketClient(URI uri, final Context context) {
         super(uri);
 
         try {
-            KeyStore keyStore = KeyStoreUtil.getEmptyKeyStore();
-            KeyStoreUtil.loadX509Certificate(keyStore, context.getAssets().open("server.crt"));
-
-//            KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("X509");
-//            keyManagerFactory.init(keyStore, new char[0]);
-
-//            TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance("X509");
-//            trustManagerFactory.init(keyStore);
 
             TrustManager trustManager = new X509TrustManager() {
                 @Override
@@ -57,6 +55,15 @@ public abstract class RVWebSocketClient extends WebSocketClient{
 
                 @Override
                 public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                    try {
+                        CertificateFactory factory = CertificateFactory.getInstance("X509");
+                        X509Certificate serverCrt = ( X509Certificate) factory.generateCertificate(context.getAssets().open("server.crt"));
+                        if (!chain[0].equals(serverCrt)) {
+                            new CertificateException();
+                        }
+                    } catch (IOException e) {
+                        Log.e(TAG, e.getMessage());
+                    }
 
                 }
 
@@ -66,8 +73,7 @@ public abstract class RVWebSocketClient extends WebSocketClient{
                 }
             };
 
-            SSLContext sslContext = null;
-            sslContext = SSLContext.getInstance( "TLS" );
+            SSLContext sslContext = SSLContext.getInstance( "TLS" );
             sslContext.init( null, new TrustManager[]{trustManager}, new SecureRandom());
             // sslContext.init( null, null, null ); // will use java's default key and trust store which is sufficient unless you deal with self-signed certificates
 
@@ -75,10 +81,7 @@ public abstract class RVWebSocketClient extends WebSocketClient{
             this.setSocket(factory.createSocket());
 
         } catch (IOException
-                | KeyStoreException
                 | NoSuchAlgorithmException
-                | CertificateException
-//                | UnrecoverableKeyException
                 | KeyManagementException
                 e) {
             Log.e(TAG, e.getMessage());
