@@ -2,7 +2,6 @@ package net.c_kogyo.returnvisitorv5.data;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import net.c_kogyo.returnvisitorv5.data.list.DataList;
@@ -55,6 +54,8 @@ public class RVData {
 
     public DeletedList deletedList;
 
+    private RVDataCallback mCallback;
+
     private static RVData instance = new RVData();
     private RVData() {
 
@@ -74,30 +75,36 @@ public class RVData {
 
     public static RVData getInstance() {return instance;}
 
-    public void saveData(Context context, @Nullable RVDataStoreCallback callback){
-        new SaveData(context, callback).execute();
+    public void setRVDataCallback(RVDataCallback rvDataCallback) {
+        mCallback = rvDataCallback;
     }
 
-    public void loadData(Context context, @Nullable RVDataStoreCallback callback) {
-        new LoadData(context, callback).execute();
+    public void saveData(Context context){
+        new SaveData(context).execute();
+    }
+
+    public void loadData(Context context) {
+        new LoadData(context).execute();
     }
 
     private class LoadData extends AsyncTask<Void, Void, Void> {
 
-        RVDataStoreCallback mCallback;
         Context mContext;
-        private LoadData(Context context, RVDataStoreCallback callback) {
+        private LoadData(Context context) {
             mContext = context;
-            mCallback = callback;
         }
 
         @Override
         protected Void doInBackground(Void... voids) {
 
+            if (mCallback != null) {
+                mCallback.onStartLoadingData();
+            }
+
             jsonToData(stringToJson(loadStringFromFile()));
 
             if (mCallback != null) {
-                mCallback.onDataLoaded();
+                mCallback.onFinishLoadingData();
             }
 
             return null;
@@ -205,15 +212,17 @@ public class RVData {
     private boolean isDataSaving = false;
     private class SaveData extends AsyncTask<Void, Void, Void> {
 
-        RVDataStoreCallback mCallback;
         Context mContext;
-        private SaveData(Context context, RVDataStoreCallback callback) {
+        private SaveData(Context context) {
             mContext = context;
-            mCallback = callback;
         }
 
         @Override
         protected Void doInBackground(Void... voids) {
+
+            if (mCallback != null) {
+                mCallback.onStartSavingData();
+            }
 
             // 他のインスタンスがデータの書き込み中だったら待つ
             while (isDataSaving) {
@@ -234,7 +243,7 @@ public class RVData {
             isDataSaving = false;
 
             if (mCallback != null) {
-                mCallback.onDataSaved();
+                mCallback.onFinishSavingData();
             }
             return null;
         }
@@ -376,12 +385,12 @@ public class RVData {
         return monthWithData;
     }
 
-    public interface RVDataStoreCallback{
-
-        void onDataSaved();
-
-        void onDataLoaded();
-    }
+//    public interface RVDataStoreCallback{
+//
+//        void onDataSaved();
+//
+//        void onDataLoaded();
+//    }
 
     public boolean hasWorkOrVisit() {
         return visitList.getList().size() > 0 || workList.getList().size() > 0;
@@ -421,5 +430,18 @@ public class RVData {
 
         return array;
     }
+
+    public interface RVDataCallback {
+
+        void onStartSavingData();
+
+        void onFinishSavingData();
+
+        void onStartLoadingData();
+
+        void onFinishLoadingData();
+    }
+
+
 
 }
