@@ -15,6 +15,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.widget.Toast;
 
 import net.c_kogyo.returnvisitorv5.R;
+import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Work;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
@@ -79,6 +80,8 @@ public class TimeCountService extends Service {
 
                     RVData.getInstance().workList.setOrAdd(mWork);
                     RVData.getInstance().saveData(getApplicationContext());
+
+                    RVCloudSync.syncDataIfLoggedIn(getApplicationContext());
                 }
             }
         };
@@ -101,6 +104,8 @@ public class TimeCountService extends Service {
             mWork = new Work(Calendar.getInstance());
             RVData.getInstance().workList.setOrAdd(mWork);
             RVData.getInstance().saveData(getApplicationContext());
+
+            RVCloudSync.syncDataIfLoggedIn(getApplicationContext());
         } else if (intent.getAction().equals(RESTART_COUNTING_ACTION_TO_SERVICE)) {
             String workId = intent.getStringExtra(COUNTING_WORK_ID);
             mWork = RVData.getInstance().workList.getById(workId);
@@ -142,6 +147,7 @@ public class TimeCountService extends Service {
 
                             RVData.getInstance().workList.setOrAdd(mWork);
                             RVData.getInstance().saveData(getApplicationContext());
+                            RVCloudSync.syncDataIfLoggedIn(getApplicationContext());
                             minCounter = 0;
                         }
                     }

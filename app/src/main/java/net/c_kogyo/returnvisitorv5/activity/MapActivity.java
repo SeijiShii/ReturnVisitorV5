@@ -530,6 +530,8 @@ public class MapActivity extends AppCompatActivity
 
         RVData.getInstance().saveData(this);
 
+        RVCloudSync.syncDataIfLoggedIn(this);
+
     }
 
     private RelativeLayout dialogOverlay;
@@ -682,6 +684,8 @@ public class MapActivity extends AppCompatActivity
                                 placeMarkers.removeByPlace(place);
                                 RVData.getInstance().placeList.deleteById(place.getId());
                                 RVData.getInstance().saveData(MapActivity.this);
+
+                                RVCloudSync.syncDataIfLoggedIn(MapActivity.this);
                             }
 
                             @Override
@@ -789,6 +793,8 @@ public class MapActivity extends AppCompatActivity
                                 placeMarkers.removeByPlace(housingComplex);
                                 RVData.getInstance().placeList.deleteById(housingComplex.getId());
                                 RVData.getInstance().saveData(MapActivity.this);
+
+                                RVCloudSync.syncDataIfLoggedIn(MapActivity.this);
                             }
                         }, true, true);
         fadeInDialogOverlay(housingComplexDialog);
@@ -845,6 +851,8 @@ public class MapActivity extends AppCompatActivity
         RVData.getInstance().placeList.setOrAdd(place);
         RVData.getInstance().visitList.setOrAdd(visit);
         RVData.getInstance().saveData(this);
+
+        RVCloudSync.syncDataIfLoggedIn(this);
 
         placeMarkers.addMarker(place);
     }
@@ -1176,6 +1184,8 @@ public class MapActivity extends AppCompatActivity
 
         RVData.getInstance().workList.setOrAdd(work);
         RVData.getInstance().saveData(this);
+
+        RVCloudSync.syncDataIfLoggedIn(this);
 
         Intent withNewWorkIntent = new Intent(this, WorkPagerActivity.class);
         withNewWorkIntent.setAction(Constants.WorkPagerActivityActions.START_WITH_NEW_WORK);
@@ -1514,7 +1524,8 @@ public class MapActivity extends AppCompatActivity
 
             case STATUS_200_SYNC_OK:
                 saveLastSyncTime();
-                placeMarkers.drawAllMarkers();
+                RVData.getInstance().saveData(this);
+                placeMarkers = new PlaceMarkers(mMap);
                 break;
 
             case STATUS_202_AUTHENTICATED:

@@ -29,6 +29,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.R;
+import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
 import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.Placement;
@@ -658,6 +659,9 @@ public class RecordVisitActivity extends AppCompatActivity {
                 }
 
                 RVData.getInstance().saveData(getApplicationContext());
+
+                RVCloudSync.syncDataIfLoggedIn(RecordVisitActivity.this);
+
                 finish();
 
             }

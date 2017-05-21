@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.R;
+import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Work;
 import net.c_kogyo.returnvisitorv5.dialogcontents.AddWorkDialog;
@@ -36,6 +37,9 @@ import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.IS_LOGGED_IN;
+import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.PASSWORD;
+import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.USER_NAME;
 import static net.c_kogyo.returnvisitorv5.util.ViewUtil.setOnClickListener;
 
 /**
@@ -544,6 +548,8 @@ public class CalendarPagerActivity extends AppCompatActivity {
     // DONE: 2017/05/06 getClosestPosition
 
 
+
+
     // TODO: 2017/05/06 AdView to Real
     // DONE: 2017/05/08 Add Work
     private void showAddWorkDialog() {
@@ -576,6 +582,8 @@ public class CalendarPagerActivity extends AppCompatActivity {
 
         RVData.getInstance().workList.setOrAdd(work);
         RVData.getInstance().saveData(this);
+
+        RVCloudSync.syncDataIfLoggedIn(this);
 
         Intent withNewWorkIntent = new Intent(this, WorkPagerActivity.class);
         withNewWorkIntent.setAction(Constants.WorkPagerActivityActions.START_WITH_NEW_WORK);

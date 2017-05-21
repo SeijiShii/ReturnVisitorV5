@@ -17,9 +17,13 @@ import org.json.JSONObject;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import static android.content.Context.MODE_PRIVATE;
 import static net.c_kogyo.returnvisitorv5.Constants.DATA_ARRAY_LATER_THAN_TIME;
 import static net.c_kogyo.returnvisitorv5.Constants.LOADED_DATA_ARRAY;
+import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.IS_LOGGED_IN;
 import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.LAST_DEVICE_SYNC_TIME;
+import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.PASSWORD;
+import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.USER_NAME;
 
 /**
  * Created by SeijiShii on 2017/05/10.
@@ -206,7 +210,7 @@ public class RVCloudSync {
         mCallback.onStartRequest(RVCloudSyncMethod.SYNC_DATA);
 
         SharedPreferences prefs
-                = context.getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, Context.MODE_PRIVATE);
+                = context.getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
         long lastSyncTime = prefs.getLong(LAST_DEVICE_SYNC_TIME, 0);
 
         final SyncData syncData
@@ -323,6 +327,17 @@ public class RVCloudSync {
         }
     }
 
+    public static void syncDataIfLoggedIn(Context context) {
+        SharedPreferences prefs
+                = context.getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
+        boolean isLoggedIn = prefs.getBoolean(IS_LOGGED_IN, false);
+        String userName = prefs.getString(Constants.SharedPrefTags.USER_NAME, null);
+        String password = prefs.getString(Constants.SharedPrefTags.PASSWORD, null);
+
+        if (isLoggedIn) {
+            getInstance().startDataSync(userName, password, context);
+        }
+    }
 
 
 

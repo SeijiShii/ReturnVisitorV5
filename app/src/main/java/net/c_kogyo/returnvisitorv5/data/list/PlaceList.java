@@ -26,7 +26,7 @@ public class PlaceList extends DataList<Place> {
         return list;
     }
 
-    public ArrayList<Place> getRoomList(String parentId) {
+    public synchronized ArrayList<Place> getRoomList(String parentId) {
         ArrayList<Place> roomList = new ArrayList<>();
         for (Place place : this) {
             if (place.getParentId() != null && place.getParentId().equals(parentId)) {

@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import net.c_kogyo.returnvisitorv5.R;
+import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.Work;
@@ -405,6 +406,8 @@ public class WorkView extends BaseAnimateView {
                         RVData.getInstance().visitList.deleteById(visitCell1.getVisit().getId());
                         RVData.getInstance().saveData(getContext());
                         visitCellContainer.removeView(visitCell1);
+
+                        RVCloudSync.syncDataIfLoggedIn(getContext());
                     }
 
                     @Override

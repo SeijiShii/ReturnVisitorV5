@@ -24,6 +24,7 @@ import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.R;
+import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
@@ -618,6 +619,8 @@ public class WorkPagerActivity extends AppCompatActivity {
         fragment.addWorkViewAndExtract(work);
 
         RVData.getInstance().saveData(WorkPagerActivity.this);
+
+        RVCloudSync.syncDataIfLoggedIn(WorkPagerActivity.this);
     }
 
     private void hideSoftKeyboard() {
@@ -697,6 +700,8 @@ public class WorkPagerActivity extends AppCompatActivity {
                             RVData.getInstance().workList.deleteById(work.getId());
                             RVData.getInstance().saveData(WorkPagerActivity.this);
                             notifyDataSetChanged();
+
+                            RVCloudSync.syncDataIfLoggedIn(WorkPagerActivity.this);
                         }
 
                         @Override

@@ -74,23 +74,23 @@ public class PlaceMarkers {
     }
 
     public void refreshMarker(Place place) {
-        Marker marker = getMarkerByPlace(place);
+        PlaceMarker marker = getPlaceMarkerByPlace(place);
         if (marker != null) {
             if (place.getCategory() == Place.Category.HOUSE) {
-                marker.setIcon(BitmapDescriptorFactory.fromResource(Constants.markerRes[place.getPriority().num()]));
+                marker.marker.setIcon(BitmapDescriptorFactory.fromResource(Constants.markerRes[place.getPriority().num()]));
             } else if (place.getCategory() == Place.Category.HOUSING_COMPLEX) {
-                marker.setIcon(BitmapDescriptorFactory.fromResource(Constants.complexRes[place.getPriority().num()]));
+                marker.marker.setIcon(BitmapDescriptorFactory.fromResource(Constants.complexRes[place.getPriority().num()]));
             }
         } else {
             addMarker(place);
         }
     }
 
-    public Marker getMarkerByPlace(Place place) {
+    public PlaceMarker getPlaceMarkerByPlace(Place place) {
 
         for (PlaceMarker marker : markers) {
             if (marker.placeId.equals(place.getId())) {
-                return marker.marker;
+                return marker;
             }
         }
         return null;
@@ -107,11 +107,11 @@ public class PlaceMarkers {
     }
 
     public void removeByPlace(Place place) {
-        Marker marker = getMarkerByPlace(place);
+        PlaceMarker marker = getPlaceMarkerByPlace(place);
         if (marker == null) return;
 
         markers.remove(marker);
-        marker.remove();
+        marker.marker.remove();
     }
 
 }

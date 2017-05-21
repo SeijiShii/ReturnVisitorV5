@@ -17,6 +17,7 @@ import android.widget.FrameLayout;
 import android.widget.ListView;
 
 import net.c_kogyo.returnvisitorv5.R;
+import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
@@ -156,6 +157,8 @@ public class PlaceDialog extends FrameLayout {
                                         RVData.getInstance().visitList.deleteById(visitCell.getVisit().getId());
                                         RVData.getInstance().saveData(getContext());
                                         notifyDataSetChanged();
+
+                                        RVCloudSync.syncDataIfLoggedIn(getContext());
 
                                     }
 

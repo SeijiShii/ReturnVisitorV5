@@ -29,6 +29,7 @@ import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.Constants;
+import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.service.FetchAddressIntentService;
@@ -325,6 +326,8 @@ public class HousingComplexDialog extends FrameLayout {
         RVData.getInstance().placeList.addList(addedRooms);
         RVData.getInstance().placeList.removeList(removedRooms);
         RVData.getInstance().saveData(getContext());
+
+        RVCloudSync.syncDataIfLoggedIn(getContext());
     }
 
     private void hideSoftKeyboard() {

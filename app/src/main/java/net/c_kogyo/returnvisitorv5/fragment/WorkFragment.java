@@ -18,6 +18,7 @@ import android.widget.ScrollView;
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.activity.RecordVisitActivity;
+import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.Work;
@@ -204,6 +205,8 @@ public class WorkFragment extends Fragment {
                         RVData.getInstance().visitList.deleteById(visitCell1.getVisit().getId());
                         RVData.getInstance().saveData(getContext());
                         container.removeView(visitCell1);
+
+                        RVCloudSync.syncDataIfLoggedIn(getContext());
                     }
 
                     @Override
@@ -289,6 +292,8 @@ public class WorkFragment extends Fragment {
                         addVisitCells(visitsRemoved);
 
                         RVData.getInstance().saveData(getContext());
+
+                        RVCloudSync.syncDataIfLoggedIn(getContext());
 
                     }
 

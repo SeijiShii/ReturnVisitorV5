@@ -17,7 +17,7 @@ import java.util.Calendar;
 
 public class VisitList extends DataList<Visit> {
 
-    public ArrayList<Visit> getVisitsForPlace(String placeId) {
+    public synchronized ArrayList<Visit> getVisitsForPlace(String placeId) {
 
         ArrayList<Visit> visits = new ArrayList<>();
         for (Visit visit : this) {
