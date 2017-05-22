@@ -45,7 +45,7 @@ public class DataList<T extends DataItem> implements Iterable<T>{
         this.list.removeAll(list);
     }
 
-    public int indexOf(T data) {
+    synchronized public int indexOf(T data) {
 
         for (int i = 0; i < list.size() ; i++ ) {
 
@@ -58,11 +58,11 @@ public class DataList<T extends DataItem> implements Iterable<T>{
         return -1;
     }
 
-    public boolean contains(T data) {
+    synchronized public boolean contains(T data) {
         return indexOf(data) >= 0;
     }
 
-    public T getById(String id) {
+    synchronized public T getById(String id) {
 
         for ( T data : list ) {
             if (data.getId().equals(id)) {
@@ -72,10 +72,10 @@ public class DataList<T extends DataItem> implements Iterable<T>{
         return null;
     }
 
-    private void delete(T data) {
+    synchronized private void delete(T data) {
         list.remove(data);
         // DONE: 2017/05/10 DeleteListへの追加
-        RVData.getInstance().deletedList.onDelete(data);
+        RVData.getInstance().inDeviceDeletedList.add(data);
     }
 
     synchronized public void deleteAll(ArrayList<T> dataList) {
@@ -84,7 +84,7 @@ public class DataList<T extends DataItem> implements Iterable<T>{
         }
     }
 
-    public void deleteById(String id) {
+    synchronized public void deleteById(String id) {
 
         T data = getById(id);
         if ( data == null ) return;
@@ -92,7 +92,7 @@ public class DataList<T extends DataItem> implements Iterable<T>{
         delete(data);
     }
 
-    private void removeByIdIfContained(String id) {
+    synchronized private void removeByIdIfContained(String id) {
 
         T data = getById(id);
         if ( data == null ) return;
@@ -117,20 +117,20 @@ public class DataList<T extends DataItem> implements Iterable<T>{
         return arrayList;
     }
 
-    public ArrayList<T> getList() {
+    synchronized public ArrayList<T> getList() {
         return list;
     }
 
-    public int size() {
+    synchronized public int size() {
 
         return list.size();
     }
 
-    public T get(int index) {
+    synchronized public T get(int index) {
         return list.get(index);
     }
 
-    public boolean containsDataWithName(String data) {
+    synchronized public boolean containsDataWithName(String data) {
 
         for (T item : list) {
             if (item.getName().equals(data)) {
@@ -140,7 +140,7 @@ public class DataList<T extends DataItem> implements Iterable<T>{
         return false;
     }
 
-    public ArrayList<T> getSearchedItems(String searchWord, Context context) {
+    synchronized public ArrayList<T> getSearchedItems(String searchWord, Context context) {
 
         String[] words = searchWord.split(" ");
 
@@ -168,7 +168,6 @@ public class DataList<T extends DataItem> implements Iterable<T>{
         }
         return laterList;
     }
-
 
 }
 

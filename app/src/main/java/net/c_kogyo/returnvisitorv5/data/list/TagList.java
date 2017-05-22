@@ -13,7 +13,7 @@ import java.util.Comparator;
 public class TagList extends DataList<Tag> {
 
     @Override
-    public ArrayList<Tag> getList() {
+    synchronized public ArrayList<Tag> getList() {
         ArrayList<Tag> list = super.getList();
         Collections.sort(list, new Comparator<Tag>() {
             @Override

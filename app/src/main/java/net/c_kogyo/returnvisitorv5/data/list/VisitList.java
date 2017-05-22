@@ -31,7 +31,7 @@ public class VisitList extends DataList<Visit> {
     }
 
     @Nullable
-    public Visit getLatestVisitToPlace(String placeId) {
+    synchronized public Visit getLatestVisitToPlace(String placeId) {
 
         ArrayList<Visit> visits = getVisitsForPlace(placeId);
 
@@ -48,7 +48,7 @@ public class VisitList extends DataList<Visit> {
         return visit;
     }
 
-    private ArrayList<Visit> getVisitsInMonth(Calendar month) {
+    synchronized private ArrayList<Visit> getVisitsInMonth(Calendar month) {
         ArrayList<Visit> visitsInMonth = new ArrayList<>();
         for (Visit visit : getList()) {
             if (CalendarUtil.isSameMonth(month, visit.getDatetime())) {
@@ -58,7 +58,7 @@ public class VisitList extends DataList<Visit> {
         return visitsInMonth;
     }
 
-    public ArrayList<Visit> getVisitsInDay(Calendar date) {
+    synchronized public ArrayList<Visit> getVisitsInDay(Calendar date) {
         ArrayList<Visit> visits = new ArrayList<>();
         for (Visit visit : getList()) {
             if (CalendarUtil.isSameDay(visit.getDatetime(), date)) {
@@ -68,7 +68,7 @@ public class VisitList extends DataList<Visit> {
         return visits;
     }
 
-    public ArrayList<Visit> getVisitsInWork(Work work) {
+    synchronized public ArrayList<Visit> getVisitsInWork(Work work) {
         ArrayList<Visit> visits = new ArrayList<>();
         for (Visit visit : getList()) {
             if (visit.getDatetime().after(work.getStart())
@@ -79,7 +79,7 @@ public class VisitList extends DataList<Visit> {
         return visits;
     }
 
-    public ArrayList<Visit> getVisitsInWorkInDay(Calendar date) {
+    synchronized public ArrayList<Visit> getVisitsInWorkInDay(Calendar date) {
 
         ArrayList<Work> worksInDay = RVData.getInstance().workList.getWorksInDay(date);
         ArrayList<Visit> visitsInWorkInDay = new ArrayList<>();
@@ -89,13 +89,13 @@ public class VisitList extends DataList<Visit> {
         return visitsInWorkInDay;
     }
 
-    public ArrayList<Visit> getVisitsInDayNotInWork(Calendar date) {
+    synchronized public ArrayList<Visit> getVisitsInDayNotInWork(Calendar date) {
         ArrayList<Visit> visits = getVisitsInDay(date);
         visits.removeAll(getVisitsInWorkInDay(date));
         return visits;
     }
 
-    public ArrayList<Calendar> getDates() {
+    synchronized public ArrayList<Calendar> getDates() {
 
         ArrayList<Calendar> dates = new ArrayList<>();
 
@@ -124,13 +124,12 @@ public class VisitList extends DataList<Visit> {
         return dates;
     }
 
-    public ArrayList<VisitDetail> getBSVisitDetailsInMonth(Calendar month) {
+    synchronized public ArrayList<VisitDetail> getBSVisitDetailsInMonth(Calendar month) {
         ArrayList<VisitDetail> bsVisitDetails = new ArrayList<>();
         for (Visit visit : getVisitsInMonth(month)) {
             bsVisitDetails.addAll(visit.getBSVisitDetails());
         }
         return bsVisitDetails;
     }
-
 
 }

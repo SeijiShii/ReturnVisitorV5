@@ -14,7 +14,7 @@ import java.util.Comparator;
 
 public class PlaceList extends DataList<Place> {
 
-    public ArrayList<Place> getListByIds(ArrayList<String> ids) {
+    public synchronized ArrayList<Place> getListByIds(ArrayList<String> ids) {
         ArrayList<Place> list = new ArrayList<>();
         for (String id : ids) {
 
@@ -46,7 +46,7 @@ public class PlaceList extends DataList<Place> {
     }
 
     @Nullable
-    public Place getMostPriorRoom(String parentId) {
+    synchronized public Place getMostPriorRoom(String parentId) {
         ArrayList<Place> roomList = getRoomList(parentId);
 
         if (roomList.size() <= 0) return null;

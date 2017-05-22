@@ -17,7 +17,7 @@ import java.util.Comparator;
 
 public class WorkList extends DataList<Work> {
 
-    public ArrayList<Work> getWorksInDay(Calendar date) {
+    synchronized public ArrayList<Work> getWorksInDay(Calendar date) {
 
         ArrayList<Work> works = new ArrayList<>();
         for (Work work : getList()) {
@@ -28,7 +28,7 @@ public class WorkList extends DataList<Work> {
         return works;
     }
 
-    public ArrayList<Calendar> getDates() {
+    synchronized public ArrayList<Calendar> getDates() {
 
         ArrayList<Calendar> dates = new ArrayList<>();
 
@@ -63,7 +63,7 @@ public class WorkList extends DataList<Work> {
      * @param workChanged 時間の変更された
      * @return 調整の結果削除されたWorkのリスト
      */
-    public ArrayList<Work> onChangeTime(Work workChanged) {
+    synchronized public ArrayList<Work> onChangeTime(Work workChanged) {
 
         ArrayList<Work> worksRemoved = new ArrayList<>();
 
@@ -124,7 +124,7 @@ public class WorkList extends DataList<Work> {
     }
 
     @Nullable
-    public Work getByVisit(Visit visit) {
+    synchronized public Work getByVisit(Visit visit) {
         for (Work work : getList()) {
             if (visit.getDatetime().after(work.getStart()) && visit.getDatetime().before(work.getEnd())) {
                 return work;
@@ -133,7 +133,7 @@ public class WorkList extends DataList<Work> {
         return null;
     }
 
-    public ArrayList<Work> getWorksInMonth(Calendar month) {
+    synchronized public ArrayList<Work> getWorksInMonth(Calendar month) {
         ArrayList<Work> works = new ArrayList<>();
         for (Work work : getList()) {
             if (CalendarUtil.isSameMonth(work.getStart(), month)) {
