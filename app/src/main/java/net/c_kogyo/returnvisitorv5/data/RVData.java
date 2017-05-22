@@ -54,7 +54,8 @@ public class RVData {
     public DataList<Publication> pubList;
     public WorkList workList;
 
-    public DeletedList deletedList;
+    public DeletedList inDeviceDeletedList;
+    public DeletedList inCloudDeletedList;
 
     private RVDataCallback mCallback;
     private Handler mHandler;
@@ -72,7 +73,8 @@ public class RVData {
 
         workList = new WorkList();
 
-        deletedList = new DeletedList();
+        inDeviceDeletedList = new DeletedList();
+        inCloudDeletedList = new DeletedList();
 
     }
 
@@ -185,7 +187,7 @@ public class RVData {
             try {
                 if (object.has(RV_DATA_LIST)) {
                     JSONArray array = object.getJSONArray(RV_DATA_LIST);
-                    setFromRecordArray(array);
+                    setFromRecordArray(array, RecordArraySource.FROM_DEVICE);
                 }
             }catch (JSONException e) {
                 Log.e(TAG, e.getMessage());
@@ -193,7 +195,12 @@ public class RVData {
         }
     }
 
-    public void setFromRecordArray(JSONArray jsonArray) {
+    public enum RecordArraySource{
+        FROM_DEVICE,
+        FROM_CLOUD
+    }
+
+    public void setFromRecordArray(JSONArray jsonArray, RecordArraySource source) {
         for ( int i = 0 ; i < jsonArray.length() ; i++ ) {
 
             try {
@@ -223,14 +230,52 @@ public class RVData {
                         workList.setOrAdd(new Work(record));
                         break;
                     case "DeletedData":
-                        deletedList.onLoadData(record);
+                        if (source == RecordArraySource.FROM_CLOUD) {
+                            inCloudDeletedList.add(record);
+                        } else if (source == RecordArraySource.FROM_DEVICE) {
+                            inDeviceDeletedList.add(record);
+                        }
                         break;
                 }
             } catch (JSONException e) {
                 Log.e(TAG, e.getMessage());
             }
-
         }
+    }
+
+    public void removeDeletedData() {
+
+        for (DeletedData deletedData : inCloudDeletedList) {
+
+            switch (deletedData.getClassName()) {
+                case "Place":
+                    placeList.deleteById(deletedData.getDataId());
+                    break;
+                case "Person":
+                    personList.deleteById(deletedData.getDataId());
+                    break;
+                case "Visit":
+                    visitList.deleteById(deletedData.getDataId());
+                    break;
+                case "Tag":
+                    tagList.deleteById(deletedData.getDataId());
+                    break;
+                case "NoteCompItem":
+                    noteCompList.deleteById(deletedData.getDataId());
+                    break;
+                case "Publication":
+                    pubList.deleteById(deletedData.getDataId());
+                    break;
+                case "Work":
+                    workList.deleteById(deletedData.getDataId());
+                    break;
+                case "DeletedData":
+
+                    break;
+            }
+        }
+        inCloudDeletedList.clear();
+
     }
 
     private boolean isDataSaving = false;
@@ -325,7 +370,7 @@ public class RVData {
                 array.put(new Record(work).getFullJSON());
             }
 
-            for (DeletedData deletedData : deletedList) {
+            for (DeletedData deletedData : inDeviceDeletedList) {
                 array.put(new Record(deletedData).getFullJSON());
             }
 
@@ -472,6 +517,11 @@ public class RVData {
             array.put(new Record(item).getFullJSON());
         }
 
+        for (DeletedData deletedData : inDeviceDeletedList) {
+            array.put(new Record(deletedData).getFullJSON());
+        }
+        inDeviceDeletedList.clear();
+
         return array;
     }
 
@@ -486,7 +536,7 @@ public class RVData {
         void onFinishLoadingData();
     }
 
-    // TODO: 2017/05/22 削除データがうまく飛んでないんだよね。
+    // TODO: 2017/05/22 削除データがうまく飛んでないんだよね。改善した。要検証
 
 
 

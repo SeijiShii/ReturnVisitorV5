@@ -20,12 +20,16 @@ public class DeletedList implements Iterable<DeletedData>{
     }
 
 
-    public <T extends DataItem> void onDelete(T data) {
+    synchronized public <T extends DataItem> void add(T data) {
         list.add(new DeletedData(data));
     }
 
-    public void onLoadData(Record record) {
+    synchronized public void add(Record record) {
         list.add(new DeletedData(record));
+    }
+
+    synchronized public void clear() {
+        list.clear();
     }
 
     @Override

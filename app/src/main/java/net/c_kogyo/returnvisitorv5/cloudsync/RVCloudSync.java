@@ -168,7 +168,8 @@ public class RVCloudSync {
                                 break;
 
                             case SYNC_DATA:
-                                RVData.getInstance().setFromRecordArray(loadedArray);
+                                RVData.getInstance().setFromRecordArray(loadedArray, RVData.RecordArraySource.FROM_CLOUD);
+                                RVData.getInstance().removeDeletedData();
                                 mHandler.post(new Runnable() {
                                     @Override
                                     public void run() {
