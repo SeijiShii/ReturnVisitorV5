@@ -100,6 +100,8 @@ public class MapActivity extends AppCompatActivity
 
         setContentView(R.layout.map_activity);
         initWaitScreen();
+        initProgressFrame();
+        initWaitMessageText();
         initLogoButton();
 
 //        loginDialogHandler = new Handler();
@@ -226,7 +228,7 @@ public class MapActivity extends AppCompatActivity
                         refreshLogoButton();
                         refreshWorkButton();
                         refreshCalendarButton();
-                        fadeoutWaitScreen();
+                        enableWaitScreen(false);
                     }
                 });
                 
@@ -1197,105 +1199,31 @@ public class MapActivity extends AppCompatActivity
 
     // DONE: 2017/05/05 データ読み込みまでボタンを押せなくする
     // DONE: 2017/05/08 データ読み込みwait画面
-    private RelativeLayout waitScreen;
+    private View waitScreen;
     private void initWaitScreen() {
-        waitScreen = (RelativeLayout) findViewById(R.id.wait_screen);
+        waitScreen = findViewById(R.id.wait_screen);
         waitScreen.setAlpha(0f);
-        initWaitMessageText();
     }
 
-    private void enableWaitScreen(final boolean enabled) {
+    private LinearLayout progressFrame;
+    private void initProgressFrame() {
+        progressFrame = (LinearLayout) findViewById(R.id.progress_frame);
+        progressFrame.setAlpha(0f);
+    }
 
-        float origin, target;
+    private void enableWaitScreen(boolean enabled) {
 
-        if (enabled) {
-            origin = 0f;
-            target = 1f;
-            waitScreen.setVisibility(View.VISIBLE);
-            waitScreen.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    return true;
-                }
-            });
-        } else {
-            origin = 1f;
-            target = 0f;
-            waitScreen.setOnTouchListener(null);
-        }
+        ViewUtil.fadeView(waitScreen, enabled, true, 500);
 
-        ValueAnimator animator = ValueAnimator.ofFloat(origin, target);
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                waitScreen.setAlpha((float) animation.getAnimatedValue());
-            }
-        });
-        animator.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
+    }
 
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                if (!enabled) {
-                    waitScreen.setVisibility(View.INVISIBLE);
-                }
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-
-            }
-        });
-        animator.setDuration(500);
-        animator.start();
+    private void fadeProgressFrame(boolean fadeIn) {
+        ViewUtil.fadeView(progressFrame, fadeIn, false, 500);
     }
 
     private TextView waitMessageText;
     private void initWaitMessageText() {
         waitMessageText = (TextView) findViewById(R.id.wait_message_text);
-    }
-
-    private void fadeoutWaitScreen() {
-
-        ValueAnimator animator = ValueAnimator.ofFloat(1f, 0f);
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                waitScreen.setAlpha((float) animation.getAnimatedValue());
-            }
-        });
-        animator.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                waitScreen.setVisibility(View.INVISIBLE);
-                waitScreen.setOnTouchListener(null);
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-
-            }
-        });
-        animator.setDuration(500);
-        animator.start();
     }
 
     private void initAddVisitButton() {
@@ -1469,19 +1397,20 @@ public class MapActivity extends AppCompatActivity
     // RVDataCallback implementation
     @Override
     public void onStartSavingData() {
-        enableWaitScreen(true);
+        fadeProgressFrame(true);
         waitMessageText.setText(R.string.saving);
     }
 
     @Override
     public void onFinishSavingData() {
-        enableWaitScreen(false);
+        fadeProgressFrame(false);
         waitMessageText.setText("");
     }
 
     @Override
     public void onStartLoadingData() {
         enableWaitScreen(true);
+        fadeProgressFrame(true);
         waitMessageText.setText(R.string.loading);
     }
 
@@ -1489,6 +1418,7 @@ public class MapActivity extends AppCompatActivity
     public void onFinishLoadingData() {
         refreshLogoButton();
         isDataLoaded = true;
+        fadeProgressFrame(false);
         enableWaitScreen(false);
         waitMessageText.setText("");
     }
@@ -1564,4 +1494,5 @@ public class MapActivity extends AppCompatActivity
         refreshCalendarButton();
 
     }
+    // TODO: 2017/05/22 SAVEのたびにUIが停止するのはいただけない。
 }

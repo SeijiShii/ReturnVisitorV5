@@ -1,5 +1,7 @@
 package net.c_kogyo.returnvisitorv5.util;
 
+import android.animation.Animator;
+import android.animation.ValueAnimator;
 import android.graphics.Point;
 import android.view.MotionEvent;
 import android.view.View;
@@ -76,5 +78,66 @@ public class ViewUtil {
             return;
         }
         getDeepChildOffset(mainParent, parentGroup.getParent(), parentGroup, accumulatedOffset);
+    }
+
+    public static void fadeView(final View view,
+                                final boolean fadeIn,
+                                boolean setOnTouch,
+                                int duration) {
+        float origin, target;
+
+        if (fadeIn) {
+            origin = 0f;
+            target = 1f;
+
+            view.setVisibility(View.VISIBLE);
+
+            if (setOnTouch) {
+                view.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        return true;
+                    }
+                });
+            }
+
+        } else {
+            origin = 1f;
+            target = 0f;
+            view.setOnTouchListener(null);
+        }
+
+        ValueAnimator animator = ValueAnimator.ofFloat(origin, target);
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                view.setAlpha((float) animation.getAnimatedValue());
+            }
+        });
+        animator.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                if (!fadeIn) {
+                    view.setVisibility(View.INVISIBLE);
+                }
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        animator.setDuration(duration);
+        animator.start();
     }
 }

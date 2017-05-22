@@ -254,24 +254,32 @@
         </ScrollView>
 
         <!-- Wait Screen -->
-        <RelativeLayout
+        <View
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/wait_screen"
             android:background="#8FFF"
-            android:visibility="invisible">
+            android:visibility="invisible"
+            />
+
+        <!-- Progress -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_centerInParent="true">
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                android:layout_margin="10dp"
+                android:id="@+id/progress_frame">
 
                 <ProgressBar
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    style="@android:style/Widget.ProgressBar.Large"
-                    android:id="@+id/wait_progress"/>
+                    style="@android:style/Widget.ProgressBar.Large"/>
 
                 <TextView
                     android:layout_width="wrap_content"
