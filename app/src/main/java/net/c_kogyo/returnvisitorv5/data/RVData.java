@@ -486,6 +486,8 @@ public class RVData {
         void onFinishLoadingData();
     }
 
+    // TODO: 2017/05/22 削除データがうまく飛んでないんだよね。
+
 
 
 }

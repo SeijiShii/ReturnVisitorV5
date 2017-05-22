@@ -437,8 +437,8 @@ public class LoginDialog extends FrameLayout {
     }
 
     // DONE: 2017/05/11 userName to userName
-    // TODO: 2017/05/13 ログインダイアログのUIの動きについてはまだいろいろ考える必要がある。
-    // TODO: 2017/05/13  editTextの活性
+    // DONE: 2017/05/13 ログインダイアログのUIの動きについてはまだいろいろ考える必要がある。
+    // DONE: 2017/05/13  editTextの活性
 
 
 }

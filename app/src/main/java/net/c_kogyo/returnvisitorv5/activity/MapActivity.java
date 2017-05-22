@@ -1356,13 +1356,13 @@ public class MapActivity extends AppCompatActivity
         mIsLoggedIn = login;
     }
 
-    // TODO: 2017/05/05 データがないときにWORKやカレンダーに遷移しないようにする(実装済み、要検証)
+    // DONE: 2017/05/05 データがないときにWORKやカレンダーに遷移しないようにする(実装済み、要検証)
     // TODO: 2017/05/06 AdView to Real
     // DONE: 2017/05/08 開始時間に秒はいらない
     // DONE: 2017/05/08 ログイン画面
-    // TODO: 2017/05/08 データ同期まわり
+    // DONE: 2017/05/08 データ同期まわり
 
-    // TODO: 2017/05/16 save login state
+    // DONE: 2017/05/16 save login state
 
     private void saveLoginState() {
 
@@ -1397,8 +1397,8 @@ public class MapActivity extends AppCompatActivity
 
     }
 
-    // TODO: 2017/05/21 データロード中、同期中の表示
-    // TODO: 2017/05/21 同期結果の表示
+    // DONE: 2017/05/21 データロード中、同期中の表示
+    // DONE: 2017/05/21 同期結果の表示
 
     // RVDataCallback implementation
     @Override
@@ -1500,5 +1500,5 @@ public class MapActivity extends AppCompatActivity
         refreshCalendarButton();
 
     }
-    // TODO: 2017/05/22 SAVEのたびにUIが停止するのはいただけない。
+    // DONE: 2017/05/22 SAVEのたびにUIが停止するのはいただけない。
 }
