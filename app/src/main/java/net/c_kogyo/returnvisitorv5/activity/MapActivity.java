@@ -121,6 +121,8 @@ public class MapActivity extends AppCompatActivity
 
         loadLoginState();
 
+//        saveLastSyncTime();
+
     }
 
     private void saveLastSyncTime() {
@@ -128,6 +130,10 @@ public class MapActivity extends AppCompatActivity
                 = getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putLong(Constants.SharedPrefTags.LAST_DEVICE_SYNC_TIME, Calendar.getInstance().getTimeInMillis());
+
+        // リセット用
+        // editor.putLong(Constants.SharedPrefTags.LAST_DEVICE_SYNC_TIME, 0);
+
         editor.apply();
     }
 

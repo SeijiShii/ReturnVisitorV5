@@ -68,7 +68,7 @@ public class RVCloudSync {
 //    public static final int UNAUTHORIZED    = 401;
 //    public static final int NOT_FOUND       = 404;
 
-    private final String ROOT_URL = "http://192.168.3.4:1337";
+    private final String ROOT_URL = "https://c-kogyo.work:1337";
 
     private static RVCloudSync instance = new RVCloudSync();
     private RVCloudSyncCallback mCallback;
@@ -157,7 +157,7 @@ public class RVCloudSync {
         final UserData userData = new UserData(userName, password);
 
         if (socketClient.isOpen()) {
-            sendUserData(userData, RVCloudSyncMethod.LOGIN);
+            sendUserData(userData, method);
         } else {
             new Thread(new Runnable() {
                 @Override
@@ -175,7 +175,7 @@ public class RVCloudSync {
                             Log.e(TAG, e.getMessage());
                         }
                     }
-                    sendUserData(userData, RVCloudSyncMethod.LOGIN);
+                    sendUserData(userData, method);
                 }
             }).start();
             socketClient.connect();
