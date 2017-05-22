@@ -101,53 +101,8 @@ public class RVCloudSync {
 
         mCallback.onStartRequest(method);
 
-        try {
-            if (socketClient == null) {
-                socketClient = new RVWebSocketClient(new URI(ROOT_URL), context) {
-                    @Override
-                    public void onMessage(String s) {
-
-                        try {
-                            JSONObject object = new JSONObject(s);
-                            RVCloudSyncMethod method = RVCloudSyncMethod.valueOf(object.getString(METHOD));
-                            ResultStatus status = ResultStatus.valueOf(object.getString(STATE));
-                            UserData userData = new UserData(object.getJSONObject(USER_DATA));
-
-                            JSONArray loadedArray = new JSONArray();
-                            if (object.has(LOADED_DATA_ARRAY))
-                                loadedArray = object.getJSONArray(Constants.LOADED_DATA_ARRAY);
-
-                            final RequestResult result = new RequestResult(userData, status);
-
-                            switch (method) {
-                                case LOGIN:
-                                case CREATE_USER:
-                                    mHandler.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            mCallback.onRequestResult(result);
-                                        }
-                                    });
-                                    break;
-
-                                case SYNC_DATA:
-                                    RVData.getInstance().setFromRecordArray(loadedArray);
-                                    mHandler.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            mCallback.onRequestResult(result);
-                                        }
-                                    });
-                                    break;
-                            }
-                        } catch (JSONException e) {
-                            Log.e(TAG, e.getMessage());
-                        }
-                    }
-                };
-            }
-        } catch (URISyntaxException e) {
-            Log.e(TAG, e.getMessage());
+        if (socketClient == null) {
+            initSocketClient(context);
         }
 
         if (socketClient == null)
@@ -183,6 +138,55 @@ public class RVCloudSync {
         }
     }
 
+    private void initSocketClient(Context context) {
+        try {
+            socketClient = new RVWebSocketClient(new URI(ROOT_URL), context) {
+                @Override
+                public void onMessage(String s) {
+
+                    try {
+                        JSONObject object = new JSONObject(s);
+                        RVCloudSyncMethod method = RVCloudSyncMethod.valueOf(object.getString(METHOD));
+                        ResultStatus status = ResultStatus.valueOf(object.getString(STATE));
+                        UserData userData = new UserData(object.getJSONObject(USER_DATA));
+
+                        JSONArray loadedArray = new JSONArray();
+                        if (object.has(LOADED_DATA_ARRAY))
+                            loadedArray = object.getJSONArray(Constants.LOADED_DATA_ARRAY);
+
+                        final RequestResult result = new RequestResult(userData, status);
+
+                        switch (method) {
+                            case LOGIN:
+                            case CREATE_USER:
+                                mHandler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mCallback.onRequestResult(result);
+                                    }
+                                });
+                                break;
+
+                            case SYNC_DATA:
+                                RVData.getInstance().setFromRecordArray(loadedArray);
+                                mHandler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mCallback.onRequestResult(result);
+                                    }
+                                });
+                                break;
+                        }
+                    } catch (JSONException e) {
+                        Log.e(TAG, e.getMessage());
+                    }
+                }
+            };
+        } catch (URISyntaxException e) {
+            Log.e(TAG, e.getMessage());
+        }
+    }
+
     private void postErrorResult(final ResultStatus status) {
         mHandler.post(new Runnable() {
             @Override
@@ -208,6 +212,10 @@ public class RVCloudSync {
     public void startDataSync(@Nullable String userName, @Nullable String password, Context context) {
 
         mCallback.onStartRequest(RVCloudSyncMethod.SYNC_DATA);
+
+        if (socketClient == null) {
+            initSocketClient(context);
+        }
 
         SharedPreferences prefs
                 = context.getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
