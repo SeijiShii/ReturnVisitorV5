@@ -294,8 +294,6 @@ public class PlacementDialog extends FrameLayout {
         });
     }
 
-
-
     public interface OnButtonClickListener {
 
         void onCancelClick();
@@ -303,5 +301,7 @@ public class PlacementDialog extends FrameLayout {
         void onOkClick(Placement placement, String parentId);
 
     }
+
+    // TODO: 2017/05/22 よく使う配布物を表示 
 
 }
