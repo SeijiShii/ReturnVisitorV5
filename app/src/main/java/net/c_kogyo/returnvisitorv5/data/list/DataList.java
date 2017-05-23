@@ -3,6 +3,7 @@ package net.c_kogyo.returnvisitorv5.data.list;
 import android.content.Context;
 
 import net.c_kogyo.returnvisitorv5.data.DataItem;
+import net.c_kogyo.returnvisitorv5.data.DeletedData;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ public class DataList<T extends DataItem> implements Iterable<T>{
 
     // DONE: 2017/03/16 さくじょしたものが拾われないようにする
     // DONE: 2017/05/10 削除フラグの撤去に伴う変更
-    private ArrayList<T> list;
+    protected ArrayList<T> list;
 
     public DataList() {
 
@@ -92,6 +93,13 @@ public class DataList<T extends DataItem> implements Iterable<T>{
         delete(data);
     }
 
+    synchronized public void deleteByDeletedData(DeletedData deletedData) {
+        T data = getById(deletedData.getDataId());
+        if ( data == null ) return;
+
+        list.remove(data);
+    }
+
     synchronized private void removeByIdIfContained(String id) {
 
         T data = getById(id);
@@ -103,18 +111,6 @@ public class DataList<T extends DataItem> implements Iterable<T>{
     @Override
     public Iterator<T> iterator() {
         return list.iterator();
-    }
-
-    public ArrayList<T> getList(ArrayList<String> ids) {
-
-        ArrayList<T> arrayList = new ArrayList<>();
-        for ( T item : list ) {
-
-            if (ids.contains(item.getId())) {
-                arrayList.add(item);
-            }
-        }
-        return arrayList;
     }
 
     synchronized public ArrayList<T> getList() {

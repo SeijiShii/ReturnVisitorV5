@@ -50,7 +50,7 @@ public class VisitList extends DataList<Visit> {
 
     synchronized private ArrayList<Visit> getVisitsInMonth(Calendar month) {
         ArrayList<Visit> visitsInMonth = new ArrayList<>();
-        for (Visit visit : getList()) {
+        for (Visit visit : list) {
             if (CalendarUtil.isSameMonth(month, visit.getDatetime())) {
                 visitsInMonth.add(visit);
             }
@@ -60,7 +60,7 @@ public class VisitList extends DataList<Visit> {
 
     synchronized public ArrayList<Visit> getVisitsInDay(Calendar date) {
         ArrayList<Visit> visits = new ArrayList<>();
-        for (Visit visit : getList()) {
+        for (Visit visit : list) {
             if (CalendarUtil.isSameDay(visit.getDatetime(), date)) {
                 visits.add(visit);
             }
@@ -70,7 +70,7 @@ public class VisitList extends DataList<Visit> {
 
     synchronized public ArrayList<Visit> getVisitsInWork(Work work) {
         ArrayList<Visit> visits = new ArrayList<>();
-        for (Visit visit : getList()) {
+        for (Visit visit : list) {
             if (visit.getDatetime().after(work.getStart())
                     && visit.getDatetime().before(work.getEnd())) {
                 visits.add(visit);
@@ -99,7 +99,7 @@ public class VisitList extends DataList<Visit> {
 
         ArrayList<Calendar> dates = new ArrayList<>();
 
-        for (Visit visit : getList()) {
+        for (Visit visit : list) {
             dates.add(visit.getDatetime());
         }
 

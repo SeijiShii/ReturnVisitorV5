@@ -20,7 +20,7 @@ public class WorkList extends DataList<Work> {
     synchronized public ArrayList<Work> getWorksInDay(Calendar date) {
 
         ArrayList<Work> works = new ArrayList<>();
-        for (Work work : getList()) {
+        for (Work work : list) {
             if (CalendarUtil.isSameDay(work.getStart(), date)) {
                 works.add(work);
             }
@@ -32,7 +32,7 @@ public class WorkList extends DataList<Work> {
 
         ArrayList<Calendar> dates = new ArrayList<>();
 
-        for (Work work : getList()) {
+        for (Work work : list) {
             dates.add(work.getStart());
         }
 
@@ -68,10 +68,10 @@ public class WorkList extends DataList<Work> {
         ArrayList<Work> worksRemoved = new ArrayList<>();
 
         // 念のため存在チェック
-        if (!getList().contains(workChanged)) return worksRemoved;
+        if (!list.contains(workChanged)) return worksRemoved;
 
         // すべてのリストを開始時間で整列
-        ArrayList<Work> sortedList = getList();
+        ArrayList<Work> sortedList = new ArrayList<>(list);
         Collections.sort(sortedList, new Comparator<Work>() {
             @Override
             public int compare(Work work, Work t1) {
@@ -125,7 +125,7 @@ public class WorkList extends DataList<Work> {
 
     @Nullable
     synchronized public Work getByVisit(Visit visit) {
-        for (Work work : getList()) {
+        for (Work work : list) {
             if (visit.getDatetime().after(work.getStart()) && visit.getDatetime().before(work.getEnd())) {
                 return work;
             }
@@ -135,7 +135,7 @@ public class WorkList extends DataList<Work> {
 
     synchronized public ArrayList<Work> getWorksInMonth(Calendar month) {
         ArrayList<Work> works = new ArrayList<>();
-        for (Work work : getList()) {
+        for (Work work : list) {
             if (CalendarUtil.isSameMonth(work.getStart(), month)) {
                 works.add(work);
             }
