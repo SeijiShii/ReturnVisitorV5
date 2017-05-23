@@ -20,13 +20,24 @@
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <!-- Placement List -->
+        <!-- List Frame -->
+        <!-- Suggestion List -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <android.support.v7.widget.ListViewCompat
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/ui_height_small"
+                android:id="@+id/search_text"
+                android:background="@drawable/gray_trans_circle"
+                android:padding="5dp"
+                android:layout_margin="5dp"
+                android:hint="@string/search"
+                android:gravity="center_vertical|left"/>
+
+            <ListView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
@@ -92,7 +103,7 @@
 
             </LinearLayout>
 
-            <AutoCompleteTextView
+            <EditText
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/ui_height_small"
                 android:background="@drawable/gray_trans_circle"
@@ -205,7 +216,8 @@
 
             </LinearLayout>
 
-            <AutoCompleteTextView
+            <!-- Magazine Name Text -->
+            <EditText
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/ui_height_small"
                 android:background="@drawable/gray_trans_circle"

@@ -2,7 +2,6 @@ package net.c_kogyo.returnvisitorv5.view;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.support.v7.widget.SwitchCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
@@ -11,15 +10,14 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
+import net.c_kogyo.returnvisitorv5.data.NoteCompItem;
 import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Placement;
-import net.c_kogyo.returnvisitorv5.data.Publication;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
@@ -234,7 +232,13 @@ public class VisitDetailView extends BaseAnimateView {
                 mVisitDetail.getPlacements().remove(cell.getPlacement());
                 changeToTheHeight();
             }
-        });
+        },
+        true){
+            @Override
+            public void setLayoutParams(BaseAnimateView view) {
+                view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            }
+        };
         placementContainer.addView(placementCell);
 
     }
@@ -276,14 +280,14 @@ public class VisitDetailView extends BaseAnimateView {
         // DONE: 2017/02/27 AutoCompleteTextViewアダプタ
         // PENDING: 2017/03/08 要動作検証
 
-        ArrayList<String> pubNameList = new ArrayList<>();
-        for (Publication pub : RVData.getInstance().pubList){
-            pubNameList.add(pub.getName());
+        ArrayList<String> noteCompList = new ArrayList<>();
+        for (NoteCompItem compItem : RVData.getInstance().noteCompList){
+            noteCompList.add(compItem.getName());
         }
-        String[] pubArray = pubNameList.toArray(new String[0]);
+        String[] compArray = noteCompList.toArray(new String[0]);
 
         ArrayAdapter<String> adapter
-                = new ArrayAdapter<>(getContext(), android.R.layout.simple_dropdown_item_1line, pubArray);
+                = new ArrayAdapter<>(getContext(), android.R.layout.simple_dropdown_item_1line, compArray);
         noteText.setAdapter(adapter);
 
         noteText.addTextChangedListener(new TextWatcher() {

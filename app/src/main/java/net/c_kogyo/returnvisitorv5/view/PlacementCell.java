@@ -2,6 +2,7 @@ package net.c_kogyo.returnvisitorv5.view;
 
 import android.animation.Animator;
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -12,22 +13,25 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
+import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.Placement;
 
 /**
  * Created by SeijiShii on 2017/03/12.
  */
 
-public class PlacementCell extends BaseAnimateView {
+public abstract class PlacementCell extends BaseAnimateView {
 
     private Placement mPlacement;
     private PlacementCellListener mCellListener;
     private boolean mExtracted;
+    private boolean mShowDeleteButton;
 
     public PlacementCell(Context context,
                          Placement placement,
                          boolean extracted,
-                         PlacementCellListener listener) {
+                         @Nullable PlacementCellListener listener,
+                         boolean showDeleteButton) {
         super(context,
                 0,
                 R.layout.placement_cell);
@@ -35,6 +39,7 @@ public class PlacementCell extends BaseAnimateView {
         mExtracted = extracted;
         mPlacement = placement;
         mCellListener = listener;
+        mShowDeleteButton = showDeleteButton;
 
         initCommon();
     }
@@ -43,10 +48,6 @@ public class PlacementCell extends BaseAnimateView {
         super(context, attrs, resId);
     }
 
-    @Override
-    public void setLayoutParams(BaseAnimateView view) {
-        view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0));
-    }
 
     private void initCommon() {
 
@@ -87,46 +88,60 @@ public class PlacementCell extends BaseAnimateView {
         }
     }
 
+    private TextView placementText;
     private void initPlacementText() {
-        TextView placementText = (TextView) getViewById(R.id.placement_text);
-        placementText.setText(mPlacement.toString(getContext()));
+        placementText = (TextView) getViewById(R.id.placement_text);
+        refreshData(null);
     }
 
     private void initDeleteButton() {
         // DONE: 2017/03/23 クリックイベントが起きたり起きなかったり
         final Button deleteButton = (Button) getViewById(R.id.plc_delete_button);
-        deleteButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                PlacementCell.this.changeViewHeight(0,
-                                        true,
-                                        null,
-                                        new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animator) {
+        if (mShowDeleteButton) {
+            deleteButton.setVisibility(VISIBLE);
+            deleteButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    PlacementCell.this.changeViewHeight(0,
+                            true,
+                            null,
+                            new Animator.AnimatorListener() {
+                                @Override
+                                public void onAnimationStart(Animator animator) {
 
-                    }
+                                }
 
-                    @Override
-                    public void onAnimationEnd(Animator animator) {
+                                @Override
+                                public void onAnimationEnd(Animator animator) {
 
-                        if (mCellListener != null) {
-                            mCellListener.postCompress(PlacementCell.this);
-                        }
-                    }
+                                    if (mCellListener != null) {
+                                        mCellListener.postCompress(PlacementCell.this);
+                                    }
+                                }
 
-                    @Override
-                    public void onAnimationCancel(Animator animator) {
+                                @Override
+                                public void onAnimationCancel(Animator animator) {
 
-                    }
+                                }
 
-                    @Override
-                    public void onAnimationRepeat(Animator animator) {
+                                @Override
+                                public void onAnimationRepeat(Animator animator) {
 
-                    }
-                });
-            }
-        });
+                                }
+                            });
+                }
+            });
+        } else {
+            deleteButton.setVisibility(INVISIBLE);
+        }
+    }
+
+    public void refreshData(@Nullable Placement placement) {
+        if (placement != null) {
+            mPlacement = placement;
+        }
+
+        placementText.setText(mPlacement.toString(getContext()));
     }
 
     public Placement getPlacement() {

@@ -14,6 +14,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.FrameLayout;
@@ -45,6 +46,7 @@ import net.c_kogyo.returnvisitorv5.service.FetchAddressIntentService;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 import net.c_kogyo.returnvisitorv5.util.InputUtil;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
+import net.c_kogyo.returnvisitorv5.view.BaseAnimateView;
 import net.c_kogyo.returnvisitorv5.view.ClearEditText;
 import net.c_kogyo.returnvisitorv5.view.PlacementCell;
 import net.c_kogyo.returnvisitorv5.view.PriorityRater;
@@ -632,9 +634,28 @@ public class RecordVisitActivity extends AppCompatActivity {
                 }
 
                 // PENDING: 2017/03/08 要動作検証 noteがAutoCompListについかされたかどうか
+
+                ArrayList<Placement> clonedPlacements = new ArrayList<>();
                 for (VisitDetail visitDetail : mVisit.getVisitDetails()) {
                     RVData.getInstance().noteCompList.addIfNoSameName(visitDetail.getNote());
+
+                    for (Placement placement : visitDetail.getPlacements()) {
+                        try {
+                            clonedPlacements.add(placement.clone(false));
+                        } catch (CloneNotSupportedException e) {
+                            //
+                        }
+                    }
+
                 }
+                for (Placement placement : mVisit.getPlacements()) {
+                    try {
+                        clonedPlacements.add(placement.clone(false));
+                    } catch (CloneNotSupportedException e) {
+                        //
+                    }
+                }
+                RVData.getInstance().placementList.addList(clonedPlacements);
 
                 switch (getIntent().getAction()) {
                     case NEW_HOUSE_ACTION:
@@ -721,18 +742,19 @@ public class RecordVisitActivity extends AppCompatActivity {
     private void showPlacementDialog(String parentId) {
 
         PlacementDialog placementDialog = new PlacementDialog(this, parentId);
-        placementDialog.setOnButtonClickListener(new PlacementDialog.OnButtonClickListener() {
+        placementDialog.setOnButtonClickListener(new PlacementDialog.PlacementDialogListener() {
             @Override
             public void onCancelClick() {
                 fadeDialogOverlay(false, null);
             }
 
             @Override
-            public void onOkClick(Placement placement, String parentId) {
+            public void onDecidePlacement(Placement placement, String parentId) {
 
                 addPlacement(placement, parentId);
                 addPlacementCell(placement, parentId, false);
                 fadeDialogOverlay(false, null);
+
             }
         });
         dialogFrame.addView(placementDialog);
@@ -776,7 +798,13 @@ public class RecordVisitActivity extends AppCompatActivity {
                     mVisit.getPlacements().remove(cell.getPlacement());
                     placementContainer.removeView(cell);
                 }
-            });
+            },
+                    true){
+                @Override
+                public void setLayoutParams(BaseAnimateView view) {
+                    view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                }
+            };
             placementContainer.addView(placementCell);
 
         } else {
