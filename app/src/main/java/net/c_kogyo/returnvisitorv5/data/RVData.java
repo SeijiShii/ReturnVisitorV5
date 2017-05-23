@@ -10,6 +10,7 @@ import net.c_kogyo.returnvisitorv5.data.list.DataList;
 import net.c_kogyo.returnvisitorv5.data.list.DeletedList;
 import net.c_kogyo.returnvisitorv5.data.list.NoteCompList;
 import net.c_kogyo.returnvisitorv5.data.list.PlaceList;
+import net.c_kogyo.returnvisitorv5.data.list.PlacementList;
 import net.c_kogyo.returnvisitorv5.data.list.TagList;
 import net.c_kogyo.returnvisitorv5.data.list.VisitList;
 import net.c_kogyo.returnvisitorv5.data.list.WorkList;
@@ -51,8 +52,8 @@ public class RVData {
     public VisitList visitList;
     public TagList tagList;
     public NoteCompList noteCompList;
-    public DataList<Publication> pubList;
     public WorkList workList;
+    public PlacementList placementList;
 
     public DeletedList inDeviceDeletedList;
     public DeletedList inCloudDeletedList;
@@ -69,9 +70,9 @@ public class RVData {
 
         tagList = new TagList();
         noteCompList = new NoteCompList();
-        pubList = new DataList<>();
 
         workList = new WorkList();
+        placementList = new PlacementList();
 
         inDeviceDeletedList = new DeletedList();
         inCloudDeletedList = new DeletedList();
@@ -223,11 +224,11 @@ public class RVData {
                     case "NoteCompItem":
                         noteCompList.setOrAdd(new NoteCompItem(record));
                         break;
-                    case "Publication":
-                        pubList.setOrAdd(new Publication(record));
-                        break;
                     case "Work":
                         workList.setOrAdd(new Work(record));
+                        break;
+                    case "Placement":
+                        placementList.setOrAdd(new Placement(record));
                         break;
                     case "DeletedData":
                         if (source == RecordArraySource.FROM_CLOUD) {
@@ -249,25 +250,25 @@ public class RVData {
 
             switch (deletedData.getClassName()) {
                 case "Place":
-                    placeList.deleteById(deletedData.getDataId());
+                    placeList.deleteByDeletedData(deletedData);
                     break;
                 case "Person":
-                    personList.deleteById(deletedData.getDataId());
+                    personList.deleteByDeletedData(deletedData);
                     break;
                 case "Visit":
-                    visitList.deleteById(deletedData.getDataId());
+                    visitList.deleteByDeletedData(deletedData);
                     break;
                 case "Tag":
-                    tagList.deleteById(deletedData.getDataId());
+                    tagList.deleteByDeletedData(deletedData);
                     break;
                 case "NoteCompItem":
-                    noteCompList.deleteById(deletedData.getDataId());
-                    break;
-                case "Publication":
-                    pubList.deleteById(deletedData.getDataId());
+                    noteCompList.deleteByDeletedData(deletedData);
                     break;
                 case "Work":
-                    workList.deleteById(deletedData.getDataId());
+                    workList.deleteByDeletedData(deletedData);
+                    break;
+                case "Placement":
+                    placementList.deleteByDeletedData(deletedData);
                     break;
                 case "DeletedData":
 
@@ -362,12 +363,12 @@ public class RVData {
                 array.put(new Record(note).getFullJSON());
             }
 
-            for (Publication pub : pubList ) {
-                array.put(new Record(pub).getFullJSON());
-            }
-
             for (Work work : workList) {
                 array.put(new Record(work).getFullJSON());
+            }
+
+            for (Placement placement : placementList) {
+                array.put(new Record(placement).getFullJSON());
             }
 
             for (DeletedData deletedData : inDeviceDeletedList) {
@@ -505,12 +506,12 @@ public class RVData {
             array.put(new Record(tag).getFullJSON());
         }
 
-        for (Publication publication : pubList.getListLaterThanTime(dateTimeInMills)) {
-            array.put(new Record(publication).getFullJSON());
-        }
-
         for (Work work : workList.getListLaterThanTime(dateTimeInMills)) {
             array.put(new Record(work).getFullJSON());
+        }
+
+        for (Placement placement : placementList.getListLaterThanTime(dateTimeInMills)) {
+            array.put(new Record(placement).getFullJSON());
         }
 
         for (DataItem item : noteCompList.getListLaterThanTime(dateTimeInMills)) {

@@ -82,10 +82,12 @@ public class Placement extends DataItem implements Cloneable{
     public static final String CATEGORY = "category";
     public static final String MAGAZINE_CATEGORY = "magazine_category";
     public static final String NUMBER = "number";
+    public static final String PLACED_DATE = "placed_date";
 
     private Category category;
     private MagazineCategory magCategory;
     private Calendar number;
+    private Calendar placedDate;
 
     public Placement() {
         super(PLACEMENT);
@@ -94,6 +96,8 @@ public class Placement extends DataItem implements Cloneable{
         this.magCategory = MagazineCategory.WATCHTOWER;
         this.number = Calendar.getInstance();
 
+        this.placedDate = Calendar.getInstance();
+
     }
 
     public Placement(Category category) {
@@ -101,6 +105,10 @@ public class Placement extends DataItem implements Cloneable{
         this();
 
         this.category = category;
+    }
+
+    public Placement(Record record) {
+        this(record.getDataJSON());
     }
 
     public Placement(JSONObject object) {
@@ -115,6 +123,11 @@ public class Placement extends DataItem implements Cloneable{
                 this.number = Calendar.getInstance();
                 this.number.setTimeInMillis(object.getLong(NUMBER));
             }
+
+            this.placedDate = Calendar.getInstance();
+            if (object.has(PLACED_DATE)) {
+                this.placedDate.setTimeInMillis(object.getLong(PLACED_DATE));
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -128,6 +141,9 @@ public class Placement extends DataItem implements Cloneable{
             object.put(CATEGORY, this.category);
             object.put(MAGAZINE_CATEGORY, this.magCategory);
             object.put(NUMBER, this.number.getTimeInMillis());
+            if (this.placedDate != null) {
+                object.put(PLACED_DATE, this.placedDate.getTimeInMillis());
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -191,29 +207,6 @@ public class Placement extends DataItem implements Cloneable{
         return number;
 
     }
-
-//    @Override
-//    public HashMap<String, Object> toMap() {
-//
-//        HashMap<String, Object> map = super.toMap();
-//
-//        map.put(CATEGORY, category.toString());
-//        map.put(MAGAZINE_CATEGORY, magCategory.toString());
-//        map.put(NUMBER, number.getTimeInMillis());
-//
-//        return map;
-//  }
-//
-//    @Override
-//    public void setMap(@NonNull HashMap<String, Object> map) {
-//        super.setMap(map);
-//
-//        this.category = Category.valueOf(map.get(CATEGORY).toString());
-//        this.magCategory = MagazineCategory.valueOf(map.get(MAGAZINE_CATEGORY).toString());
-//        this.number = Calendar.getInstance();
-//        this.number.setTimeInMillis(Long.valueOf(map.get(NUMBER).toString()));
-//
-//    }
 
     public void setNumber(Calendar number) {
         this.number = number;
@@ -281,8 +274,7 @@ public class Placement extends DataItem implements Cloneable{
         return list;
     }
 
-    @Override
-    protected Object clone() throws CloneNotSupportedException {
+    public Placement clone (boolean withPlacedDate)  throws CloneNotSupportedException{
 
         Placement clonedPlc = (Placement) super.clone();
 
@@ -290,6 +282,16 @@ public class Placement extends DataItem implements Cloneable{
         clonedPlc.magCategory = this.magCategory;
         clonedPlc.number = (Calendar) this.number.clone();
 
+        if (withPlacedDate) {
+            clonedPlc.placedDate = (Calendar) this.placedDate.clone();
+        }else {
+            clonedPlc.placedDate = Calendar.getInstance();
+        }
+
         return clonedPlc;
+    }
+
+    public Calendar getPlacedDate() {
+        return placedDate;
     }
 }
