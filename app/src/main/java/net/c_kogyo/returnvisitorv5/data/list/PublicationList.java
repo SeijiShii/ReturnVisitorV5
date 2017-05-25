@@ -1,6 +1,7 @@
 package net.c_kogyo.returnvisitorv5.data.list;
 
 import android.content.Context;
+import android.view.ViewDebug;
 
 import net.c_kogyo.returnvisitorv5.data.Placement;
 import net.c_kogyo.returnvisitorv5.data.Publication;
@@ -96,4 +97,41 @@ public class PublicationList extends DataList<Publication> {
         return rankedList;
     }
 
+    public Publication getCorrespondingData(Publication publication) {
+        if (indexOf(publication) < 0) {
+            return publication;
+        } else {
+            return get(indexOf(publication));
+        }
+    }
+
+    @Override
+    synchronized public void setOrAdd(Publication data) {
+
+        if (contains(data)) {
+//            list.set(indexOf(data), data);
+        } else {
+            list.add(data);
+        }
+    }
+
+    @Override
+    synchronized public boolean contains(Publication data) {
+        return indexOf(data) >= 0;
+    }
+
+
+    @Override
+    public synchronized int indexOf(Publication data) {
+
+        for (int i = 0; i < list.size() ; i++ ) {
+
+            Publication data1 = list.get(i);
+
+            if (data.equals(data1)) {
+                return i;
+            }
+        }
+        return -1;
+    }
 }

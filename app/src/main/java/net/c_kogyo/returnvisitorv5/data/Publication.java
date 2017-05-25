@@ -267,16 +267,10 @@ public class Publication extends DataItem implements Cloneable{
         return list;
     }
 
-    @Override
-    public boolean equals(Object obj) {
+    public boolean equals(Publication pub) {
 
-        if (super.equals(obj))
+        if (super.equals(pub))
             return true;
-
-        if (!(obj instanceof Publication))
-            return false;
-
-        Publication pub = (Publication) obj;
 
         if (this.category == Category.MAGAZINE) {
 

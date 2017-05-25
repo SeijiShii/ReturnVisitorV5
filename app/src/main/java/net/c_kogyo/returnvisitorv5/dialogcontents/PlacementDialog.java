@@ -223,7 +223,8 @@ public  class  PlacementDialog <T extends SwitchablePagerBaseFragment>extends Fr
                 mPublication.setName(generalNameText.getText().toString());
 
                 RVData.getInstance().publicationList.setOrAdd(mPublication);
-                Placement placement = new Placement(mPublication, getContext());
+                Publication publication = RVData.getInstance().publicationList.getCorrespondingData(mPublication);
+                Placement placement = new Placement(publication, getContext());
 
                 if (mListener != null) {
                     mListener.onDecidePlacement(placement, mParentId);
@@ -381,7 +382,8 @@ public  class  PlacementDialog <T extends SwitchablePagerBaseFragment>extends Fr
                 mPublication.setName(magazineNameText.getText().toString());
 
                 RVData.getInstance().publicationList.setOrAdd(mPublication);
-                Placement placement = new Placement(mPublication, getContext());
+                Publication publication = RVData.getInstance().publicationList.getCorrespondingData(mPublication);
+                Placement placement = new Placement(publication, getContext());
 
                 if (mListener != null) {
                     mListener.onDecidePlacement(placement, mParentId);
