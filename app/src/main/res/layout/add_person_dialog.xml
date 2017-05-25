@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!-- Dialog title -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_height_small"
+        android:textColor="@color/textColorGray"
+        android:textSize="@dimen/text_size_large"
+        android:gravity="center"
+        android:text="@string/add_person_from_other_place"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/ui_height_small"
+            android:id="@+id/data_frame">
+
+            <!-- Search Text -->
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/search_text"
+                android:background="@drawable/gray_trans_circle"
+                android:padding="5dp"
+                android:layout_margin="5dp"
+                android:hint="@string/search"
+                android:gravity="center_vertical|left"/>
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/map_frame"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/whiteFog"
+                android:id="@+id/person_list_frame">
+
+                <ListView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/person_list_view"
+                    android:layout_centerInParent="true"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/whiteFog"
+                android:id="@+id/message_frame">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/textColorGray"
+                    android:textSize="@dimen/text_size_middle"
+                    android:text="@string/no_item_to_show"
+                    android:layout_centerInParent="true"/>
+
+            </RelativeLayout>
+
+        </FrameLayout>
+    </LinearLayout>
+
+    <!-- Cancel Button -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_height_small">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:id="@+id/cancel_button"
+            android:background="@drawable/trans_orange_selector"
+            android:textSize="@dimen/text_size_middle"
+            android:textColor="@color/colorAccent"
+            android:text="@string/cancel"/>
+
+    </RelativeLayout>
+
+</LinearLayout>

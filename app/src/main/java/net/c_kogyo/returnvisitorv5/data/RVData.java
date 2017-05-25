@@ -9,6 +9,7 @@ import android.util.Log;
 import net.c_kogyo.returnvisitorv5.data.list.DataList;
 import net.c_kogyo.returnvisitorv5.data.list.DeletedList;
 import net.c_kogyo.returnvisitorv5.data.list.NoteCompList;
+import net.c_kogyo.returnvisitorv5.data.list.PersonList;
 import net.c_kogyo.returnvisitorv5.data.list.PlaceList;
 import net.c_kogyo.returnvisitorv5.data.list.PublicationList;
 import net.c_kogyo.returnvisitorv5.data.list.TagList;
@@ -48,7 +49,7 @@ public class RVData {
 //    public static final String PUB_LIST = "pub_list";
 
     public PlaceList placeList;
-    public DataList<Person> personList;
+    public PersonList personList;
     public VisitList visitList;
     public TagList tagList;
     public NoteCompList noteCompList;
@@ -65,7 +66,7 @@ public class RVData {
     private RVData() {
 
         placeList = new PlaceList();
-        personList = new DataList<>();
+        personList = new PersonList();
         visitList = new VisitList();
 
         tagList = new TagList();

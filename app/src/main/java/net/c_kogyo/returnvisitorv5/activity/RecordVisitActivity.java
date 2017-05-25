@@ -38,6 +38,9 @@ import net.c_kogyo.returnvisitorv5.data.Publication;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
+import net.c_kogyo.returnvisitorv5.data.Work;
+import net.c_kogyo.returnvisitorv5.dialogcontents.AddPersonDialog;
+import net.c_kogyo.returnvisitorv5.dialogcontents.AddWorkDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.HousingComplexDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.PersonDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.PlacementDialog;
@@ -98,6 +101,7 @@ public class RecordVisitActivity extends AppCompatActivity {
         initDateText();
         initTimeText();
         initAddPersonButton();
+        initOtherPlacePersonButton();
 
         initRecordPlacementButton();
         initPlacementContainer();
@@ -111,6 +115,7 @@ public class RecordVisitActivity extends AppCompatActivity {
 
         initScrollView();
         initLogoButton();
+
     }
 
     private void initData() {
@@ -892,6 +897,41 @@ public class RecordVisitActivity extends AppCompatActivity {
                 },
                 mMapView);
         dialogFrame.addView(setPlaceDialog);
+        dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                fadeDialogOverlay(false, null);
+                return true;
+            }
+        });
+        fadeDialogOverlay(true, null);
+    }
+
+    private void initOtherPlacePersonButton() {
+        Button otherPlacePersonButton = (Button) findViewById(R.id.other_place_person_button);
+        otherPlacePersonButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showAddPersonDialog();
+            }
+        });
+    }
+
+
+    private void showAddPersonDialog() {
+        AddPersonDialog addPersonDialog = new AddPersonDialog(this,
+                new AddPersonDialog.AddPersonDialogListener() {
+                    @Override
+                    public void onCancel() {
+                        fadeDialogOverlay(false, null);
+                    }
+
+                    @Override
+                    public void onSetPerson(Person person) {
+
+                    }
+                }, mMapView);
+        dialogFrame.addView(addPersonDialog);
         dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {

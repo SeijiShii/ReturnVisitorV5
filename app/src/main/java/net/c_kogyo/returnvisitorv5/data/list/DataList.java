@@ -166,5 +166,15 @@ public class DataList<T extends DataItem> implements Iterable<T>{
         return laterList;
     }
 
+    public ArrayList<T> getList(ArrayList<String> ids) {
+        ArrayList<T> items = new ArrayList<>();
+        for (String id : ids) {
+            if( getById(id) != null){
+                items.add(getById(id));
+            }
+        }
+        return items;
+    }
+
 }
 

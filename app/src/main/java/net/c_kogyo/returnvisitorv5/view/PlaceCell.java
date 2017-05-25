@@ -27,16 +27,24 @@ public class PlaceCell extends FrameLayout {
 
     private Place mPlace;
     private PlaceCellListener mListener;
+    private boolean mTransparent;
 
-    public PlaceCell(@NonNull Context context, Place place) {
+    public PlaceCell(@NonNull Context context,
+                     Place place,
+                     @Nullable PlaceCellListener listener,
+                     boolean transParent) {
         super(context);
 
+        mTransparent = transParent;
         mPlace = place;
+        mListener = listener;
+
         initCommon();
     }
 
     public PlaceCell(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        mTransparent = true;
     }
 
     public void setPlaceAndInitialize(Place place, PlaceCellListener listener) {
@@ -48,6 +56,10 @@ public class PlaceCell extends FrameLayout {
     private View view;
     private void initCommon() {
         view = LayoutInflater.from(getContext()).inflate(R.layout.place_cell, this);
+
+        if (!mTransparent) {
+            view.setBackgroundResource(R.drawable.gray_white_circle);
+        }
 
         initPlaceMarker();
         initPlaceText();
@@ -74,12 +86,18 @@ public class PlaceCell extends FrameLayout {
     private Button menuButton;
     private void initMenuButton() {
         menuButton = (Button) view.findViewById(R.id.edit_button);
-        menuButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showPopupMenu();
-            }
-        });
+
+        if (mListener != null) {
+            menuButton.setVisibility(VISIBLE);
+            menuButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showPopupMenu();
+                }
+            });
+        } else {
+            menuButton.setVisibility(INVISIBLE);
+        }
     }
 
     private void showPopupMenu() {

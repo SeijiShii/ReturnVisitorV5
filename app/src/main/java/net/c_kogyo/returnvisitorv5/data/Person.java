@@ -289,4 +289,18 @@ public class Person extends DataItem implements Cloneable{
         return person;
     }
 
+    public Visit.Priority getPriority() {
+
+        Visit.Priority priority = Visit.Priority.NONE;
+        for (Visit visit : RVData.getInstance().visitList){
+            for (VisitDetail visitDetail : visit.getVisitDetails()) {
+                if (visitDetail.getPersonId().equals(this.id) && visitDetail.getPriority().num() > priority.num()) {
+                    priority = visitDetail.getPriority();
+                }
+            }
+        }
+        return priority;
+
+    }
+
 }
