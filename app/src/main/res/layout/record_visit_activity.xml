@@ -158,7 +158,7 @@
                     android:gravity="center"
                     android:text="@string/person_from_other_place"/>
 
-                <!-- Record Placement -->
+                <!-- Record Publication -->
                 <Button
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/ui_height_small"
@@ -170,7 +170,7 @@
                     android:gravity="center"
                     android:text="@string/record_placement_button"/>
 
-                <!-- Placement Container -->
+                <!-- Publication Container -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

@@ -1461,7 +1461,11 @@ public class MapActivity extends AppCompatActivity
             case STATUS_200_SYNC_OK:
                 saveLastSyncTime();
                 RVData.getInstance().saveData(this);
-                placeMarkers.drawAllMarkers();
+                if (placeMarkers == null) {
+                    placeMarkers = new PlaceMarkers(mMap);
+                } else {
+                    placeMarkers.drawAllMarkers();
+                }
                 break;
 
             case STATUS_202_AUTHENTICATED:

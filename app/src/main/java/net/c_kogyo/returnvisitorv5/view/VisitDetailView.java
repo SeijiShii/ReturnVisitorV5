@@ -18,6 +18,7 @@ import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.NoteCompItem;
 import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Placement;
+import net.c_kogyo.returnvisitorv5.data.Publication;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
@@ -218,7 +219,7 @@ public class VisitDetailView extends BaseAnimateView {
 
         PlacementCell placementCell
                 = new PlacementCell(getContext(),
-                        placement,
+                placement,
                         extracted,
                         new PlacementCell.PlacementCellListener() {
             @Override
@@ -232,15 +233,8 @@ public class VisitDetailView extends BaseAnimateView {
                 mVisitDetail.getPlacements().remove(cell.getPlacement());
                 changeToTheHeight();
             }
-        },
-        true){
-            @Override
-            public void setLayoutParams(BaseAnimateView view) {
-                view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT));
-            }
-        };
+        });
         placementContainer.addView(placementCell);
-
     }
     
     private Button tagButton;

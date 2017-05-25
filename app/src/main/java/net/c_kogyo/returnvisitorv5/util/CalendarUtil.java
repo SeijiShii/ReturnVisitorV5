@@ -42,4 +42,13 @@ public class CalendarUtil {
 
         return (year1 < year2) || ( year1 == year2 && mMonth1 < mMonth2);
     }
+
+    public static boolean isSameNumber(Calendar number1, Calendar number2) {
+
+        int num1 = number1.get(Calendar.MONTH) / 2 + 1;
+        int num2 = number2.get(Calendar.MONTH) / 2 + 1;
+
+        return number1.get(Calendar.YEAR) == number2.get(Calendar.YEAR) && num1 == num2;
+
+    }
 }

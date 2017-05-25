@@ -10,7 +10,7 @@ import net.c_kogyo.returnvisitorv5.data.list.DataList;
 import net.c_kogyo.returnvisitorv5.data.list.DeletedList;
 import net.c_kogyo.returnvisitorv5.data.list.NoteCompList;
 import net.c_kogyo.returnvisitorv5.data.list.PlaceList;
-import net.c_kogyo.returnvisitorv5.data.list.PlacementList;
+import net.c_kogyo.returnvisitorv5.data.list.PublicationList;
 import net.c_kogyo.returnvisitorv5.data.list.TagList;
 import net.c_kogyo.returnvisitorv5.data.list.VisitList;
 import net.c_kogyo.returnvisitorv5.data.list.WorkList;
@@ -53,7 +53,7 @@ public class RVData {
     public TagList tagList;
     public NoteCompList noteCompList;
     public WorkList workList;
-    public PlacementList placementList;
+    public PublicationList publicationList;
 
     public DeletedList inDeviceDeletedList;
     public DeletedList inCloudDeletedList;
@@ -72,7 +72,7 @@ public class RVData {
         noteCompList = new NoteCompList();
 
         workList = new WorkList();
-        placementList = new PlacementList();
+        publicationList = new PublicationList();
 
         inDeviceDeletedList = new DeletedList();
         inCloudDeletedList = new DeletedList();
@@ -227,8 +227,8 @@ public class RVData {
                     case "Work":
                         workList.setOrAdd(new Work(record));
                         break;
-                    case "Placement":
-                        placementList.setOrAdd(new Placement(record));
+                    case "Publication":
+                        publicationList.setOrAdd(new Publication(record));
                         break;
                     case "DeletedData":
                         if (source == RecordArraySource.FROM_CLOUD) {
@@ -267,8 +267,8 @@ public class RVData {
                 case "Work":
                     workList.deleteByDeletedData(deletedData);
                     break;
-                case "Placement":
-                    placementList.deleteByDeletedData(deletedData);
+                case "Publication":
+                    publicationList.deleteByDeletedData(deletedData);
                     break;
                 case "DeletedData":
 
@@ -367,8 +367,8 @@ public class RVData {
                 array.put(new Record(work).getFullJSON());
             }
 
-            for (Placement placement : placementList) {
-                array.put(new Record(placement).getFullJSON());
+            for (Publication publication : publicationList) {
+                array.put(new Record(publication).getFullJSON());
             }
 
             for (DeletedData deletedData : inDeviceDeletedList) {
@@ -510,8 +510,8 @@ public class RVData {
             array.put(new Record(work).getFullJSON());
         }
 
-        for (Placement placement : placementList.getListLaterThanTime(dateTimeInMills)) {
-            array.put(new Record(placement).getFullJSON());
+        for (Publication publication : publicationList.getListLaterThanTime(dateTimeInMills)) {
+            array.put(new Record(publication).getFullJSON());
         }
 
         for (DataItem item : noteCompList.getListLaterThanTime(dateTimeInMills)) {

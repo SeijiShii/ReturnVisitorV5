@@ -238,7 +238,7 @@ public class VisitDetail extends DataItem  implements Cloneable{
         if (placements.size() > 0) {
             builder.append("\n").append(context.getString(R.string.placement)).append(":");
             for (Placement placement : placements) {
-                builder.append("\n").append(spaces).append(placement.toString(context));
+                builder.append("\n").append(spaces).append(placement.getPublicationData());
             }
         }
 
@@ -261,8 +261,8 @@ public class VisitDetail extends DataItem  implements Cloneable{
         clonedDetail.isStudy = this.isStudy;
 
         clonedDetail.placements = new ArrayList<>();
-        for (Placement plc : this.placements ) {
-            clonedDetail.placements.add((Placement) plc.clone());
+        for (Placement placement : this.placements) {
+            clonedDetail.placements.add((Placement) placement.clone());
         }
 
         clonedDetail.tagIds = new ArrayList<>(this.tagIds);
@@ -274,9 +274,9 @@ public class VisitDetail extends DataItem  implements Cloneable{
     public int getPlacementCount() {
 
         int count = 0;
-        for (Placement plc : placements) {
-            if (plc.getCategory() != Placement.Category.SHOW_VIDEO
-                    && plc.getCategory() != Placement.Category.OTHER) {
+        for (Placement placement : placements) {
+            if (placement.getCategory() != Publication.Category.SHOW_VIDEO
+                    && placement.getCategory() != Publication.Category.OTHER) {
                 count++;
             }
         }
@@ -286,8 +286,8 @@ public class VisitDetail extends DataItem  implements Cloneable{
     public int getShowVideoCount() {
 
         int count = 0;
-        for (Placement plc : placements) {
-            if (plc.getCategory() == Placement.Category.SHOW_VIDEO) {
+        for (Placement placement : placements) {
+            if (placement.getCategory() == Publication.Category.SHOW_VIDEO) {
                 count++;
             }
         }

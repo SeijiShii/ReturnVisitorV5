@@ -34,6 +34,7 @@ import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
 import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.Placement;
+import net.c_kogyo.returnvisitorv5.data.Publication;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
@@ -78,6 +79,9 @@ public class RecordVisitActivity extends AppCompatActivity {
     private ArrayList<Person> mAddedPersons;
     private ArrayList<Person> mRemovedPersons;
 
+    private ArrayList<Publication> mAddedPublications;
+
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,6 +117,7 @@ public class RecordVisitActivity extends AppCompatActivity {
 
         mAddedPersons = new ArrayList<>();
         mRemovedPersons = new ArrayList<>();
+        mAddedPublications = new ArrayList<>();
 
         Intent intent = getIntent();
         switch (intent.getAction()) {
@@ -635,27 +640,9 @@ public class RecordVisitActivity extends AppCompatActivity {
 
                 // PENDING: 2017/03/08 要動作検証 noteがAutoCompListについかされたかどうか
 
-                ArrayList<Placement> clonedPlacements = new ArrayList<>();
                 for (VisitDetail visitDetail : mVisit.getVisitDetails()) {
                     RVData.getInstance().noteCompList.addIfNoSameName(visitDetail.getNote());
-
-                    for (Placement placement : visitDetail.getPlacements()) {
-                        try {
-                            clonedPlacements.add(placement.clone(false));
-                        } catch (CloneNotSupportedException e) {
-                            //
-                        }
-                    }
-
                 }
-                for (Placement placement : mVisit.getPlacements()) {
-                    try {
-                        clonedPlacements.add(placement.clone(false));
-                    } catch (CloneNotSupportedException e) {
-                        //
-                    }
-                }
-                RVData.getInstance().placementList.addList(clonedPlacements);
 
                 switch (getIntent().getAction()) {
                     case NEW_HOUSE_ACTION:
@@ -798,8 +785,7 @@ public class RecordVisitActivity extends AppCompatActivity {
                     mVisit.getPlacements().remove(cell.getPlacement());
                     placementContainer.removeView(cell);
                 }
-            },
-                    true){
+            }){
                 @Override
                 public void setLayoutParams(BaseAnimateView view) {
                     view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));

@@ -27,21 +27,11 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/ui_height_small"
-                android:id="@+id/search_text"
-                android:background="@drawable/gray_trans_circle"
-                android:padding="5dp"
-                android:layout_margin="5dp"
-                android:hint="@string/search"
-                android:gravity="center_vertical|left"/>
-
-            <ListView
+            <net.c_kogyo.returnvisitorv5.view.SwitchablePager
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:id="@+id/placement_list_view"/>
+                android:id="@+id/switchable_pager"/>
 
             <!-- Cancel Button -->
             <RelativeLayout
@@ -61,7 +51,7 @@
             </RelativeLayout>
         </LinearLayout>
 
-        <!-- General Placement Frame -->
+        <!-- General Publication Frame -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"

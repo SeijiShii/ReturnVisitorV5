@@ -6,41 +6,42 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.Pair;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatSpinner;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.Placement;
+import net.c_kogyo.returnvisitorv5.data.Publication;
 import net.c_kogyo.returnvisitorv5.data.RVData;
-import net.c_kogyo.returnvisitorv5.view.BaseAnimateView;
-import net.c_kogyo.returnvisitorv5.view.PlacementCell;
+import net.c_kogyo.returnvisitorv5.fragment.DefaultPublicationListFragment;
+import net.c_kogyo.returnvisitorv5.fragment.RankedPublicationListFragment;
+import net.c_kogyo.returnvisitorv5.fragment.SwitchablePagerBaseFragment;
+import net.c_kogyo.returnvisitorv5.view.SwitchablePager;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 /**
  * Created by SeijiShii on 2017/03/09.
  */
 
-public class PlacementDialog extends FrameLayout {
+public  class  PlacementDialog <T extends SwitchablePagerBaseFragment>extends FrameLayout {
 
     private PlacementDialogListener mListener;
-    private Placement mPlacement;
+    private Publication mPublication;
     private String mParentId;
 
     public PlacementDialog(@NonNull Context context, String parentId) {
@@ -65,8 +66,8 @@ public class PlacementDialog extends FrameLayout {
 
         view = LayoutInflater.from(getContext()).inflate(R.layout.placement_dialog, this);
 
-        initSearchText();
-        initPlacementList();
+        initSwitchablePager();
+
         initCancelButton();
 
         initGeneralPlcFrame();
@@ -74,88 +75,101 @@ public class PlacementDialog extends FrameLayout {
         initMagazineFrame();
     }
 
-    private TextView searchText;
-    private void initSearchText() {
-        searchText = (EditText) view.findViewById(R.id.search_text);
-        searchText.addTextChangedListener(new TextWatcher() {
+
+
+    private SwitchablePager switchablePager;
+    private RankedPublicationListFragment rankedPublicationListFragment;
+    private void initSwitchablePager() {
+        switchablePager = (SwitchablePager) view.findViewById(R.id.switchable_pager);
+
+        List<Object> contents = new ArrayList<>();
+        rankedPublicationListFragment = RankedPublicationListFragment.newInstance(new RankedPublicationListFragment.RankedPublicationListListener() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                refreshPlacementListView(s.toString());
+            public void onClickItem(Placement placement) {
+                if (mListener != null) {
+                    mListener.onDecidePlacement(placement, mParentId);
+                }
             }
         });
-    }
 
-    private ListView placementListView;
-    private void initPlacementList() {
-
-        placementListView = (ListView) view.findViewById(R.id.placement_list_view);
-
-        initDefaultPlacementList();
-
-        refreshPlacementListView("");
-    }
-
-    private RankedPlacementListAdapter mRankedPlacementListAdapter;
-    private void refreshPlacementListView(String searchWord) {
-        mRankedPlacementListAdapter = new RankedPlacementListAdapter(Calendar.getInstance(), searchWord);
-        mRankedPlacementListAdapter.notifyDataSetChanged();
-
-
-        if (mRankedPlacementListAdapter.getCount() > 0) {
-            placementListView.setAdapter(mRankedPlacementListAdapter);
-            placementListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    try {
-                        mPlacement = ((PlacementCell) view).getPlacement().clone(false);
-                        if (mListener != null) {
-                            mListener.onDecidePlacement(mPlacement, mParentId);
-                        }
-                    } catch (CloneNotSupportedException e) {
-
-                    }
+        contents.add(rankedPublicationListFragment);
+        contents.add(DefaultPublicationListFragment.newInstance(new DefaultPublicationListFragment.DefaultPublicationListListener() {
+            @Override
+            public void onTouchListItem(Publication publication) {
+                mPublication = publication;
+                if (publication.getCategory() == Publication.Category.MAGAZINE) {
+                    fadeInMagazineFrame();
+                } else {
+                    fadeInGeneralFrame();
                 }
-            });
 
-        } else {
-            placementListView.setAdapter(defaultPlacementAdapter);
-            placementListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    if (i == 3) {
-                        // Magazine
-                        mPlacement = new Placement(Placement.Category.MAGAZINE);
-                        fadeInMagazineFrame();
+            }
+        }));
 
-                    } else {
 
-                        mPlacement = new Placement(Placement.Category.getEnum(i));
-                        fadeInGeneralFrame();
-                    }
-                }
-            });
-        }
+        switchablePager.setContents(contents, ((AppCompatActivity)getContext()).getSupportFragmentManager());
     }
 
-    private String[] defaultPlcArray;
-    private ArrayAdapter<String> defaultPlacementAdapter;
-    private void initDefaultPlacementList() {
-        defaultPlcArray = getContext().getResources().getStringArray(R.array.placement_array);
-        defaultPlacementAdapter
-                = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, defaultPlcArray);
 
-    }
+//    private ViewContent rankedContent;
+//    private ArrayList<Publication> rankedList;
+//    private void initRankedListView(String searchWord) {
+//
+//        ListView rankedListView = new ListView(getContext());
+//        rankedListView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+//
+//        rankedList = RVData.getInstance().publicationList.getSearchedAndRankedList(Calendar.getInstance(), searchWord, getContext());
+//
+//        ArrayAdapter<String> rankedListAdapter;
+//        ArrayList<String> rankedDataList = new ArrayList<>();
+//        for (Publication publication : rankedList) {
+//            rankedDataList.add(publication.toString(getContext()));
+//        }
+//
+//        rankedListAdapter
+//                = new ArrayAdapter<>(getContext(),
+//                android.R.layout.simple_list_item_1,
+//                rankedDataList);
+//
+//        rankedListAdapter.notifyDataSetChanged();
+//
+//        rankedListView.setAdapter(rankedListAdapter);
+//        rankedListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//
+//                Placement placement = new Placement(rankedList.get(position), getContext());
+//
+//                if (mListener != null) {
+//                    mListener.onDecidePlacement(placement, mParentId);
+//                }
+//            }
+//        });
+//
+//        rankedContent = new ViewContent(rankedListView, getContext().getString(R.string.history_title));
+//    }
 
+//    private ViewContent defaultContent;
+//    private String[] defaultArray;
+//    private void initDefaultListView() {
+//        defaultArray = getContext().getResources().getStringArray(R.array.placement_array);
+//        ArrayAdapter<String> defaultListAdapter
+//                = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, defaultArray);
+//
+//        ListView defaultListView = new ListView(getContext());
+//        defaultListView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+//
+//        defaultListView.setAdapter(defaultListAdapter);
+//        defaultListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+//            }
+//        });
+//
+//        defaultContent = new ViewContent(defaultListView, getContext().getString(R.string.default_title));
+//
+//    }
 
     private void initCancelButton() {
 
@@ -206,9 +220,13 @@ public class PlacementDialog extends FrameLayout {
         generalOKButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                mPlacement.setName(generalNameText.getText().toString());
+                mPublication.setName(generalNameText.getText().toString());
+
+                RVData.getInstance().publicationList.setOrAdd(mPublication);
+                Placement placement = new Placement(mPublication, getContext());
+
                 if (mListener != null) {
-                    mListener.onDecidePlacement(mPlacement, mParentId);
+                    mListener.onDecidePlacement(placement, mParentId);
                 }
             }
         });
@@ -216,8 +234,10 @@ public class PlacementDialog extends FrameLayout {
 
     private void fadeInGeneralFrame() {
 
+        String defaultArray[] = getContext().getResources().getStringArray(R.array.placement_array);
+
         generalPlcFrame.setVisibility(VISIBLE);
-        categoryText.setText(defaultPlcArray[mPlacement.getCategory().num()]);
+        categoryText.setText(defaultArray[mPublication.getCategory().num()]);
         ValueAnimator animator = ValueAnimator.ofFloat(0f, 1f);
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -304,7 +324,7 @@ public class PlacementDialog extends FrameLayout {
         magCategorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                refreshNumberSpinner(Placement.MagazineCategory.getEnum(i));
+                refreshNumberSpinner(Publication.MagazineCategory.getEnum(i));
             }
 
             @Override
@@ -321,8 +341,8 @@ public class PlacementDialog extends FrameLayout {
     }
 
     private ArrayList<Pair<Calendar, String>> numbers;
-    private void refreshNumberSpinner(Placement.MagazineCategory magCategory) {
-        numbers = Placement.getMagazineNumberArrayList(magCategory, getContext());
+    private void refreshNumberSpinner(Publication.MagazineCategory magCategory) {
+        numbers = Publication.getMagazineNumberArrayList(magCategory, getContext());
         ArrayList<String> numList = new ArrayList<>();
         for (Pair<Calendar, String> pair : numbers) {
             numList.add(pair.second);
@@ -356,12 +376,15 @@ public class PlacementDialog extends FrameLayout {
             @Override
             public void onClick(View view) {
 
-                mPlacement.setMagCategory(Placement.MagazineCategory.getEnum(magCategorySpinner.getSelectedItemPosition()));
-                mPlacement.setNumber(numbers.get(numberSpinner.getSelectedItemPosition()).first);
-                mPlacement.setName(magazineNameText.getText().toString());
+                mPublication.setMagCategory(Publication.MagazineCategory.getEnum(magCategorySpinner.getSelectedItemPosition()));
+                mPublication.setNumber(numbers.get(numberSpinner.getSelectedItemPosition()).first);
+                mPublication.setName(magazineNameText.getText().toString());
+
+                RVData.getInstance().publicationList.setOrAdd(mPublication);
+                Placement placement = new Placement(mPublication, getContext());
 
                 if (mListener != null) {
-                    mListener.onDecidePlacement(mPlacement, mParentId);
+                    mListener.onDecidePlacement(placement, mParentId);
                 }
             }
         });
@@ -377,47 +400,47 @@ public class PlacementDialog extends FrameLayout {
 
     // TODO: 2017/05/22 よく使う配布物を表示
 
-    private class RankedPlacementListAdapter extends BaseAdapter {
-
-        private ArrayList<Placement> mRankedList;
-        public RankedPlacementListAdapter(Calendar today, String searchWord) {
-
-            mRankedList = RVData.getInstance().placementList.getSearchedAndRankedList(today, searchWord, getContext());
-        }
-
-        @Override
-        public int getCount() {
-
-            return mRankedList.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return mRankedList.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return 0;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-
-            if (convertView == null) {
-
-                convertView = new PlacementCell(getContext(), (Placement) getItem(position), true, null, false) {
-                    @Override
-                    public void setLayoutParams(BaseAnimateView view) {
-                        view.setLayoutParams(new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-                    }
-                };
-            } else {
-
-                ((PlacementCell) convertView).refreshData((Placement) getItem(position));
-            }
-            return convertView;
-        }
-    }
+//    private class RankedPlacementListAdapter extends BaseAdapter {
+//
+//        private ArrayList<Publication> mRankedList;
+//        public RankedPlacementListAdapter(Calendar today, String searchWord) {
+//
+//            mRankedList = RVData.getInstance().publicationList.getSearchedAndRankedList(today, searchWord, getContext());
+//        }
+//
+//        @Override
+//        public int getCount() {
+//
+//            return mRankedList.size();
+//        }
+//
+//        @Override
+//        public Object getItem(int position) {
+//            return mRankedList.get(position);
+//        }
+//
+//        @Override
+//        public long getItemId(int position) {
+//            return 0;
+//        }
+//
+//        @Override
+//        public View getView(int position, View convertView, ViewGroup parent) {
+//
+//            if (convertView == null) {
+//
+//                convertView = new PlacementCell(getContext(), (Publication) getItem(position), true, null, false) {
+//                    @Override
+//                    public void setLayoutParams(BaseAnimateView view) {
+//                        view.setLayoutParams(new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+//                    }
+//                };
+//            } else {
+//
+//                ((PlacementCell) convertView).refreshData((Publication) getItem(position));
+//            }
+//            return convertView;
+//        }
+//    }
 
 }
