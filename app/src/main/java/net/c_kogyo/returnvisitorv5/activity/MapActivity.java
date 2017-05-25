@@ -1393,8 +1393,8 @@ public class MapActivity extends AppCompatActivity
             } catch (RVCloudSync.RVCloudSyncException e){
                 Log.e(RVCloudSync.TAG, e.getMessage());
             }
+            refreshLoginButton();
         }
-
     }
 
     // DONE: 2017/05/21 データロード中、同期中の表示
