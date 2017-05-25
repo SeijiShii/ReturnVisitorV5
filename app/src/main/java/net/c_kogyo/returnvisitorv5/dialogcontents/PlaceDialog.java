@@ -172,13 +172,6 @@ public class PlaceDialog extends FrameLayout {
 
                                     }
                                 });
-                                ConfirmDialog.confirmAndDeleteVisit(getContext(),
-                                        new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialogInterface, int i) {
-
-                                            }
-                                        });
                             }
 
                             @Override
