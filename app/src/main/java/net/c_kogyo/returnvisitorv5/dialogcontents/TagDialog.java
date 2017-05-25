@@ -26,6 +26,7 @@ import net.c_kogyo.returnvisitorv5.data.Tag;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
 
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by SeijiShii on 2017/03/06.
@@ -228,7 +229,7 @@ public class TagDialog extends FrameLayout {
     private class TagListAdapter extends BaseAdapter{
 
         private ArrayList<Tag> mTags;
-        TagListAdapter(ArrayList<Tag> tags) {
+        TagListAdapter(CopyOnWriteArrayList<Tag> tags) {
             mTags = new ArrayList<>(tags);
         }
 

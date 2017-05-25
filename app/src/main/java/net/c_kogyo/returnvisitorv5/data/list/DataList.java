@@ -9,6 +9,7 @@ import net.c_kogyo.returnvisitorv5.data.RVData;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by SeijiShii on 2016/07/24.
@@ -19,11 +20,11 @@ public class DataList<T extends DataItem> implements Iterable<T>{
 
     // DONE: 2017/03/16 さくじょしたものが拾われないようにする
     // DONE: 2017/05/10 削除フラグの撤去に伴う変更
-    protected ArrayList<T> list;
+    protected CopyOnWriteArrayList<T> list;
 
     public DataList() {
 
-        this.list = new ArrayList<>();
+        this.list = new CopyOnWriteArrayList<>();
 
     }
 
@@ -109,11 +110,11 @@ public class DataList<T extends DataItem> implements Iterable<T>{
     }
 
     @Override
-    public Iterator<T> iterator() {
+    synchronized public Iterator<T> iterator() {
         return list.iterator();
     }
 
-    synchronized public ArrayList<T> getList() {
+    synchronized public CopyOnWriteArrayList<T> getList() {
         return list;
     }
 
@@ -136,11 +137,11 @@ public class DataList<T extends DataItem> implements Iterable<T>{
         return false;
     }
 
-    synchronized public ArrayList<T> getSearchedItems(String searchWord, Context context) {
+    synchronized public CopyOnWriteArrayList<T> getSearchedItems(String searchWord, Context context) {
 
         String[] words = searchWord.split(" ");
 
-        ArrayList<T> searchResultItems = new ArrayList<>(list);
+        CopyOnWriteArrayList<T> searchResultItems = new CopyOnWriteArrayList<>(list);
 
         for (String word : words) {
             List<T> listToRemove = new ArrayList<>();

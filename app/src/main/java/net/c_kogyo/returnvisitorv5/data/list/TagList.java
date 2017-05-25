@@ -5,6 +5,7 @@ import net.c_kogyo.returnvisitorv5.data.Tag;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by SeijiShii on 2017/05/08.
@@ -13,8 +14,8 @@ import java.util.Comparator;
 public class TagList extends DataList<Tag> {
 
     @Override
-    synchronized public ArrayList<Tag> getList() {
-        ArrayList<Tag> list = new ArrayList<>(super.list);
+    synchronized public CopyOnWriteArrayList<Tag> getList() {
+        CopyOnWriteArrayList<Tag> list = new CopyOnWriteArrayList<>(super.list);
         Collections.sort(list, new Comparator<Tag>() {
             @Override
             public int compare(Tag o1, Tag o2) {
