@@ -73,7 +73,7 @@ public class PublicationList extends DataList<Publication> {
     }
 
 
-    // TODO: 2017/05/23 getSearchedAndRankedList
+    // DONE: 2017/05/23 getSearchedAndRankedList
     public ArrayList<Publication> getSearchedAndRankedList(Calendar today, String searchWord, Context context) {
 
         if (searchWord.length() <= 0)

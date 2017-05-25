@@ -537,7 +537,7 @@ public class RVData {
         void onFinishLoadingData();
     }
 
-    // TODO: 2017/05/22 削除データがうまく飛んでないんだよね。改善した。要検証
+    // DONE: 2017/05/22 削除データがうまく飛んでないんだよね。改善した。要検証
 
 
 

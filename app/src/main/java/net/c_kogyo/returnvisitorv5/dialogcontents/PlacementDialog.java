@@ -398,7 +398,7 @@ public  class  PlacementDialog <T extends SwitchablePagerBaseFragment>extends Fr
 
     }
 
-    // TODO: 2017/05/22 よく使う配布物を表示
+    // DONE: 2017/05/22 よく使う配布物を表示
 
 //    private class RankedPlacementListAdapter extends BaseAdapter {
 //
