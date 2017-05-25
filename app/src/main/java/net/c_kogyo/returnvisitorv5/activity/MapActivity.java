@@ -1386,10 +1386,7 @@ public class MapActivity extends AppCompatActivity
 
         if (mIsLoggedIn){
             try {
-                RVCloudSync.getInstance().startSendingUserData(userName,
-                        password,
-                        RVCloudSync.RVCloudSyncMethod.LOGIN,
-                        this);
+                RVCloudSync.getInstance().startDataSync(userName, password, this);
             } catch (RVCloudSync.RVCloudSyncException e){
                 Log.e(RVCloudSync.TAG, e.getMessage());
             }
@@ -1473,7 +1470,11 @@ public class MapActivity extends AppCompatActivity
                 mIsLoggedIn = true;
                 MapActivity.this.userName = result.userData.userName;
                 MapActivity.this.password = result.userData.password;
-                RVCloudSync.getInstance().startDataSync(userName, password, MapActivity.this);
+                try {
+                    RVCloudSync.getInstance().startDataSync(userName, password, MapActivity.this);
+                } catch (RVCloudSync.RVCloudSyncException e) {
+                    Log.e(RVCloudSync.TAG, e.getMessage());
+                }
                 break;
 
             case STATUS_401_UNAUTHORIZED:
@@ -1485,6 +1486,7 @@ public class MapActivity extends AppCompatActivity
             case REQUEST_TIME_OUT:
             case SERVER_NOT_AVAILABLE:
                 mIsLoggedIn = false;
+                refreshLoginButton();
                 break;
         }
 

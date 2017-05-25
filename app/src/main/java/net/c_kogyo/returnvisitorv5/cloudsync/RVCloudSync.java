@@ -8,7 +8,9 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import net.c_kogyo.returnvisitorv5.Constants;
+import net.c_kogyo.returnvisitorv5.activity.MapActivity;
 import net.c_kogyo.returnvisitorv5.data.RVData;
+import net.c_kogyo.returnvisitorv5.util.EncryptUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -92,7 +94,9 @@ public class RVCloudSync {
     public void startSendingUserData(@Nullable String userName,
                                      @Nullable String password,
                                      final RVCloudSyncMethod method,
-                                     Context context) throws RVCloudSyncException{
+                                     Context context,
+                                     boolean passAlreadyEncrypted)
+                                        throws RVCloudSyncException{
         if (userName == null || password == null)
             return;
 
@@ -109,7 +113,7 @@ public class RVCloudSync {
             return;
 
 
-        final UserData userData = new UserData(userName, password);
+        final UserData userData = new UserData(userName, password, passAlreadyEncrypted);
 
         if (socketClient.isOpen()) {
             sendUserData(userData, method);
@@ -192,7 +196,7 @@ public class RVCloudSync {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                mCallback.onRequestResult(new RequestResult(new UserData(null, null), status));
+                mCallback.onRequestResult(new RequestResult(new UserData(null, null, false), status));
             }
         });
     }
@@ -210,7 +214,11 @@ public class RVCloudSync {
         }
     }
 
-    public void startDataSync(@Nullable String userName, @Nullable String password, Context context) {
+    public void startDataSync(@Nullable String userName, @Nullable String password, Context context) throws RVCloudSyncException{
+
+        if (mCallback == null) {
+            throw new RVCloudSyncException();
+        }
 
         mCallback.onStartRequest(RVCloudSyncMethod.SYNC_DATA);
 
@@ -223,7 +231,7 @@ public class RVCloudSync {
         long lastSyncTime = prefs.getLong(LAST_DEVICE_SYNC_TIME, 0);
 
         final SyncData syncData
-                = new SyncData(new UserData(userName, password),
+                = new SyncData(new UserData(userName, password, true),
                 lastSyncTime,
                 RVData.getInstance().getJSONArrayLaterThanTime(lastSyncTime));
 
@@ -270,9 +278,18 @@ public class RVCloudSync {
     public class UserData {
         public String userName, password;
 
-        private UserData(String userName, String password) {
+        private UserData(@Nullable String userName, @Nullable String password, boolean passAlreadyEncrypted) {
+
+            if (userName == null || password == null) {
+                return;
+            }
+
             this.userName = userName;
-            this.password = password;
+            if (passAlreadyEncrypted) {
+                this.password = password;
+            } else {
+                this.password = EncryptUtil.toEncryptedHashValue("SHA-256", password);
+            }
         }
 
         private UserData(JSONObject object) {
@@ -344,7 +361,11 @@ public class RVCloudSync {
         String password = prefs.getString(Constants.SharedPrefTags.PASSWORD, null);
 
         if (isLoggedIn) {
-            getInstance().startDataSync(userName, password, context);
+            try {
+                RVCloudSync.getInstance().startDataSync(userName, password, context);
+            } catch (RVCloudSync.RVCloudSyncException e) {
+                Log.e(RVCloudSync.TAG, e.getMessage());
+            }
         }
     }
 
