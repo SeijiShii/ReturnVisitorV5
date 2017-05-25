@@ -79,7 +79,7 @@ public class RVData {
 
     }
 
-    public static RVData getInstance() {return instance;}
+    public synchronized static RVData getInstance() {return instance;}
 
     public void setRVDataCallback(@NonNull RVDataCallback rvDataCallback, @NonNull Handler handler) {
         mCallback = rvDataCallback;

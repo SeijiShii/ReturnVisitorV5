@@ -3,6 +3,7 @@ package net.c_kogyo.returnvisitorv5.view;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -68,6 +69,7 @@ public class SwitchablePager <T extends SwitchablePagerBaseFragment> extends Lin
     private ArrayList<T> mContents;
     private ViewContentAdapter mAdapter;
 
+    private Handler handler;
     public void setContents(List<T> contents, FragmentManager fragmentManager) {
 
         mContents = new ArrayList<>(contents);
@@ -93,28 +95,51 @@ public class SwitchablePager <T extends SwitchablePagerBaseFragment> extends Lin
             }
         });
 
-        initSwitches();
-        initBar();
+        handler = new Handler();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (SwitchablePager.this.getWidth() <= 0) {
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
 
-        slideBar();
-        refreshButtons();
+                    }
+                }
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        initSwitches();
+                        initBar();
+
+                        slideBar();
+                        refreshButtons();
+                    }
+                });
+            }
+        }).start();
     }
 
 
     private Button[] buttons;
     private void initSwitches() {
+//        int buttonWidth = switchContainer.getWidth() / 2;
         buttons = new Button[mContents.size()];
         for (int i = 0 ; i < mContents.size() ; i++) {
             buttons[i] = new Button(getContext());
 
             LayoutParams params = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT);
             params.weight = 1;
+            buttons[i].setLayoutParams(params);
+
             buttons[i].setText(mContents.get(i).getTitle());
             buttons[i].setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f);
             buttons[i].setGravity(Gravity.CENTER);
             buttons[i].setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
             buttons[i].setBackground(null);
             buttons[i].setOnClickListener(this);
+
+            switchContainer.addView(buttons[i]);
         }
 
     }
@@ -123,32 +148,36 @@ public class SwitchablePager <T extends SwitchablePagerBaseFragment> extends Lin
     private int barWidth;
     private void initBar() {
 
-        barContainer.measure(0, 0);
-        int containerWidth = barContainer.getMeasuredWidth();
+        int containerWidth = barContainer.getWidth();
 
         barWidth = containerWidth / mContents.size();
         bar = new View(getContext());
 
-        MarginLayoutParams params = new MarginLayoutParams(barWidth, ViewGroup.LayoutParams.MATCH_PARENT);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(barWidth, ViewGroup.LayoutParams.MATCH_PARENT);
         params.setMargins(barWidth * viewPager.getCurrentItem(), 0, 0, 0);
         bar.setLayoutParams(params);
 
-        bar.setBackgroundResource(R.color.colorPrimaryDark);
+        bar.setBackgroundResource(R.color.colorPrimary);
 
         barContainer.addView(bar);
     }
 
     private void slideBar() {
 
-        final int targetMargin = viewPager.getCurrentItem() * barWidth;
+        int targetMargin = viewPager.getCurrentItem() * barWidth;
         ValueAnimator animator = ValueAnimator.ofInt(((MarginLayoutParams) bar.getLayoutParams()).leftMargin, targetMargin);
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                ((MarginLayoutParams) bar.getLayoutParams()).leftMargin = targetMargin;
+
+//                ((MarginLayoutParams) bar.getLayoutParams()).leftMargin = (Integer) animation.getAnimatedValue();
+
+                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(barWidth, ViewGroup.LayoutParams.MATCH_PARENT);
+                params.setMargins((int) animation.getAnimatedValue(), 0, 0, 0);
+                bar.setLayoutParams(params);
             }
         });
-        animator.setDuration(500);
+        animator.setDuration(300);
         animator.start();
     }
 

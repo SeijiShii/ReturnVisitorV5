@@ -1,5 +1,6 @@
 package net.c_kogyo.returnvisitorv5.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -26,16 +27,13 @@ public class DefaultPublicationListFragment extends SwitchablePagerBaseFragment 
 
         mListener = listener;
 
-        DefaultPublicationListFragment fragment = new DefaultPublicationListFragment();
-        return fragment;
+        return new DefaultPublicationListFragment();
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        title = getContext().getString(R.string.default_title);
-
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        title = context.getString(R.string.default_title);
     }
 
     @Nullable

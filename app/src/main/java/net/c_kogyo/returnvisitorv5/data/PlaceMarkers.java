@@ -38,7 +38,7 @@ public class PlaceMarkers {
         drawAllMarkers();
     }
 
-    public void drawAllMarkers() {
+    synchronized public void drawAllMarkers() {
 
         if (this.markers != null) {
             for (PlaceMarker marker : this.markers) {
@@ -56,7 +56,7 @@ public class PlaceMarkers {
         }
     }
 
-    public void addMarker(Place place) {
+    synchronized public void addMarker(Place place) {
 
         if (place.getCategory() == Place.Category.ROOM)
             return;
@@ -74,7 +74,7 @@ public class PlaceMarkers {
         markers.add(new PlaceMarker(place.getId(), marker));
     }
 
-    public void refreshMarker(Place place) {
+    synchronized public void refreshMarker(Place place) {
         PlaceMarker marker = getPlaceMarkerByPlace(place);
         if (marker != null) {
             if (place.getCategory() == Place.Category.HOUSE) {
@@ -87,7 +87,7 @@ public class PlaceMarkers {
         }
     }
 
-    public PlaceMarker getPlaceMarkerByPlace(Place place) {
+    synchronized public PlaceMarker getPlaceMarkerByPlace(Place place) {
 
         for (PlaceMarker marker : markers) {
             if (marker.placeId.equals(place.getId())) {
@@ -97,7 +97,7 @@ public class PlaceMarkers {
         return null;
     }
 
-    @Nullable public Place getPlace(Marker marker) {
+    @Nullable synchronized public Place getPlace(Marker marker) {
 
         for (PlaceMarker placeMarker : markers) {
             if (placeMarker.marker.equals(marker)) {
@@ -107,7 +107,7 @@ public class PlaceMarkers {
         return null;
     }
 
-    public void removeByPlace(Place place) {
+    synchronized public void removeByPlace(Place place) {
         PlaceMarker marker = getPlaceMarkerByPlace(place);
         if (marker == null) return;
 

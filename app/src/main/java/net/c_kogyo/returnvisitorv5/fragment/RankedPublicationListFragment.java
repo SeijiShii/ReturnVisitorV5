@@ -1,5 +1,6 @@
 package net.c_kogyo.returnvisitorv5.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.Editable;
@@ -38,14 +39,12 @@ public class RankedPublicationListFragment extends SwitchablePagerBaseFragment {
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        title = getContext().getString(R.string.history_title);
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        title = context.getString(R.string.history_title);
     }
 
     private View view;
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
