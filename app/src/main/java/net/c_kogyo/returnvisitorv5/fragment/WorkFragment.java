@@ -1,6 +1,7 @@
 package net.c_kogyo.returnvisitorv5.fragment;
 
 import android.animation.Animator;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
 import android.os.Bundle;
@@ -181,7 +182,7 @@ public class WorkFragment extends Fragment {
         }
     }
 
-    private VisitCell generateVisitCell(Visit visit, boolean fromZero) {
+    private VisitCell generateVisitCell(final Visit visit, boolean fromZero) {
 
         int initHeight;
         if (fromZero) {
@@ -194,32 +195,16 @@ public class WorkFragment extends Fragment {
 
             @Override
             public void onDeleteVisit(final VisitCell visitCell1) {
-                visitCell1.changeViewHeight(0, true, null, new Animator.AnimatorListener() {
+                removeVisitCell(visit, new PostRemoveVisitCellListener() {
                     @Override
-                    public void onAnimationStart(Animator animation) {
+                    public void postRemoveVisitCell() {
 
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
                         RVData.getInstance().visitList.deleteById(visitCell1.getVisit().getId());
-                        RVData.getInstance().saveData(getContext());
-                        container.removeView(visitCell1);
-
-                        RVCloudSync.syncDataIfLoggedIn(getContext());
-                    }
-
-                    @Override
-                    public void onAnimationCancel(Animator animation) {
-
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animator animation) {
+                        RVData.getInstance().saveData(WorkFragment.this.getActivity());
+                        RVCloudSync.syncDataIfLoggedIn(WorkFragment.this.getActivity());
 
                     }
                 });
-
             }
 
             @Override
@@ -291,9 +276,9 @@ public class WorkFragment extends Fragment {
                         removeVisitCells(visitsAdded);
                         addVisitCells(visitsRemoved);
 
-                        RVData.getInstance().saveData(getContext());
+                        RVData.getInstance().saveData(getActivity());
 
-                        RVCloudSync.syncDataIfLoggedIn(getContext());
+                        RVCloudSync.syncDataIfLoggedIn(getActivity());
 
                     }
 
@@ -303,7 +288,7 @@ public class WorkFragment extends Fragment {
                         Work deletedWork = workView.getWork();
 //                        RVData.getInstance().workList.deleteById(deletedWork.getId());
                         removeWorkView(deletedWork);
-//                        RVData.getInstance().saveData(getContext(), null);
+//                        RVData.getInstance().saveData(getActivity(), null);
                     }
 
                     @Override
@@ -667,10 +652,10 @@ public class WorkFragment extends Fragment {
                 ViewParent parent = visitCell.getParent();
                 LinearLayout linearLayout = (LinearLayout) parent;
                 linearLayout.removeView(visitCell);
-                verifyItemRemains();
                 if (postRemoveVisitCellListener != null) {
                     postRemoveVisitCellListener.postRemoveVisitCell();
                 }
+                verifyItemRemains();
             }
 
             @Override
