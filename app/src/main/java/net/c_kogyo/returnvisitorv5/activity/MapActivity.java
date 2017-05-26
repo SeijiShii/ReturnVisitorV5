@@ -458,6 +458,9 @@ public class MapActivity extends AppCompatActivity
                 placeMarkers.removeByPlace(tmpPlace);
                 fadeOutOverlay();
                 fadeOutDialogFrame(normalFadeOutListener);
+
+                enableLogoButton(true);
+                enableSearchText(true);
             }
 
             @Override
@@ -493,6 +496,9 @@ public class MapActivity extends AppCompatActivity
                 placeMarkers.removeByPlace(tmpPlace);
                 fadeOutOverlay();
                 fadeOutDialogFrame(normalFadeOutListener);
+
+                enableLogoButton(true);
+                enableSearchText(true);
                 return true;
             }
         });
@@ -506,6 +512,9 @@ public class MapActivity extends AppCompatActivity
 
                 fadeOutDialogFrame(normalFadeOutListener);
                 fadeOutOverlay();
+
+                enableLogoButton(true);
+                enableSearchText(true);
                 return true;
             }
         });
@@ -606,6 +615,9 @@ public class MapActivity extends AppCompatActivity
         public void postFade(View view) {
             dialogFrame.removeAllViews();
             dialogFrame.setVisibility(View.INVISIBLE);
+
+            enableLogoButton(true);
+            enableSearchText(true);
         }
     };
 
@@ -705,6 +717,7 @@ public class MapActivity extends AppCompatActivity
 
                                 fadeOutDialogFrame(normalFadeOutListener);
                                 fadeOutOverlay();
+
                                 // DONE: 2017/03/16 Record Visitへの遷移
                                 startRecordVisitActivityForNewVisit(place);
 
@@ -714,12 +727,14 @@ public class MapActivity extends AppCompatActivity
                             public void onCancelClick() {
                                 fadeOutDialogFrame(normalFadeOutListener);
                                 fadeOutOverlay();
+
                             }
 
                             @Override
                             public void onDeleteClick(Place place) {
                                 fadeOutDialogFrame(normalFadeOutListener);
                                 fadeOutOverlay();
+
                                 placeMarkers.removeByPlace(place);
                                 RVData.getInstance().placeList.deleteById(place.getId());
                                 RVData.getInstance().saveData(MapActivity.this);
@@ -731,6 +746,7 @@ public class MapActivity extends AppCompatActivity
                             public void onEditVisitClick(Visit visit) {
                                 fadeOutDialogFrame(normalFadeOutListener);
                                 fadeOutOverlay();
+
                                 startRecordVisitActivityToEditVisit(visit);
                             }
                         });
@@ -783,6 +799,7 @@ public class MapActivity extends AppCompatActivity
                             public void onClickAddRoomButton(Place newRoom) {
                                 fadeOutOverlay();
                                 fadeOutDialogFrame(normalFadeOutListener);
+
                                 startRecordVisitActivityForNewVisit(newRoom);
                             }
 
@@ -804,12 +821,14 @@ public class MapActivity extends AppCompatActivity
                                 placeMarkers.refreshMarker(housingComplex);
                                 fadeOutOverlay();
                                 fadeOutDialogFrame(normalFadeOutListener);
+
                             }
 
                             @Override
                             public void onClickCancelButton() {
                                 fadeOutOverlay();
                                 fadeOutDialogFrame(normalFadeOutListener);
+
                             }
 
                             @Override
@@ -830,10 +849,12 @@ public class MapActivity extends AppCompatActivity
                 InputUtil.hideSoftKeyboard(MapActivity.this);
                 fadeOutOverlay();
                 fadeOutDialogFrame(normalFadeOutListener);
+
                 return true;
             }
         });
         fadeInDialogFrame(housingComplexDialog);
+        fadeInOverlay(normalOverlayTouchListener);
 
         enableLogoButton(false);
         enableSearchText(false);
@@ -1157,12 +1178,14 @@ public class MapActivity extends AppCompatActivity
 
                         fadeOutOverlay();
                         fadeOutDialogFrame(normalFadeOutListener);
+
                     }
 
                     @Override
                     public void onCancelClick() {
                         fadeOutOverlay();
                         fadeOutDialogFrame(normalFadeOutListener);
+
                     }
                 },
                 true,
@@ -1298,6 +1321,7 @@ public class MapActivity extends AppCompatActivity
             public void onClickClose() {
                 fadeOutOverlay();
                 fadeOutDialogFrame(normalFadeOutListener);
+
             }
 
             @Override
@@ -1613,16 +1637,20 @@ public class MapActivity extends AppCompatActivity
                 fadeOutDialogFrame(new ViewUtil.PostFadeViewListener() {
                     @Override
                     public void postFade(View view) {
+
+                        isSearchDialogShowing = false;
+                        if (searchText.getText().length() > 0) {
+                            searchText.setText("");
+                        }
                         dialogFrame.removeAllViews();
+
+                        fadeInOverlay(normalOverlayTouchListener);
                         showDialogFitToPlace(place);
                         mMap.animateCamera(CameraUpdateFactory.newLatLng(place.getLatLng()));
 
                     }
                 });
-                isSearchDialogShowing = false;
-                if (searchText.getText().length() > 0) {
-                    searchText.setText("");
-                }
+
             }
         },initialSearchWord);
         fadeInDialogFrame(searchDialog);
@@ -1668,7 +1696,7 @@ public class MapActivity extends AppCompatActivity
 
     private void enableSearchText(boolean enabled) {
         ViewUtil.halfFadeView(searchText, enabled, null, null, 500);
-        searchText.setFocusable(enabled);
+        searchText.setEnabled(enabled);
     }
 
     private void showDialogFitToPlace(Place place) {
