@@ -5,6 +5,7 @@ import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
 import android.app.Activity;
+import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,6 +13,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -21,12 +23,15 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ImageView;
@@ -57,6 +62,8 @@ import net.c_kogyo.returnvisitorv5.dialogcontents.PlaceDialog;
 import net.c_kogyo.returnvisitorv5.service.TimeCountService;
 import net.c_kogyo.returnvisitorv5.util.AdMobHelper;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
+import net.c_kogyo.returnvisitorv5.util.InputUtil;
+import net.c_kogyo.returnvisitorv5.util.SoftKeyboard;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 import net.c_kogyo.returnvisitorv5.view.CountTimeFrame;
 
@@ -103,6 +110,10 @@ public class MapActivity extends AppCompatActivity
         initProgressFrame();
         initWaitMessageText();
         initLogoButton();
+
+        initDummyFocusView();
+        initSoftKeyboard();
+        initSearchText();
 
 //        loginDialogHandler = new Handler();
         RVCloudSync.getInstance().setCallback(this, new Handler());
@@ -278,6 +289,8 @@ public class MapActivity extends AppCompatActivity
 
         mapView.onDestroy();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+
+        softKeyboard.unRegisterSoftKeyboardCallback();
 
     }
 
@@ -1512,4 +1525,78 @@ public class MapActivity extends AppCompatActivity
 
     }
     // DONE: 2017/05/22 SAVEのたびにUIが停止するのはいただけない。
+
+    private EditText searchText;
+    private void initSearchText() {
+        searchText = (EditText) findViewById(R.id.search_text);
+        searchText.setAlpha(0.5f);
+
+//        searchText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+//            @Override
+//            public void onFocusChange(View v, boolean hasFocus) {
+//                if (hasFocus) {
+//                    v.setAlpha(1f);
+//                } else {
+//                    v.setAlpha(0.5f);
+//                }
+//            }
+//        });
+        searchText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.length() <= 0) {
+                    dummyFocusView.requestFocus();
+                    InputUtil.hideSoftKeyboard(MapActivity.this);
+                }
+            }
+        });
+    }
+
+    private View dummyFocusView;
+    private void initDummyFocusView() {
+        dummyFocusView = findViewById(R.id.dummy_focus_view);
+        dummyFocusView.requestFocus();
+    }
+
+    private SoftKeyboard softKeyboard;
+    private void initSoftKeyboard() {
+        final Handler handler = new Handler();
+        LinearLayout mainLayout = (LinearLayout) findViewById(R.id.main_layout);
+        InputMethodManager inputMethodManager =  (InputMethodManager) getSystemService(Service.INPUT_METHOD_SERVICE);
+        softKeyboard = new SoftKeyboard(mainLayout, inputMethodManager);
+        softKeyboard.setSoftKeyboardCallback(new SoftKeyboard.SoftKeyboardChanged() {
+            @Override
+            public void onSoftKeyboardHide() {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        dummyFocusView.requestFocus();
+                        searchText.setAlpha(0.5f);
+                    }
+                });
+            }
+
+            @Override
+            public void onSoftKeyboardShow() {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        searchText.setAlpha(1f);
+                    }
+                });
+            }
+        });
+    }
+
+
 }

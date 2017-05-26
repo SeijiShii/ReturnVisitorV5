@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:ads="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:id="@+id/main_layout">
 
     <!-- Main Map Frame -->
     <FrameLayout
@@ -24,15 +25,40 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:orientation="horizontal">
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/logo_button"
-                    android:background="@mipmap/v5_logo"
-                    android:layout_margin="10dp"/>
+                <RelativeLayout
+                    android:layout_width="50dp"
+                    android:layout_height="50dp">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:id="@+id/logo_button"
+                        android:background="@mipmap/v5_logo"
+                        android:layout_centerInParent="true"/>
+                </RelativeLayout>
+
+                <EditText
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:background="@drawable/gray_white_circle"
+                    android:layout_margin="5dp"
+                    android:hint="@string/search"
+                    android:inputType="text"
+                    android:id="@+id/search_text"/>
+
+                <!-- Dummy Focus View -->
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:id="@+id/dummy_focus_view"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"/>
 
             </LinearLayout>
 
