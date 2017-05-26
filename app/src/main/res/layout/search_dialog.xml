@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/text_size_middle"
+                android:textColor="@color/textColorGray"
+                android:gravity="center"
+                android:layout_centerInParent="true"
+                android:id="@+id/no_item_message_text"
+                android:text="@string/no_item_to_show"/>
+
+        </RelativeLayout>
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/search_list_view"/>
+
+    </FrameLayout>
+
+    <!-- Close Button -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_height_small">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:id="@+id/close_button"
+            android:background="@drawable/trans_orange_selector"
+            android:textSize="@dimen/text_size_middle"
+            android:textColor="@color/colorAccent"
+            android:text="@string/close"/>
+
+    </RelativeLayout>
+
+</LinearLayout>

@@ -3,6 +3,7 @@ package net.c_kogyo.returnvisitorv5.util;
 import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.graphics.Point;
+import android.support.annotation.Nullable;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -82,8 +83,8 @@ public class ViewUtil {
 
     public static void fadeView(final View view,
                                 final boolean fadeIn,
-                                View.OnTouchListener onTouchListener,
-                                final PostFadeViewListener fadeViewListener,
+                                @Nullable View.OnTouchListener onTouchListener,
+                                @Nullable final PostFadeViewListener fadeViewListener,
                                 int duration) {
         float origin, target;
 
@@ -91,9 +92,10 @@ public class ViewUtil {
             origin = 0f;
             target = 1f;
 
+            if (onTouchListener != null) {
+                view.setOnTouchListener(onTouchListener);
+            }
             view.setVisibility(View.VISIBLE);
-
-            view.setOnTouchListener(onTouchListener);
 
         } else {
             origin = 1f;
@@ -119,6 +121,61 @@ public class ViewUtil {
                 if (!fadeIn) {
                     view.setVisibility(View.INVISIBLE);
                 }
+                if (fadeViewListener != null) {
+                    fadeViewListener.postFade(view);
+                }
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        animator.setDuration(duration);
+        animator.start();
+    }
+
+    public static void halfFadeView(final View view,
+                                final boolean fadeIn,
+                                @Nullable View.OnTouchListener onTouchListener,
+                                @Nullable final PostFadeViewListener fadeViewListener,
+                                int duration) {
+        float origin, target;
+
+        if (fadeIn) {
+            origin = 0.5f;
+            target = 1f;
+
+            if (onTouchListener != null) {
+                view.setOnTouchListener(onTouchListener);
+            }
+
+        } else {
+            origin = 1f;
+            target = 0.5f;
+            view.setOnTouchListener(null);
+        }
+
+        ValueAnimator animator = ValueAnimator.ofFloat(origin, target);
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                view.setAlpha((float) animation.getAnimatedValue());
+            }
+        });
+        animator.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
                 if (fadeViewListener != null) {
                     fadeViewListener.postFade(view);
                 }

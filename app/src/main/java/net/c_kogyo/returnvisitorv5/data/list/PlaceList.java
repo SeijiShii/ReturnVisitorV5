@@ -2,7 +2,11 @@ package net.c_kogyo.returnvisitorv5.data.list;
 
 import android.support.annotation.Nullable;
 
+import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Place;
+import net.c_kogyo.returnvisitorv5.data.RVData;
+import net.c_kogyo.returnvisitorv5.data.Visit;
+import net.c_kogyo.returnvisitorv5.data.VisitDetail;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,5 +63,21 @@ public class PlaceList extends DataList<Place> {
                 return lhs.getPriority().num() - rhs.getPriority().num();
             }
         });
+    }
+
+    public ArrayList<Place> getByPerson(Person person) {
+
+        ArrayList<String> placeIds = new ArrayList<>();
+
+        for (Visit visit : RVData.getInstance().visitList) {
+            for (VisitDetail visitDetail : visit.getVisitDetails()) {
+                if (visitDetail.getPersonId().equals(person.getId())) {
+                    if (!placeIds.contains(visitDetail.getPlaceId())) {
+                        placeIds.add(visitDetail.getPlaceId());
+                    }
+                }
+            }
+        }
+        return getList(placeIds);
     }
 }

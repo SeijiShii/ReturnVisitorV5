@@ -34,6 +34,8 @@ import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.service.FetchAddressIntentService;
 import net.c_kogyo.returnvisitorv5.util.ConfirmDialog;
+import net.c_kogyo.returnvisitorv5.util.InputUtil;
+import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 
 import java.util.ArrayList;
 
@@ -151,7 +153,7 @@ public class HousingComplexDialog extends FrameLayout {
             @Override
             public void onClick(View v) {
 
-                hideSoftKeyboard();
+                InputUtil.hideSoftKeyboard((Activity) getContext());
 
                 // DONE: 2017/03/27 リストに部屋を追加する処理
                 String name = roomText.getText().toString();
@@ -330,15 +332,6 @@ public class HousingComplexDialog extends FrameLayout {
         RVCloudSync.syncDataIfLoggedIn(getContext());
     }
 
-    private void hideSoftKeyboard() {
-        InputMethodManager inputMethodManager = (InputMethodManager)  getContext().getSystemService(Activity.INPUT_METHOD_SERVICE);
-
-        View view = ((Activity) getContext()).getCurrentFocus();
-        if (view != null) {
-            inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
-        }
-    }
-
     private class RoomListAdapter extends BaseAdapter{
 
         private ArrayList<Place> mRoomList;
@@ -408,7 +401,7 @@ public class HousingComplexDialog extends FrameLayout {
         private View view;
         private void initCommon() {
 
-            view = LayoutInflater.from(getContext()).inflate(R.layout.place_cell, this);
+            view = LayoutInflater.from(getContext()).inflate(R.layout.room_list_cell, this);
             initPriorityMarker();
             initNameText();
             initMenuButton();
@@ -419,7 +412,7 @@ public class HousingComplexDialog extends FrameLayout {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
 
-                    hideSoftKeyboard();
+                    InputUtil.hideSoftKeyboard((Activity) getContext());
 
                     switch (event.getAction()) {
                         case MotionEvent.ACTION_DOWN:
