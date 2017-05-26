@@ -35,6 +35,7 @@ public class VisitDetail extends DataItem  implements Cloneable{
     private ArrayList<Placement> placements;
     private ArrayList<String> tagIds;
     private Visit.Priority priority;
+    private int termForNextVisit;
 
 
     public VisitDetail(String personId, String visitId, String placeId) {

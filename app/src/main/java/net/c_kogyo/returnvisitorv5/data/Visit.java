@@ -65,6 +65,14 @@ public class Visit extends DataItem implements Cloneable{
 
     }
 
+    public enum TermForNextVisit {
+        ONE_WEEK,
+        TWO_WEEKS,
+        ONE_MONTH,
+        TWO_MONTH,
+        TEN_YEARS
+    }
+
     public Visit() {
         super(VISIT);
         initCommon(null);

@@ -137,6 +137,20 @@
         android:layout_height="wrap_content"
         android:id="@+id/priority_rater"/>
 
+    <!-- Term for next visit -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_height_small"
+        android:textSize="@dimen/text_size_middle"
+        android:textColor="@color/textColorGray"
+        android:text="@string/term_for_next_visit"
+        android:gravity="center"/>
+
+   <net.c_kogyo.returnvisitorv5.view.TermBar
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:id="@+id/term_bar"/>
+
     <!-- Note -->
     <AutoCompleteTextView
         android:layout_width="match_parent"
