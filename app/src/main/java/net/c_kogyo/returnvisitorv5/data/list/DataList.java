@@ -137,11 +137,11 @@ public class DataList<T extends DataItem> implements Iterable<T>{
         return false;
     }
 
-    synchronized public CopyOnWriteArrayList<T> getSearchedItems(String searchWord, Context context) {
+    synchronized public ArrayList<T> getSearchedItems(String searchWord, Context context) {
 
         String[] words = searchWord.split(" ");
 
-        CopyOnWriteArrayList<T> searchResultItems = new CopyOnWriteArrayList<>(list);
+        ArrayList<T> searchResultItems = new ArrayList<>(list);
 
         for (String word : words) {
             List<T> listToRemove = new ArrayList<>();

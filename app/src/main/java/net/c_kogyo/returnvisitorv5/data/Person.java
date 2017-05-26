@@ -239,6 +239,8 @@ public class Person extends DataItem implements Cloneable{
         builder.append(context.getResources().getStringArray(R.array.sex_array)[this.sex.num()]).append(" ");
         builder.append(context.getResources().getStringArray(R.array.age_array)[this.age.num()]).append(" ");
 
+        // TODO: 2017/05/26 タグも対象とするか
+
         return builder.toString();
     }
 

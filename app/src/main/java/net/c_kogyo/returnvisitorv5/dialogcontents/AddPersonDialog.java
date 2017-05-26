@@ -15,6 +15,7 @@ import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -23,6 +24,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -82,8 +84,8 @@ public class AddPersonDialog extends FrameLayout
         initSearchText();
         initMapFrame();
 
-        initPlacePersonListView();
-        initMessageFrame();
+        initPersonListView();
+        initNoItemMessageText();
 
         initCancelButton();
     }
@@ -109,7 +111,11 @@ public class AddPersonDialog extends FrameLayout
 
             @Override
             public void afterTextChanged(Editable s) {
-
+                if (s.length() > 0) {
+                    fadeInListFrameBySearchWord(s.toString());
+                } else {
+                    fadeOutListFrame();
+                }
             }
         });
     }
@@ -130,29 +136,33 @@ public class AddPersonDialog extends FrameLayout
         cancelButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mListener != null) {
-                    mListener.onCancel();
+
+                if (listFrame.getVisibility() == VISIBLE) {
+                    fadeOutListFrame();
+                } else {
+                    if (mListener != null) {
+                        mListener.onCancel();
+                    }
                 }
             }
         });
     }
 
     private ListView personListView;
-    private RelativeLayout personListFrame;
-    private void initPlacePersonListView() {
-        personListFrame = (RelativeLayout) view.findViewById(R.id.person_list_frame);
+    private RelativeLayout listFrame;
+    private void initPersonListView() {
+        listFrame = (RelativeLayout) view.findViewById(R.id.list_frame);
         personListView = (ListView) view.findViewById(R.id.person_list_view);
 
-        personListFrame.setVisibility(INVISIBLE);
-        personListFrame.setAlpha(0f);
+        listFrame.setVisibility(INVISIBLE);
+        listFrame.setAlpha(0f);
 
     }
 
-    private RelativeLayout messageFrame;
-    private void initMessageFrame() {
-        messageFrame = (RelativeLayout) view.findViewById(R.id.message_frame);
-        messageFrame.setAlpha(0f);
-        messageFrame.setVisibility(INVISIBLE);
+    private TextView noItemMessageText;
+    private void initNoItemMessageText() {
+        noItemMessageText = (TextView) view.findViewById(R.id.no_item_message_text);
+        noItemMessageText.setVisibility(INVISIBLE);
     }
 
     private GoogleMap mMap;
@@ -231,7 +241,7 @@ public class AddPersonDialog extends FrameLayout
         Place place = placeMarkers.getPlace(marker);
         if (place != null) {
             // TODO: 2017/05/25 place action
-            fadeInPlacePersonListFrame(place);
+            fadeInListFrameByPlace(place);
         }
         saveCameraPosition();
         return false;
@@ -264,17 +274,101 @@ public class AddPersonDialog extends FrameLayout
         editor.apply();
     }
 
-    private void fadeInPlacePersonListFrame(Place place) {
+    private void fadeInListFrameByPlace(Place place) {
         ArrayList<Person> persons = RVData.getInstance().personList.getPersonsInPlace(place);
         PersonListAdapter adapter = new PersonListAdapter(persons);
         personListView.setAdapter(adapter);
-        personListFrame.setVisibility(VISIBLE);
-        ViewUtil.fadeView(personListFrame, true, true, 500);
 
-        PlaceCell placeCell = new PlaceCell(getContext(), place, null, false);
+        if (adapter.getCount() <= 0) {
+            noItemMessageText.setVisibility(VISIBLE);
+            personListView.setVisibility(INVISIBLE);
+        } else {
+            noItemMessageText.setVisibility(INVISIBLE);
+            personListView.setVisibility(VISIBLE);
+        }
+
+        listFrame.setVisibility(VISIBLE);
+        ViewUtil.fadeView(listFrame,
+                true,
+                new OnTouchListener(){
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                fadeOutListFrame();
+                return true;
+            }
+        }, null, 500 );
+
+        fadeInPlaceCell(place);
+
+    }
+
+    private PlaceCell placeCell;
+    private void fadeInPlaceCell(Place place) {
+        placeCell = new PlaceCell(getContext(), place, null, false);
         placeCell.setAlpha(0f);
         dataFrame.addView(placeCell);
-        ViewUtil.fadeView(placeCell, true, true, 500);
+        ViewUtil.fadeView(placeCell,
+                true,
+                new OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        return true;
+                    }
+                }, null, 500);
+    }
+
+    private void fadeInListFrameBySearchWord(String searchWord) {
+        ArrayList<Person> persons = new ArrayList<>(RVData.getInstance().personList.getSearchedItems(searchWord, getContext()));
+        PersonListAdapter adapter = new PersonListAdapter(persons);
+        personListView.setAdapter(adapter);
+
+        if (adapter.getCount() <= 0) {
+            noItemMessageText.setVisibility(VISIBLE);
+            personListView.setVisibility(INVISIBLE);
+        } else {
+            noItemMessageText.setVisibility(INVISIBLE);
+            personListView.setVisibility(VISIBLE);
+        }
+
+        listFrame.setVisibility(VISIBLE);
+        ViewUtil.fadeView(listFrame,
+                true,
+                new OnTouchListener(){
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        fadeOutListFrame();
+                        return true;
+                    }
+                }, null, 500 );
+    }
+
+    private void fadeOutListFrame() {
+
+        if (listFrame.getAlpha() <= 0)
+            return;
+
+        ViewUtil.fadeView(listFrame, false, null,
+            new ViewUtil.PostFadeViewListener() {
+                @Override
+                public void postFade(View view) {
+                    listFrame.setVisibility(INVISIBLE);
+                    noItemMessageText.setVisibility(INVISIBLE);
+                    personListView.setVisibility(INVISIBLE);
+                    personListView.setAdapter(null);
+                    searchText.setText("");
+                }
+            }, 500);
+
+        if (placeCell != null) {
+            ViewUtil.fadeView(placeCell, false, null,
+                new ViewUtil.PostFadeViewListener() {
+                    @Override
+                    public void postFade(View view) {
+                        placeCell.setVisibility(INVISIBLE);
+                        placeCell = null;
+                    }
+                }, 500);
+        }
     }
 
     public interface AddPersonDialogListener {

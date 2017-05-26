@@ -1219,12 +1219,17 @@ public class MapActivity extends AppCompatActivity
 
     private void enableWaitScreen(boolean enabled) {
 
-        ViewUtil.fadeView(waitScreen, enabled, true, 500);
+        ViewUtil.fadeView(waitScreen, enabled, new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return true;
+            }
+        }, null, 500);
 
     }
 
     private void fadeProgressFrame(boolean fadeIn) {
-        ViewUtil.fadeView(progressFrame, fadeIn, false, 500);
+        ViewUtil.fadeView(progressFrame, fadeIn, null, null, 500);
     }
 
     private TextView waitMessageText;

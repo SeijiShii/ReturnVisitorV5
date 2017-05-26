@@ -82,7 +82,8 @@ public class ViewUtil {
 
     public static void fadeView(final View view,
                                 final boolean fadeIn,
-                                boolean setOnTouch,
+                                View.OnTouchListener onTouchListener,
+                                final PostFadeViewListener fadeViewListener,
                                 int duration) {
         float origin, target;
 
@@ -92,14 +93,7 @@ public class ViewUtil {
 
             view.setVisibility(View.VISIBLE);
 
-            if (setOnTouch) {
-                view.setOnTouchListener(new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        return true;
-                    }
-                });
-            }
+            view.setOnTouchListener(onTouchListener);
 
         } else {
             origin = 1f;
@@ -125,6 +119,9 @@ public class ViewUtil {
                 if (!fadeIn) {
                     view.setVisibility(View.INVISIBLE);
                 }
+                if (fadeViewListener != null) {
+                    fadeViewListener.postFade(view);
+                }
             }
 
             @Override
@@ -139,5 +136,9 @@ public class ViewUtil {
         });
         animator.setDuration(duration);
         animator.start();
+    }
+
+    public interface PostFadeViewListener {
+        void postFade(View view);
     }
 }

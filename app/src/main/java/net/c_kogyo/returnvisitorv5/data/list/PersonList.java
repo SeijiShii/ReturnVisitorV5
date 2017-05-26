@@ -16,16 +16,24 @@ public class PersonList extends DataList<Person> {
 
     public ArrayList<Person> getPersonsInPlace(Place place) {
 
+        ArrayList<Place> places = new ArrayList<>();
+        if (place.getCategory() == Place.Category.HOUSING_COMPLEX) {
+            places = new ArrayList<>(RVData.getInstance().placeList.getRoomList(place.getId()));
+        } else {
+            places.add(place);
+        }
+
         ArrayList<String> ids = new ArrayList<>();
-        ArrayList<Visit> visits = RVData.getInstance().visitList.getVisitsForPlace(place.getId());
-        for (Visit visit : visits) {
-            for (VisitDetail visitDetail : visit.getVisitDetails()) {
-                if (!ids.contains(visitDetail.getPersonId())) {
-                    ids.add(visitDetail.getPersonId());
+        for (Place place1 : places) {
+            ArrayList<Visit> visits = RVData.getInstance().visitList.getVisitsForPlace(place1.getId());
+            for (Visit visit : visits) {
+                for (VisitDetail visitDetail : visit.getVisitDetails()) {
+                    if (!ids.contains(visitDetail.getPersonId())) {
+                        ids.add(visitDetail.getPersonId());
+                    }
                 }
             }
         }
-
         return getList(ids);
     }
 }

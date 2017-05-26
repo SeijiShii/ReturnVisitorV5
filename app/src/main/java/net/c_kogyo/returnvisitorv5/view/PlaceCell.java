@@ -57,7 +57,9 @@ public class PlaceCell extends FrameLayout {
     private void initCommon() {
         view = LayoutInflater.from(getContext()).inflate(R.layout.place_cell, this);
 
-        if (!mTransparent) {
+        if (mTransparent) {
+            view.setBackgroundResource(R.drawable.gray_trans_circle);
+        } else {
             view.setBackgroundResource(R.drawable.gray_white_circle);
         }
 
@@ -70,10 +72,16 @@ public class PlaceCell extends FrameLayout {
     private void initPlaceMarker() {
         placeMarker = (ImageView) view.findViewById(R.id.place_marker);
 
-        if (mPlace.getCategory() == Place.Category.HOUSE) {
-            placeMarker.setBackgroundResource(Constants.markerRes[mPlace.getPriority().num()]);
-        } else if (mPlace.getCategory() == Place.Category.ROOM) {
-            placeMarker.setBackgroundResource(Constants.buttonRes[mPlace.getPriority().num()]);
+        switch (mPlace.getCategory()) {
+            case HOUSE:
+                placeMarker.setBackgroundResource(Constants.markerRes[mPlace.getPriority().num()]);
+                break;
+            case ROOM:
+                placeMarker.setBackgroundResource(Constants.buttonRes[mPlace.getPriority().num()]);
+                break;
+            case HOUSING_COMPLEX:
+                placeMarker.setBackgroundResource(Constants.complexRes[mPlace.getPriority().num()]);
+                break;
         }
     }
 
