@@ -1,7 +1,11 @@
 package net.c_kogyo.returnvisitorv5.view;
 
+import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.support.annotation.Nullable;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.PopupMenu;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -9,6 +13,7 @@ import android.util.AttributeSet;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -24,6 +29,7 @@ import net.c_kogyo.returnvisitorv5.data.Publication;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
+import net.c_kogyo.returnvisitorv5.util.ConfirmDialog;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 
 import java.util.ArrayList;
@@ -166,8 +172,6 @@ public class VisitDetailView extends BaseAnimateView {
         animator.start();
     }
     
-//    private SwitchCompat seenSwitch;
-//    private TextView seenText;
     private void initSeenSwitch() {
         RightTextSwitch seenSwitch = (RightTextSwitch) getViewById(R.id.seen_switch);
         seenSwitch.setChecked(mVisitDetail.isSeen());
@@ -180,20 +184,6 @@ public class VisitDetailView extends BaseAnimateView {
 
     }
 
-//    private Button editPersonButton;
-//    private void initEditPersonButton() {
-//        editPersonButton = (Button) getViewById(R.id.edit_person_button);
-//        editPersonButton.setOnClickListener(new OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                // DONE: 2017/02/27 人編集ダイアログへの遷移
-//                if (mListener != null){
-//                    mListener.onEditPersonClick(mPerson);
-//                }
-//            }
-//        });
-//    }
-    
     private Button placementButton;
     private void initPlacementButton() {
         placementButton = (Button) getViewById(R.id.add_placement_button);
@@ -406,10 +396,34 @@ public class VisitDetailView extends BaseAnimateView {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.edit_person:
+                        if (mListener != null) {
+                            mListener.onEditPersonClick(mPerson);
+                        }
                         return true;
                     case R.id.remove_person:
+                        VisitDetailView.this.compress(new PostCompressListener() {
+                            @Override
+                            public void postCompress() {
+                                if (mListener != null) {
+                                    mListener.postRemoveVisitDetail(mVisitDetail);
+                                }
+                            }
+                        });
                         return true;
-                    case R.id.delete:
+                    case R.id.delete_person:
+                        ConfirmDialog.confirmAndDeletePerson(getContext(), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                VisitDetailView.this.compress(new PostCompressListener() {
+                                    @Override
+                                    public void postCompress() {
+                                        if (mListener != null) {
+                                            mListener.postDeletePerson(mPerson);
+                                        }
+                                    }
+                                });
+                            }
+                        }, mPerson);
                         return true;
                 }
                 return false;
@@ -432,6 +446,10 @@ public class VisitDetailView extends BaseAnimateView {
         void onPrioritySet(Visit.Priority priority);
 
         void postExtractView(VisitDetailView visitDetailView);
+
+        void postRemoveVisitDetail(VisitDetail visitDetail);
+
+        void postDeletePerson(Person person);
     }
 
     // DONE: 2017/03/20 mExtractによる振り分け
@@ -443,5 +461,41 @@ public class VisitDetailView extends BaseAnimateView {
         if (mListener!= null) {
             mListener.postExtractView((VisitDetailView) view);
         }
+    }
+
+    private void compress(@Nullable final PostCompressListener compressListener) {
+
+        this.changeViewHeight(0, true, null, new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+
+                ViewParent parent = VisitDetailView.this.getParent();
+                ((LinearLayout) parent).removeView(VisitDetailView.this);
+
+                if (compressListener != null) {
+                    compressListener.postCompress();
+                }
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+
+    }
+
+    interface PostCompressListener {
+        void postCompress();
     }
 }

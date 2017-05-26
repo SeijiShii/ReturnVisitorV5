@@ -530,6 +530,18 @@ public class RecordVisitActivity extends AppCompatActivity {
                             ViewUtil.scrollToView(scrollView, visitDetailView);
                         }
                     }
+
+                    @Override
+                    public void postRemoveVisitDetail(VisitDetail visitDetail) {
+                        mVisit.getVisitDetails().remove(visitDetail);
+                    }
+
+                    @Override
+                    public void postDeletePerson(Person person) {
+                        RVData.getInstance().personList.deleteById(person.getId());
+                        RVData.getInstance().saveData(RecordVisitActivity.this);
+                        RVCloudSync.syncDataIfLoggedIn(RecordVisitActivity.this);
+                    }
                 });
         visitDetailFrame.addView(detailView);
     }
