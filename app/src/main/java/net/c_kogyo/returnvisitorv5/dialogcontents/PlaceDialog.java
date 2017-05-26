@@ -1,8 +1,11 @@
 package net.c_kogyo.returnvisitorv5.dialogcontents;
 
 import android.animation.Animator;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Point;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
@@ -14,6 +17,7 @@ import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import net.c_kogyo.returnvisitorv5.R;
@@ -22,6 +26,7 @@ import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.util.ConfirmDialog;
+import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 import net.c_kogyo.returnvisitorv5.view.BaseAnimateView;
 import net.c_kogyo.returnvisitorv5.view.PlaceCell;
 import net.c_kogyo.returnvisitorv5.view.VisitCell;
@@ -83,6 +88,29 @@ public class PlaceDialog extends FrameLayout {
         visitListView = (ListView) view.findViewById(R.id.visit_list_view);
         visitListView.setAdapter(new VisitListAdapter());
 
+        final Handler handler = new Handler();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (visitListView.getWidth() <= 0) {
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+
+                    }
+                }
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Point point = ViewUtil.getDisplaySize((Activity) getContext());
+                        int height = point.y - (int) (getContext().getResources().getDisplayMetrics().density * 300);
+                        visitListView.getLayoutParams().height = height;
+                        visitListView.requestLayout();
+                    }
+                });
+            }
+        }).start();
+
     }
 
     private void initRecordVisitButton() {
@@ -119,7 +147,6 @@ public class PlaceDialog extends FrameLayout {
                     + (int)(getContext().getResources().getDisplayMetrics().density * 5);
         }
 
-
         @Override
         public int getCount() {
             return RVData.getInstance().visitList.getVisitsForPlace(mPlace.getId()).size();
@@ -144,34 +171,13 @@ public class PlaceDialog extends FrameLayout {
                         initialHeight,
                         new VisitCell.VisitCellListener() {
                             @Override
-                            public void onDeleteVisit(final VisitCell visitCell) {
+                            public void postCompressVisitCell(VisitCell visitCell) {
 
-                                visitCell.changeViewHeight(0, true, null, new Animator.AnimatorListener() {
-                                    @Override
-                                    public void onAnimationStart(Animator animation) {
+                                RVData.getInstance().visitList.deleteById(visitCell.getVisit().getId());
+                                RVData.getInstance().saveData(getContext());
+                                notifyDataSetChanged();
 
-                                    }
-
-                                    @Override
-                                    public void onAnimationEnd(Animator animation) {
-                                        RVData.getInstance().visitList.deleteById(visitCell.getVisit().getId());
-                                        RVData.getInstance().saveData(getContext());
-                                        notifyDataSetChanged();
-
-                                        RVCloudSync.syncDataIfLoggedIn(getContext());
-
-                                    }
-
-                                    @Override
-                                    public void onAnimationCancel(Animator animation) {
-
-                                    }
-
-                                    @Override
-                                    public void onAnimationRepeat(Animator animation) {
-
-                                    }
-                                });
+                                RVCloudSync.syncDataIfLoggedIn(getContext());
                             }
 
                             @Override
@@ -184,6 +190,11 @@ public class PlaceDialog extends FrameLayout {
                             @Override
                             public void onClickToMap(Visit visit) {
 
+                            }
+
+                            @Override
+                            public void onUpdateHeight() {
+                                visitListView.requestLayout();
                             }
                         },
                         VisitCell.HeaderContent.DATETIME){
@@ -203,8 +214,6 @@ public class PlaceDialog extends FrameLayout {
 
             return view;
         }
-
-
 
     }
 

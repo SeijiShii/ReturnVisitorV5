@@ -133,24 +133,28 @@ public abstract class VisitCell extends BaseAnimateView {
         openCloseMark = (ImageView) getViewById(R.id.open_close_mark);
     }
 
-    private BaseAnimateView.HeightUpdateListener mHeightUpdateListener;
-    public void setHeightUpdateListener(HeightUpdateListener heightUpdateListener) {
-        mHeightUpdateListener = heightUpdateListener;
-    }
-
     private boolean isViewOpen = false;
     private void openCloseCell() {
+
+        HeightUpdateListener listener = new HeightUpdateListener() {
+            @Override
+            public void onUpdate() {
+                if (mListener != null) {
+                    mListener.onUpdateHeight();
+                }
+            }
+        };
+
         if (isViewOpen) {
-            VisitCell.this.changeViewHeight(mCollapseHeight, true, mHeightUpdateListener, null);
+            VisitCell.this.changeViewHeight(mCollapseHeight, true, listener, null);
         } else {
-            VisitCell.this.changeViewHeight(mExtractHeight, true, mHeightUpdateListener, null);
+            VisitCell.this.changeViewHeight(mExtractHeight, true, listener, null);
         }
 
         rotateOpenCloseMark();
 
         isViewOpen = !isViewOpen;
     }
-
 
     private void rotateOpenCloseMark() {
 
@@ -209,9 +213,30 @@ public abstract class VisitCell extends BaseAnimateView {
                         ConfirmDialog.confirmAndDeleteVisit(getContext(), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                if (mListener != null) {
-                                    mListener.onDeleteVisit(VisitCell.this);
-                                }
+                                compress(new Animator.AnimatorListener() {
+                                    @Override
+                                    public void onAnimationStart(Animator animation) {
+
+                                    }
+
+                                    @Override
+                                    public void onAnimationEnd(Animator animation) {
+                                        if (mListener != null) {
+                                            mListener.postCompressVisitCell(VisitCell.this);
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onAnimationCancel(Animator animation) {
+
+                                    }
+
+                                    @Override
+                                    public void onAnimationRepeat(Animator animation) {
+
+                                    }
+                                });
+
                             }
                         }, mVisit);
                         return true;
@@ -246,11 +271,13 @@ public abstract class VisitCell extends BaseAnimateView {
 
     public interface VisitCellListener {
 
-        void onDeleteVisit(VisitCell visitCell);
+        void postCompressVisitCell(VisitCell visitCell);
 
         void onEditClick(Visit visit);
 
         void onClickToMap(Visit visit);
+
+        void onUpdateHeight();
 
     }
 

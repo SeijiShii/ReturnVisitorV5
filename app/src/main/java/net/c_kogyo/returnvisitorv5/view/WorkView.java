@@ -392,35 +392,15 @@ public class WorkView extends BaseAnimateView {
     }
 
     private VisitCell generateVisitCell(Visit visit, int initHeight) {
-        VisitCell visitCell = new VisitCell(getContext(), visit, initHeight,new VisitCell.VisitCellListener() {
+        return new VisitCell(getContext(), visit, initHeight,new VisitCell.VisitCellListener() {
             @Override
-            public void onDeleteVisit(final VisitCell visitCell1) {
-                visitCell1.changeViewHeight(0, true, null, new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animation) {
+            public void postCompressVisitCell(final VisitCell visitCell1) {
 
-                    }
+                RVData.getInstance().visitList.deleteById(visitCell1.getVisit().getId());
+                RVData.getInstance().saveData(getContext());
+                visitCellContainer.removeView(visitCell1);
 
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        RVData.getInstance().visitList.deleteById(visitCell1.getVisit().getId());
-                        RVData.getInstance().saveData(getContext());
-                        visitCellContainer.removeView(visitCell1);
-
-                        RVCloudSync.syncDataIfLoggedIn(getContext());
-                    }
-
-                    @Override
-                    public void onAnimationCancel(Animator animation) {
-
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animator animation) {
-
-                    }
-                });
-
+                RVCloudSync.syncDataIfLoggedIn(getContext());
             }
 
             @Override
@@ -437,6 +417,10 @@ public class WorkView extends BaseAnimateView {
                 }
             }
 
+            @Override
+            public void onUpdateHeight() {
+                WorkView.this.requestLayout();
+            }
         }, VisitCell.HeaderContent.BOTH)
         {
             @Override
@@ -449,13 +433,6 @@ public class WorkView extends BaseAnimateView {
 
             }
         };
-        visitCell.setHeightUpdateListener(new HeightUpdateListener() {
-            @Override
-            public void onUpdate() {
-                WorkView.this.requestLayout();
-            }
-        });
-        return visitCell;
     }
 
     public Work getWork() {

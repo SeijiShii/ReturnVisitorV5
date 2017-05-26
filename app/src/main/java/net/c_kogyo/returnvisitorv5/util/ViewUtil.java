@@ -2,8 +2,10 @@ package net.c_kogyo.returnvisitorv5.util;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
+import android.app.Activity;
 import android.graphics.Point;
 import android.support.annotation.Nullable;
+import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -197,5 +199,12 @@ public class ViewUtil {
 
     public interface PostFadeViewListener {
         void postFade(View view);
+    }
+
+    public static Point getDisplaySize(Activity activity){
+        Display display = activity.getWindowManager().getDefaultDisplay();
+        Point point = new Point();
+        display.getSize(point);
+        return point;
     }
 }

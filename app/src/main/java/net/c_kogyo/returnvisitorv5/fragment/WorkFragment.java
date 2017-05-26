@@ -194,17 +194,13 @@ public class WorkFragment extends Fragment {
         VisitCell cell = new VisitCell(getContext(), visit, initHeight,new VisitCell.VisitCellListener() {
 
             @Override
-            public void onDeleteVisit(final VisitCell visitCell1) {
-                removeVisitCell(visit, new PostRemoveVisitCellListener() {
-                    @Override
-                    public void postRemoveVisitCell() {
+            public void postCompressVisitCell(final VisitCell visitCell1) {
 
-                        RVData.getInstance().visitList.deleteById(visitCell1.getVisit().getId());
-                        RVData.getInstance().saveData(WorkFragment.this.getActivity());
-                        RVCloudSync.syncDataIfLoggedIn(WorkFragment.this.getActivity());
+                container.removeView(visitCell1);
 
-                    }
-                });
+                RVData.getInstance().visitList.deleteById(visitCell1.getVisit().getId());
+                RVData.getInstance().saveData(WorkFragment.this.getActivity());
+                RVCloudSync.syncDataIfLoggedIn(WorkFragment.this.getActivity());
             }
 
             @Override
@@ -221,8 +217,10 @@ public class WorkFragment extends Fragment {
                 }
             }
 
+            @Override
+            public void onUpdateHeight() {
 
-
+            }
         }, VisitCell.HeaderContent.BOTH) {
             @Override
             public void setLayoutParams(BaseAnimateView view) {
@@ -408,10 +406,13 @@ public class WorkFragment extends Fragment {
                 String visitId = data.getStringExtra(Visit.VISIT);
                 if (visitId == null) return;
 
-                Visit visit = getVisit(visitId);
-                if (visit == null) return;
+//                Visit visit = getVisit(visitId);
+//                if (visit == null) return;
 
-                removeVisitCell(visit, null);
+                VisitCell visitCell = getVisitCell(visitId, false);
+                if (visitCell == null) return;
+
+                removeVisitCell(visitCell, null);
 //                visitsInDayNotInWork.remove(visit);
 
             } else if (resultCode == Constants.RecordVisitActions.VISIT_EDITED_RESULT_CODE) {
@@ -523,7 +524,7 @@ public class WorkFragment extends Fragment {
             if (visitCell != null) {
                 if (isVisitCellInProperPosition(visitCell))
                     return;
-                removeVisitCell(visit, new PostRemoveVisitCellListener() {
+                removeVisitCell(visitCell, new PostRemoveVisitCellListener() {
                     @Override
                     public void postRemoveVisitCell() {
                         insertVisitCellAndExtract(visit);
@@ -631,15 +632,14 @@ public class WorkFragment extends Fragment {
     public void removeVisitCells(ArrayList<Visit> visits) {
 
         for (Visit visit : visits) {
-            removeVisitCell(visit, null);
+            VisitCell visitCell = getVisitCell(visit.getId(), false);
+            if (visitCell != null) {
+                removeVisitCell(visitCell, null);
+            }
         }
     }
 
-    private void removeVisitCell(Visit visit, final PostRemoveVisitCellListener postRemoveVisitCellListener) {
-
-        final VisitCell visitCell = getVisitCell(visit.getId(), false);
-
-        if (visitCell == null) return;
+    private void removeVisitCell(final VisitCell visitCell, final PostRemoveVisitCellListener postRemoveVisitCellListener) {
 
         visitCell.compress(new Animator.AnimatorListener() {
             @Override
