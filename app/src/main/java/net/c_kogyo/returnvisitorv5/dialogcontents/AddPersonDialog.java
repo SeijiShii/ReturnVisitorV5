@@ -18,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -157,6 +158,15 @@ public class AddPersonDialog extends FrameLayout
         listFrame.setVisibility(INVISIBLE);
         listFrame.setAlpha(0f);
 
+        personListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (mListener != null) {
+                    mListener.onSetPerson((Person) personListAdapter.getItem(position));
+                }
+            }
+        });
+
     }
 
     private TextView noItemMessageText;
@@ -274,32 +284,11 @@ public class AddPersonDialog extends FrameLayout
         editor.apply();
     }
 
+    private PersonListAdapter personListAdapter;
     private void fadeInListFrameByPlace(Place place) {
         ArrayList<Person> persons = RVData.getInstance().personList.getPersonsInPlace(place);
-        PersonListAdapter adapter = new PersonListAdapter(persons);
-        personListView.setAdapter(adapter);
-
-        if (adapter.getCount() <= 0) {
-            noItemMessageText.setVisibility(VISIBLE);
-            personListView.setVisibility(INVISIBLE);
-        } else {
-            noItemMessageText.setVisibility(INVISIBLE);
-            personListView.setVisibility(VISIBLE);
-        }
-
-        listFrame.setVisibility(VISIBLE);
-        ViewUtil.fadeView(listFrame,
-                true,
-                new OnTouchListener(){
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                fadeOutListFrame();
-                return true;
-            }
-        }, null, 500 );
-
+        fadeInPersonList(persons);
         fadeInPlaceCell(place);
-
     }
 
     private PlaceCell placeCell;
@@ -317,12 +306,11 @@ public class AddPersonDialog extends FrameLayout
                 }, null, 500);
     }
 
-    private void fadeInListFrameBySearchWord(String searchWord) {
-        ArrayList<Person> persons = new ArrayList<>(RVData.getInstance().personList.getSearchedItems(searchWord, getContext()));
-        PersonListAdapter adapter = new PersonListAdapter(persons);
-        personListView.setAdapter(adapter);
+    private void fadeInPersonList(ArrayList<Person> persons) {
+        personListAdapter = new PersonListAdapter(persons);
+        personListView.setAdapter(personListAdapter);
 
-        if (adapter.getCount() <= 0) {
+        if (personListAdapter.getCount() <= 0) {
             noItemMessageText.setVisibility(VISIBLE);
             personListView.setVisibility(INVISIBLE);
         } else {
@@ -340,6 +328,11 @@ public class AddPersonDialog extends FrameLayout
                         return true;
                     }
                 }, null, 500 );
+    }
+
+    private void fadeInListFrameBySearchWord(String searchWord) {
+        ArrayList<Person> persons = new ArrayList<>(RVData.getInstance().personList.getSearchedItems(searchWord, getContext()));
+        fadeInPersonList(persons);
     }
 
     private void fadeOutListFrame() {

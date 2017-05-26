@@ -306,7 +306,7 @@ public class RecordVisitActivity extends AppCompatActivity {
                         InputUtil.hideSoftKeyboard(RecordVisitActivity.this);
                         // とりあえずアクティビティ内のアレイリストに追加
                         mAddedPersons.add(person);
-                        final VisitDetail visitDetail = new VisitDetail(person.getId(), mVisit.getId());
+                        final VisitDetail visitDetail = new VisitDetail(person.getId(), mVisit.getId(), mVisit.getPlaceId());
                         // 新しく人を追加したということは会えたということでしょう。
                         visitDetail.setSeen(true);
                         mVisit.addVisitDetail(visitDetail);
@@ -927,8 +927,16 @@ public class RecordVisitActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onSetPerson(Person person) {
-
+                    public void onSetPerson(final Person person) {
+                        fadeDialogOverlay(false, new DialogPostAnimationListener() {
+                            @Override
+                            public void onFinishAnimation() {
+                                VisitDetail visitDetail = new VisitDetail(person.getId(), mVisit.getId(), mVisit.getPlaceId());
+                                addVisitDetailView(visitDetail,
+                                        person,
+                                        VisitDetailView.DrawCondition.EXTRACT_POST_DRAWN_FROM_0);
+                            }
+                        });
                     }
                 }, mMapView);
         dialogFrame.addView(addPersonDialog);

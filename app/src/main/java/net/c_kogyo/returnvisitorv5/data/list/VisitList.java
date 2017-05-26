@@ -132,4 +132,14 @@ public class VisitList extends DataList<Visit> {
         return bsVisitDetails;
     }
 
+    public void setPlaceIdToVisitDetails() {
+
+        for (Visit visit : list) {
+            for (VisitDetail visitDetail : visit.getVisitDetails()) {
+                if (visitDetail.getPlaceId().equals("")) {
+                    visitDetail.setPlaceId(visit.getPlaceId());
+                }
+            }
+        }
+    }
 }

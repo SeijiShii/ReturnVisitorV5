@@ -121,6 +121,9 @@ public class RVData {
 
             jsonToData(stringToJson(loadStringFromFile()));
 
+            // DONE: 2017/05/26 後で削除
+//            RVData.getInstance().visitList.setPlaceIdToVisitDetails();
+
             if (mCallback != null) {
                 new Thread(new Runnable() {
                     @Override

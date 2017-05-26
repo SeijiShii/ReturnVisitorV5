@@ -10,6 +10,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import static net.c_kogyo.returnvisitorv5.data.Visit.PLACE_ID;
 import static net.c_kogyo.returnvisitorv5.data.Visit.PRIORITY;
 
 /**
@@ -21,6 +22,7 @@ public class VisitDetail extends DataItem  implements Cloneable{
     public static final String VISIT_DETAIL = "visit_detail";
     public static final String PERSON_ID = "person_id";
     public static final String VISIT_ID = "visit_id";
+    public static final String PLACE_ID = "place_id";
     public static final String PLACEMENTS = "placements";
     public static final String TAG_IDS = "tag_ids";
     public static final String SEEN = "seen";
@@ -28,25 +30,28 @@ public class VisitDetail extends DataItem  implements Cloneable{
     public static final String IS_RV = "is_rv";
 
 
-    private String personId, visitId;
+    private String personId, visitId, placeId;
     private boolean seen, isStudy, isRV;
     private ArrayList<Placement> placements;
     private ArrayList<String> tagIds;
     private Visit.Priority priority;
 
-    public VisitDetail(String personId, String visitId) {
+
+    public VisitDetail(String personId, String visitId, String placeId) {
         super(VISIT_DETAIL);
 
         initCommon();
 
         this.personId = personId;
         this.visitId = visitId;
+        this.placeId = placeId;
 
     }
 
     private void initCommon() {
         this.personId = "";
         this.visitId = "";
+        this.placeId = "";
 
         this.seen = false;
         this.isStudy = false;
@@ -59,7 +64,9 @@ public class VisitDetail extends DataItem  implements Cloneable{
 
     public VisitDetail(VisitDetail lastVisitDetail) {
 
-        this(lastVisitDetail.personId, lastVisitDetail.visitId);
+        this(lastVisitDetail.personId,
+                lastVisitDetail.visitId,
+                lastVisitDetail.placeId);
 
         this.isStudy = lastVisitDetail.isStudy;
         this.isRV = lastVisitDetail.isRV;
@@ -78,6 +85,8 @@ public class VisitDetail extends DataItem  implements Cloneable{
                 this.personId = object.getString(PERSON_ID);
             if (object.has(VISIT_ID))
                 this.visitId = object.getString(VISIT_ID);
+            if (object.has(PLACE_ID))
+                this.placeId = object.getString(PLACE_ID);
             if (object.has(SEEN))
                 this.seen = object.getBoolean(SEEN);
             if (object.has(IS_RV))
@@ -114,6 +123,8 @@ public class VisitDetail extends DataItem  implements Cloneable{
         try {
             object.put(PERSON_ID, this.personId);
             object.put(VISIT_ID, this.visitId);
+            object.put(PLACE_ID, this.placeId);
+
             object.put(SEEN, this.seen);
             object.put(IS_RV, this.isRV);
             object.put(IS_STUDY, this.isStudy);
@@ -192,6 +203,14 @@ public class VisitDetail extends DataItem  implements Cloneable{
 
     public boolean isRV() {
         return isRV;
+    }
+
+    public String getPlaceId() {
+        return placeId;
+    }
+
+    public void setPlaceId(String placeId) {
+        this.placeId = placeId;
     }
 
     public String toString(Context context, int indents) {
@@ -292,5 +311,25 @@ public class VisitDetail extends DataItem  implements Cloneable{
             }
         }
         return count;
+    }
+
+    public boolean belongsToMultiplePlace() {
+
+        ArrayList<String> placeIds = new ArrayList<>();
+
+        for (Visit visit : RVData.getInstance().visitList.getList()) {
+            for (VisitDetail visitDetail : visit.getVisitDetails()) {
+                if (visitDetail.personId.equals(this.personId)) {
+                    if (!placeIds.contains(visit.getPlaceId()) && !visit.getPlaceId().equals("")) {
+                        placeIds.add(visit.getPlaceId());
+                    }
+                }
+            }
+        }
+        if (!placeIds.contains(this.placeId) && !this.placeId.equals("")) {
+            placeIds.add(this.placeId);
+        }
+
+        return placeIds.size() > 1;
     }
 }
