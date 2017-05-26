@@ -201,6 +201,8 @@ public class WorkFragment extends Fragment {
                 RVData.getInstance().visitList.deleteById(visitCell1.getVisit().getId());
                 RVData.getInstance().saveData(WorkFragment.this.getActivity());
                 RVCloudSync.syncDataIfLoggedIn(WorkFragment.this.getActivity());
+
+                verifyItemRemains();
             }
 
             @Override
