@@ -6,37 +6,61 @@
     android:layout_height="wrap_content"
     android:background="@drawable/gray_white_circle">
 
-    <!-- First Row -->
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/ui_height_small"
-        android:orientation="horizontal"
-        android:id="@+id/first_row">
+        android:orientation="horizontal">
 
-        <!-- Person Data -->
-        <TextView
+        <!-- First Row -->
+        <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:id="@+id/data_text"
-            android:gravity="center"
-            android:textColor="@color/textColorGray"
-            android:textSize="@dimen/text_size_middle" />
+            android:layout_height="@dimen/ui_height_small"
+            android:orientation="horizontal"
+            android:id="@+id/first_row">
 
-        <!-- Open Close Button -->
+            <!-- Open Close Button -->
+            <RelativeLayout
+                android:layout_width="@dimen/ui_height_small"
+                android:layout_height="@dimen/ui_height_small">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:id="@+id/open_close_button"
+                    android:background="@drawable/upper_arrow_selector"
+                    android:layout_centerInParent="true"/>
+
+            </RelativeLayout>
+
+            <!-- Person Data -->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:id="@+id/data_text"
+                android:gravity="center"
+                android:textColor="@color/textColorGray"
+                android:textSize="@dimen/text_size_middle" />
+
+        </LinearLayout>
+
         <RelativeLayout
             android:layout_width="@dimen/ui_height_small"
             android:layout_height="@dimen/ui_height_small">
 
-            <ImageView
+            <Button
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:id="@+id/open_close_button"
-                android:background="@drawable/upper_arrow_selector"
+                android:id="@+id/edit_button"
+                android:background="@drawable/gray_menu_button_selector"
                 android:layout_centerInParent="true"/>
 
         </RelativeLayout>
+
     </LinearLayout>
+
 
     <!-- Seen Switch -->
     <RelativeLayout
@@ -50,23 +74,6 @@
             app:checked_text="@string/seen"
             app:unchecked_text="@string/not_seen"/>
 
-    </RelativeLayout>
-
-    <!-- Edit Person Button -->
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/ui_height_small">
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:id="@+id/edit_person_button"
-            android:background="@drawable/trans_blue_selector"
-            android:textColor="@color/colorPrimary"
-            android:textSize="@dimen/text_size_middle"
-            android:text="@string/edit_person"
-            android:layout_alignParentLeft="true"
-            android:layout_margin="@dimen/ui_margin_normal"/>
     </RelativeLayout>
 
     <!-- Placements -->

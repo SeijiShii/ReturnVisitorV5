@@ -261,7 +261,7 @@ public class PersonDialog extends FrameLayout {
                                         mButtonsClickListener.onDeleteClick(mPerson);
                                     }
                                 }
-                            });
+                            }, mPerson);
                 }
             });
         } else {

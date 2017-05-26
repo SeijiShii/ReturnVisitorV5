@@ -213,7 +213,7 @@ public abstract class VisitCell extends BaseAnimateView {
                                     mListener.onDeleteVisit(VisitCell.this);
                                 }
                             }
-                        });
+                        }, mVisit);
                         return true;
                     case SHOW_IN_MAP_MENU:
                         if (mListener != null) {

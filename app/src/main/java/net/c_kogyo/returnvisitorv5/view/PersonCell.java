@@ -97,7 +97,7 @@ public class PersonCell extends FrameLayout {
                                     mListener.onClickDelete(mPerson);
                                 }
                             }
-                        });
+                        }, mPerson);
                         return true;
                 }
                 return false;

@@ -211,7 +211,7 @@ public class WorkView extends BaseAnimateView {
                                     mListener.onDeleteWork(WorkView.this);
                                 }
                             }
-                        });
+                        }, mWork);
                         return true;
                     case STOP_COUNT_MENU_ID:
                         TimeCountService.stopTimeCount();

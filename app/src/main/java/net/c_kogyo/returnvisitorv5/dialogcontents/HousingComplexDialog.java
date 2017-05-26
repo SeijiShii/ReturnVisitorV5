@@ -117,7 +117,7 @@ public class HousingComplexDialog extends FrameLayout {
                                             mListener.onDeleteHousingComplex(mHousingComplex);
                                         }
                                     }
-                                });
+                                }, mHousingComplex);
                                 return true;
                             }
                             return false;
@@ -309,7 +309,7 @@ public class HousingComplexDialog extends FrameLayout {
                 initRoomAdapter();
                 refreshRoomListHeight();
             }
-        });
+        }, place);
     }
 
     private void confirmEdit() {

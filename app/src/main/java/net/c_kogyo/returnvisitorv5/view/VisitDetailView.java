@@ -2,9 +2,11 @@ package net.c_kogyo.returnvisitorv5.view;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.support.v7.widget.PopupMenu;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -75,15 +77,18 @@ public class VisitDetailView extends BaseAnimateView {
 
     private void initCommon() {
 
+        // 新規追加の時はたいてい会えたから。
+        mVisitDetail.setSeen(true);
+
         isViewOpen = true;
         mCollapseHeight = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small)
                 + (int) (getContext().getResources().getDisplayMetrics().density * 5);
 
         initFirstRow();
+        initEditButton();
         initDataText();
         initOpenCloseButton();
         initSeenSwitch();
-        initEditPersonButton();
         initPlacementButton();
         initPlacementContainer();
         initTagButton();
@@ -175,19 +180,19 @@ public class VisitDetailView extends BaseAnimateView {
 
     }
 
-    private Button editPersonButton;
-    private void initEditPersonButton() {
-        editPersonButton = (Button) getViewById(R.id.edit_person_button);
-        editPersonButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // DONE: 2017/02/27 人編集ダイアログへの遷移
-                if (mListener != null){
-                    mListener.onEditPersonClick(mPerson);
-                }
-            }
-        });
-    }
+//    private Button editPersonButton;
+//    private void initEditPersonButton() {
+//        editPersonButton = (Button) getViewById(R.id.edit_person_button);
+//        editPersonButton.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                // DONE: 2017/02/27 人編集ダイアログへの遷移
+//                if (mListener != null){
+//                    mListener.onEditPersonClick(mPerson);
+//                }
+//            }
+//        });
+//    }
     
     private Button placementButton;
     private void initPlacementButton() {
@@ -367,7 +372,7 @@ public class VisitDetailView extends BaseAnimateView {
         int rowHeight = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small);
         int padding = getContext().getResources().getDimensionPixelSize(R.dimen.padding_normal);
 
-        fixedHeight = rowHeight * 10 + padding * 2;
+        fixedHeight = rowHeight * 9 + padding * 2;
 
         int lineCount;
         if (noteText.getLineCount() <= 0) {
@@ -380,6 +385,40 @@ public class VisitDetailView extends BaseAnimateView {
 
         return fixedHeight + plcHeight + noteHeight + tagFrame.getFrameHeight();
 
+    }
+
+    private Button editButton;
+    private void initEditButton() {
+        editButton = (Button) getViewById(R.id.edit_button);
+        editButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showMenuPopup();
+            }
+        });
+    }
+
+    private void showMenuPopup() {
+        PopupMenu popupMenu = new PopupMenu(getContext(), editButton);
+        popupMenu.getMenuInflater().inflate(R.menu.visit_detail_menu, popupMenu.getMenu());
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.edit_person:
+                        return true;
+                    case R.id.remove_person:
+                        return true;
+                    case R.id.delete:
+                        return true;
+                }
+                return false;
+            }
+        });
+        if (!mVisitDetail.belongsToMultiplePlace()) {
+            popupMenu.getMenu().removeItem(R.id.remove_person);
+        }
+        popupMenu.show();
     }
 
     public interface VisitDetailViewListener {

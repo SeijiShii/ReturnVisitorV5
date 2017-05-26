@@ -122,7 +122,7 @@ public class PlaceCell extends FrameLayout {
                                 mListener.onDeletePlace(mPlace);
                             }
                         }
-                    });
+                    }, mPlace);
                     return true;
                 }
                 return false;
