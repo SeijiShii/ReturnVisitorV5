@@ -250,7 +250,7 @@ public class AddPersonDialog extends FrameLayout
 
         Place place = placeMarkers.getPlace(marker);
         if (place != null) {
-            // TODO: 2017/05/25 place action
+            // DONE: 2017/05/25 place action
             fadeInListFrameByPlace(place);
         }
         saveCameraPosition();

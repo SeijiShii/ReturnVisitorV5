@@ -1078,6 +1078,6 @@ public class RecordVisitActivity extends AppCompatActivity {
     // DONE: 2017/04/05 Activity起動時にスクロール位置が一番上にない
     // DONE: 2017/05/06 再訪問時に人visit detailが閉じているようにしたい。
 
-    // TODO: 2017/05/09 Add Person from another place
+    // DONE: 2017/05/09 Add Person from another place
 
 }
