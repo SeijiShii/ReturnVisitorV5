@@ -13,9 +13,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class TagList extends DataList<Tag> {
 
-    @Override
-    synchronized public CopyOnWriteArrayList<Tag> getList() {
-        CopyOnWriteArrayList<Tag> list = new CopyOnWriteArrayList<>(super.list);
+    public ArrayList<Tag> getSortedList() {
+        ArrayList<Tag> list = new ArrayList<>(super.list);
         Collections.sort(list, new Comparator<Tag>() {
             @Override
             public int compare(Tag o1, Tag o2) {

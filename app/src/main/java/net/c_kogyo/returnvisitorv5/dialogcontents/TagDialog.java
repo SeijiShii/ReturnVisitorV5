@@ -26,7 +26,6 @@ import net.c_kogyo.returnvisitorv5.data.Tag;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
 
 import java.util.ArrayList;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by SeijiShii on 2017/03/06.
@@ -82,7 +81,7 @@ public class TagDialog extends FrameLayout {
                 s = trimWhitespace(s);
 
                 if (s.length() <= 0) {
-                    mAdapter = new TagListAdapter(new ArrayList<Tag>(RVData.getInstance().tagList.getList()));
+                    mAdapter = new TagListAdapter(RVData.getInstance().tagList.getSortedList());
                 } else {
                     mAdapter = new TagListAdapter(RVData.getInstance().tagList.getSearchedItems(s, getContext()));
                 }
@@ -148,7 +147,7 @@ public class TagDialog extends FrameLayout {
 
                 mVisitDetail.getTagIds().add(newTag.getId());
 
-                mAdapter = new TagListAdapter(new ArrayList<Tag>(RVData.getInstance().tagList.getList()));
+                mAdapter = new TagListAdapter(RVData.getInstance().tagList.getSortedList());
                 tagListView.setAdapter(mAdapter);
                 mAdapter.notifyDataSetChanged();
                 setListViewHeight();
@@ -166,7 +165,7 @@ public class TagDialog extends FrameLayout {
 
         tagListView = (ListViewCompat) view.findViewById(R.id.tag_list_view);
         // DONE: 2017/03/06 tag list adapter
-        mAdapter = new TagListAdapter(new ArrayList<>(RVData.getInstance().tagList.getList()));
+        mAdapter = new TagListAdapter(RVData.getInstance().tagList.getSortedList());
         tagListView.setAdapter(mAdapter);
 
         setListViewHeight();
@@ -274,7 +273,7 @@ public class TagDialog extends FrameLayout {
                     RVData.getInstance().tagList.deleteById(tag.getId());
                     mVisitDetail.getTagIds().remove(tag.getId());
 
-                    mAdapter = new TagListAdapter(new ArrayList<Tag>(RVData.getInstance().tagList.getList()));
+                    mAdapter = new TagListAdapter(RVData.getInstance().tagList.getSortedList());
                     tagListView.setAdapter(mAdapter);
                     mAdapter.notifyDataSetChanged();
 
