@@ -31,6 +31,7 @@ import net.c_kogyo.returnvisitorv5.fragment.CalendarFragment;
 import net.c_kogyo.returnvisitorv5.util.AdMobHelper;
 import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
+import net.c_kogyo.returnvisitorv5.util.InputUtil;
 import net.c_kogyo.returnvisitorv5.util.MailReport;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 
@@ -91,6 +92,13 @@ public class CalendarPagerActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         savePrefs();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // メール画面からもどったときのため
+        InputUtil.hideSoftKeyboard(this);
     }
 
     private ViewPager mPager;

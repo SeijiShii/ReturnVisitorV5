@@ -278,6 +278,31 @@
                     android:layout_marginRight="5dp"
                     android:layout_marginLeft="5dp"/>
 
+                <!-- Suggestion Button -->
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/ui_height_small">
+
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:id="@+id/suggestion_button"
+                        android:textColor="@color/colorPrimaryDark"
+                        android:background="@drawable/trans_blue_selector"
+                        android:text="@string/suggestion"
+                        android:paddingLeft="5dp"
+                        android:paddingRight="5dp"
+                        android:layout_centerInParent="true"/>
+
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/textColorGray"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginLeft="5dp"/>
+
             </LinearLayout>
 
         </ScrollView>

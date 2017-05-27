@@ -931,6 +931,7 @@ public class MapActivity extends AppCompatActivity
         initCalendarButton();
         initAddWorkButton();
         initAddVisitButton();
+        initSuggestionButton();
     }
 
     private void initDrawerLogoButton() {
@@ -1195,6 +1196,17 @@ public class MapActivity extends AppCompatActivity
 
         enableLogoButton(false);
         enableSearchText(false);
+    }
+
+    private void initSuggestionButton() {
+        Button suggestionButton = (Button) findViewById(R.id.suggestion_button);
+        suggestionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MapActivity.this, VisitSuggestionActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void startWorkPagerActivityWithNewWork(Work work) {

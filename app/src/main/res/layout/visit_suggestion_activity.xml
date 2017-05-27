@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
+
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <!-- Header Row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/ui_height_small"
+                android:orientation="horizontal"
+                android:background="@color/colorPrimaryDark"
+                android:id="@+id/header_row">
+
+                <!-- Logo Button -->
+                <RelativeLayout
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/logo_button"
+                        android:background="@drawable/v5_logo_036"
+                        android:layout_centerInParent="true"/>
+
+                </RelativeLayout>
+
+                <!-- Title and Date -->
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:textSize="25sp"
+                        android:textStyle="bold"
+                        android:text="@string/suggestion"
+                        android:textColor="@color/colorPrimary"
+                        android:layout_alignParentLeft="true"
+                        android:layout_marginLeft="5dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:textSize="20sp"
+                        android:textColor="#FFF"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginRight="5dp"
+                        android:id="@+id/date_text"/>
+
+                </RelativeLayout>
+
+                <!-- Menu Button -->
+                <RelativeLayout
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="@drawable/white_menu_button"
+                        android:id="@+id/work_menu_button"
+                        android:layout_centerInParent="true"/>
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+            <ListView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:id="@+id/suggestion_list_view"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="25dp"
+                android:background="@color/colorPrimaryDark"/>
+
+
+        </LinearLayout>
+
+        <!-- Dialog overlay -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#B000"
+            android:id="@+id/dialog_overlay"
+            android:visibility="invisible"/>
+
+        <!-- Filter Button layer -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/filter_frame_height_close"
+                android:orientation="vertical"
+                android:layout_alignParentBottom="true"
+                android:background="@color/colorPrimary"
+                android:id="@+id/filter_frame">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/filter_frame_height_close"
+                    android:id="@+id/filter_toggle_bar">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/white_upper_arrow"
+                        android:layout_centerInParent="true"
+                        android:id="@+id/toggle_arrow"/>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/filter_frame_content_height">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:orientation="horizontal">
+
+                        <net.c_kogyo.returnvisitorv5.view.ToggleColorButton
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:id="@+id/toggle_0"
+                            ads:trueResId="@mipmap/button_maker_orange"
+                            ads:initialState="true"/>
+
+                        <net.c_kogyo.returnvisitorv5.view.ToggleColorButton
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:id="@+id/toggle_1"
+                            ads:trueResId="@mipmap/button_marker_yellow"
+                            ads:initialState="true"/>
+
+                        <net.c_kogyo.returnvisitorv5.view.ToggleColorButton
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:id="@+id/toggle_2"
+                            ads:trueResId="@mipmap/button_marker_green"
+                            ads:initialState="true"/>
+
+                        <net.c_kogyo.returnvisitorv5.view.ToggleColorButton
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:id="@+id/toggle_3"
+                            ads:trueResId="@mipmap/button_marker_emerald"
+                            ads:initialState="true"/>
+
+                        <net.c_kogyo.returnvisitorv5.view.ToggleColorButton
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:id="@+id/toggle_4"
+                            ads:trueResId="@mipmap/button_marker_blue"
+                            ads:initialState="true"/>
+
+                        <net.c_kogyo.returnvisitorv5.view.ToggleColorButton
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:id="@+id/toggle_5"
+                            ads:trueResId="@mipmap/button_marker_purple"
+                            ads:initialState="true"/>
+
+                        <net.c_kogyo.returnvisitorv5.view.ToggleColorButton
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:id="@+id/toggle_6"
+                            ads:trueResId="@mipmap/button_marker_red"
+                            ads:initialState="true"/>
+
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+
+    </FrameLayout>
+
+    <!-- Ad Frame -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ad_frame_height"
+        android:background="@color/adFrameGray">
+
+        <com.google.android.gms.ads.AdView
+            android:id="@+id/adView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"
+            ads:adSize="BANNER"
+            ads:adUnitId="@string/ad_id"
+            android:layout_centerInParent="true">
+        </com.google.android.gms.ads.AdView>
+
+    </RelativeLayout>
+
+</LinearLayout>

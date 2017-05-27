@@ -8,4 +8,11 @@
         <attr name="checked_text" format="string"/>
         <attr name="unchecked_text" format="string"/>
     </declare-styleable>
+
+    <declare-styleable name="ToggleColorButton">
+        <attr name="trueResId" format="reference"/>
+        <attr name="falseResId" format="reference"/>
+        <attr name="initialState" format="boolean"/>
+    </declare-styleable>
+
 </resources>
