@@ -1,5 +1,7 @@
 package net.c_kogyo.returnvisitorv5.data.list;
 
+import android.util.Log;
+
 import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.RVData;
@@ -7,12 +9,15 @@ import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
 
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by SeijiShii on 2017/05/25.
  */
 
 public class PersonList extends DataList<Person> {
+
+    private static final String TAG = "PersonList";
 
     public ArrayList<Person> getPersonsInPlace(Place place) {
 
@@ -35,5 +40,42 @@ public class PersonList extends DataList<Person> {
             }
         }
         return getList(ids);
+    }
+
+    // for maintenance
+    public void removeItemsWithoutVisitDetail() {
+
+        ArrayList<String> validIds = new ArrayList<>();
+
+        for (Visit visit : RVData.getInstance().visitList) {
+            for (VisitDetail visitDetail : visit.getVisitDetails()) {
+               if (!validIds.contains(visitDetail.getPersonId())) {
+                   validIds.add(visitDetail.getPersonId());
+               }
+            }
+        }
+
+        ArrayList<Person> validPersons = new ArrayList<>();
+        for (String validId : validIds) {
+            Person person = getById(validId);
+            if (person != null) {
+                validPersons.add(person);
+            }
+        }
+
+        ArrayList<Person> deleteList = new ArrayList<>();
+        for (Person person : list) {
+            if (!validPersons.contains(person)) {
+                deleteList.add(person);
+            }
+        }
+
+        for (Person deletedPerson : deleteList) {
+            deleteById(deletedPerson.getId());
+        }
+
+        Log.d(TAG, "Valid person count: " + validIds.size());
+        Log.d(TAG, "Invalid person count: " + deleteList.size());
+
     }
 }

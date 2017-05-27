@@ -1,10 +1,12 @@
 package net.c_kogyo.returnvisitorv5.data.list;
 
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.RVData;
+import net.c_kogyo.returnvisitorv5.data.Tag;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
 
@@ -17,6 +19,8 @@ import java.util.Comparator;
  */
 
 public class PlaceList extends DataList<Place> {
+
+    private final String TAG = "PlaceList";
 
     public synchronized ArrayList<Place> getListByIds(ArrayList<String> ids) {
         ArrayList<Place> list = new ArrayList<>();
@@ -79,5 +83,30 @@ public class PlaceList extends DataList<Place> {
             }
         }
         return getList(placeIds);
+    }
+
+    // maintenance
+    public void deleteItemWithoutVisit() {
+
+        ArrayList<String> validIds = new ArrayList<>();
+        for (Visit visit : RVData.getInstance().visitList) {
+            if (!validIds.contains(visit.getPlaceId())) {
+                validIds.add(visit.getPlaceId());
+            }
+        }
+
+        ArrayList<Place> deleteList = new ArrayList<>();
+        for (Place place : list) {
+            if (!validIds.contains(place.getId())) {
+                deleteList.add(place);
+            }
+        }
+
+        for (Place place : deleteList) {
+            deleteById(place.getId());
+        }
+
+        Log.d(TAG, "Valid place count: " + list.size());
+        Log.d(TAG, "Invalid place count: " + deleteList.size());
     }
 }

@@ -454,7 +454,7 @@ public class RecordVisitActivity extends AppCompatActivity {
 
     private void inquireAddress() {
 
-        if (!mPlace.getAddress().equals("") && mPlace.getAddress() != null) return;
+        if (mPlace.getAddress() != null) return;
 
         double lat, lng;
 

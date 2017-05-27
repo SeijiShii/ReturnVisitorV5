@@ -96,7 +96,7 @@ public class Place extends DataItem {
 
     private void initCommon() {
         this.latLng = new LatLng(0, 0);
-        this.address = "";
+        this.address = null;
 //        this.markerId = null;
         this.parentId = null;
         this.category = Category.HOUSE;
