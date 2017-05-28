@@ -343,4 +343,13 @@ public class Visit extends DataItem implements Cloneable{
     public void setDatetime(Calendar datetime) {
         this.datetime = datetime;
     }
+
+    public boolean hasPerson(String personId) {
+        for (VisitDetail visitDetail : visitDetails) {
+            if (visitDetail.getPersonId().equals(personId)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

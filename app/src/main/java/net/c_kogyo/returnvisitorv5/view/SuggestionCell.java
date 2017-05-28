@@ -64,7 +64,12 @@ public class SuggestionCell extends FrameLayout {
         }
 
         marker.setBackgroundResource(Constants.buttonRes[mVisitSuggestion.getLatestVisit().getPriority().num()]);
-        dataText.setText(mVisitSuggestion.getPerson().toString(getContext()));
+
+        if (mVisitSuggestion.getPerson() != null) {
+            dataText.setText(mVisitSuggestion.getPerson().toString(getContext()));
+        } else {
+            dataText.setText(R.string.not_home);
+        }
         final DateFormat format = android.text.format.DateFormat.getMediumDateFormat(getContext());
         String lastVisitDate = getContext().getString(R.string.last_visit_date,
                 format.format(mVisitSuggestion.getLatestVisit().getDatetime().getTime()),

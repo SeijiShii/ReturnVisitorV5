@@ -2,6 +2,7 @@ package net.c_kogyo.returnvisitorv5.data.list;
 
 import android.support.annotation.Nullable;
 
+import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
@@ -10,6 +11,8 @@ import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Created by SeijiShii on 2017/03/05.
@@ -130,6 +133,48 @@ public class VisitList extends DataList<Visit> {
             bsVisitDetails.addAll(visit.getBSVisitDetails());
         }
         return bsVisitDetails;
+    }
+
+    public ArrayList<Visit> getVisitsToPerson(String personId) {
+
+        ArrayList<Visit> visits = new ArrayList<>();
+
+        for (Visit visit : list) {
+
+            if (visit.hasPerson(personId)) {
+                visits.add(visit);
+            }
+        }
+
+        Collections.sort(visits, new Comparator<Visit>() {
+            @Override
+            public int compare(Visit o1, Visit o2) {
+                return o1.getDatetime().compareTo(o2.getDatetime());
+            }
+        });
+
+        return visits;
+    }
+
+    @Nullable
+    public Visit getLatestVisitToPerson(String personId) {
+
+        ArrayList<Visit> visits = getVisitsToPerson(personId);
+
+        if (visits.size() <= 0) return null;
+
+        return visits.get(visits.size() - 1);
+
+    }
+
+    public ArrayList<Visit> getAllNotHomeVisits() {
+        ArrayList<Visit> nhVisits = new ArrayList<>();
+        for (Visit visit : list) {
+            if (visit.getPriority() == Visit.Priority.NOT_HOME) {
+                nhVisits.add(visit);
+            }
+        }
+        return nhVisits;
     }
 
     public void setPlaceIdToVisitDetails() {

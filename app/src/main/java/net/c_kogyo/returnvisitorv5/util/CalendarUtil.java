@@ -9,6 +9,8 @@ import java.util.Calendar;
 public class CalendarUtil {
 
     public static final long ONE_DAY = 1000 * 60 * 60 * 24;
+    public static final long ONE_MONTH = ONE_DAY * 31;
+    public static final long ONE_YEAR = ONE_DAY * 365;
 
     public static boolean isSameDay(Calendar calendar0, Calendar calendar1) {
 
