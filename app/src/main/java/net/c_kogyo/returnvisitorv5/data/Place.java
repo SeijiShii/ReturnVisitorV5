@@ -281,5 +281,7 @@ public class Place extends DataItem {
         return category;
     }
 
-
+    public void setCategory(Category category) {
+        this.category = category;
+    }
 }

@@ -466,11 +466,16 @@ public class MapActivity extends AppCompatActivity
             @Override
             public void onClickHousingComplexButton() {
                 // DONE: 2017/03/17 record complex action
-                placeMarkers.removeByPlace(tmpPlace);
                 // 同じダイアログを使用するのでアニメータリスナエンド後に表示メソッドを起動する
 
                 fadeOutOverlay();
-                fadeOutDialogFrame(normalFadeOutListener);
+                fadeOutDialogFrame(new ViewUtil.PostFadeViewListener() {
+                    @Override
+                    public void postFade(View view) {
+                        dialogFrame.removeAllViews();
+                        showHousingComplexDialog(tmpPlace);
+                    }
+                });
 
             }
 
@@ -533,7 +538,7 @@ public class MapActivity extends AppCompatActivity
         if (place.getCategory() == Place.Category.HOUSE) {
             showPlaceDialog(place);
         } else if (place.getCategory() == Place.Category.HOUSING_COMPLEX) {
-            showHousingComplexDialog(place, null);
+            showHousingComplexDialog(place);
         }
         return false;
     }
@@ -781,19 +786,15 @@ public class MapActivity extends AppCompatActivity
         startActivityForResult(newVisitIntent, NEW_VISIT_REQUEST_CODE);
     }
 
-    private void showHousingComplexDialog(@Nullable Place housingComplex, @Nullable LatLng latLng) {
+    private void showHousingComplexDialog(Place housingComplex) {
 
-        Place mComplex;
-
-        if (housingComplex == null) {
-            mComplex =  new Place(latLng, Place.Category.HOUSING_COMPLEX);
-        } else {
-            mComplex = housingComplex;
-        }
+        housingComplex.setCategory(Place.Category.HOUSING_COMPLEX);
+        RVData.getInstance().placeList.setOrAdd(housingComplex);
+        RVCloudSync.syncDataIfLoggedIn(this);
 
         HousingComplexDialog housingComplexDialog
                 = new HousingComplexDialog(this,
-                        mComplex,
+                        housingComplex,
                         new HousingComplexDialog.HousingComplexDialogListener() {
                             @Override
                             public void onClickAddRoomButton(Place newRoom) {
@@ -1717,11 +1718,11 @@ public class MapActivity extends AppCompatActivity
                 showPlaceDialog(place);
                 break;
             case HOUSING_COMPLEX:
-                showHousingComplexDialog(place, null);
+                showHousingComplexDialog(place);
                 break;
             case ROOM:
                 Place parent = RVData.getInstance().placeList.getById(place.getParentId());
-                showHousingComplexDialog(parent, null);
+                showHousingComplexDialog(parent);
                 break;
         }
     }

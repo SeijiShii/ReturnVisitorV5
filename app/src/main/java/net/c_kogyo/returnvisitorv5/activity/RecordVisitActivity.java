@@ -638,10 +638,9 @@ public class RecordVisitActivity extends AppCompatActivity {
 
     }
 
-    private Button okButton;
     private void initOkButton() {
 
-        okButton = (Button) findViewById(R.id.ok_button);
+        Button okButton = (Button) findViewById(R.id.ok_button);
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -944,6 +943,7 @@ public class RecordVisitActivity extends AppCompatActivity {
                             @Override
                             public void onFinishAnimation() {
                                 VisitDetail visitDetail = new VisitDetail(person.getId(), mVisit.getId(), mVisit.getPlaceId());
+                                mVisit.addVisitDetail(visitDetail);
                                 addVisitDetailView(visitDetail,
                                         person,
                                         VisitDetailView.DrawCondition.EXTRACT_POST_DRAWN_FROM_0);
