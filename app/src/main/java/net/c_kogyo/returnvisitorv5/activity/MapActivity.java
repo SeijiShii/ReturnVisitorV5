@@ -66,6 +66,7 @@ import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 import net.c_kogyo.returnvisitorv5.util.InputUtil;
 import net.c_kogyo.returnvisitorv5.util.SoftKeyboard;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
+import net.c_kogyo.returnvisitorv5.util.WriteLogThread;
 import net.c_kogyo.returnvisitorv5.view.CountTimeFrame;
 
 import java.util.ArrayList;
@@ -106,6 +107,9 @@ public class MapActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // log
+        new WriteLogThread(this).start();
 
         setContentView(R.layout.map_activity);
         initWaitScreen();
@@ -332,6 +336,8 @@ public class MapActivity extends AppCompatActivity
     }
 
     private void saveCameraPosition() {
+
+        if (mMap == null) return;
 
         SharedPreferences prefs = getSharedPreferences(RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
