@@ -8,6 +8,8 @@ import java.util.Calendar;
 
 public class CalendarUtil {
 
+    public static final long ONE_DAY = 1000 * 60 * 60 * 24;
+
     public static boolean isSameDay(Calendar calendar0, Calendar calendar1) {
 
         int year0 = calendar0.get(Calendar.YEAR);
@@ -49,6 +51,13 @@ public class CalendarUtil {
         int num2 = number2.get(Calendar.MONTH) / 2 + 1;
 
         return number1.get(Calendar.YEAR) == number2.get(Calendar.YEAR) && num1 == num2;
+
+    }
+
+    public static int daysPast(Calendar before, Calendar later) {
+
+        long diff = later.getTimeInMillis() - before.getTimeInMillis();
+        return (int) (diff / ONE_DAY) + 1;
 
     }
 }
