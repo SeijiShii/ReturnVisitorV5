@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.ScrollView;
 
+import net.c_kogyo.returnvisitorv5.view.SuggestionCell;
+
 /**
  * Created by SeijiShii on 2017/04/02.
  */
@@ -207,7 +209,5 @@ public class ViewUtil {
         display.getSize(point);
         return point;
     }
-
-
 
 }

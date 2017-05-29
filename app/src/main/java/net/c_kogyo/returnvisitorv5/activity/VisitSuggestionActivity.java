@@ -211,7 +211,8 @@ public class VisitSuggestionActivity extends AppCompatActivity {
                         new SuggestionCell.SuggestionCellListener() {
                             @Override
                             public void onDismiss(VisitSuggestion suggestion) {
-
+                                mSuggestions.remove(suggestion);
+                                notifyDataSetChanged();
                             }
 
                             @Override

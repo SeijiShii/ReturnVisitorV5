@@ -1,5 +1,7 @@
 package net.c_kogyo.returnvisitorv5.view;
 
+import android.animation.Animator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -7,6 +9,8 @@ import android.support.v7.widget.PopupMenu;
 import android.util.AttributeSet;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -112,6 +116,8 @@ public class SuggestionCell extends FrameLayout {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.dismiss:
+
+                        compress();
                         return true;
                     case R.id.show_map:
                         if (mLister != null) {
@@ -123,6 +129,46 @@ public class SuggestionCell extends FrameLayout {
             }
         });
         popupMenu.show();
+    }
+
+
+    private void compress() {
+
+        ValueAnimator animator = ValueAnimator.ofInt(getHeight(), 0);
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                AbsListView.LayoutParams params
+                        = new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) animation.getAnimatedValue());
+                SuggestionCell.this.setLayoutParams(params);
+                requestLayout();
+            }
+        });
+        animator.setDuration(300);
+        animator.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                if (mLister != null) {
+                    mLister.onDismiss(mVisitSuggestion);
+                }
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        animator.start();
     }
 
     public interface SuggestionCellListener{
