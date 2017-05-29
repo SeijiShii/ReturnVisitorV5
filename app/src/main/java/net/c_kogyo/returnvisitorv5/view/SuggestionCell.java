@@ -44,13 +44,14 @@ public class SuggestionCell extends FrameLayout {
 
     private View view;
     private ImageView marker;
-    private TextView dataText, lastVisitText;
+    private TextView dataText, lastVisitText, lastSeenText;
     private void initCommon() {
         view = View.inflate(getContext(), R.layout.suggestion_cell, this);
 
         marker = (ImageView) view.findViewById(R.id.marker);
         dataText = (TextView) view.findViewById(R.id.data_text);
         lastVisitText = (TextView) view.findViewById(R.id.last_visit_date_text);
+        lastSeenText = (TextView) view.findViewById(R.id.last_seen_text);
 
         refreshData(null);
 
@@ -72,9 +73,18 @@ public class SuggestionCell extends FrameLayout {
         }
         final DateFormat format = android.text.format.DateFormat.getMediumDateFormat(getContext());
         String lastVisitDate = getContext().getString(R.string.last_visit_date,
-                format.format(mVisitSuggestion.getLatestVisit().getDatetime().getTime()),
-                CalendarUtil.daysPast(mVisitSuggestion.getLatestVisit().getDatetime(), Calendar.getInstance()));
+                format.format(mVisitSuggestion.getLatestVisit().getDatetime().getTime()));
         lastVisitText.setText(lastVisitDate);
+
+        int days = mVisitSuggestion.getPassedDaysFromLastSeen();
+        String lastSeenMassage;
+        if (days >= 0) {
+            lastSeenMassage = getContext().getString(R.string.last_seen, days);
+        } else {
+            lastSeenMassage = getContext().getString(R.string.never_seen);
+        }
+        lastSeenText.setText(lastSeenMassage);
+
     }
 
     private Button menuButton;

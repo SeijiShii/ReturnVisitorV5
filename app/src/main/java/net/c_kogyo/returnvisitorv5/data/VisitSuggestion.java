@@ -43,6 +43,14 @@ public class VisitSuggestion {
         return latestVisit.getPriority();
     }
 
+    public int getPassedDaysFromLastSeen(){
+        if (latestSeenVisit != null) {
+            return CalendarUtil.daysPast(latestSeenVisit.getDatetime(), Calendar.getInstance());
+        } else {
+            return -1;
+        }
+    }
+
     public static ArrayList<VisitSuggestion> getFilteredSuggestions(ArrayList<Visit.Priority> priorities) {
 
         ArrayList<Visit.Priority> noDoubledPriorities = new ArrayList<>();
@@ -80,43 +88,45 @@ public class VisitSuggestion {
                     if (latestVisit != null) {
                         switch (priority) {
                             case HIGH:
-                                if (CalendarUtil.daysPast(latestVisit.getDatetime(), Calendar.getInstance()) > 4) {
-                                    if (latestSeenVisit == null) {
-                                        // 一度も会えていないなら
+
+                                if (latestSeenVisit != null) {
+                                    if (CalendarUtil.daysPast(latestSeenVisit.getDatetime(), Calendar.getInstance()) > 4
+                                            && !CalendarUtil.isSameDay(latestSeenVisit.getDatetime(), Calendar.getInstance())) {
                                         suggestions.add(new VisitSuggestion(person, latestVisit, latestSeenVisit));
-                                    } else {
-                                        if (CalendarUtil.daysPast(latestSeenVisit.getDatetime(), Calendar.getInstance()) > 2
-                                                && !CalendarUtil.isSameDay(latestSeenVisit.getDatetime(), Calendar.getInstance())) {
-                                            suggestions.add(new VisitSuggestion(person, latestVisit, latestSeenVisit));
-                                        }
                                     }
+                                } else {
+                                    // 一度も会えていないなら
+                                    suggestions.add(new VisitSuggestion(person, latestVisit, latestSeenVisit));
                                 }
+
                                 break;
+
                             case MIDDLE:
-                                if (CalendarUtil.daysPast(latestVisit.getDatetime(), Calendar.getInstance()) > 10) {
-                                    if (latestSeenVisit == null) {
-                                        // 一度も会えていないなら
+
+                                if (latestSeenVisit != null) {
+                                    if (CalendarUtil.daysPast(latestSeenVisit.getDatetime(), Calendar.getInstance()) > 7
+                                            && !CalendarUtil.isSameDay(latestSeenVisit.getDatetime(), Calendar.getInstance())) {
                                         suggestions.add(new VisitSuggestion(person, latestVisit, latestSeenVisit));
-                                    } else {
-                                        if (CalendarUtil.daysPast(latestSeenVisit.getDatetime(), Calendar.getInstance()) > 5
-                                                && !CalendarUtil.isSameDay(latestSeenVisit.getDatetime(), Calendar.getInstance())) {
-                                            suggestions.add(new VisitSuggestion(person, latestVisit, latestSeenVisit));
-                                        }
                                     }
+                                } else {
+                                    // 一度も会えていないなら
+                                    suggestions.add(new VisitSuggestion(person, latestVisit, latestSeenVisit));
                                 }
+
                                 break;
+
                             case LOW:
-                                if (CalendarUtil.daysPast(latestVisit.getDatetime(), Calendar.getInstance()) > 20) {
-                                    if (latestSeenVisit == null) {
-                                        // 一度も会えていないなら
+
+                                if (latestSeenVisit != null) {
+                                    if (CalendarUtil.daysPast(latestSeenVisit.getDatetime(), Calendar.getInstance()) > 15
+                                            && !CalendarUtil.isSameDay(latestSeenVisit.getDatetime(), Calendar.getInstance())) {
                                         suggestions.add(new VisitSuggestion(person, latestVisit, latestSeenVisit));
-                                    } else {
-                                        if (CalendarUtil.daysPast(latestSeenVisit.getDatetime(), Calendar.getInstance()) > 10
-                                                && !CalendarUtil.isSameDay(latestSeenVisit.getDatetime(), Calendar.getInstance())) {
-                                            suggestions.add(new VisitSuggestion(person, latestVisit, latestSeenVisit));
-                                        }
                                     }
+                                } else {
+                                    // 一度も会えていないなら
+                                    suggestions.add(new VisitSuggestion(person, latestVisit, latestSeenVisit));
                                 }
+
                                 break;
                             case BUSY:
                                 suggestions.add(new VisitSuggestion(person, latestVisit, latestSeenVisit));

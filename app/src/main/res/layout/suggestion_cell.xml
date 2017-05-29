@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="70dp">
+    android:layout_height="90dp">
 
     <!-- First Low -->
     <LinearLayout
@@ -41,10 +41,18 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="30dp"
+        android:layout_height="25dp"
         android:textSize="15sp"
         android:textColor="@color/colorPrimaryDark"
         android:gravity="center"
         android:id="@+id/last_visit_date_text"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:textSize="15sp"
+        android:textColor="@color/colorPrimaryDark"
+        android:gravity="center"
+        android:id="@+id/last_seen_text"/>
 
 </LinearLayout>
