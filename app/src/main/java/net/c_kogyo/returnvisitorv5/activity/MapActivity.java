@@ -37,6 +37,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -60,9 +61,11 @@ import net.c_kogyo.returnvisitorv5.dialogcontents.LoginDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.MapLongClickDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.PlaceDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.SearchDialog;
+import net.c_kogyo.returnvisitorv5.service.TimeCountIntentService;
 import net.c_kogyo.returnvisitorv5.service.TimeCountService;
 import net.c_kogyo.returnvisitorv5.util.AdMobHelper;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
+import net.c_kogyo.returnvisitorv5.util.ErrorLogIntentService;
 import net.c_kogyo.returnvisitorv5.util.InputUtil;
 import net.c_kogyo.returnvisitorv5.util.SoftKeyboard;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
@@ -109,7 +112,9 @@ public class MapActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
 
         // log
-        new WriteLogThread(this).start();
+        Intent errorLogIntent = new Intent(this, ErrorLogIntentService.class);
+        startService(errorLogIntent);
+
 
         setContentView(R.layout.map_activity);
         initWaitScreen();
@@ -264,6 +269,7 @@ public class MapActivity extends AppCompatActivity
     @Override
     protected void onStart() {
         super.onStart();
+
         InputUtil.hideSoftKeyboard(this);
         mapView.onStart();
         isForeground = true;
@@ -319,8 +325,9 @@ public class MapActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
+
         mapView.onResume();
-        restartTimeCountIfNeeded();
+//        restartTimeCountIfNeeded();
 
     }
 
@@ -1021,14 +1028,18 @@ public class MapActivity extends AppCompatActivity
     }
 
     private CountTimeFrame countTimeFrame;
+    private Handler timeCountHandler;
     private void initCountTimeFrame() {
+
+        timeCountHandler = new Handler();
+
         countTimeFrame = (CountTimeFrame) findViewById(R.id.count_time_frame);
         countTimeFrame.setExtracted(TimeCountService.isTimeCounting());
         countTimeFrame.setListener(new CountTimeFrame.CountTimeFrameListener() {
             @Override
             public void onClickStartButton() {
-                Intent startTimeCountIntent = new Intent(getApplicationContext(), TimeCountService.class);
-                startTimeCountIntent.setAction(TimeCountService.START_COUNTING_ACTION_TO_SERVICE);
+                Intent startTimeCountIntent = new Intent(getApplicationContext(), TimeCountIntentService.class);
+//                startTimeCountIntent.setAction(TimeCountService.START_COUNTING_ACTION_TO_SERVICE);
                 startService(startTimeCountIntent);
             }
 
@@ -1056,6 +1067,13 @@ public class MapActivity extends AppCompatActivity
                SharedPreferences.Editor editor = preferences.edit();
                editor.putBoolean(Constants.SharedPrefTags.IS_COUNTING_TIME, false);
                editor.apply();
+
+               timeCountHandler.post(new Runnable() {
+                   @Override
+                   public void run() {
+                       Toast.makeText(MapActivity.this, R.string.stop_time_count, Toast.LENGTH_SHORT).show();
+                   }
+               });
 
            } else if (intent.getAction().equals(TimeCountService.TIME_COUNTING_ACTION_TO_ACTIVITY)) {
 
@@ -1088,22 +1106,22 @@ public class MapActivity extends AppCompatActivity
         manager.registerReceiver(receiver, new IntentFilter(TimeCountService.STOP_TIME_COUNT_ACTION_TO_ACTIVITY));
     }
 
-    private void restartTimeCountIfNeeded() {
-        SharedPreferences preferences
-                = getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
-        boolean isCounting = preferences.getBoolean(Constants.SharedPrefTags.IS_COUNTING_TIME, false);
-        if (isCounting) {
-            String workId = preferences.getString(Constants.SharedPrefTags.COUNTING_WORK_ID, null);
-
-            if (workId == null) return;
-
-            Intent restartCountIntent = new Intent(this, TimeCountService.class);
-            restartCountIntent.setAction(TimeCountService.RESTART_COUNTING_ACTION_TO_SERVICE);
-            restartCountIntent.putExtra(TimeCountService.COUNTING_WORK_ID, workId);
-            startService(restartCountIntent);
-        }
-
-    }
+//    private void restartTimeCountIfNeeded() {
+//        SharedPreferences preferences
+//                = getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
+//        boolean isCounting = preferences.getBoolean(Constants.SharedPrefTags.IS_COUNTING_TIME, false);
+//        if (isCounting) {
+//            String workId = preferences.getString(Constants.SharedPrefTags.COUNTING_WORK_ID, null);
+//
+//            if (workId == null) return;
+//
+//            Intent restartCountIntent = new Intent(this, TimeCountService.class);
+//            restartCountIntent.setAction(TimeCountService.RESTART_COUNTING_ACTION_TO_SERVICE);
+//            restartCountIntent.putExtra(TimeCountService.COUNTING_WORK_ID, workId);
+//            startService(restartCountIntent);
+//        }
+//
+//    }
 
     private Button workButton;
     private void initWorkButton() {
