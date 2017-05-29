@@ -255,10 +255,10 @@ public class Visit extends DataItem implements Cloneable{
     }
 
     @Nullable
-    public VisitDetail getVisitDetail(Person person) {
+    public VisitDetail getVisitDetail(String personId) {
 
         for (VisitDetail visitDetail : visitDetails) {
-            if (visitDetail.getPersonId().equals(person.getId())) {
+            if (visitDetail.getPersonId().equals(personId)) {
                 return visitDetail;
             }
         }

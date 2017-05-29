@@ -16,11 +16,12 @@ import java.util.Comparator;
 public class VisitSuggestion {
 
     private Person person;
-    private Visit latestVisit;
+    private Visit latestVisit, latestSeenVisit;
 
-    public VisitSuggestion(@Nullable Person person, Visit latestVisit) {
+    public VisitSuggestion(@Nullable Person person, Visit latestVisit, @Nullable Visit latestSeenVisit) {
         this.person = person;
         this.latestVisit = latestVisit;
+        this.latestSeenVisit = latestSeenVisit;
     }
 
     @Nullable
@@ -32,69 +33,105 @@ public class VisitSuggestion {
         return latestVisit;
     }
 
-    public static ArrayList<VisitSuggestion> getSuggestions() {
+    public Visit.Priority getPriority() {
+
+        for (VisitDetail visitDetail : latestVisit.getVisitDetails()) {
+            if (visitDetail.getPersonId().equals(person.getId())) {
+                return visitDetail.getPriority();
+            }
+        }
+        return latestVisit.getPriority();
+    }
+
+    public static ArrayList<VisitSuggestion> getFilteredSuggestions(ArrayList<Visit.Priority> priorities) {
+
+        ArrayList<Visit.Priority> noDoubledPriorities = new ArrayList<>();
+        for (Visit.Priority priority : priorities) {
+            if (!noDoubledPriorities.contains(priority)) {
+                noDoubledPriorities.add(priority);
+            }
+        }
+
+        ArrayList<VisitSuggestion> suggestions = new ArrayList<>();
+        for (Visit.Priority priority : noDoubledPriorities) {
+            suggestions.addAll(getSuggestionByPriority(priority));
+        }
+
+        Collections.sort(suggestions, new Comparator<VisitSuggestion>() {
+            @Override
+            public int compare(VisitSuggestion o1, VisitSuggestion o2) {
+                return o2.getPriority().num() - o1.getPriority().num();
+            }
+        });
+
+        return suggestions;
+    }
+
+    private static ArrayList<VisitSuggestion> getSuggestionByPriority(Visit.Priority priority) {
 
         ArrayList<VisitSuggestion> suggestions = new ArrayList<>();
 
-        // すべての人の最新の訪問情報
-        for (Person person : RVData.getInstance().personList) {
-            Visit latestVisit = RVData.getInstance().visitList.getLatestVisitToPerson(person.getId());
-            if (latestVisit != null) {
-                suggestions.add(new VisitSuggestion(person, latestVisit));
+        if (priority != Visit.Priority.NOT_HOME) {
+            for (Person person : RVData.getInstance().personList) {
+
+                if (person.getPriority() == priority) {
+                    Visit latestVisit = RVData.getInstance().visitList.getLatestVisitToPerson(person.getId());
+                    Visit latestSeenVisit = RVData.getInstance().visitList.getLatestVisitSeenToPerson(person.getId());
+                    if (latestVisit != null) {
+                        switch (priority) {
+                            case HIGH:
+                                if (CalendarUtil.daysPast(latestVisit.getDatetime(), Calendar.getInstance()) > 4) {
+                                    if (latestSeenVisit == null) {
+                                        // 一度も会えていないなら
+                                        suggestions.add(new VisitSuggestion(person, latestVisit, latestSeenVisit));
+                                    } else {
+                                        if (CalendarUtil.daysPast(latestSeenVisit.getDatetime(), Calendar.getInstance()) > 2
+                                                && !CalendarUtil.isSameDay(latestSeenVisit.getDatetime(), Calendar.getInstance())) {
+                                            suggestions.add(new VisitSuggestion(person, latestVisit, latestSeenVisit));
+                                        }
+                                    }
+                                }
+                                break;
+                            case MIDDLE:
+                                if (CalendarUtil.daysPast(latestVisit.getDatetime(), Calendar.getInstance()) > 10) {
+                                    if (latestSeenVisit == null) {
+                                        // 一度も会えていないなら
+                                        suggestions.add(new VisitSuggestion(person, latestVisit, latestSeenVisit));
+                                    } else {
+                                        if (CalendarUtil.daysPast(latestSeenVisit.getDatetime(), Calendar.getInstance()) > 5
+                                                && !CalendarUtil.isSameDay(latestSeenVisit.getDatetime(), Calendar.getInstance())) {
+                                            suggestions.add(new VisitSuggestion(person, latestVisit, latestSeenVisit));
+                                        }
+                                    }
+                                }
+                                break;
+                            case LOW:
+                                if (CalendarUtil.daysPast(latestVisit.getDatetime(), Calendar.getInstance()) > 20) {
+                                    if (latestSeenVisit == null) {
+                                        // 一度も会えていないなら
+                                        suggestions.add(new VisitSuggestion(person, latestVisit, latestSeenVisit));
+                                    } else {
+                                        if (CalendarUtil.daysPast(latestSeenVisit.getDatetime(), Calendar.getInstance()) > 10
+                                                && !CalendarUtil.isSameDay(latestSeenVisit.getDatetime(), Calendar.getInstance())) {
+                                            suggestions.add(new VisitSuggestion(person, latestVisit, latestSeenVisit));
+                                        }
+                                    }
+                                }
+                                break;
+                            case BUSY:
+                                suggestions.add(new VisitSuggestion(person, latestVisit, latestSeenVisit));
+                                break;
+
+                            default:
+                        }
+                    }
+                }
+            }
+        } else {
+            for (Visit visit : RVData.getInstance().visitList.getAllNotHomeVisitsInOneMonth()) {
+                suggestions.add(new VisitSuggestion(null, visit, null));
             }
         }
-
-        // 1年以上古いものを削除
-        ArrayList<VisitSuggestion> deleteList = new ArrayList<>();
-        for (VisitSuggestion suggestion : suggestions) {
-            if (CalendarUtil.daysPast(suggestion.getLatestVisit().getDatetime(), Calendar.getInstance()) > 365) {
-                deleteList.add(suggestion);
-            }
-        }
-        suggestions.removeAll(deleteList);
-
-        // 3日以内のものを削除
-        // TODO: 2017/05/28 会いたい人に会えているか
-        deleteList = new ArrayList<>();
-        for (VisitSuggestion suggestion : suggestions) {
-            if (CalendarUtil.daysPast(suggestion.getLatestVisit().getDatetime(), Calendar.getInstance()) < 3) {
-                deleteList.add(suggestion);
-            }
-        }
-        suggestions.removeAll(deleteList);
-
-        ArrayList<VisitSuggestion> nhSuggestions = new ArrayList<>();
-        // すべての留守宅をゲット
-        for (Visit visit : RVData.getInstance().visitList.getAllNotHomeVisits()) {
-            nhSuggestions.add(new VisitSuggestion(null, visit));
-        }
-
-        // 3か月以上たった留守宅を削除
-        deleteList = new ArrayList<>();
-        for (VisitSuggestion suggestion : nhSuggestions) {
-            if (CalendarUtil.daysPast(suggestion.getLatestVisit().getDatetime(), Calendar.getInstance()) > 90) {
-                deleteList.add(suggestion);
-            }
-        }
-        nhSuggestions.removeAll(deleteList);
-
-        suggestions.addAll(nhSuggestions);
-
-        // 日時で整列
-        Collections.sort(suggestions, new Comparator<VisitSuggestion>() {
-            @Override
-            public int compare(VisitSuggestion o1, VisitSuggestion o2) {
-                return o2.getLatestVisit().getDatetime().compareTo(o1.getLatestVisit().getDatetime());
-            }
-        });
-
-        // 優先度で整列
-        Collections.sort(suggestions, new Comparator<VisitSuggestion>() {
-            @Override
-            public int compare(VisitSuggestion o1, VisitSuggestion o2) {
-                return o2.getLatestVisit().getPriority().num() - o1.getLatestVisit().getPriority().num();
-            }
-        });
 
         return suggestions;
     }

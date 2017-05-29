@@ -14,11 +14,13 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 
 import net.c_kogyo.returnvisitorv5.R;
+import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitSuggestion;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 import net.c_kogyo.returnvisitorv5.view.SuggestionCell;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by SeijiShii on 2017/05/27.
@@ -113,15 +115,16 @@ public class VisitSuggestionActivity extends AppCompatActivity {
 
     private void initSuggestionList() {
         ListView suggestionList = (ListView) findViewById(R.id.suggestion_list_view);
-        SuggestionListAdapter mAdapter = new SuggestionListAdapter();
+        ArrayList<Visit.Priority> priorities = new ArrayList<>(Arrays.asList(Visit.Priority.values()));
+        SuggestionListAdapter mAdapter = new SuggestionListAdapter(priorities);
         suggestionList.setAdapter(mAdapter);
     }
 
     private class SuggestionListAdapter extends BaseAdapter {
 
         ArrayList<VisitSuggestion> mSuggestions;
-        SuggestionListAdapter() {
-            mSuggestions = VisitSuggestion.getSuggestions();
+        SuggestionListAdapter(ArrayList<Visit.Priority> priorities) {
+            mSuggestions = VisitSuggestion.getFilteredSuggestions(priorities);
         }
 
         @Override

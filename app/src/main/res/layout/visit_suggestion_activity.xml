@@ -177,20 +177,6 @@
                             ads:trueResId="@mipmap/button_marker_blue"
                             ads:initialState="true"/>
 
-                        <net.c_kogyo.returnvisitorv5.view.ToggleColorButton
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:id="@+id/toggle_5"
-                            ads:trueResId="@mipmap/button_marker_purple"
-                            ads:initialState="true"/>
-
-                        <net.c_kogyo.returnvisitorv5.view.ToggleColorButton
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:id="@+id/toggle_6"
-                            ads:trueResId="@mipmap/button_marker_red"
-                            ads:initialState="true"/>
-
                     </LinearLayout>
 
                 </RelativeLayout>

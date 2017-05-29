@@ -164,14 +164,33 @@ public class VisitList extends DataList<Visit> {
         if (visits.size() <= 0) return null;
 
         return visits.get(visits.size() - 1);
-
     }
 
-    public ArrayList<Visit> getAllNotHomeVisits() {
+    @Nullable public Visit getLatestVisitSeenToPerson(String personId) {
+
+        ArrayList<Visit> visits = getVisitsToPerson(personId);
+
+        if (visits.size() <= 0) return null;
+
+        for (int i = visits.size() - 1 ; i >= 0 ; i-- ) {
+            Visit visit = visits.get(i);
+            VisitDetail visitDetail = visit.getVisitDetail(personId);
+            if (visitDetail != null) {
+                if (visitDetail.isSeen()) {
+                    return visit;
+                }
+            }
+        }
+        return null;
+    }
+
+    public ArrayList<Visit> getAllNotHomeVisitsInOneMonth() {
         ArrayList<Visit> nhVisits = new ArrayList<>();
         for (Visit visit : list) {
             if (visit.getPriority() == Visit.Priority.NOT_HOME) {
-                nhVisits.add(visit);
+                if (CalendarUtil.daysPast(visit.getDatetime(), Calendar.getInstance()) < 32) {
+                    nhVisits.add(visit);
+                }
             }
         }
         return nhVisits;

@@ -554,7 +554,7 @@ public class RecordVisitActivity extends AppCompatActivity {
                 new PersonDialog.OnButtonsClickListener() {
                     @Override
                     public void onOkClick(Person person) {
-                        VisitDetail visitDetail = mVisit.getVisitDetail(person);
+                        VisitDetail visitDetail = mVisit.getVisitDetail(person.getId());
                         if (visitDetail != null) {
                             VisitDetailView visitDetailView = getVisitDetailView(visitDetail);
                             if (visitDetailView != null) {
@@ -573,7 +573,7 @@ public class RecordVisitActivity extends AppCompatActivity {
                     public void onDeleteClick(Person person) {
                         fadeDialogOverlay(false, null);
                         // DONE: 2017/03/08 削除動作テスト 削除時のUIの動きを実装
-                        VisitDetail visitDetail = mVisit.getVisitDetail(person);
+                        VisitDetail visitDetail = mVisit.getVisitDetail(person.getId());
                         if (visitDetail == null) return;
 
                         removeVisitDetailView(visitDetail);
