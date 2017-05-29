@@ -11,7 +11,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import static net.c_kogyo.returnvisitorv5.data.Visit.PLACE_ID;
-import static net.c_kogyo.returnvisitorv5.data.Visit.PRIORITY;
 
 /**
  * Created by SeijiShii on 2017/02/20.
@@ -28,6 +27,7 @@ public class VisitDetail extends DataItem  implements Cloneable{
     public static final String SEEN = "seen";
     public static final String IS_STUDY = "is_study";
     public static final String IS_RV = "is_rv";
+    public static final String PRIORITY = "priority";
 
 
     private String personId, visitId, placeId;
@@ -35,7 +35,6 @@ public class VisitDetail extends DataItem  implements Cloneable{
     private ArrayList<Placement> placements;
     private ArrayList<String> tagIds;
     private Visit.Priority priority;
-    private int termForNextVisit;
 
 
     public VisitDetail(String personId, String visitId, String placeId) {

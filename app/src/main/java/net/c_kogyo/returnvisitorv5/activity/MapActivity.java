@@ -876,7 +876,6 @@ public class MapActivity extends AppCompatActivity
 
     private void recordNotHome(Place place) {
         Visit visit = new Visit(place);
-        visit.setPriority(Visit.Priority.NOT_HOME);
         RVData.getInstance().placeList.setOrAdd(place);
         RVData.getInstance().visitList.setOrAdd(visit);
         RVData.getInstance().saveData(this);

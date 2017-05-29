@@ -107,93 +107,84 @@
             </LinearLayout>
 
             <!-- Visit Detail Frame -->
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_height="@dimen/ui_height_small">
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/ui_height_small">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_centerInParent="true">
+
+                    <ImageView
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:id="@+id/priority_mark"
+                        android:layout_marginRight="10dp"/>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/visit_details"
                         android:textColor="@color/textColorGray"
-                        android:textSize="15sp"
-                        android:layout_centerInParent="true"/>
+                        android:textSize="15sp"/>
 
-                </RelativeLayout>
+                </LinearLayout>
+            </RelativeLayout>
 
-                <!-- Visit Detail Frame  -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:id="@+id/visit_detail_frame"
-                    android:layout_margin="@dimen/ui_margin_normal"/>
+            <!-- Visit Detail Frame  -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:id="@+id/visit_detail_frame"
+                android:layout_margin="@dimen/ui_margin_normal"/>
 
-                <!-- Add new person button -->
-                <Button
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/ui_height_small"
-                    android:id="@+id/add_person_button"
-                    android:background="@drawable/primary_blue_selector"
-                    android:layout_margin="@dimen/ui_margin_normal"
-                    android:textColor="#FFF"
-                    android:textSize="@dimen/text_size_small"
-                    android:gravity="center"
-                    android:text="@string/add_person"/>
+            <!-- Add new person button -->
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/ui_height_small"
+                android:id="@+id/add_person_button"
+                android:background="@drawable/primary_blue_selector"
+                android:layout_margin="@dimen/ui_margin_normal"
+                android:textColor="#FFF"
+                android:textSize="@dimen/text_size_small"
+                android:gravity="center"
+                android:text="@string/add_person"/>
 
-                <!-- Add person from other place button -->
-                <Button
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/ui_height_small"
-                    android:id="@+id/other_place_person_button"
-                    android:background="@drawable/primary_blue_selector"
-                    android:layout_margin="@dimen/ui_margin_normal"
-                    android:textColor="#FFF"
-                    android:textSize="@dimen/text_size_small"
-                    android:gravity="center"
-                    android:text="@string/person_from_other_place"/>
+            <!-- Add person from other place button -->
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/ui_height_small"
+                android:id="@+id/other_place_person_button"
+                android:background="@drawable/primary_blue_selector"
+                android:layout_margin="@dimen/ui_margin_normal"
+                android:textColor="#FFF"
+                android:textSize="@dimen/text_size_small"
+                android:gravity="center"
+                android:text="@string/person_from_other_place"/>
 
-                <!-- Record Publication -->
-                <Button
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/ui_height_small"
-                    android:id="@+id/record_placement_button"
-                    android:background="@drawable/primary_blue_selector"
-                    android:layout_margin="@dimen/ui_margin_normal"
-                    android:textColor="#FFF"
-                    android:textSize="@dimen/text_size_small"
-                    android:gravity="center"
-                    android:text="@string/record_placement_button"/>
+            <!-- Record Publication -->
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/ui_height_small"
+                android:id="@+id/record_placement_button"
+                android:background="@drawable/primary_blue_selector"
+                android:layout_margin="@dimen/ui_margin_normal"
+                android:textColor="#FFF"
+                android:textSize="@dimen/text_size_small"
+                android:gravity="center"
+                android:text="@string/record_placement_button"/>
 
-                <!-- Publication Container -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:id="@+id/placement_container"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"/>
-
-                <!-- Priority -->
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/ui_height_small"
-                    android:textSize="@dimen/text_size_middle"
-                    android:textColor="@color/textColorGray"
-                    android:text="@string/priority_for_place"
-                    android:gravity="center"/>
-
-                <net.c_kogyo.returnvisitorv5.view.PriorityRater
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/visit_priority_rater"/>
-
-            </LinearLayout>
+            <!-- Publication Container -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:id="@+id/placement_container"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"/>
 
             <!-- OK -->
             <Button

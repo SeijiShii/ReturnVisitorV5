@@ -12,6 +12,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Created by 56255 on 2016/07/19.
@@ -23,13 +25,11 @@ public class Visit extends DataItem implements Cloneable{
     public static final String PLACEMENTS = "publications";
     public static final String VISIT_DETAILS = "visit_details";
     public static final String DATE_TIME = "datetime";
-    public static final String PRIORITY = "priority";
 
     private Calendar datetime;
     private String placeId;
     private ArrayList<Placement> placements;
     private ArrayList<VisitDetail> visitDetails;
-    private Priority priority;
 
     public enum Priority {
 
@@ -82,7 +82,6 @@ public class Visit extends DataItem implements Cloneable{
 
         // DONE: 2017/03/21 先回の訪問で生成
         this.placeId = lastVisit.getPlaceId();
-        this.priority = lastVisit.getPriority();
 
         for (VisitDetail visitDetail : lastVisit.getVisitDetails()) {
             this.visitDetails.add(new VisitDetail(visitDetail));
@@ -110,7 +109,6 @@ public class Visit extends DataItem implements Cloneable{
         }
         this.placements = new ArrayList<>();
         this.visitDetails = new ArrayList<>();
-        this.priority = Priority.NONE;
     }
 
     public void addPlacement(Placement placement) {
@@ -162,8 +160,6 @@ public class Visit extends DataItem implements Cloneable{
             }
             object.put(PLACEMENTS, plcArray);
 
-            object.put(PRIORITY, priority.toString());
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -211,7 +207,6 @@ public class Visit extends DataItem implements Cloneable{
         try {
             if (object.has(PLACE_ID)) visit.placeId = object.getString(PLACE_ID);
             if (object.has(DATE_TIME)) visit.datetime.setTimeInMillis(object.getLong(DATE_TIME));
-            if (object.has(PRIORITY)) visit.priority = Priority.valueOf(object.getString(PRIORITY));
             if (object.has(PLACEMENTS)) {
                 JSONArray array = object.getJSONArray(PLACEMENTS);
                 for ( int i = 0 ; i < array.length() ; i++ ) {
@@ -235,23 +230,20 @@ public class Visit extends DataItem implements Cloneable{
     }
     
     public Priority getPriority() {
-        return priority;
+
+        if (visitDetails.size() <= 0) return Priority.NOT_HOME;
+
+        return getPriorVisitDetail().getPriority();
     }
 
-    public void setPriority(Priority priority) {
-        this.priority = priority;
-    }
+    private VisitDetail getPriorVisitDetail() {
 
-    public void refreshPriority() {
-
-        if (visitDetails.size() <= 0) return;
-
-        priority = visitDetails.get(0).getPriority();
-        for (VisitDetail visitDetail : visitDetails) {
-            if (visitDetail.getPriority().num() > priority.num()) {
-                priority = visitDetail.getPriority();
+        return Collections.max(visitDetails, new Comparator<VisitDetail>() {
+            @Override
+            public int compare(VisitDetail o1, VisitDetail o2) {
+                return o2.getPriority().num() - o1.getPriority().num();
             }
-        }
+        });
     }
 
     @Nullable
@@ -274,9 +266,7 @@ public class Visit extends DataItem implements Cloneable{
 
         builder.append(DateTimeText.getDateTimeText(datetime, context));
 
-        if (priority != Priority.NONE) {
-            builder.append("\n").append(context.getResources().getStringArray(R.array.priority_array)[priority.num()]);
-        }
+        builder.append("\n").append(context.getResources().getStringArray(R.array.priority_array)[getPriority().num()]);
 
         if (visitDetails.size() >= 0) {
             for (VisitDetail visitDetail : visitDetails) {
@@ -310,8 +300,6 @@ public class Visit extends DataItem implements Cloneable{
         for (VisitDetail detail : this.visitDetails) {
             clonedVisit.visitDetails.add((VisitDetail) detail.clone());
         }
-
-        clonedVisit.priority = this.priority;
 
         return clonedVisit;
     }

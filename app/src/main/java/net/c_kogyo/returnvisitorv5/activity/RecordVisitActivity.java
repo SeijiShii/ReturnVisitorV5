@@ -106,12 +106,12 @@ public class RecordVisitActivity extends AppCompatActivity {
         initRecordPlacementButton();
         initPlacementContainer();
 
+        initPriorityMark();
         initVisitDetailFrame();
         initDialogOverlay();
         initOkButton();
         initCancelButton();
         initDeleteButton();
-        initPriorityRater();
 
         initScrollView();
         initLogoButton();
@@ -477,6 +477,16 @@ public class RecordVisitActivity extends AppCompatActivity {
         startService(addressServiceIntent);
     }
 
+    private ImageView priorityMark;
+    private void initPriorityMark() {
+        priorityMark = (ImageView) findViewById(R.id.priority_mark);
+        refreshPriorityMark();
+    }
+
+    private void refreshPriorityMark() {
+        priorityMark.setBackgroundResource(Constants.buttonRes[mVisit.getPriority().num()]);
+    }
+
     private LinearLayout visitDetailFrame;
     private void initVisitDetailFrame() {
         visitDetailFrame = (LinearLayout) findViewById(R.id.visit_detail_frame);
@@ -505,8 +515,7 @@ public class RecordVisitActivity extends AppCompatActivity {
                 new VisitDetailView.VisitDetailViewListener() {
                     @Override
                     public void onPrioritySet(Visit.Priority priority) {
-                        mVisit.refreshPriority();
-                        visitPriorityRater.setPriority(mVisit.getPriority());
+                        refreshPriorityMark();
                     }
 
                     @Override
@@ -623,19 +632,6 @@ public class RecordVisitActivity extends AppCompatActivity {
 
             }
         });
-    }
-
-    private PriorityRater visitPriorityRater;
-    private void initPriorityRater() {
-        visitPriorityRater = (PriorityRater) findViewById(R.id.visit_priority_rater);
-        visitPriorityRater.setPriority(mVisit.getPriority());
-        visitPriorityRater.setOnPrioritySetListener(new PriorityRater.OnPrioritySetListener() {
-            @Override
-            public void onPrioritySet(Visit.Priority priority) {
-                mVisit.setPriority(priority);
-            }
-        });
-
     }
 
     private void initOkButton() {
@@ -1011,8 +1007,6 @@ public class RecordVisitActivity extends AppCompatActivity {
                             VisitDetailView.DrawCondition.EXTRACT_POST_DRAWN_FROM_0);
                 }
             }
-
-            visitPriorityRater.setPriority(mVisit.getPriority());
         }
         mVisit.setDatetime(oldDateTime);
 
