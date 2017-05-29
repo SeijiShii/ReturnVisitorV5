@@ -136,48 +136,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/filter_frame_content_height">
 
-                    <LinearLayout
+                    <FrameLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
-                        android:orientation="horizontal">
-
-                        <net.c_kogyo.returnvisitorv5.view.ToggleColorButton
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:id="@+id/toggle_0"
-                            ads:trueResId="@mipmap/button_maker_orange"
-                            ads:initialState="true"/>
-
-                        <net.c_kogyo.returnvisitorv5.view.ToggleColorButton
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:id="@+id/toggle_1"
-                            ads:trueResId="@mipmap/button_marker_yellow"
-                            ads:initialState="true"/>
-
-                        <net.c_kogyo.returnvisitorv5.view.ToggleColorButton
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:id="@+id/toggle_2"
-                            ads:trueResId="@mipmap/button_marker_green"
-                            ads:initialState="true"/>
-
-                        <net.c_kogyo.returnvisitorv5.view.ToggleColorButton
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:id="@+id/toggle_3"
-                            ads:trueResId="@mipmap/button_marker_emerald"
-                            ads:initialState="true"/>
-
-                        <net.c_kogyo.returnvisitorv5.view.ToggleColorButton
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:id="@+id/toggle_4"
-                            ads:trueResId="@mipmap/button_marker_blue"
-                            ads:initialState="true"/>
-
-                    </LinearLayout>
+                        android:id="@+id/filter_button_frame"
+                        android:layout_centerInParent="true"/>
 
                 </RelativeLayout>
 

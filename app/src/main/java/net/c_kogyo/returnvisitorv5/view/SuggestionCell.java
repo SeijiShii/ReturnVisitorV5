@@ -3,7 +3,9 @@ package net.c_kogyo.returnvisitorv5.view;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.PopupMenu;
 import android.util.AttributeSet;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -29,11 +31,15 @@ import java.util.Calendar;
 public class SuggestionCell extends FrameLayout {
 
     private VisitSuggestion mVisitSuggestion;
+    private SuggestionCellListener mLister;
 
-    public SuggestionCell(@NonNull Context context, VisitSuggestion visitSuggestion) {
+    public SuggestionCell(@NonNull Context context,
+                          VisitSuggestion visitSuggestion,
+                          @NonNull SuggestionCellListener listener) {
         super(context);
 
         mVisitSuggestion = visitSuggestion;
+        mLister = listener;
 
         initCommon();
     }
@@ -93,8 +99,36 @@ public class SuggestionCell extends FrameLayout {
         menuButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                showPopup();
             }
         });
+    }
+
+    private void showPopup() {
+        PopupMenu popupMenu = new PopupMenu(getContext(), menuButton);
+        popupMenu.getMenuInflater().inflate(R.menu.suggestion_cell_menu, popupMenu.getMenu());
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.dismiss:
+                        return true;
+                    case R.id.show_map:
+                        if (mLister != null) {
+                            mLister.onClickShowInMap(mVisitSuggestion);
+                        }
+                        return true;
+                }
+                return false;
+            }
+        });
+        popupMenu.show();
+    }
+
+    public interface SuggestionCellListener{
+
+        void onDismiss(VisitSuggestion suggestion);
+
+        void onClickShowInMap(VisitSuggestion suggestion);
     }
 }

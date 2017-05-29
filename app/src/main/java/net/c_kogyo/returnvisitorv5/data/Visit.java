@@ -241,7 +241,7 @@ public class Visit extends DataItem implements Cloneable{
         return Collections.max(visitDetails, new Comparator<VisitDetail>() {
             @Override
             public int compare(VisitDetail o1, VisitDetail o2) {
-                return o2.getPriority().num() - o1.getPriority().num();
+                return o1.getPriority().num() - o2.getPriority().num();
             }
         });
     }

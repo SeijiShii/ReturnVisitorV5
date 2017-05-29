@@ -8,19 +8,26 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
+import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.R;
+import net.c_kogyo.returnvisitorv5.data.Place;
+import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitSuggestion;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 import net.c_kogyo.returnvisitorv5.view.SuggestionCell;
+import net.c_kogyo.returnvisitorv5.view.ToggleColorButton;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+
+import static net.c_kogyo.returnvisitorv5.Constants.LATITUDE;
+import static net.c_kogyo.returnvisitorv5.Constants.LONGITUDE;
 
 /**
  * Created by SeijiShii on 2017/05/27.
@@ -35,6 +42,8 @@ public class VisitSuggestionActivity extends AppCompatActivity {
         setContentView(R.layout.visit_suggestion_activity);
 
         initFilterFrame();
+        initFilterButtonFrame();
+
         initLogoButton();
 
         initSuggestionList();
@@ -113,11 +122,62 @@ public class VisitSuggestionActivity extends AppCompatActivity {
         finish();
     }
 
+    private void moveToMapWithPlace(Visit visit) {
+        String placeId = visit.getPlaceId();
+
+        Intent intent = new Intent(VisitSuggestionActivity.this, MapActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra(Place.PLACE, placeId);
+
+        startActivity(intent);
+    }
+
+    private ListView suggestionList;
     private void initSuggestionList() {
-        ListView suggestionList = (ListView) findViewById(R.id.suggestion_list_view);
-        ArrayList<Visit.Priority> priorities = new ArrayList<>(Arrays.asList(Visit.Priority.values()));
+        suggestionList = (ListView) findViewById(R.id.suggestion_list_view);
+        refreshFilter();
+    }
+
+
+    private ToggleColorButton[] filterButtons;
+    private void initFilterButtonFrame() {
+
+        FrameLayout filterButtonFrame = (FrameLayout) findViewById(R.id.filter_button_frame);
+
+        LinearLayout filterButtonBase = new LinearLayout(this);
+        filterButtonBase.setOrientation(LinearLayout.HORIZONTAL);
+
+        filterButtons = new ToggleColorButton[5];
+        for (int i = 0 ; i < 5 ; i++ ) {
+            filterButtons[i] = new ToggleColorButton(this,
+                    Constants.buttonRes[i + 3],
+                    Constants.buttonRes[0],
+                    true);
+            filterButtons[i].setCheckChangeListener(mCheckChangeListener);
+            filterButtonBase.addView(filterButtons[i]);
+        }
+        filterButtonFrame.addView(filterButtonBase);
+
+    }
+
+    ToggleColorButton.CheckChangeListener mCheckChangeListener = new ToggleColorButton.CheckChangeListener() {
+        @Override
+        public void onCheckChange(boolean checked) {
+            refreshFilter();
+        }
+    };
+
+    private void refreshFilter() {
+        ArrayList<Visit.Priority> priorities = new ArrayList<>();
+        for ( int i = 0 ; i < 5 ; i++ ) {
+            if (filterButtons[i].isChecked()) {
+                priorities.add(Visit.Priority.getEnum(i + 3));
+            }
+        }
+
         SuggestionListAdapter mAdapter = new SuggestionListAdapter(priorities);
         suggestionList.setAdapter(mAdapter);
+
     }
 
     private class SuggestionListAdapter extends BaseAdapter {
@@ -146,7 +206,19 @@ public class VisitSuggestionActivity extends AppCompatActivity {
         public View getView(int position, View convertView, ViewGroup parent) {
 
             if (convertView == null) {
-                convertView = new SuggestionCell(VisitSuggestionActivity.this, (VisitSuggestion)getItem(position));
+                convertView = new SuggestionCell(VisitSuggestionActivity.this,
+                        (VisitSuggestion) getItem(position),
+                        new SuggestionCell.SuggestionCellListener() {
+                            @Override
+                            public void onDismiss(VisitSuggestion suggestion) {
+
+                            }
+
+                            @Override
+                            public void onClickShowInMap(VisitSuggestion suggestion) {
+                                moveToMapWithPlace(suggestion.getLatestVisit());
+                            }
+                        });
             } else {
                 ((SuggestionCell) convertView).refreshData((VisitSuggestion) getItem(position));
             }

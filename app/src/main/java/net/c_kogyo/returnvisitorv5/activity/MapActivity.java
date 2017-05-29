@@ -364,6 +364,7 @@ public class MapActivity extends AppCompatActivity
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         animateCameraIfHasIntentPosition(intent);
+        animateCameraIfHasIntentPlace(intent);
     }
 
     private void animateCameraIfHasIntentPosition(Intent intent) {
@@ -378,6 +379,29 @@ public class MapActivity extends AppCompatActivity
         if (lat != 1000 && lng != 1000 && mMap != null) {
             mMap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(lat, lng)));
         }
+    }
+
+    private void animateCameraIfHasIntentPlace(Intent intent) {
+
+        if (intent == null)
+            return;
+
+        String placeId = intent.getStringExtra(Place.PLACE);
+
+        if (placeId == null) return;
+
+        final Place place = RVData.getInstance().placeList.getById(placeId);
+
+        if (place == null) return;
+
+        mMap.animateCamera(CameraUpdateFactory.newLatLng(place.getLatLng()));
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                showDialogFitToPlace(place);
+            }
+        }, 1000);
+
     }
 
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_LOCATION = 717;
@@ -1227,6 +1251,7 @@ public class MapActivity extends AppCompatActivity
         suggestionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                openCloseDrawer();
                 Intent intent = new Intent(MapActivity.this, VisitSuggestionActivity.class);
                 startActivity(intent);
             }

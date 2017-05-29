@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
@@ -48,6 +49,9 @@ public class ToggleColorButton extends RelativeLayout {
     private ImageView imageView;
     private void initCommon() {
 
+        int dp40 = (int)(getContext().getResources().getDisplayMetrics().density * 40);
+        this.setLayoutParams(new ViewGroup.LayoutParams(dp40, dp40));
+
         imageView = new ImageView(getContext());
         int dp30 = (int)(getContext().getResources().getDisplayMetrics().density * 30);
         RelativeLayout.LayoutParams params = new LayoutParams(dp30, dp30);
@@ -83,6 +87,10 @@ public class ToggleColorButton extends RelativeLayout {
     private CheckChangeListener mListener;
     public void setCheckChangeListener(CheckChangeListener listener) {
         mListener = listener;
+    }
+
+    public boolean isChecked() {
+        return mChecked;
     }
 
     public interface CheckChangeListener {
