@@ -2,9 +2,12 @@ package net.c_kogyo.returnvisitorv5.activity;
 
 import android.animation.ValueAnimator;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.PopupMenu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -16,18 +19,22 @@ import android.widget.RelativeLayout;
 
 import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.R;
+import net.c_kogyo.returnvisitorv5.data.DismissedSuggestion;
 import net.c_kogyo.returnvisitorv5.data.Place;
-import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitSuggestion;
+import net.c_kogyo.returnvisitorv5.util.AdMobHelper;
+import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 import net.c_kogyo.returnvisitorv5.view.SuggestionCell;
 import net.c_kogyo.returnvisitorv5.view.ToggleColorButton;
 
-import java.util.ArrayList;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import static net.c_kogyo.returnvisitorv5.Constants.LATITUDE;
-import static net.c_kogyo.returnvisitorv5.Constants.LONGITUDE;
+import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  * Created by SeijiShii on 2017/05/27.
@@ -41,12 +48,23 @@ public class VisitSuggestionActivity extends AppCompatActivity {
 
         setContentView(R.layout.visit_suggestion_activity);
 
+        AdMobHelper.setAdView(this);
+
         initFilterFrame();
         initFilterButtonFrame();
 
         initLogoButton();
+        initMenuButton();
 
         initSuggestionList();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        loadDismissedSuggestions();
+        refreshListByFilter(false);
     }
 
     private LinearLayout filterFrame;
@@ -115,6 +133,40 @@ public class VisitSuggestionActivity extends AppCompatActivity {
         });
     }
 
+    private ImageView menuButton;
+    private void initMenuButton() {
+        menuButton = (ImageView) findViewById(R.id.menu_button);
+        ViewUtil.setOnClickListener(menuButton, new ViewUtil.OnViewClickListener() {
+            @Override
+            public void onViewClick() {
+                showPopup();
+            }
+        });
+    }
+
+    private void showPopup() {
+        PopupMenu popupMenu = new PopupMenu(this, menuButton);
+        popupMenu.getMenuInflater().inflate(R.menu.suggestion_menu, popupMenu.getMenu());
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.reload_dismissed:
+                        reloadDismissedSuggestions();
+                        return true;
+                }
+                return false;
+            }
+        });
+        popupMenu.show();
+    }
+
+    private void reloadDismissedSuggestions() {
+        dismissedSuggestions.clear();
+        saveDismissedSuggestions();
+        refreshListByFilter(true);
+    }
+
     private void returnToMapActivity() {
         Intent intent = new Intent(this, MapActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -135,7 +187,6 @@ public class VisitSuggestionActivity extends AppCompatActivity {
     private ListView suggestionList;
     private void initSuggestionList() {
         suggestionList = (ListView) findViewById(R.id.suggestion_list_view);
-        refreshFilter();
     }
 
 
@@ -163,28 +214,41 @@ public class VisitSuggestionActivity extends AppCompatActivity {
     ToggleColorButton.CheckChangeListener mCheckChangeListener = new ToggleColorButton.CheckChangeListener() {
         @Override
         public void onCheckChange(boolean checked) {
-            refreshFilter();
+            refreshListByFilter(true);
         }
     };
 
-    private void refreshFilter() {
-        ArrayList<Visit.Priority> priorities = new ArrayList<>();
+    private void refreshListByFilter(boolean blink) {
+        final ArrayList<Visit.Priority> priorities = new ArrayList<>();
         for ( int i = 0 ; i < 5 ; i++ ) {
             if (filterButtons[i].isChecked()) {
                 priorities.add(Visit.Priority.getEnum(i + 3));
             }
         }
 
-        SuggestionListAdapter mAdapter = new SuggestionListAdapter(priorities);
-        suggestionList.setAdapter(mAdapter);
+        if (blink) {
+            ViewUtil.fadeView(suggestionList, false, null,
+                    new ViewUtil.PostFadeViewListener() {
+                        @Override
+                        public void postFade(View view) {
+                            SuggestionListAdapter mAdapter = new SuggestionListAdapter(priorities);
+                            suggestionList.setAdapter(mAdapter);
 
+                            ViewUtil.fadeView(suggestionList, true, null, null, 300);
+                        }
+                    }, 300);
+
+        } else {
+            SuggestionListAdapter mAdapter = new SuggestionListAdapter(priorities);
+            suggestionList.setAdapter(mAdapter);
+        }
     }
 
     private class SuggestionListAdapter extends BaseAdapter {
 
         ArrayList<VisitSuggestion> mSuggestions;
         SuggestionListAdapter(ArrayList<Visit.Priority> priorities) {
-            mSuggestions = VisitSuggestion.getFilteredSuggestions(priorities);
+            mSuggestions = VisitSuggestion.getFilteredSuggestions(priorities, dismissedSuggestions);
         }
 
         @Override
@@ -213,6 +277,11 @@ public class VisitSuggestionActivity extends AppCompatActivity {
                             public void onDismiss(VisitSuggestion suggestion) {
                                 mSuggestions.remove(suggestion);
                                 notifyDataSetChanged();
+
+                                DismissedSuggestion dismissedSuggestion
+                                        = new DismissedSuggestion(suggestion.getLatestVisit().getId(), Calendar.getInstance());
+                                dismissedSuggestions.add(dismissedSuggestion);
+                                saveDismissedSuggestions();
                             }
 
                             @Override
@@ -226,5 +295,63 @@ public class VisitSuggestionActivity extends AppCompatActivity {
 
             return convertView;
         }
+    }
+
+    private ArrayList<DismissedSuggestion> dismissedSuggestions;
+    private void saveDismissedSuggestions() {
+
+        JSONArray array = new JSONArray();
+
+        for (DismissedSuggestion suggestion : dismissedSuggestions) {
+            array.put(suggestion.jsonObject());
+        }
+
+        JSONObject object = new JSONObject();
+
+        try {
+            object.put(DismissedSuggestion.DISMISSED_SUGGESTIONS, array);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        SharedPreferences preferences = getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(DismissedSuggestion.DISMISSED_SUGGESTIONS, object.toString());
+        editor.apply();
+    }
+
+    private void loadDismissedSuggestions() {
+        dismissedSuggestions = new ArrayList<>();
+
+        SharedPreferences preferences = getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
+        String arrayString = preferences.getString(DismissedSuggestion.DISMISSED_SUGGESTIONS, null);
+
+        if (arrayString == null) return;
+
+        try {
+            JSONObject object = new JSONObject(arrayString);
+            if (object.has(DismissedSuggestion.DISMISSED_SUGGESTIONS)) {
+                JSONArray array = object.getJSONArray(DismissedSuggestion.DISMISSED_SUGGESTIONS);
+
+                for (int i = 0 ; i < array.length() ; i++) {
+                    DismissedSuggestion dismissedSuggestion = new DismissedSuggestion(array.getJSONObject(i));
+
+                    if (CalendarUtil.isSameDay(dismissedSuggestion.getDismissedDate(), Calendar.getInstance())) {
+                        // 今日dismissしたものなら再読み込み
+                        dismissedSuggestions.add(dismissedSuggestion);
+                    }
+                }
+            }
+
+            // 内容が変更されているので再保存
+            saveDismissedSuggestions();
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+
+
     }
 }

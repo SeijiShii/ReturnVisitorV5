@@ -51,7 +51,8 @@ public class VisitSuggestion {
         }
     }
 
-    public static ArrayList<VisitSuggestion> getFilteredSuggestions(ArrayList<Visit.Priority> priorities) {
+    public static ArrayList<VisitSuggestion> getFilteredSuggestions(ArrayList<Visit.Priority> priorities,
+                                                                    ArrayList<DismissedSuggestion> dismissedSuggestions) {
 
         ArrayList<Visit.Priority> noDoubledPriorities = new ArrayList<>();
         for (Visit.Priority priority : priorities) {
@@ -71,6 +72,16 @@ public class VisitSuggestion {
                 return o2.getPriority().num() - o1.getPriority().num();
             }
         });
+
+        ArrayList<VisitSuggestion> deleteList = new ArrayList<>();
+        for (DismissedSuggestion dismissedSuggestion : dismissedSuggestions) {
+            for (VisitSuggestion suggestion : suggestions) {
+                if (suggestion.getLatestVisit().getId().equals(dismissedSuggestion.getLatestVisitId())) {
+                    deleteList.add(suggestion);
+                }
+            }
+        }
+        suggestions.removeAll(deleteList);
 
         return suggestions;
     }
