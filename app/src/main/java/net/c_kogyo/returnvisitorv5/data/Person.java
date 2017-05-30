@@ -294,15 +294,16 @@ public class Person extends DataItem implements Cloneable{
     public Visit.Priority getPriority() {
 
         Visit.Priority priority = Visit.Priority.NONE;
-        for (Visit visit : RVData.getInstance().visitList){
-            for (VisitDetail visitDetail : visit.getVisitDetails()) {
-                if (visitDetail.getPersonId().equals(this.id) && visitDetail.getPriority().num() > priority.num()) {
-                    priority = visitDetail.getPriority();
-                }
+        Visit visit = RVData.getInstance().visitList.getLatestVisitToPerson(id);
+
+        if (visit != null) {
+
+            VisitDetail visitDetail = visit.getVisitDetail(id);
+            if (visitDetail != null) {
+                priority = visitDetail.getPriority();
             }
         }
         return priority;
-
     }
 
 }
