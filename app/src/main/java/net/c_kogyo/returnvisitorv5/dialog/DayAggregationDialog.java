@@ -1,8 +1,13 @@
-package net.c_kogyo.returnvisitorv5.dialogcontents;
+package net.c_kogyo.returnvisitorv5.dialog;
 
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.content.Context;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,32 +21,44 @@ import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 
 import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by SeijiShii on 2017/04/16.
  */
 
-public class DayAggregationDialog extends FrameLayout {
+public class DayAggregationDialog extends DialogFragment {
 
-    private Calendar mDate;
-    private DayAggregationDialogListener mListener;
+    private static Calendar mDate;
 
-    public DayAggregationDialog(@NonNull Context context, Calendar date, DayAggregationDialogListener listener) {
-        super(context);
-
+    private static DayAggregationDialog instance;
+    public static DayAggregationDialog getInstance(Calendar date) {
+        
         mDate = (Calendar) date.clone();
-        mListener = listener;
 
-        initCommon();
+        if (instance == null) {
+            instance = new DayAggregationDialog();
+        }
+        return instance;
     }
 
-    public DayAggregationDialog(@NonNull Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        
+        initCommon();
+        builder.setView(view);
+
+        builder.setTitle(R.string.day_aggregation);
+        
+        builder.setNegativeButton(R.string.close, null);
+        
+        return builder.create();
     }
 
     private View view;
     private void initCommon() {
-        view = LayoutInflater.from(getContext()).inflate(R.layout.day_aggregation_dialog, this);
+        view = View.inflate(getActivity(), R.layout.day_aggregation_dialog, null);
 
         initDateTextView();
         initPlacementCountText();
@@ -50,12 +67,11 @@ public class DayAggregationDialog extends FrameLayout {
         initRVCountText();
         initStudyCountText();
 
-        initCloseButton();
     }
 
     private void initDateTextView() {
         TextView dateTextView = (TextView) view.findViewById(R.id.date_text);
-        DateFormat format = android.text.format.DateFormat.getMediumDateFormat(getContext());
+        DateFormat format = android.text.format.DateFormat.getMediumDateFormat(getActivity());
         String dateText = format.format(mDate.getTime());
         dateTextView.setText(dateText);
     }
@@ -90,21 +106,24 @@ public class DayAggregationDialog extends FrameLayout {
         studyCountText.setText(String.valueOf(studyCount));
     }
 
-    private void initCloseButton() {
-        Button closeButton = (Button) view.findViewById(R.id.cancel_button);
-        closeButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mListener != null) {
-                    mListener.onClickCloseButton();
-                }
-            }
-        });
-    }
-
-    public interface DayAggregationDialogListener {
-        void onClickCloseButton();
-    }
-
     // DONE: 2017/05/07 日付を表示
+
+    public static AtomicBoolean isShowing = new AtomicBoolean(false);
+
+    @Override
+    public void show(FragmentManager manager, String tag) {
+        if (isShowing.getAndSet(true)) return;
+
+        try {
+            super.show(manager, tag);
+        } catch (Exception e) {
+            isShowing.set(false);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        isShowing.set(false);
+    }
 }

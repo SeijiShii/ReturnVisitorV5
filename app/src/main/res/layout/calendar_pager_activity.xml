@@ -6,126 +6,99 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <FrameLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:orientation="vertical">
 
+        <!-- Header Row -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="@dimen/ui_height_small"
+            android:orientation="horizontal"
+            android:background="@color/colorPrimaryDark"
+            android:id="@+id/header_row">
 
-            <!-- Header Row -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/ui_height_small"
-                android:orientation="horizontal"
-                android:background="@color/colorPrimaryDark"
-                android:id="@+id/header_row">
+            <!-- Logo Button -->
+            <RelativeLayout
+                android:layout_width="40dp"
+                android:layout_height="match_parent">
 
-                <!-- Logo Button -->
-                <RelativeLayout
-                    android:layout_width="40dp"
-                    android:layout_height="match_parent">
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/logo_button"
+                    android:background="@drawable/v5_logo_036"
+                    android:layout_centerInParent="true"/>
 
+            </RelativeLayout>
+
+            <!-- Date mText and Buttons -->
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:layout_centerInParent="true">
+
+                    <!-- Left Button -->
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:id="@+id/logo_button"
-                        android:background="@drawable/v5_logo_036"
-                        android:layout_centerInParent="true"/>
+                        android:background="@drawable/white_arrow_left"
+                        android:id="@+id/left_button"
+                        android:layout_gravity="center"/>
 
-                </RelativeLayout>
-
-                <!-- Date mText and Buttons -->
-                <RelativeLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1">
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
+                    <!-- Month Text -->
+                    <TextView
+                        android:layout_width="100dp"
                         android:layout_height="match_parent"
-                        android:orientation="horizontal"
-                        android:layout_centerInParent="true">
+                        android:gravity="center"
+                        android:id="@+id/month_text"
+                        android:layout_margin="5dp"
+                        android:textColor="#FFF"/>
 
-                        <!-- Left Button -->
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/white_arrow_left"
-                            android:id="@+id/left_button"
-                            android:layout_gravity="center"/>
-
-                        <!-- Month Text -->
-                        <TextView
-                            android:layout_width="100dp"
-                            android:layout_height="match_parent"
-                            android:gravity="center"
-                            android:id="@+id/month_text"
-                            android:layout_margin="5dp"
-                            android:textColor="#FFF"/>
-
-                        <!-- Right Button -->
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/white_arrow_right"
-                            android:id="@+id/right_button"
-                            android:layout_gravity="center"/>
-
-                    </LinearLayout>
-
-
-                </RelativeLayout>
-
-                <!-- Menu Button -->
-                <RelativeLayout
-                    android:layout_width="40dp"
-                    android:layout_height="match_parent">
-
+                    <!-- Right Button -->
                     <ImageView
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:background="@drawable/white_menu_button"
-                        android:id="@+id/work_menu_button"
-                        android:layout_centerInParent="true"/>
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/white_arrow_right"
+                        android:id="@+id/right_button"
+                        android:layout_gravity="center"/>
 
-                </RelativeLayout>
+                </LinearLayout>
 
-            </LinearLayout>
 
-            <android.support.v4.view.ViewPager
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:id="@+id/view_pager" />
+            </RelativeLayout>
+
+            <!-- Menu Button -->
+            <RelativeLayout
+                android:layout_width="40dp"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:background="@drawable/white_menu_button"
+                    android:id="@+id/work_menu_button"
+                    android:layout_centerInParent="true"/>
+
+            </RelativeLayout>
 
         </LinearLayout>
 
-        <!-- Dialog overlay -->
-        <RelativeLayout
+        <android.support.v4.view.ViewPager
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#B000"
-            android:id="@+id/dialog_overlay"
-            android:visibility="invisible">
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:id="@+id/view_pager" />
 
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/gray_white_circle"
-                android:layout_margin="10dp"
-                android:layout_centerInParent="true"
-                android:id="@+id/dialog_frame"
-                android:padding="@dimen/padding_normal"/>
-
-        </RelativeLayout>
-
-
-    </FrameLayout>
-
+    </LinearLayout>
     <!-- Ad Frame -->
     <RelativeLayout
         android:layout_width="match_parent"

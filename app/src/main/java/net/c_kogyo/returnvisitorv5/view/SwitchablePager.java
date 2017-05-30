@@ -2,13 +2,12 @@ package net.c_kogyo.returnvisitorv5.view;
 
 import android.animation.ValueAnimator;
 import android.app.Activity;
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MarginLayoutParamsCompat;
 import android.support.v4.view.PagerAdapter;
@@ -66,11 +65,11 @@ public class SwitchablePager <T extends SwitchablePagerBaseFragment> extends Lin
         viewPager = (ViewPager) view.findViewById(R.id.view_pager);
     }
 
-    private ArrayList<T> mContents;
+    private ArrayList<Object> mContents;
     private ViewContentAdapter mAdapter;
 
     private Handler handler;
-    public void setContents(List<T> contents, FragmentManager fragmentManager) {
+    public void setContents(List<Object> contents, FragmentManager fragmentManager) {
 
         mContents = new ArrayList<>(contents);
 
@@ -120,7 +119,6 @@ public class SwitchablePager <T extends SwitchablePagerBaseFragment> extends Lin
         }).start();
     }
 
-
     private Button[] buttons;
     private void initSwitches() {
 //        int buttonWidth = switchContainer.getWidth() / 2;
@@ -132,7 +130,7 @@ public class SwitchablePager <T extends SwitchablePagerBaseFragment> extends Lin
             params.weight = 1;
             buttons[i].setLayoutParams(params);
 
-            buttons[i].setText(mContents.get(i).getTitle());
+            buttons[i].setText(((T) mContents.get(i)).getTitle());
             buttons[i].setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f);
             buttons[i].setGravity(Gravity.CENTER);
             buttons[i].setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
@@ -208,9 +206,7 @@ public class SwitchablePager <T extends SwitchablePagerBaseFragment> extends Lin
         }
     }
 
-    
-
-    class ViewContentAdapter extends FragmentStatePagerAdapter{
+    class ViewContentAdapter extends FragmentPagerAdapter {
 
         public ViewContentAdapter(FragmentManager fm) {
             super(fm);
@@ -218,14 +214,12 @@ public class SwitchablePager <T extends SwitchablePagerBaseFragment> extends Lin
 
         @Override
         public Fragment getItem(int position) {
-
-            return mContents.get(position);
-
+            return (SwitchablePagerBaseFragment)(mContents.get(position));
         }
 
         @Override
         public int getCount() {
-            return mContents.size();
+            return 0;
         }
     }
 

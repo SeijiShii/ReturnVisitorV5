@@ -1,7 +1,11 @@
-package net.c_kogyo.returnvisitorv5.dialogcontents;
+package net.c_kogyo.returnvisitorv5.dialog;
 
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
@@ -28,34 +32,43 @@ import net.c_kogyo.returnvisitorv5.util.ConfirmDialog;
  * Created by SeijiShii on 2017/02/20.
  */
 
-public class PersonDialog extends FrameLayout {
+public class PersonDialog extends DialogFragment {
 
-    private Person mPerson;
-    private OnButtonsClickListener mButtonsClickListener;
-    private boolean isPersonEdited;
+    private static Person mPerson;
+    private static OnButtonsClickListener mButtonsClickListener;
+    private static boolean isPersonEdited;
 
-    public PersonDialog(Context context,
-                        Person person,
-                        OnButtonsClickListener listener) {
-        super(context);
+    private static PersonDialog instance;
 
+    public static PersonDialog getInstance(Person person,
+                                           OnButtonsClickListener listener) {
         mPerson = person;
         mButtonsClickListener = listener;
         isPersonEdited = false;
 
-        initCommon();
+        if (instance == null) {
+            instance = new PersonDialog();
+        }
+        return instance;
     }
 
-    public PersonDialog(Context context, AttributeSet attrs) {
-        super(context, attrs);
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         initCommon();
+        builder.setView(view);
+
+        builder.setTitle(R.string.person);
+
+        return builder.create();
+
     }
 
     private View view;
     private void initCommon(){
 
-        view = LayoutInflater.from(getContext()).inflate(R.layout.person_dialog, this);
+        view = View.inflate(getActivity(), R.layout.person_dialog, null);
         initNameText();
         initSexRadioButtons();
         initAgeSpinner();
@@ -141,7 +154,7 @@ public class PersonDialog extends FrameLayout {
 
         final Person.Age oldAge = mPerson.getAge();
 
-        ageSpinner = (Spinner) findViewById(R.id.age_spinner);
+        ageSpinner = (Spinner) view.findViewById(R.id.age_spinner);
 
         AgeSpinnerAdapter adapter = new AgeSpinnerAdapter();
 
@@ -171,7 +184,7 @@ public class PersonDialog extends FrameLayout {
     private AutoCompleteTextView noteText;
     private void initNoteText() {
 
-        noteText = (AutoCompleteTextView) findViewById(R.id.note_text);
+        noteText = (AutoCompleteTextView) view.findViewById(R.id.note_text);
         noteText.setText(mPerson.getNote());
 
 //        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, RVDB.getInstance().noteCompleteList.getList());
@@ -200,7 +213,7 @@ public class PersonDialog extends FrameLayout {
     private Button okButton;
     private void initOkButton() {
 
-        okButton = (Button) findViewById(R.id.ok_button);
+        okButton = (Button) view.findViewById(R.id.ok_button);
 
         renewOkButton();
 
@@ -214,6 +227,7 @@ public class PersonDialog extends FrameLayout {
                 if (mButtonsClickListener != null) {
                     mButtonsClickListener.onOkClick(mPerson);
                 }
+                dismiss();
             }
         });
 
@@ -233,33 +247,32 @@ public class PersonDialog extends FrameLayout {
 
     private void initCancelButton() {
 
-        Button cancelButton = (Button) findViewById(R.id.cancel_button);
+        Button cancelButton = (Button) view.findViewById(R.id.cancel_button);
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mButtonsClickListener != null) {
-                    mButtonsClickListener.onCancelClick();
-                }
+                dismiss();
             }
         });
     }
 
     private void initDeleteButton() {
 
-        Button deleteButton = (Button) findViewById(R.id.delete_button);
+        Button deleteButton = (Button) view.findViewById(R.id.delete_button);
         if (RVData.getInstance().personList.contains(mPerson)) {
             deleteButton.setVisibility(View.VISIBLE);
             deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     // DONE: 2017/03/05 削除処理 -> RecordVisitActivity内の削除動作テストに譲る
-                    ConfirmDialog.confirmAndDeletePerson(getContext(),
+                    ConfirmDialog.confirmAndDeletePerson(getActivity(),
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
                                     if (mButtonsClickListener != null) {
                                         mButtonsClickListener.onDeleteClick(mPerson);
                                     }
+                                    PersonDialog.this.dismiss();
                                 }
                             }, mPerson);
                 }
@@ -273,7 +286,7 @@ public class PersonDialog extends FrameLayout {
 
         String[] ageArray;
         public AgeSpinnerAdapter() {
-            ageArray = getContext().getResources().getStringArray(R.array.age_array);
+            ageArray = getActivity().getResources().getStringArray(R.array.age_array);
         }
 
         @Override
@@ -293,7 +306,7 @@ public class PersonDialog extends FrameLayout {
 
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
-            view = LayoutInflater.from(getContext()).inflate(R.layout.age_spinner_option, null);
+            view = View.inflate(getActivity(), R.layout.age_spinner_option, null);
             TextView textView = ( TextView) view.findViewById(R.id.text_view);
             textView.setText(ageArray[i]);
             return view;
@@ -303,8 +316,6 @@ public class PersonDialog extends FrameLayout {
     public interface OnButtonsClickListener {
 
         void onOkClick(Person person);
-
-        void onCancelClick();
 
         void onDeleteClick(Person person);
     }

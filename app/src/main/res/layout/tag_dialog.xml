@@ -3,16 +3,8 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFF">
-
-    <!-- Dialog title -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/ui_height_small"
-        android:textColor="@color/textColorGray"
-        android:textSize="@dimen/text_size_large"
-        android:gravity="center"
-        android:text="@string/tag"/>
+    android:background="#FFF"
+    android:padding="5dp">
 
     <!-- Search Row -->
     <LinearLayout
@@ -69,29 +61,5 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:id="@+id/tag_list_view"/>
-
-    <!-- OK -->
-    <Button
-        android:layout_width="150dp"
-        android:layout_height="@dimen/ui_height_small"
-        android:text="@string/ok"
-        android:background="@drawable/trans_blue_selector"
-        android:textColor="@color/colorPrimary"
-        android:textSize="@dimen/text_size_small"
-        android:gravity="center"
-        android:layout_gravity="right"
-        android:id="@+id/ok_button"/>
-
-    <!-- Cancel -->
-    <Button
-        android:layout_width="150dp"
-        android:layout_height="@dimen/ui_height_small"
-        android:text="@string/cancel"
-        android:background="@drawable/trans_orange_selector"
-        android:textColor="@color/colorAccent"
-        android:textSize="@dimen/text_size_small"
-        android:gravity="center"
-        android:layout_gravity="right"
-        android:id="@+id/cancel_button"/>
 
 </LinearLayout>

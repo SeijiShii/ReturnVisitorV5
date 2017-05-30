@@ -121,6 +121,7 @@ public class RVData {
 
             jsonToData(stringToJson(loadStringFromFile()));
 
+//            placeList.deleteItemWithoutVisit();
 
             if (mCallback != null) {
                 new Thread(new Runnable() {

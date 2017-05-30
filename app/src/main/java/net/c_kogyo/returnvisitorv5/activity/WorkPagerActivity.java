@@ -30,7 +30,7 @@ import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.Work;
 import net.c_kogyo.returnvisitorv5.dialog.AddWorkDialog;
-import net.c_kogyo.returnvisitorv5.dialogcontents.DayAggregationDialog;
+import net.c_kogyo.returnvisitorv5.dialog.DayAggregationDialog;
 import net.c_kogyo.returnvisitorv5.fragment.WorkFragment;
 import net.c_kogyo.returnvisitorv5.util.AdMobHelper;
 import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
@@ -84,8 +84,6 @@ public class WorkPagerActivity extends AppCompatActivity {
 
         initMenuButton();
         initLogoButton();
-
-        initDialogOverlay();
 
     }
 
@@ -441,24 +439,7 @@ public class WorkPagerActivity extends AppCompatActivity {
     }
 
     private void showDayAggregationDialog() {
-        DayAggregationDialog dayAggregationDialog
-                = new DayAggregationDialog(this,
-                mDatePagerAdapter.getDayItem(mPager.getCurrentItem()),
-                new DayAggregationDialog.DayAggregationDialogListener() {
-                    @Override
-                    public void onClickCloseButton() {
-                        fadeDialogOverlay(false, null);
-                    }
-                });
-        dialogFrame.addView(dayAggregationDialog);
-        dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                fadeDialogOverlay(false, null);
-                return true;
-            }
-        });
-        fadeDialogOverlay(true, null);
+        DayAggregationDialog.getInstance(mDatePagerAdapter.getDayItem(mPager.getCurrentItem())).show(getFragmentManager(), null);
     }
 
     private void returnToMapActivity() {
@@ -481,123 +462,16 @@ public class WorkPagerActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private RelativeLayout dialogOverlay;
-    private void initDialogOverlay() {
-        dialogOverlay = (RelativeLayout) findViewById(R.id.dialog_overlay);
-        initDialogFrame();
-    }
-
-    private FrameLayout dialogFrame;
-    private void initDialogFrame() {
-        dialogFrame = (FrameLayout) findViewById(R.id.dialog_frame);
-    }
-
-    private void fadeDialogOverlay(boolean isFadeIn, @Nullable final DialogPostAnimationListener listener) {
-
-        hideSoftKeyboard();
-
-        if (isFadeIn) {
-            dialogOverlay.setVisibility(View.VISIBLE);
-
-            ValueAnimator fadeInAnimator = ValueAnimator.ofFloat(0f, 1f);
-            fadeInAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                    dialogOverlay.setAlpha((float) valueAnimator.getAnimatedValue());
-                    dialogOverlay.requestLayout();
-                }
-            });
-            fadeInAnimator.setDuration(500);
-
-            if (listener != null) {
-                fadeInAnimator.addListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animator) {
-
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animator animator) {
-                        listener.onFinishAnimation();
-                    }
-
-                    @Override
-                    public void onAnimationCancel(Animator animator) {
-
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animator animator) {
-
-                    }
-                });
-            }
-
-            fadeInAnimator.start();
-
-        } else {
-            ValueAnimator fadeOutAnimator = ValueAnimator.ofFloat(1f, 0f);
-            fadeOutAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                    dialogOverlay.setAlpha((float) valueAnimator.getAnimatedValue());
-                    dialogOverlay.requestLayout();
-                }
-            });
-            fadeOutAnimator.setDuration(500);
-            fadeOutAnimator.addListener(new Animator.AnimatorListener() {
-                @Override
-                public void onAnimationStart(Animator animator) {
-
-                }
-
-                @Override
-                public void onAnimationEnd(Animator animator) {
-                    dialogOverlay.setVisibility(View.INVISIBLE);
-                    dialogFrame.removeAllViews();
-                    dialogOverlay.setOnTouchListener(null);
-                    if (listener == null) return;
-                    listener.onFinishAnimation();
-                }
-
-                @Override
-                public void onAnimationCancel(Animator animator) {
-
-                }
-
-                @Override
-                public void onAnimationRepeat(Animator animator) {
-
-                }
-            });
-
-            fadeOutAnimator.start();
-        }
-    }
-
     private void showAddWorkDialog() {
         AddWorkDialog.getInstance(new AddWorkDialog.AddWorkDialogListener() {
             @Override
             public void onOkClick(final Work work) {
-                fadeDialogOverlay(false, new DialogPostAnimationListener() {
-                    @Override
-                    public void onFinishAnimation() {
-                        onAddWork(work);
-                    }
-                });
+                onAddWork(work);
             }
 
         },
                 false,
                 mDatePagerAdapter.getDayItem(mPager.getCurrentItem())).show(getFragmentManager(), null);
-//        fadeDialogOverlay(true ,null);
-//        dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
-//                fadeDialogOverlay(false, null);
-//                return true;
-//            }
-//        });
     }
 
     private void onAddWork(Work work) {

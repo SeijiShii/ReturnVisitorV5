@@ -1,8 +1,14 @@
-package net.c_kogyo.returnvisitorv5.dialogcontents;
+package net.c_kogyo.returnvisitorv5.dialog;
 
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.ListViewCompat;
 import android.support.v7.widget.PopupMenu;
 import android.text.Editable;
@@ -26,41 +32,62 @@ import net.c_kogyo.returnvisitorv5.data.Tag;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by SeijiShii on 2017/03/06.
  */
 
-public class TagDialog extends FrameLayout {
+public class TagDialog extends DialogFragment {
 
     // DONE: 2017/05/08 名前でソート
-    private VisitDetail mVisitDetail;
-    private OnButtonsClickListener mButtonsClickListener;
+    private static VisitDetail mVisitDetail;
+    private static TagDialogListener mListener;
 
-    public TagDialog(@NonNull Context context, VisitDetail visitDetail) {
-        super(context);
-
-        this.mVisitDetail = visitDetail;
-
-        initCommon();
+    private static TagDialog instance;
+    public static TagDialog getInstance(VisitDetail visitDetail, TagDialogListener listener) {
+        
+        mVisitDetail = visitDetail;
+        mListener = listener;
+        
+        if (instance == null) {
+            instance = new TagDialog();
+        }
+        return instance;
     }
 
-    public TagDialog(@NonNull Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
+
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        
+        builder.setTitle(R.string.tag);
         initCommon();
+        builder.setView(view);
+        
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (mListener != null) {
+                    mListener.onOkClick(mVisitDetail);
+                }
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, null);
+        
+        return builder.create();
     }
 
     private View view;
     private void initCommon() {
 
-        view = LayoutInflater.from(getContext()).inflate(R.layout.tag_dialog, this);
+        view = View.inflate(getActivity(), R.layout.tag_dialog, null);
 
         initSearchText();
         initClearButton();
         initAddButton();
         initTagListView();
-        initOkButton();
-        initCancelButton();
+
     }
 
     private EditText searchText;
@@ -83,7 +110,7 @@ public class TagDialog extends FrameLayout {
                 if (s.length() <= 0) {
                     mAdapter = new TagListAdapter(RVData.getInstance().tagList.getSortedList());
                 } else {
-                    mAdapter = new TagListAdapter(RVData.getInstance().tagList.getSearchedItems(s, getContext()));
+                    mAdapter = new TagListAdapter(RVData.getInstance().tagList.getSearchedItems(s, getActivity()));
                 }
                 tagListView.setAdapter(mAdapter);
                 mAdapter.notifyDataSetChanged();
@@ -115,7 +142,7 @@ public class TagDialog extends FrameLayout {
     private Button clearButton;
     private void initClearButton() {
         clearButton = (Button) view.findViewById(R.id.clear_button);
-        clearButton.setOnClickListener(new OnClickListener() {
+        clearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 searchText.setText("");
@@ -126,7 +153,7 @@ public class TagDialog extends FrameLayout {
     private Button addButton;
     private void initAddButton() {
         addButton = (Button) view.findViewById(R.id.add_button);
-        addButton.setOnClickListener(new OnClickListener() {
+        addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // DONE: 2017/03/06 タグ追加処理
@@ -152,9 +179,9 @@ public class TagDialog extends FrameLayout {
                 mAdapter.notifyDataSetChanged();
                 setListViewHeight();
 
-                RVData.getInstance().saveData(getContext());
+                RVData.getInstance().saveData(getActivity());
 
-                RVCloudSync.syncDataIfLoggedIn(getContext());
+                RVCloudSync.syncDataIfLoggedIn(getActivity());
             }
         });
     }
@@ -173,8 +200,8 @@ public class TagDialog extends FrameLayout {
 
     private void setListViewHeight() {
 
-        int rowHeight = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small)
-                 + (int) (getContext().getResources().getDisplayMetrics().density * 10);
+        int rowHeight = getActivity().getResources().getDimensionPixelSize(R.dimen.ui_height_small)
+                 + (int) (getActivity().getResources().getDisplayMetrics().density * 10);
         int count = mAdapter.getCount();
         if (count > 6) {
             count = 5;
@@ -185,44 +212,10 @@ public class TagDialog extends FrameLayout {
 
     }
 
-    private Button okButton;
-    private void initOkButton() {
-        okButton = (Button) view.findViewById(R.id.ok_button);
-        okButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // DONE: 2017/03/06 OK
-                if (mButtonsClickListener != null) {
-                    mButtonsClickListener.onOkClick(mVisitDetail);
-                }
-            }
-        });
-    }
-
-    private Button cancelButton;
-    private void initCancelButton() {
-
-        cancelButton = (Button) view.findViewById(R.id.cancel_button);
-        cancelButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // DONE: 2017/03/06 Cancel
-                if (mButtonsClickListener != null) {
-                    mButtonsClickListener.onCancelClick();
-                }
-            }
-        });
-    }
-
-    public void setOnButtonsClickListener(OnButtonsClickListener listener) {
-        this.mButtonsClickListener = listener;
-    }
-
-    public interface OnButtonsClickListener {
+    public interface TagDialogListener {
 
         void onOkClick(VisitDetail visitDetail);
 
-        void onCancelClick();
     }
 
     private class TagListAdapter extends BaseAdapter{
@@ -253,7 +246,7 @@ public class TagDialog extends FrameLayout {
             Tag tag = (Tag) getItem(i);
 
             if (view == null) {
-                view = new TagListCell(getContext(), tag, mVisitDetail.getTagIds().contains(tag.getId()));
+                view = new TagListCell(getActivity(), tag, mVisitDetail.getTagIds().contains(tag.getId()));
             } else {
                 ((TagListCell) view).refreshData(tag, mVisitDetail.getTagIds().contains(tag.getId()));
             }
@@ -279,9 +272,9 @@ public class TagDialog extends FrameLayout {
 
                     setListViewHeight();
 
-                    RVData.getInstance().saveData(getContext());
+                    RVData.getInstance().saveData(getActivity());
 
-                    RVCloudSync.syncDataIfLoggedIn(getContext());
+                    RVCloudSync.syncDataIfLoggedIn(getActivity());
                 }
             });
             return view;
@@ -314,7 +307,7 @@ public class TagDialog extends FrameLayout {
         private OnTagListCellListener mListener;
 
         private void initCommon() {
-            mView = LayoutInflater.from(getContext()).inflate(R.layout.tag_list_cell, this);
+            mView = LayoutInflater.from(getActivity()).inflate(R.layout.tag_list_cell, this);
             
             textView = (TextView) mView.findViewById(R.id.text_view);
             
@@ -323,7 +316,7 @@ public class TagDialog extends FrameLayout {
                 @Override
                 public void onClick(View view) {
                     // DONE: 2017/03/06 ポップアップで削除を尋ねる
-                    PopupMenu popupMenu = new PopupMenu(getContext(), editButton);
+                    PopupMenu popupMenu = new PopupMenu(getActivity(), editButton);
                     MenuInflater inflater = popupMenu.getMenuInflater();
                     inflater.inflate(R.menu.delete_menu, popupMenu.getMenu());
                     popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -384,5 +377,22 @@ public class TagDialog extends FrameLayout {
         void onDeleteTag(Tag tag);
     }
 
+    public static AtomicBoolean isShowing = new AtomicBoolean(false);
 
+    @Override
+    public void show(FragmentManager manager, String tag) {
+        if (isShowing.getAndSet(true)) return;
+
+        try {
+            super.show(manager, tag);
+        } catch (Exception e) {
+            isShowing.set(false);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        isShowing.set(false);
+    }
 }

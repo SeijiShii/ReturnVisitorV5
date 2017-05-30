@@ -1,15 +1,20 @@
-package net.c_kogyo.returnvisitorv5.dialogcontents;
+package net.c_kogyo.returnvisitorv5.dialog;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,6 +34,8 @@ import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.PlaceMarkers;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import static android.content.Context.MODE_PRIVATE;
 import static net.c_kogyo.returnvisitorv5.Constants.LATITUDE;
 import static net.c_kogyo.returnvisitorv5.Constants.LONGITUDE;
@@ -40,47 +47,53 @@ import static net.c_kogyo.returnvisitorv5.activity.MapActivity.MY_LOCATION_TAG;
  * Created by SeijiShii on 2017/05/09.
  */
 
-public class SetPlaceDialog extends FrameLayout
+public class SetPlaceDialog extends DialogFragment
                     implements OnMapReadyCallback,
                                 GoogleMap.OnMarkerClickListener,
                                 GoogleMap.OnMapLongClickListener{
 
-    private SetPlaceDialogListener mListener;
-    private MapView mMapView;
-
-    public SetPlaceDialog(@NonNull Context context,
-                          SetPlaceDialogListener listener,
-                          MapView mapView) {
-        super(context);
-
-        mMapView = mapView;
+    private static SetPlaceDialogListener mListener;
+    private static MapView mMapView;
+    
+    private static SetPlaceDialog instance;
+    
+    public static SetPlaceDialog getInstance(SetPlaceDialogListener listener) {
+        
         mListener = listener;
-
-        initCommon();
+        
+        if (instance == null) {
+            instance = new SetPlaceDialog();
+        }
+        return instance;
     }
 
-    public SetPlaceDialog(@NonNull Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        
+        initCommon(savedInstanceState);
+        builder.setView(view);
+
+        builder.setTitle(R.string.set_place);
+        builder.setNegativeButton(R.string.close, null);
+        
+        return builder.create();
+        
     }
 
     private View view;
-    private void initCommon() {
+    private void initCommon(Bundle savedInstanceState) {
 
-        view = LayoutInflater.from(getContext()).inflate(R.layout.set_place_dialog, this);
-
-        initMapFrame();
-        initCloseButton();
+        view = View.inflate(getActivity(), R.layout.set_place_dialog, null);
+        initMapFrame(savedInstanceState);
 
     }
 
-    private void initMapFrame() {
+    private void initMapFrame(Bundle savedInstanceState) {
 
-        FrameLayout mapFrame = (FrameLayout) view.findViewById(R.id.map_view);
-
-        if (mMapView == null)
-            return;
-
-        mapFrame.addView(mMapView);
+        mMapView = (MapView) view.findViewById(R.id.map_view); 
+        mMapView.onCreate(savedInstanceState);
         mMapView.getMapAsync(this);
     }
 
@@ -125,14 +138,14 @@ public class SetPlaceDialog extends FrameLayout
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_LOCATION = 718;
     private void setMyLocationButton() {
 
-        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                || ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                || ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
             Log.d(MY_LOCATION_TAG, "Permissions yet given.");
 
             // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale((Activity)getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-                    || ActivityCompat.shouldShowRequestPermissionRationale((Activity)getContext(), Manifest.permission.ACCESS_COARSE_LOCATION)) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale((Activity)getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
+                    || ActivityCompat.shouldShowRequestPermissionRationale((Activity)getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION)) {
 
                 Log.d(MY_LOCATION_TAG, "Should show Explanation.");
                 // Show an expanation to the user *asynchronously* -- don't block
@@ -143,7 +156,7 @@ public class SetPlaceDialog extends FrameLayout
 
                 // No explanation needed, we can request the permission.
 
-                ActivityCompat.requestPermissions((Activity)getContext(),
+                ActivityCompat.requestPermissions((Activity)getActivity(),
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
                         MY_PERMISSIONS_REQUEST_ACCESS_LOCATION);
 
@@ -177,7 +190,7 @@ public class SetPlaceDialog extends FrameLayout
     }
 
     private void loadCameraPosition() {
-        SharedPreferences prefs = getContext().getSharedPreferences(RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
+        SharedPreferences prefs = getActivity().getSharedPreferences(RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
         float zoomLevel = prefs.getFloat(ZOOM_LEVEL, 0f);
         double lat = Double.valueOf(prefs.getString(LATITUDE, "1000"));
         double lng = Double.valueOf(prefs.getString(LONGITUDE, "1000"));
@@ -189,7 +202,7 @@ public class SetPlaceDialog extends FrameLayout
 
     private void saveCameraPosition() {
 
-        SharedPreferences prefs = getContext().getSharedPreferences(RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
+        SharedPreferences prefs = getActivity().getSharedPreferences(RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
 
         float zoomLevel = mMap.getCameraPosition().zoom;
@@ -203,25 +216,29 @@ public class SetPlaceDialog extends FrameLayout
         editor.apply();
     }
 
-    private void initCloseButton() {
-        ImageView closeButton = (ImageView) view.findViewById(R.id.cancel_button);
-        ViewUtil.setOnClickListener(closeButton, new ViewUtil.OnViewClickListener() {
-            @Override
-            public void onViewClick() {
-                if (mListener != null) {
-                    mListener.onCancel();
-                }
-            }
-        });
-    }
-
     public interface SetPlaceDialogListener{
 
         void onSetPlace(Place place);
 
         void onSetLatLng(LatLng latLng);
+    }
 
-        void onCancel();
+    public static AtomicBoolean isShowing = new AtomicBoolean(false);
 
+    @Override
+    public void show(FragmentManager manager, String tag) {
+        if (isShowing.getAndSet(true)) return;
+
+        try {
+            super.show(manager, tag);
+        } catch (Exception e) {
+            isShowing.set(false);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        isShowing.set(false);
     }
 }

@@ -26,7 +26,7 @@ import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Work;
 import net.c_kogyo.returnvisitorv5.dialog.AddWorkDialog;
-import net.c_kogyo.returnvisitorv5.dialogcontents.MonthAggregationDialog;
+import net.c_kogyo.returnvisitorv5.dialog.MonthAggregationDialog;
 import net.c_kogyo.returnvisitorv5.fragment.CalendarFragment;
 import net.c_kogyo.returnvisitorv5.util.AdMobHelper;
 import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
@@ -80,7 +80,6 @@ public class CalendarPagerActivity extends AppCompatActivity {
         scrollToMonth();
         initLogoButton();
 
-        initDialogOverlay();
         initMenuButton();
 
     }
@@ -397,128 +396,19 @@ public class CalendarPagerActivity extends AppCompatActivity {
     }
 
     private void showMonthAggregationDialog() {
-        MonthAggregationDialog monthAggregationDialog
-                = new MonthAggregationDialog(this,
-                mAdapter.getMonth(mPager.getCurrentItem()),
+        MonthAggregationDialog.getInstance(mAdapter.getMonth(mPager.getCurrentItem()),
                 new MonthAggregationDialog.MonthAggregationDialogListener() {
-            @Override
-            public void onClickCloseButton() {
-                fadeDialogOverlay(false);
-            }
-
             @Override
             public void onClickMailButton(Calendar month) {
                 // DONE: 2017/05/07 Mail Action
-                fadeDialogOverlay(false);
                 MailReport.exportToMail(CalendarPagerActivity.this, month);
             }
-        });
-        dialogFrame.addView(monthAggregationDialog);
-        dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                fadeDialogOverlay(false);
-                return true;
-            }
-        });
-        fadeDialogOverlay(true);
+        }).show(getFragmentManager(), null);
     }
 
     // DONE: 2017/05/09 mail action
     private void onClickMailReport() {
         MailReport.exportToMail(this, mAdapter.getMonth(mPager.getCurrentItem()));
-    }
-
-    private RelativeLayout dialogOverlay;
-    private void initDialogOverlay() {
-        dialogOverlay = (RelativeLayout) findViewById(R.id.dialog_overlay);
-        initDialogFrame();
-    }
-
-    private FrameLayout dialogFrame;
-    private void initDialogFrame() {
-        dialogFrame = (FrameLayout) findViewById(R.id.dialog_frame);
-    }
-
-    private void fadeDialogOverlay(boolean isFadeIn) {
-
-        if (isFadeIn) {
-            dialogOverlay.setVisibility(View.VISIBLE);
-
-            ValueAnimator fadeInAnimator = ValueAnimator.ofFloat(0f, 1f);
-            fadeInAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                    dialogOverlay.setAlpha((float) valueAnimator.getAnimatedValue());
-                    dialogOverlay.requestLayout();
-                }
-            });
-            fadeInAnimator.setDuration(500);
-
-//            if (listener != null) {
-//                fadeInAnimator.addListener(new Animator.AnimatorListener() {
-//                    @Override
-//                    public void onAnimationStart(Animator animator) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onAnimationEnd(Animator animator) {
-//                        listener.onFinishAnimation();
-//                    }
-//
-//                    @Override
-//                    public void onAnimationCancel(Animator animator) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onAnimationRepeat(Animator animator) {
-//
-//                    }
-//                });
-//            }
-
-            fadeInAnimator.start();
-
-        } else {
-            ValueAnimator fadeOutAnimator = ValueAnimator.ofFloat(1f, 0f);
-            fadeOutAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                    dialogOverlay.setAlpha((float) valueAnimator.getAnimatedValue());
-                    dialogOverlay.requestLayout();
-                }
-            });
-            fadeOutAnimator.setDuration(500);
-            fadeOutAnimator.addListener(new Animator.AnimatorListener() {
-                @Override
-                public void onAnimationStart(Animator animator) {
-
-                }
-
-                @Override
-                public void onAnimationEnd(Animator animator) {
-                    dialogOverlay.setVisibility(View.INVISIBLE);
-                    dialogFrame.removeAllViews();
-                    dialogOverlay.setOnTouchListener(null);
-//                    if (listener == null) return;
-//                    listener.onFinishAnimation();
-                }
-
-                @Override
-                public void onAnimationCancel(Animator animator) {
-
-                }
-
-                @Override
-                public void onAnimationRepeat(Animator animator) {
-
-                }
-            });
-
-            fadeOutAnimator.start();
-        }
     }
 
     private void loadPrefs() {
@@ -566,7 +456,7 @@ public class CalendarPagerActivity extends AppCompatActivity {
                     }
                 },
                 true,
-                Calendar.getInstance());
+                Calendar.getInstance()).show(getFragmentManager(), null);
     }
 
     private void startWorkPagerActivityWithNewWork(Work work) {

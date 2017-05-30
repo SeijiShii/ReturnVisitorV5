@@ -1,259 +1,237 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="5dp">
+    android:layout_height="match_parent">
 
-    <!-- Dialog title -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/ui_height_small"
-        android:textColor="@color/textColorGray"
-        android:textSize="@dimen/text_size_large"
-        android:gravity="center"
-        android:text="@string/day_aggregation"/>
-
-    <!-- Date Text -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/ui_height_small"
-        android:textColor="@color/textColorGray"
-        android:textSize="@dimen/text_size_middle"
-        android:gravity="center"
-        android:id="@+id/date_text"/>
-
-    <!-- Aggregation table -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="vertical"
+        android:padding="5dp">
 
-        <View
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:background="#777"/>
+        <!-- Date Text -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/ui_height_small"
+            android:textColor="@color/textColorGray"
+            android:textSize="@dimen/text_size_middle"
+            android:gravity="center"
+            android:id="@+id/date_text"/>
 
+        <!-- Aggregation table -->
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="horizontal">
 
             <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
                 android:background="#777"/>
 
-            <!-- Publication Count Row -->
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/ui_height_small"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_weight="3"
-                    android:layout_height="match_parent"
-                    android:textColor="@color/textColorGray"
-                    android:textSize="@dimen/text_size_middle"
-                    android:text="@string/placement_count"
-                    android:gravity="left|center_vertical"
-                    android:layout_margin="5dp"/>
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
                 <View
-                    android:layout_width="1dp"
-                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
                     android:background="#777"/>
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="match_parent"
-                    android:id="@+id/placement_count_text"
-                    android:textColor="@color/textColorGray"
-                    android:textSize="@dimen/text_size_middle"
-                    android:gravity="center"/>
+                <!-- Publication Count Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/ui_height_small"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="3"
+                        android:layout_height="match_parent"
+                        android:textColor="@color/textColorGray"
+                        android:textSize="@dimen/text_size_middle"
+                        android:text="@string/placement_count"
+                        android:gravity="left|center_vertical"
+                        android:layout_margin="5dp"/>
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="#777"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:id="@+id/placement_count_text"
+                        android:textColor="@color/textColorGray"
+                        android:textSize="@dimen/text_size_middle"
+                        android:gravity="center"/>
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#777"/>
+
+                <!-- Video Count Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/ui_height_small"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="3"
+                        android:layout_height="match_parent"
+                        android:textColor="@color/textColorGray"
+                        android:textSize="@dimen/text_size_middle"
+                        android:text="@string/show_video_count"
+                        android:gravity="left|center_vertical"
+                        android:layout_margin="5dp"/>
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="#777"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:id="@+id/video_count_text"
+                        android:textColor="@color/textColorGray"
+                        android:textSize="@dimen/text_size_middle"
+                        android:gravity="center"/>
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#777"/>
+
+                <!-- Time Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/ui_height_small"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="3"
+                        android:layout_height="match_parent"
+                        android:textColor="@color/textColorGray"
+                        android:textSize="@dimen/text_size_middle"
+                        android:text="@string/time"
+                        android:gravity="left|center_vertical"
+                        android:layout_margin="5dp"/>
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="#777"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:id="@+id/time_text"
+                        android:textColor="@color/textColorGray"
+                        android:textSize="@dimen/text_size_middle"
+                        android:gravity="center"/>
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#777"/>
+
+                <!-- Return Visit Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/ui_height_small"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="3"
+                        android:layout_height="match_parent"
+                        android:textColor="@color/textColorGray"
+                        android:textSize="@dimen/text_size_middle"
+                        android:text="@string/return_visit"
+                        android:gravity="left|center_vertical"
+                        android:layout_margin="5dp"/>
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="#777"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:id="@+id/rv_count_text"
+                        android:textColor="@color/textColorGray"
+                        android:textSize="@dimen/text_size_middle"
+                        android:gravity="center"/>
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#777"/>
+
+                <!-- Study Visit Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/ui_height_small"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="3"
+                        android:layout_height="match_parent"
+                        android:textColor="@color/textColorGray"
+                        android:textSize="@dimen/text_size_middle"
+                        android:text="@string/study_visit_count"
+                        android:gravity="left|center_vertical"
+                        android:layout_margin="5dp"/>
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="#777"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:id="@+id/study_count_text"
+                        android:textColor="@color/textColorGray"
+                        android:textSize="@dimen/text_size_middle"
+                        android:gravity="center"/>
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#777"/>
 
             </LinearLayout>
 
             <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#777"/>
-
-            <!-- Video Count Row -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/ui_height_small"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_weight="3"
-                    android:layout_height="match_parent"
-                    android:textColor="@color/textColorGray"
-                    android:textSize="@dimen/text_size_middle"
-                    android:text="@string/show_video_count"
-                    android:gravity="left|center_vertical"
-                    android:layout_margin="5dp"/>
-
-                <View
-                    android:layout_width="1dp"
-                    android:layout_height="match_parent"
-                    android:background="#777"/>
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="match_parent"
-                    android:id="@+id/video_count_text"
-                    android:textColor="@color/textColorGray"
-                    android:textSize="@dimen/text_size_middle"
-                    android:gravity="center"/>
-
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#777"/>
-
-            <!-- Time Row -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/ui_height_small"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_weight="3"
-                    android:layout_height="match_parent"
-                    android:textColor="@color/textColorGray"
-                    android:textSize="@dimen/text_size_middle"
-                    android:text="@string/time"
-                    android:gravity="left|center_vertical"
-                    android:layout_margin="5dp"/>
-
-                <View
-                    android:layout_width="1dp"
-                    android:layout_height="match_parent"
-                    android:background="#777"/>
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="match_parent"
-                    android:id="@+id/time_text"
-                    android:textColor="@color/textColorGray"
-                    android:textSize="@dimen/text_size_middle"
-                    android:gravity="center"/>
-
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#777"/>
-
-            <!-- Return Visit Row -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/ui_height_small"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_weight="3"
-                    android:layout_height="match_parent"
-                    android:textColor="@color/textColorGray"
-                    android:textSize="@dimen/text_size_middle"
-                    android:text="@string/return_visit"
-                    android:gravity="left|center_vertical"
-                    android:layout_margin="5dp"/>
-
-                <View
-                    android:layout_width="1dp"
-                    android:layout_height="match_parent"
-                    android:background="#777"/>
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="match_parent"
-                    android:id="@+id/rv_count_text"
-                    android:textColor="@color/textColorGray"
-                    android:textSize="@dimen/text_size_middle"
-                    android:gravity="center"/>
-
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#777"/>
-
-            <!-- Study Visit Row -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/ui_height_small"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_weight="3"
-                    android:layout_height="match_parent"
-                    android:textColor="@color/textColorGray"
-                    android:textSize="@dimen/text_size_middle"
-                    android:text="@string/study_visit_count"
-                    android:gravity="left|center_vertical"
-                    android:layout_margin="5dp"/>
-
-                <View
-                    android:layout_width="1dp"
-                    android:layout_height="match_parent"
-                    android:background="#777"/>
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="match_parent"
-                    android:id="@+id/study_count_text"
-                    android:textColor="@color/textColorGray"
-                    android:textSize="@dimen/text_size_middle"
-                    android:gravity="center"/>
-
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
                 android:background="#777"/>
 
         </LinearLayout>
-
-        <View
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:background="#777"/>
-
     </LinearLayout>
-
-    <!-- Close button -->
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/ui_height_small"
-        android:layout_marginTop="10dp">
-
-        <Button
-            android:layout_width="150dp"
-            android:layout_height="match_parent"
-            android:id="@+id/cancel_button"
-            android:text="@string/close"
-            android:textColor="@color/colorPrimaryDark"
-            android:background="@drawable/trans_blue_selector"
-            android:layout_alignParentRight="true"/>
-
-    </RelativeLayout>
-
-</LinearLayout>
+</ScrollView>

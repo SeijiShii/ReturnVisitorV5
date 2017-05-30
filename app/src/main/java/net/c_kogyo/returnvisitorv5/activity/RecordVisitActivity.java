@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -38,12 +37,12 @@ import net.c_kogyo.returnvisitorv5.data.Publication;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
-import net.c_kogyo.returnvisitorv5.dialogcontents.AddPersonDialog;
+import net.c_kogyo.returnvisitorv5.dialog.AddPersonDialog;
 import net.c_kogyo.returnvisitorv5.dialog.HousingComplexDialog;
-import net.c_kogyo.returnvisitorv5.dialogcontents.PersonDialog;
-import net.c_kogyo.returnvisitorv5.dialogcontents.PlacementDialog;
-import net.c_kogyo.returnvisitorv5.dialogcontents.SetPlaceDialog;
-import net.c_kogyo.returnvisitorv5.dialogcontents.TagDialog;
+import net.c_kogyo.returnvisitorv5.dialog.PersonDialog;
+import net.c_kogyo.returnvisitorv5.dialog.PlacementDialog;
+import net.c_kogyo.returnvisitorv5.dialog.SetPlaceDialog;
+import net.c_kogyo.returnvisitorv5.dialog.TagDialog;
 import net.c_kogyo.returnvisitorv5.service.FetchAddressIntentService;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 import net.c_kogyo.returnvisitorv5.util.InputUtil;
@@ -81,7 +80,6 @@ public class RecordVisitActivity extends AppCompatActivity {
 
     private ArrayList<Publication> mAddedPublications;
 
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -105,7 +103,6 @@ public class RecordVisitActivity extends AppCompatActivity {
 
         initPriorityMark();
         initVisitDetailFrame();
-        initDialogOverlay();
         initOkButton();
         initCancelButton();
         initDeleteButton();
@@ -295,7 +292,7 @@ public class RecordVisitActivity extends AppCompatActivity {
 
     private void showPersonDialogForNew() {
 
-        PersonDialog personDialog = new PersonDialog(this, new Person(mPlace.getId()),
+        PersonDialog.getInstance(new Person(mPlace.getId()),
 
                 new PersonDialog.OnButtonsClickListener() {
                     @Override
@@ -307,123 +304,17 @@ public class RecordVisitActivity extends AppCompatActivity {
                         // 新しく人を追加したということは会えたということでしょう。
                         visitDetail.setSeen(true);
                         mVisit.addVisitDetail(visitDetail);
-                        fadeDialogOverlay(false, new DialogPostAnimationListener() {
-                            @Override
-                            public void onFinishAnimation() {
-                                // Person Dialogが消えたら実行するアニメーション
-                                addVisitDetailView(visitDetail,
-                                        person,
-                                        VisitDetailView.DrawCondition.EXTRACT_POST_DRAWN_FROM_0);
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onCancelClick() {
-                        fadeDialogOverlay(false, null);
+                        addVisitDetailView(visitDetail,
+                                person,
+                                VisitDetailView.DrawCondition.EXTRACT_POST_DRAWN_FROM_0);
                     }
 
                     @Override
                     public void onDeleteClick(Person person) {
                         // Newの時は削除ボタンが表示されないので呼ばれることはない
                     }
-                });
-        dialogFrame.addView(personDialog);
-        fadeDialogOverlay(true, null);
-    }
+                }).show(getFragmentManager(), null);
 
-    private RelativeLayout dialogOverlay;
-    private void initDialogOverlay() {
-        dialogOverlay = (RelativeLayout) findViewById(R.id.dialog_overlay);
-
-        initDialogFrame();
-    }
-
-    private FrameLayout dialogFrame;
-    private void initDialogFrame() {
-        dialogFrame = (FrameLayout) findViewById(R.id.dialog_frame);
-    }
-
-    private void fadeDialogOverlay(boolean isFadeIn, final DialogPostAnimationListener listener) {
-
-        InputUtil.hideSoftKeyboard(this);
-
-        if (isFadeIn) {
-            dialogOverlay.setVisibility(View.VISIBLE);
-
-            ValueAnimator fadeInAnimator = ValueAnimator.ofFloat(0f, 1f);
-            fadeInAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                    dialogOverlay.setAlpha((float) valueAnimator.getAnimatedValue());
-                    dialogOverlay.requestLayout();
-                }
-            });
-            fadeInAnimator.setDuration(500);
-
-            if (listener != null) {
-                fadeInAnimator.addListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animator) {
-
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animator animator) {
-                        listener.onFinishAnimation();
-                    }
-
-                    @Override
-                    public void onAnimationCancel(Animator animator) {
-
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animator animator) {
-
-                    }
-                });
-            }
-
-            fadeInAnimator.start();
-
-        } else {
-            ValueAnimator fadeOutAnimator = ValueAnimator.ofFloat(1f, 0f);
-            fadeOutAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                    dialogOverlay.setAlpha((float) valueAnimator.getAnimatedValue());
-                    dialogOverlay.requestLayout();
-                }
-            });
-            fadeOutAnimator.setDuration(500);
-            fadeOutAnimator.addListener(new Animator.AnimatorListener() {
-                @Override
-                public void onAnimationStart(Animator animator) {
-
-                }
-
-                @Override
-                public void onAnimationEnd(Animator animator) {
-                    dialogOverlay.setVisibility(View.INVISIBLE);
-                    dialogFrame.removeAllViews();
-                    if (listener == null) return;
-                    listener.onFinishAnimation();
-                }
-
-                @Override
-                public void onAnimationCancel(Animator animator) {
-
-                }
-
-                @Override
-                public void onAnimationRepeat(Animator animator) {
-
-                }
-            });
-
-            fadeOutAnimator.start();
-        }
     }
 
     interface DialogPostAnimationListener {
@@ -527,8 +418,8 @@ public class RecordVisitActivity extends AppCompatActivity {
 
                     @Override
                     public void onPlacementButtonClick(VisitDetail visitDetail) {
-                showPlacementDialog(visitDetail.getId());
-            }
+                        showPlacementDialog(visitDetail.getId());
+                    }
 
                     @Override
                     public void postExtractView(VisitDetailView visitDetailView) {
@@ -554,9 +445,7 @@ public class RecordVisitActivity extends AppCompatActivity {
 
     private void showPersonDialogForEdit(Person person) {
 
-        PersonDialog personDialog
-                = new PersonDialog(this,
-                person,
+        PersonDialog.getInstance(person,
                 new PersonDialog.OnButtonsClickListener() {
                     @Override
                     public void onOkClick(Person person) {
@@ -567,17 +456,10 @@ public class RecordVisitActivity extends AppCompatActivity {
                                 visitDetailView.refreshPersonData();
                             }
                         }
-                        fadeDialogOverlay(false, null);
-                    }
-
-                    @Override
-                    public void onCancelClick() {
-                        fadeDialogOverlay(false, null);
                     }
 
                     @Override
                     public void onDeleteClick(Person person) {
-                        fadeDialogOverlay(false, null);
                         // DONE: 2017/03/08 削除動作テスト 削除時のUIの動きを実装
                         VisitDetail visitDetail = mVisit.getVisitDetail(person.getId());
                         if (visitDetail == null) return;
@@ -586,9 +468,7 @@ public class RecordVisitActivity extends AppCompatActivity {
                         mVisit.getVisitDetails().remove(visitDetail);
                         mRemovedPersons.add(person);
                     }
-                });
-        dialogFrame.addView(personDialog);
-        fadeDialogOverlay(true, null);
+                }).show(getFragmentManager(), null);
     }
 
     @Nullable
@@ -714,8 +594,7 @@ public class RecordVisitActivity extends AppCompatActivity {
     }
 
     private void showTagDialog(VisitDetail visitDetail) {
-        TagDialog tagDialog = new TagDialog(this, visitDetail);
-        tagDialog.setOnButtonsClickListener(new TagDialog.OnButtonsClickListener() {
+        TagDialog.getInstance(visitDetail, new TagDialog.TagDialogListener() {
             @Override
             public void onOkClick(VisitDetail visitDetail1) {
 
@@ -723,38 +602,20 @@ public class RecordVisitActivity extends AppCompatActivity {
                 if (detailView != null) {
                     detailView.refreshTagFrame();
                 }
-                fadeDialogOverlay(false, null);
             }
 
-            @Override
-            public void onCancelClick() {
-                fadeDialogOverlay(false, null);
-            }
-        });
-        dialogFrame.addView(tagDialog);
-        fadeDialogOverlay(true, null);
+        }).show(getFragmentManager(), null);
     }
 
     private void showPlacementDialog(String parentId) {
 
-        PlacementDialog placementDialog = new PlacementDialog(this, parentId);
-        placementDialog.setOnButtonClickListener(new PlacementDialog.PlacementDialogListener() {
-            @Override
-            public void onCancelClick() {
-                fadeDialogOverlay(false, null);
-            }
-
+        PlacementDialog.getInstance(parentId, new PlacementDialog.PlacementDialogListener() {
             @Override
             public void onDecidePlacement(Placement placement, String parentId) {
-
                 addPlacement(placement, parentId);
                 addPlacementCell(placement, parentId, false);
-                fadeDialogOverlay(false, null);
-
-            }
-        });
-        dialogFrame.addView(placementDialog);
-        fadeDialogOverlay(true, null);
+                }
+            }).show(getFragmentManager(), null);
 
     }
 
@@ -876,13 +737,11 @@ public class RecordVisitActivity extends AppCompatActivity {
     }
 
     private void showSetPlaceDialog() {
-        final SetPlaceDialog setPlaceDialog = new SetPlaceDialog(this,
-                new SetPlaceDialog.SetPlaceDialogListener() {
+        SetPlaceDialog.getInstance(new SetPlaceDialog.SetPlaceDialogListener() {
                     @Override
                     public void onSetPlace(Place place) {
                         if (place.getCategory() == Place.Category.HOUSE) {
                             setPlace(place);
-                            fadeDialogOverlay(false, null);
                         } else if (place.getCategory() == Place.Category.HOUSING_COMPLEX) {
                             onHousingComplexSelected(place);
                         }
@@ -890,25 +749,9 @@ public class RecordVisitActivity extends AppCompatActivity {
 
                     @Override
                     public void onSetLatLng(LatLng latLng) {
-                        fadeDialogOverlay(false, null);
                         setPlace(new Place(latLng, Place.Category.HOUSE));
                     }
-
-                    @Override
-                    public void onCancel() {
-                        fadeDialogOverlay(false, null);
-                    }
-                },
-                mMapView);
-        dialogFrame.addView(setPlaceDialog);
-        dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                fadeDialogOverlay(false, null);
-                return true;
-            }
-        });
-        fadeDialogOverlay(true, null);
+                }).show(getFragmentManager(), null);
     }
 
     private void initOtherPlacePersonButton() {
@@ -923,36 +766,16 @@ public class RecordVisitActivity extends AppCompatActivity {
 
 
     private void showAddPersonDialog() {
-        AddPersonDialog addPersonDialog = new AddPersonDialog(this,
-                new AddPersonDialog.AddPersonDialogListener() {
-                    @Override
-                    public void onCancel() {
-                        fadeDialogOverlay(false, null);
-                    }
-
+        AddPersonDialog.getInstance(new AddPersonDialog.AddPersonDialogListener() {
                     @Override
                     public void onSetPerson(final Person person) {
-                        fadeDialogOverlay(false, new DialogPostAnimationListener() {
-                            @Override
-                            public void onFinishAnimation() {
-                                VisitDetail visitDetail = new VisitDetail(person.getId(), mVisit.getId(), mVisit.getPlaceId());
-                                mVisit.addVisitDetail(visitDetail);
-                                addVisitDetailView(visitDetail,
-                                        person,
-                                        VisitDetailView.DrawCondition.EXTRACT_POST_DRAWN_FROM_0);
-                            }
-                        });
+                        VisitDetail visitDetail = new VisitDetail(person.getId(), mVisit.getId(), mVisit.getPlaceId());
+                        mVisit.addVisitDetail(visitDetail);
+                        addVisitDetailView(visitDetail,
+                                person,
+                                VisitDetailView.DrawCondition.EXTRACT_POST_DRAWN_FROM_0);
                     }
-                }, mMapView);
-        dialogFrame.addView(addPersonDialog);
-        dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                fadeDialogOverlay(false, null);
-                return true;
-            }
-        });
-        fadeDialogOverlay(true, null);
+                }).show(getFragmentManager(), null);
     }
 
     @Override
@@ -1011,12 +834,7 @@ public class RecordVisitActivity extends AppCompatActivity {
     }
 
     private void onHousingComplexSelected(final Place housingComplex) {
-        fadeDialogOverlay(false, new DialogPostAnimationListener() {
-            @Override
-            public void onFinishAnimation() {
-                showHousingComplexDialog(housingComplex);
-            }
-        });
+        showHousingComplexDialog(housingComplex);
     }
 
     private void showHousingComplexDialog(Place housingComplex) {
@@ -1025,13 +843,11 @@ public class RecordVisitActivity extends AppCompatActivity {
                 new HousingComplexDialog.HousingComplexDialogListener() {
                     @Override
                     public void onClickAddRoomButton(Place newRoom) {
-                        fadeDialogOverlay(false, null);
                         setPlace(newRoom);
                     }
 
                     @Override
                     public void onClickRoomCell(final Place room) {
-                        fadeDialogOverlay(false, null);
                         setPlace(room);
                     }
 

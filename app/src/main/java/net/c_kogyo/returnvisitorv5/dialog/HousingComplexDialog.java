@@ -86,6 +86,10 @@ public class HousingComplexDialog extends DialogFragment {
         builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+
+                RVData.getInstance().placeList.setOrAdd(mHousingComplex);
+                RVCloudSync.syncDataIfLoggedIn(getActivity());
+
                 if (mListener != null) {
                     mListener.onOkClick(mHousingComplex);
                 }
@@ -185,7 +189,10 @@ public class HousingComplexDialog extends DialogFragment {
             @Override
             public void onClick(View v) {
 
-                InputUtil.hideSoftKeyboard((Activity) getActivity());
+                RVData.getInstance().placeList.setOrAdd(mHousingComplex);
+                RVCloudSync.syncDataIfLoggedIn(getActivity());
+
+                InputUtil.hideSoftKeyboard(getActivity());
 
                 // DONE: 2017/03/27 リストに部屋を追加する処理
                 String name = roomText.getText().toString();

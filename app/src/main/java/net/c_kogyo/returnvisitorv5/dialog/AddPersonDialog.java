@@ -1,26 +1,26 @@
-package net.c_kogyo.returnvisitorv5.dialogcontents;
+package net.c_kogyo.returnvisitorv5.dialog;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.FragmentManager;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.AttributeSet;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ListView;
@@ -44,8 +44,11 @@ import net.c_kogyo.returnvisitorv5.view.PersonCell;
 import net.c_kogyo.returnvisitorv5.view.PlaceCell;
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static android.content.Context.MODE_PRIVATE;
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
 import static net.c_kogyo.returnvisitorv5.Constants.LATITUDE;
 import static net.c_kogyo.returnvisitorv5.Constants.LONGITUDE;
 import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS;
@@ -56,39 +59,58 @@ import static net.c_kogyo.returnvisitorv5.activity.MapActivity.MY_LOCATION_TAG;
  * Created by SeijiShii on 2017/05/25.
  */
 
-public class AddPersonDialog extends FrameLayout
+public class AddPersonDialog extends DialogFragment
                                 implements OnMapReadyCallback,
                                             GoogleMap.OnMarkerClickListener{
 
-    private AddPersonDialogListener mListener;
-    private MapView mMapView;
+    private static AddPersonDialogListener mListener;
 
-    public AddPersonDialog(@NonNull Context context,
-                           AddPersonDialogListener listener,
-                           MapView mapView) {
-        super(context);
-
+    private static AddPersonDialog instance;
+    
+    public static AddPersonDialog getInstance(AddPersonDialogListener listener) {
+        
         mListener = listener;
-        mMapView = mapView;
-        initCommon();
+        
+        if (instance == null) {
+            instance = new AddPersonDialog();
+        }
+        return instance;
     }
 
-    public AddPersonDialog(@NonNull Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                
+        initCommon(savedInstanceState);
+        builder.setView(view);
+        
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (listFrame.getVisibility() == VISIBLE) {
+                    fadeOutListFrame();
+                } else {
+                    dismiss();
+                }                
+            }
+        });
+        
+        return builder.create();
     }
 
     private View view;
-    private void initCommon() {
-        view = LayoutInflater.from(getContext()).inflate(R.layout.add_person_dialog, this);
+    private void initCommon(Bundle savedInstanceState) {
+        
+        view = View.inflate(getActivity(), R.layout.add_work_dialog, null);
 
         initDataFrame();
         initSearchText();
-        initMapFrame();
+        initMapFrame(savedInstanceState);
 
         initPersonListView();
         initNoItemMessageText();
 
-        initCancelButton();
     }
 
     private FrameLayout dataFrame;
@@ -121,32 +143,12 @@ public class AddPersonDialog extends FrameLayout
         });
     }
 
-    private void initMapFrame() {
+    private MapView mMapView;
+    private void initMapFrame(Bundle savedInstanceState) {
 
-        FrameLayout mapFrame = (FrameLayout) view.findViewById(R.id.map_view);
-
-        if (mMapView == null)
-            return;
-
-        mapFrame.addView(mMapView);
+        mMapView = (MapView) view.findViewById(R.id.map_view);
+        mMapView.onCreate(savedInstanceState);
         mMapView.getMapAsync(this);
-    }
-
-    private void initCancelButton() {
-        Button cancelButton = (Button) view.findViewById(R.id.cancel_button);
-        cancelButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                if (listFrame.getVisibility() == VISIBLE) {
-                    fadeOutListFrame();
-                } else {
-                    if (mListener != null) {
-                        mListener.onCancel();
-                    }
-                }
-            }
-        });
     }
 
     private ListView personListView;
@@ -215,14 +217,14 @@ public class AddPersonDialog extends FrameLayout
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_LOCATION = 718;
     private void setMyLocationButton() {
 
-        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                || ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                || ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
             Log.d(MY_LOCATION_TAG, "Permissions yet given.");
 
             // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale((Activity)getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-                    || ActivityCompat.shouldShowRequestPermissionRationale((Activity)getContext(), Manifest.permission.ACCESS_COARSE_LOCATION)) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale((Activity)getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
+                    || ActivityCompat.shouldShowRequestPermissionRationale((Activity)getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION)) {
 
                 Log.d(MY_LOCATION_TAG, "Should show Explanation.");
                 // Show an expanation to the user *asynchronously* -- don't block
@@ -233,7 +235,7 @@ public class AddPersonDialog extends FrameLayout
 
                 // No explanation needed, we can request the permission.
 
-                ActivityCompat.requestPermissions((Activity)getContext(),
+                ActivityCompat.requestPermissions((Activity)getActivity(),
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
                         MY_PERMISSIONS_REQUEST_ACCESS_LOCATION);
 
@@ -258,7 +260,7 @@ public class AddPersonDialog extends FrameLayout
     }
 
     private void loadCameraPosition() {
-        SharedPreferences prefs = getContext().getSharedPreferences(RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
+        SharedPreferences prefs = getActivity().getSharedPreferences(RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
         float zoomLevel = prefs.getFloat(ZOOM_LEVEL, 0f);
         double lat = Double.valueOf(prefs.getString(LATITUDE, "1000"));
         double lng = Double.valueOf(prefs.getString(LONGITUDE, "1000"));
@@ -270,7 +272,7 @@ public class AddPersonDialog extends FrameLayout
 
     private void saveCameraPosition() {
 
-        SharedPreferences prefs = getContext().getSharedPreferences(RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
+        SharedPreferences prefs = getActivity().getSharedPreferences(RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
 
         float zoomLevel = mMap.getCameraPosition().zoom;
@@ -293,12 +295,12 @@ public class AddPersonDialog extends FrameLayout
 
     private PlaceCell placeCell;
     private void fadeInPlaceCell(Place place) {
-        placeCell = new PlaceCell(getContext(), place, null, false);
+        placeCell = new PlaceCell(getActivity(), place, null, false);
         placeCell.setAlpha(0f);
         dataFrame.addView(placeCell);
         ViewUtil.fadeView(placeCell,
                 true,
-                new OnTouchListener() {
+                new View.OnTouchListener() {
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
                         return true;
@@ -321,7 +323,7 @@ public class AddPersonDialog extends FrameLayout
         listFrame.setVisibility(VISIBLE);
         ViewUtil.fadeView(listFrame,
                 true,
-                new OnTouchListener(){
+                new View.OnTouchListener(){
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
                         fadeOutListFrame();
@@ -331,7 +333,7 @@ public class AddPersonDialog extends FrameLayout
     }
 
     private void fadeInListFrameBySearchWord(String searchWord) {
-        ArrayList<Person> persons = new ArrayList<>(RVData.getInstance().personList.getSearchedItems(searchWord, getContext()));
+        ArrayList<Person> persons = new ArrayList<>(RVData.getInstance().personList.getSearchedItems(searchWord, getActivity()));
         fadeInPersonList(persons);
     }
 
@@ -366,8 +368,6 @@ public class AddPersonDialog extends FrameLayout
 
     public interface AddPersonDialogListener {
 
-        void onCancel();
-
         void onSetPerson(Person person);
     }
 
@@ -397,11 +397,61 @@ public class AddPersonDialog extends FrameLayout
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
-                convertView = new PersonCell(getContext(), (Person) getItem(position), false, null);
+                convertView = new PersonCell(getActivity(), (Person) getItem(position), false, null);
             } else {
                 ((PersonCell) convertView).refreshData((Person) getItem(position));
             }
             return convertView;
         }
+    }
+
+    public static AtomicBoolean isShowing = new AtomicBoolean(false);
+
+    @Override
+    public void show(FragmentManager manager, String tag) {
+        if (isShowing.getAndSet(true)) return;
+
+        try {
+            super.show(manager, tag);
+        } catch (Exception e) {
+            isShowing.set(false);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        isShowing.set(false);
+        mMapView.onResume();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mMapView.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mMapView.onStop();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mMapView.onPause();
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        mMapView.onLowMemory();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mMapView.onDestroy();
     }
 }

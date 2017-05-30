@@ -727,9 +727,6 @@ public class MapActivity extends AppCompatActivity
                     @Override
                     public void onOkClick(Place housingComplex) {
 
-                        RVData.getInstance().placeList.setOrAdd(housingComplex);
-                        RVCloudSync.syncDataIfLoggedIn(MapActivity.this);
-
                         placeMarkers.refreshMarker(housingComplex);
                     }
 

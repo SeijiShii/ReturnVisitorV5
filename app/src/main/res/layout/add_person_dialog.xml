@@ -4,92 +4,59 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <!-- Dialog title -->
-    <TextView
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/ui_height_small"
-        android:textColor="@color/textColorGray"
-        android:textSize="@dimen/text_size_large"
-        android:gravity="center"
-        android:text="@string/add_person_from_other_place"/>
+        android:id="@+id/data_frame">
 
-    <LinearLayout
+        <!-- Search Text -->
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/search_text"
+            android:background="@drawable/gray_trans_circle"
+            android:padding="5dp"
+            android:layout_margin="5dp"
+            android:hint="@string/search"
+            android:gravity="center_vertical|left"/>
+
+    </FrameLayout>
+
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:orientation="vertical">
+        android:padding="3dp">
 
-        <FrameLayout
+        <com.google.android.gms.maps.MapView
             android:layout_width="match_parent"
-            android:layout_height="@dimen/ui_height_small"
-            android:id="@+id/data_frame">
-
-            <!-- Search Text -->
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/search_text"
-                android:background="@drawable/gray_trans_circle"
-                android:padding="5dp"
-                android:layout_margin="5dp"
-                android:hint="@string/search"
-                android:gravity="center_vertical|left"/>
-
-        </FrameLayout>
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:padding="3dp">
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/map_view"/>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/whiteFog"
-                android:padding="3dp"
-                android:id="@+id/list_frame">
-
-                <ListView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/person_list_view"
-                    android:layout_centerInParent="true"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/textColorGray"
-                    android:textSize="@dimen/text_size_middle"
-                    android:text="@string/no_item_to_show"
-                    android:layout_centerInParent="true"
-                    android:id="@+id/no_item_message_text"/>
-
-            </RelativeLayout>
-
-        </FrameLayout>
-    </LinearLayout>
-
-    <!-- Cancel Button -->
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/ui_height_small">
-
-        <Button
-            android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_alignParentRight="true"
-            android:id="@+id/cancel_button"
-            android:background="@drawable/trans_orange_selector"
-            android:textSize="@dimen/text_size_middle"
-            android:textColor="@color/colorAccent"
-            android:text="@string/cancel"/>
+            android:id="@+id/map_view"/>
 
-    </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/whiteFog"
+            android:padding="3dp"
+            android:id="@+id/list_frame">
+
+            <ListView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/person_list_view"
+                android:layout_centerInParent="true"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/textColorGray"
+                android:textSize="@dimen/text_size_middle"
+                android:text="@string/no_item_to_show"
+                android:layout_centerInParent="true"
+                android:id="@+id/no_item_message_text"/>
+
+        </RelativeLayout>
+
+    </FrameLayout>
 
 </LinearLayout>

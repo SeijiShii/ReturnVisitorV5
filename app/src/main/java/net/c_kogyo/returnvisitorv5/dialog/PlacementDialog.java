@@ -1,11 +1,16 @@
-package net.c_kogyo.returnvisitorv5.dialogcontents;
+package net.c_kogyo.returnvisitorv5.dialog;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.content.Context;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.Pair;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatSpinner;
 import android.text.Editable;
@@ -33,42 +38,51 @@ import net.c_kogyo.returnvisitorv5.view.SwitchablePager;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
 
 /**
  * Created by SeijiShii on 2017/03/09.
  */
 
-public  class  PlacementDialog <T extends SwitchablePagerBaseFragment>extends FrameLayout {
+public  class  PlacementDialog<T extends SwitchablePagerBaseFragment> extends DialogFragment {
 
-    private PlacementDialogListener mListener;
-    private Publication mPublication;
-    private String mParentId;
-
-    public PlacementDialog(@NonNull Context context, String parentId) {
-        super(context);
-
+    private static PlacementDialogListener mListener;
+    private static Publication mPublication;
+    private static String mParentId;
+ 
+    private static PlacementDialog instance;
+    public static PlacementDialog getInstance(String parentId, PlacementDialogListener listener) {
+        
         mParentId = parentId;
-        initCommon();
+        mListener = listener;
+        
+        if (instance == null) {
+            instance = new PlacementDialog();
+        }
+        return instance;
     }
 
-    public PlacementDialog(@NonNull Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
-
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        
         initCommon();
-    }
+        builder.setView(view);
 
-    public void setOnButtonClickListener(PlacementDialogListener listener) {
-        this.mListener = listener;
+        builder.setNegativeButton(R.string.cancel, null);
+        
+        return builder.create();
     }
 
     private View view;
     private void initCommon() {
 
-        view = LayoutInflater.from(getContext()).inflate(R.layout.placement_dialog, this);
+        view = View.inflate(getActivity(), R.layout.placement_dialog, null);
 
         initSwitchablePager();
-
-        initCancelButton();
 
         initGeneralPlcFrame();
 
@@ -83,7 +97,8 @@ public  class  PlacementDialog <T extends SwitchablePagerBaseFragment>extends Fr
         switchablePager = (SwitchablePager) view.findViewById(R.id.switchable_pager);
 
         List<Object> contents = new ArrayList<>();
-        rankedPublicationListFragment = RankedPublicationListFragment.newInstance(new RankedPublicationListFragment.RankedPublicationListListener() {
+        rankedPublicationListFragment
+                = RankedPublicationListFragment.newInstance(new RankedPublicationListFragment.RankedPublicationListListener() {
             @Override
             public void onClickItem(Placement placement) {
                 if (mListener != null) {
@@ -106,8 +121,7 @@ public  class  PlacementDialog <T extends SwitchablePagerBaseFragment>extends Fr
             }
         }));
 
-
-        switchablePager.setContents(contents, ((AppCompatActivity)getContext()).getSupportFragmentManager());
+        switchablePager.setContents(contents, getChildFragmentManager());
     }
 
 
@@ -115,19 +129,19 @@ public  class  PlacementDialog <T extends SwitchablePagerBaseFragment>extends Fr
 //    private ArrayList<Publication> rankedList;
 //    private void initRankedListView(String searchWord) {
 //
-//        ListView rankedListView = new ListView(getContext());
+//        ListView rankedListView = new ListView(getActivity());
 //        rankedListView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 //
-//        rankedList = RVData.getInstance().publicationList.getSearchedAndRankedList(Calendar.getInstance(), searchWord, getContext());
+//        rankedList = RVData.getInstance().publicationList.getSearchedAndRankedList(Calendar.getInstance(), searchWord, getActivity());
 //
 //        ArrayAdapter<String> rankedListAdapter;
 //        ArrayList<String> rankedDataList = new ArrayList<>();
 //        for (Publication publication : rankedList) {
-//            rankedDataList.add(publication.toString(getContext()));
+//            rankedDataList.add(publication.toString(getActivity()));
 //        }
 //
 //        rankedListAdapter
-//                = new ArrayAdapter<>(getContext(),
+//                = new ArrayAdapter<>(getActivity(),
 //                android.R.layout.simple_list_item_1,
 //                rankedDataList);
 //
@@ -138,7 +152,7 @@ public  class  PlacementDialog <T extends SwitchablePagerBaseFragment>extends Fr
 //            @Override
 //            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 //
-//                Placement placement = new Placement(rankedList.get(position), getContext());
+//                Placement placement = new Placement(rankedList.get(position), getActivity());
 //
 //                if (mListener != null) {
 //                    mListener.onDecidePlacement(placement, mParentId);
@@ -146,17 +160,17 @@ public  class  PlacementDialog <T extends SwitchablePagerBaseFragment>extends Fr
 //            }
 //        });
 //
-//        rankedContent = new ViewContent(rankedListView, getContext().getString(R.string.history_title));
+//        rankedContent = new ViewContent(rankedListView, getActivity().getString(R.string.history_title));
 //    }
 
 //    private ViewContent defaultContent;
 //    private String[] defaultArray;
 //    private void initDefaultListView() {
-//        defaultArray = getContext().getResources().getStringArray(R.array.placement_array);
+//        defaultArray = getActivity().getResources().getStringArray(R.array.placement_array);
 //        ArrayAdapter<String> defaultListAdapter
-//                = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, defaultArray);
+//                = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, defaultArray);
 //
-//        ListView defaultListView = new ListView(getContext());
+//        ListView defaultListView = new ListView(getActivity());
 //        defaultListView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 //
 //        defaultListView.setAdapter(defaultListAdapter);
@@ -167,22 +181,9 @@ public  class  PlacementDialog <T extends SwitchablePagerBaseFragment>extends Fr
 //            }
 //        });
 //
-//        defaultContent = new ViewContent(defaultListView, getContext().getString(R.string.default_title));
+//        defaultContent = new ViewContent(defaultListView, getActivity().getString(R.string.default_title));
 //
 //    }
-
-    private void initCancelButton() {
-
-        Button cancelButton = (Button) view.findViewById(R.id.cancel_button);
-        cancelButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mListener != null) {
-                    mListener.onCancelClick();
-                }
-            }
-        });
-    }
 
     private LinearLayout generalPlcFrame;
     private void initGeneralPlcFrame() {
@@ -202,7 +203,7 @@ public  class  PlacementDialog <T extends SwitchablePagerBaseFragment>extends Fr
     private void initGeneralCloseButton() {
 
         Button generalCloseButton = (Button) view.findViewById(R.id.general_close_button);
-        generalCloseButton.setOnClickListener(new OnClickListener() {
+        generalCloseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 fadeOutFrame(generalPlcFrame);
@@ -217,14 +218,14 @@ public  class  PlacementDialog <T extends SwitchablePagerBaseFragment>extends Fr
 
     private void initGeneralOKButton() {
         Button generalOKButton = (Button) view.findViewById(R.id.general_ok_button);
-        generalOKButton.setOnClickListener(new OnClickListener() {
+        generalOKButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mPublication.setName(generalNameText.getText().toString());
 
                 RVData.getInstance().publicationList.setOrAdd(mPublication);
                 Publication publication = RVData.getInstance().publicationList.getCorrespondingData(mPublication);
-                Placement placement = new Placement(publication, getContext());
+                Placement placement = new Placement(publication, getActivity());
 
                 if (mListener != null) {
                     mListener.onDecidePlacement(placement, mParentId);
@@ -235,7 +236,7 @@ public  class  PlacementDialog <T extends SwitchablePagerBaseFragment>extends Fr
 
     private void fadeInGeneralFrame() {
 
-        String defaultArray[] = getContext().getResources().getStringArray(R.array.placement_array);
+        String defaultArray[] = getActivity().getResources().getStringArray(R.array.placement_array);
 
         generalPlcFrame.setVisibility(VISIBLE);
         categoryText.setText(defaultArray[mPublication.getCategory().num()]);
@@ -317,9 +318,9 @@ public  class  PlacementDialog <T extends SwitchablePagerBaseFragment>extends Fr
     private AppCompatSpinner magCategorySpinner;
     private void initMagCategorySpinner() {
         magCategorySpinner = (AppCompatSpinner) view.findViewById(R.id.magazine_category_spinner);
-        String[] magCatArray = getContext().getResources().getStringArray(R.array.magazine_array);
+        String[] magCatArray = getActivity().getResources().getStringArray(R.array.magazine_array);
         ArrayAdapter<String> magCatAdapter
-                = new ArrayAdapter<>(getContext(), android.R.layout.simple_dropdown_item_1line, magCatArray);
+                = new ArrayAdapter<>(getActivity(), android.R.layout.simple_dropdown_item_1line, magCatArray);
         magCategorySpinner.setAdapter(magCatAdapter);
 
         magCategorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -343,14 +344,14 @@ public  class  PlacementDialog <T extends SwitchablePagerBaseFragment>extends Fr
 
     private ArrayList<Pair<Calendar, String>> numbers;
     private void refreshNumberSpinner(Publication.MagazineCategory magCategory) {
-        numbers = Publication.getMagazineNumberArrayList(magCategory, getContext());
+        numbers = Publication.getMagazineNumberArrayList(magCategory, getActivity());
         ArrayList<String> numList = new ArrayList<>();
         for (Pair<Calendar, String> pair : numbers) {
             numList.add(pair.second);
         }
 
         ArrayAdapter<String> numAdapter
-                = new ArrayAdapter(getContext(), android.R.layout.simple_dropdown_item_1line, numList);
+                = new ArrayAdapter(getActivity(), android.R.layout.simple_dropdown_item_1line, numList);
         numberSpinner.setAdapter(numAdapter);
         numberSpinner.setSelection(numList.size() - 3);
 
@@ -363,7 +364,7 @@ public  class  PlacementDialog <T extends SwitchablePagerBaseFragment>extends Fr
 
     private void initMagazineCloseButton() {
         Button magazineCloseButton = (Button) view.findViewById(R.id.magazine_close_button);
-        magazineCloseButton.setOnClickListener(new OnClickListener() {
+        magazineCloseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 fadeOutFrame(magazineFrame);
@@ -373,7 +374,7 @@ public  class  PlacementDialog <T extends SwitchablePagerBaseFragment>extends Fr
 
     private void initMagazineOKButton() {
         Button magazineOKButton = (Button) view.findViewById(R.id.magazine_ok_button);
-        magazineOKButton.setOnClickListener(new OnClickListener() {
+        magazineOKButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -383,7 +384,7 @@ public  class  PlacementDialog <T extends SwitchablePagerBaseFragment>extends Fr
 
                 RVData.getInstance().publicationList.setOrAdd(mPublication);
                 Publication publication = RVData.getInstance().publicationList.getCorrespondingData(mPublication);
-                Placement placement = new Placement(publication, getContext());
+                Placement placement = new Placement(publication, getActivity());
 
                 if (mListener != null) {
                     mListener.onDecidePlacement(placement, mParentId);
@@ -393,8 +394,6 @@ public  class  PlacementDialog <T extends SwitchablePagerBaseFragment>extends Fr
     }
 
     public interface PlacementDialogListener {
-
-        void onCancelClick();
 
         void onDecidePlacement(Placement placement, String parentId);
 
@@ -407,7 +406,7 @@ public  class  PlacementDialog <T extends SwitchablePagerBaseFragment>extends Fr
 //        private ArrayList<Publication> mRankedList;
 //        public RankedPlacementListAdapter(Calendar today, String searchWord) {
 //
-//            mRankedList = RVData.getInstance().publicationList.getSearchedAndRankedList(today, searchWord, getContext());
+//            mRankedList = RVData.getInstance().publicationList.getSearchedAndRankedList(today, searchWord, getActivity());
 //        }
 //
 //        @Override
@@ -431,7 +430,7 @@ public  class  PlacementDialog <T extends SwitchablePagerBaseFragment>extends Fr
 //
 //            if (convertView == null) {
 //
-//                convertView = new PlacementCell(getContext(), (Publication) getItem(position), true, null, false) {
+//                convertView = new PlacementCell(getActivity(), (Publication) getItem(position), true, null, false) {
 //                    @Override
 //                    public void setLayoutParams(BaseAnimateView view) {
 //                        view.setLayoutParams(new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -444,5 +443,24 @@ public  class  PlacementDialog <T extends SwitchablePagerBaseFragment>extends Fr
 //            return convertView;
 //        }
 //    }
+
+    public static AtomicBoolean isShowing = new AtomicBoolean(false);
+
+    @Override
+    public void show(FragmentManager manager, String tag) {
+        if (isShowing.getAndSet(true)) return;
+
+        try {
+            super.show(manager, tag);
+        } catch (Exception e) {
+            isShowing.set(false);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        isShowing.set(false);
+    }
 
 }

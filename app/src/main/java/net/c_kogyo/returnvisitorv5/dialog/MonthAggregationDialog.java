@@ -1,8 +1,13 @@
-package net.c_kogyo.returnvisitorv5.dialogcontents;
+package net.c_kogyo.returnvisitorv5.dialog;
 
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,29 +25,51 @@ import java.util.Calendar;
  * Created by SeijiShii on 2017/05/07.
  */
 
-public class MonthAggregationDialog extends FrameLayout {
+public class MonthAggregationDialog extends DialogFragment {
 
-    private Calendar mMonth;
-    private MonthAggregationDialogListener mListener;
+    private static Calendar mMonth;
+    private static MonthAggregationDialogListener mListener;
 
-    public MonthAggregationDialog(@NonNull Context context,
-                                  Calendar month,
-                                  MonthAggregationDialogListener listener) {
-        super(context);
+    private static MonthAggregationDialog instance;
 
+    public static MonthAggregationDialog getInstance(Calendar month, MonthAggregationDialogListener listener) {
+        
         mMonth = (Calendar) month.clone();
         mListener = listener;
-
-        initCommon();
+        
+        if (instance == null) {
+            instance = new MonthAggregationDialog();
+        }
+        return instance;
     }
 
-    public MonthAggregationDialog(@NonNull Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        
+        builder.setTitle(R.string.month_aggregation);
+        
+        initCommon();
+        builder.setView(view);
+
+        builder.setNeutralButton(R.string.report_mail, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (mListener != null) {
+                    mListener.onClickMailButton(mMonth);
+                }
+            }
+        });
+
+        builder.setNegativeButton(R.string.close, null);
+        
+        return builder.create();
     }
 
     private View view;
     private void initCommon() {
-        view = LayoutInflater.from(getContext()).inflate(R.layout.month_aggregation_dialog, this);
+        
+        view = View.inflate(getActivity(), R.layout.month_aggregation_dialog, null);
 
         initMonthTextView();
         initPlacementCountText();
@@ -52,13 +79,11 @@ public class MonthAggregationDialog extends FrameLayout {
         initStudyCountText();
         initCarryOverText();
 
-        initCloseButton();
-        initMailButton();
     }
 
     private void initMonthTextView() {
         TextView monthTextView = (TextView) view.findViewById(R.id.month_text);
-        String monthText = DateTimeText.getMonthText(mMonth, getContext());
+        String monthText = DateTimeText.getMonthText(mMonth, getActivity());
         monthTextView.setText(monthText);
     }
 
@@ -92,41 +117,16 @@ public class MonthAggregationDialog extends FrameLayout {
         studyCountText.setText(String.valueOf(studyCount));
     }
 
-    private void initCloseButton() {
-        Button closeButton = (Button) view.findViewById(R.id.cancel_button);
-        closeButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mListener != null) {
-                    mListener.onClickCloseButton();
-                }
-            }
-        });
-    }
-
-    private void initMailButton() {
-        Button mailButton = (Button) view.findViewById(R.id.mail_button);
-        mailButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mListener != null) {
-                    mListener.onClickMailButton(mMonth);
-                }
-            }
-        });
-    }
-
     private void initCarryOverText() {
         TextView carryOverTextView = (TextView) view.findViewById(R.id.carry_over_text);
         long carryOver = AggregationOfMonth.getCarryOver(AggregationOfMonth.time(mMonth));
         int minute = (int)(carryOver / (60 * 1000));
 
-        String carryOverText = getContext().getString(R.string.carry_over, String.valueOf(minute));
+        String carryOverText = getActivity().getString(R.string.carry_over, String.valueOf(minute));
         carryOverTextView.setText(carryOverText);
     }
 
     public interface MonthAggregationDialogListener {
-        void onClickCloseButton();
 
         void onClickMailButton(Calendar month);
     }
