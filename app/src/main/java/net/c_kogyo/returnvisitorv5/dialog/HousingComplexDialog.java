@@ -1,14 +1,18 @@
-package net.c_kogyo.returnvisitorv5.dialogcontents;
+package net.c_kogyo.returnvisitorv5.dialog;
 
 import android.app.Activity;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -43,32 +47,41 @@ import java.util.ArrayList;
  * Created by SeijiShii on 2017/03/18.
  */
 
-public class HousingComplexDialog extends FrameLayout {
+public class HousingComplexDialog extends DialogFragment {
 
     // DONE: 2017/05/08 部屋名ソート
-    private Place mHousingComplex;
-    private HousingComplexDialogListener mListener;
+    static private Place mHousingComplex;
+    static private HousingComplexDialogListener mListener;
     private ArrayList<Place> addedRooms;
     private ArrayList<Place> removedRooms;
-    private boolean mShowDeleteButton, mShowOkButton;
-
-    public HousingComplexDialog(@NonNull Context context,
-                                Place housingComplex,
-                                HousingComplexDialogListener listener,
-                                boolean showDeleteButton,
-                                boolean showOkButton) {
-        super(context);
-        this.mHousingComplex = housingComplex;
-        this.mListener = listener;
-
+    static private boolean mShowDeleteButton, mShowOkButton;
+    
+    private static HousingComplexDialog instance;
+    
+    public static HousingComplexDialog getInstance(Place housingComplex, 
+                                                   HousingComplexDialogListener listener,
+                                                   boolean showDeleteButton,
+                                                   boolean showOkButton) {
+        mListener = listener;
+        mHousingComplex = housingComplex;
         mShowDeleteButton = showDeleteButton;
         mShowOkButton = showOkButton;
-
-        initCommon();
+        
+        if (instance == null) {
+            instance = new HousingComplexDialog();
+        }
+        return instance;
+        
     }
 
-    public HousingComplexDialog(@NonNull Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+        initCommon();
+        builder.setView(view);
+
+        return builder.create();
     }
 
     private View view;
@@ -77,7 +90,7 @@ public class HousingComplexDialog extends FrameLayout {
         addedRooms = new ArrayList<>();
         removedRooms = new ArrayList<>();
 
-        view = LayoutInflater.from(getContext()).inflate(R.layout.housing_complex_dialog, this);
+        view = View.inflate(getActivity(), R.layout.housing_complex_dialog, null);
 
         initNameText();
         initMenuButton();
@@ -103,16 +116,16 @@ public class HousingComplexDialog extends FrameLayout {
     private void initMenuButton() {
         final Button menuButton = (Button) view.findViewById(R.id.menu_button);
         if (mShowDeleteButton) {
-            menuButton.setOnClickListener(new OnClickListener() {
+            menuButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    PopupMenu popupMenu = new PopupMenu(getContext(), menuButton);
+                    PopupMenu popupMenu = new PopupMenu(getActivity(), menuButton);
                     popupMenu.getMenuInflater().inflate(R.menu.delete_menu, popupMenu.getMenu());
                     popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                         @Override
                         public boolean onMenuItemClick(MenuItem item) {
                             if (item.getItemId() == R.id.delete) {
-                                ConfirmDialog.confirmAndDeletePlace(getContext(), new DialogInterface.OnClickListener() {
+                                ConfirmDialog.confirmAndDeletePlace(getActivity(), new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         if (mListener != null) {
@@ -149,11 +162,11 @@ public class HousingComplexDialog extends FrameLayout {
 
     private void initAddRoomButton() {
         Button addRoomButton = (Button) view.findViewById(R.id.add_room_button);
-        addRoomButton.setOnClickListener(new OnClickListener() {
+        addRoomButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                InputUtil.hideSoftKeyboard((Activity) getContext());
+                InputUtil.hideSoftKeyboard((Activity) getActivity());
 
                 // DONE: 2017/03/27 リストに部屋を追加する処理
                 String name = roomText.getText().toString();
@@ -214,7 +227,7 @@ public class HousingComplexDialog extends FrameLayout {
 
     private void refreshRoomListHeight() {
 
-        int cellHeight = (int) (getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small));
+        int cellHeight = (int) (getActivity().getResources().getDimensionPixelSize(R.dimen.ui_height_small));
         int height;
         if (roomAdapter.getCount() <= 0) {
             height = cellHeight;
@@ -230,7 +243,7 @@ public class HousingComplexDialog extends FrameLayout {
         Button okButton = (Button) view.findViewById(R.id.ok_button);
 
         if (mShowOkButton) {
-            okButton.setOnClickListener(new OnClickListener() {
+            okButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     confirmEdit();
@@ -247,7 +260,7 @@ public class HousingComplexDialog extends FrameLayout {
 
     private void initCancelButton() {
         Button cancelButton = (Button) view.findViewById(R.id.cancel_button);
-        cancelButton.setOnClickListener(new OnClickListener() {
+        cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mListener != null) {
@@ -272,7 +285,7 @@ public class HousingComplexDialog extends FrameLayout {
 
     private void initBroadcasting() {
 
-        LocalBroadcastManager manager = LocalBroadcastManager.getInstance(getContext());
+        LocalBroadcastManager manager = LocalBroadcastManager.getInstance(getActivity());
         manager.registerReceiver(receiver, new IntentFilter(FetchAddressIntentService.SEND_FETCED_ADDRESS_ACTION));
 
     }
@@ -280,13 +293,13 @@ public class HousingComplexDialog extends FrameLayout {
     private void inquireAddress() {
         if (mHousingComplex.getAddress() == null || mHousingComplex.getAddress().equals("")) {
 
-            Intent addressServiceIntent = new Intent(getContext(), FetchAddressIntentService.class);
+            Intent addressServiceIntent = new Intent(getActivity(), FetchAddressIntentService.class);
 
             addressServiceIntent.putExtra(Constants.LATITUDE, mHousingComplex.getLatLng().latitude);
             addressServiceIntent.putExtra(Constants.LONGITUDE, mHousingComplex.getLatLng().longitude);
             addressServiceIntent.putExtra(FetchAddressIntentService.IS_USING_MAP_LOCALE, true);
 
-            getContext().startService(addressServiceIntent);
+            getActivity().startService(addressServiceIntent);
         }
     }
 
@@ -304,7 +317,7 @@ public class HousingComplexDialog extends FrameLayout {
     };
 
     private void confirmAndDeleteRoom(final Place place) {
-        ConfirmDialog.confirmAndDeletePlace(getContext(), new DialogInterface.OnClickListener() {
+        ConfirmDialog.confirmAndDeletePlace(getActivity(), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 removedRooms.add(place);
@@ -327,9 +340,9 @@ public class HousingComplexDialog extends FrameLayout {
         RVData.getInstance().placeList.setOrAdd(mHousingComplex);
         RVData.getInstance().placeList.addList(addedRooms);
         RVData.getInstance().placeList.removeList(removedRooms);
-        RVData.getInstance().saveData(getContext());
+        RVData.getInstance().saveData(getActivity());
 
-        RVCloudSync.syncDataIfLoggedIn(getContext());
+        RVCloudSync.syncDataIfLoggedIn(getActivity());
     }
 
     private class RoomListAdapter extends BaseAdapter{
@@ -359,7 +372,7 @@ public class HousingComplexDialog extends FrameLayout {
 
             if (convertView == null) {
                 convertView
-                        = new RoomListCell(getContext(),
+                        = new RoomListCell(getActivity(),
                                 (Place) getItem(position));
             } else {
                 ((RoomListCell) convertView).refreshData((Place) getItem(position));
@@ -401,7 +414,7 @@ public class HousingComplexDialog extends FrameLayout {
         private View view;
         private void initCommon() {
 
-            view = LayoutInflater.from(getContext()).inflate(R.layout.room_list_cell, this);
+            view = LayoutInflater.from(getActivity()).inflate(R.layout.room_list_cell, this);
             initPriorityMarker();
             initNameText();
             initMenuButton();
@@ -412,7 +425,7 @@ public class HousingComplexDialog extends FrameLayout {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
 
-                    InputUtil.hideSoftKeyboard((Activity) getContext());
+                    InputUtil.hideSoftKeyboard((Activity) getActivity());
 
                     switch (event.getAction()) {
                         case MotionEvent.ACTION_DOWN:
@@ -451,7 +464,7 @@ public class HousingComplexDialog extends FrameLayout {
             menuButton.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    PopupMenu popupMenu = new PopupMenu(getContext(), RoomListCell.this);
+                    PopupMenu popupMenu = new PopupMenu(getActivity(), RoomListCell.this);
                     popupMenu.getMenuInflater().inflate(R.menu.delete_menu, popupMenu.getMenu());
                     popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                         @Override

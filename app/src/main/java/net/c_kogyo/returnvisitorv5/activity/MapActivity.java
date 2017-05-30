@@ -1,10 +1,8 @@
 package net.c_kogyo.returnvisitorv5.activity;
 
 import android.Manifest;
-import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
-import android.app.Activity;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -15,7 +13,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
-import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -25,16 +22,18 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
+import android.widget.PopupWindow;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -56,7 +55,7 @@ import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.Work;
 import net.c_kogyo.returnvisitorv5.dialogcontents.AddWorkDialog;
-import net.c_kogyo.returnvisitorv5.dialogcontents.HousingComplexDialog;
+import net.c_kogyo.returnvisitorv5.dialog.HousingComplexDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.LoginDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.MapLongClickDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.PlaceDialog;
@@ -69,7 +68,6 @@ import net.c_kogyo.returnvisitorv5.util.ErrorLogIntentService;
 import net.c_kogyo.returnvisitorv5.util.InputUtil;
 import net.c_kogyo.returnvisitorv5.util.SoftKeyboard;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
-import net.c_kogyo.returnvisitorv5.util.WriteLogThread;
 import net.c_kogyo.returnvisitorv5.view.CountTimeFrame;
 
 import java.util.ArrayList;
@@ -475,19 +473,31 @@ public class MapActivity extends AppCompatActivity
     @Override
     public void onMapLongClick(LatLng latLng) {
         mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-        showMapLongClickDialog(latLng);
+        showMapLongClickPopup(latLng);
     }
 
-    private void showMapLongClickDialog(final LatLng latLng) {
+    private void showMapLongClickPopup(final LatLng latLng) {
 
         final Place tmpPlace = new Place(latLng, Place.Category.HOUSE);
         placeMarkers.addMarker(tmpPlace);
 
-        MapLongClickDialog mapLongClickDialog
-                = new MapLongClickDialog(this,
-                new MapLongClickDialog.MapLongClickDialogListener() {
+        final PopupWindow popupWindow = new PopupWindow(this);
+
+        // 背景設定
+        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.gray_fog_circle));
+
+        // タップ時に他のViewでキャッチされないための設定
+        popupWindow.setOutsideTouchable(true);
+        popupWindow.setFocusable(true);
+
+        popupWindow.setWidth(WindowManager.LayoutParams.WRAP_CONTENT);
+        popupWindow.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
+
+        popupWindow.setContentView(new MapLongClickDialog(this, new MapLongClickDialog.MapLongClickDialogListener() {
             @Override
             public void onClickNewSinglePlaceButton() {
+
+                popupWindow.dismiss();
 
                 startRecordVisitActivityForNewPlace(latLng);
 
@@ -502,68 +512,31 @@ public class MapActivity extends AppCompatActivity
 
             @Override
             public void onClickHousingComplexButton() {
-                // DONE: 2017/03/17 record complex action
-                // 同じダイアログを使用するのでアニメータリスナエンド後に表示メソッドを起動する
 
-                fadeOutOverlay();
-                fadeOutDialogFrame(new ViewUtil.PostFadeViewListener() {
-                    @Override
-                    public void postFade(View view) {
-                        dialogFrame.removeAllViews();
-                        showHousingComplexDialog(tmpPlace);
-                    }
-                });
+                popupWindow.dismiss();
 
+                showHousingComplexDialog(tmpPlace);
             }
 
             @Override
             public void onClickNotHomeButton() {
+
+                popupWindow.dismiss();
+
                 // DONE: 2017/03/17 record not home action
                 placeMarkers.removeByPlace(tmpPlace);
                 recordNotHome(tmpPlace);
-                fadeOutOverlay();
-                fadeOutDialogFrame(normalFadeOutListener);
             }
 
             @Override
             public void onClickCancelButton() {
-                placeMarkers.removeByPlace(tmpPlace);
-                fadeOutOverlay();
-                fadeOutDialogFrame(normalFadeOutListener);
-            }
-        });
-        fadeInOverlay(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                placeMarkers.removeByPlace(tmpPlace);
-                fadeOutOverlay();
-                fadeOutDialogFrame(normalFadeOutListener);
 
-                enableLogoButton(true);
-                enableSearchText(true);
-                return true;
-            }
-        });
-        fadeInDialogFrame(mapLongClickDialog);
-
-        overlay.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
+                popupWindow.dismiss();
 
                 placeMarkers.removeByPlace(tmpPlace);
-
-                fadeOutDialogFrame(normalFadeOutListener);
-                fadeOutOverlay();
-
-                enableLogoButton(true);
-                enableSearchText(true);
-                return true;
             }
-        });
-
-        enableLogoButton(false);
-        enableSearchText(false);
-
+        }));
+        popupWindow.showAtLocation(mapView, Gravity.CENTER, 0, 0);
     }
 
     @Override
@@ -829,70 +802,56 @@ public class MapActivity extends AppCompatActivity
         RVData.getInstance().placeList.setOrAdd(housingComplex);
         RVCloudSync.syncDataIfLoggedIn(this);
 
-        HousingComplexDialog housingComplexDialog
-                = new HousingComplexDialog(this,
-                        housingComplex,
-                        new HousingComplexDialog.HousingComplexDialogListener() {
+        HousingComplexDialog.getInstance(housingComplex,
+                new HousingComplexDialog.HousingComplexDialogListener() {
+                    @Override
+                    public void onClickAddRoomButton(Place newRoom) {
+                        fadeOutOverlay();
+                        fadeOutDialogFrame(normalFadeOutListener);
+
+                        startRecordVisitActivityForNewVisit(newRoom);
+                    }
+
+                    @Override
+                    public void onClickRoomCell(final Place room) {
+                        fadeOutOverlay();
+                        fadeOutDialogFrame(new ViewUtil.PostFadeViewListener() {
                             @Override
-                            public void onClickAddRoomButton(Place newRoom) {
-                                fadeOutOverlay();
-                                fadeOutDialogFrame(normalFadeOutListener);
-
-                                startRecordVisitActivityForNewVisit(newRoom);
+                            public void postFade(View view) {
+                                overlay.setVisibility(View.INVISIBLE);
+                                dialogFrame.removeAllViews();
+                                showPlaceDialog(room);
                             }
+                        });
+                    }
 
-                            @Override
-                            public void onClickRoomCell(final Place room) {
-                                fadeOutOverlay();
-                                fadeOutDialogFrame(new ViewUtil.PostFadeViewListener() {
-                                    @Override
-                                    public void postFade(View view) {
-                                        overlay.setVisibility(View.INVISIBLE);
-                                        dialogFrame.removeAllViews();
-                                        showPlaceDialog(room);
-                                    }
-                                });
-                            }
+                    @Override
+                    public void onClickOkButton(Place housingComplex) {
+                        placeMarkers.refreshMarker(housingComplex);
+                        fadeOutOverlay();
+                        fadeOutDialogFrame(normalFadeOutListener);
 
-                            @Override
-                            public void onClickOkButton(Place housingComplex) {
-                                placeMarkers.refreshMarker(housingComplex);
-                                fadeOutOverlay();
-                                fadeOutDialogFrame(normalFadeOutListener);
+                    }
 
-                            }
+                    @Override
+                    public void onClickCancelButton() {
+                        fadeOutOverlay();
+                        fadeOutDialogFrame(normalFadeOutListener);
 
-                            @Override
-                            public void onClickCancelButton() {
-                                fadeOutOverlay();
-                                fadeOutDialogFrame(normalFadeOutListener);
+                    }
 
-                            }
+                    @Override
+                    public void onDeleteHousingComplex(Place housingComplex) {
+                        fadeOutOverlay();
+                        fadeOutDialogFrame(normalFadeOutListener);
 
-                            @Override
-                            public void onDeleteHousingComplex(Place housingComplex) {
-                                fadeOutOverlay();
-                                fadeOutDialogFrame(normalFadeOutListener);
+                        placeMarkers.removeByPlace(housingComplex);
+                        RVData.getInstance().placeList.deleteById(housingComplex.getId());
+                        RVData.getInstance().saveData(MapActivity.this);
 
-                                placeMarkers.removeByPlace(housingComplex);
-                                RVData.getInstance().placeList.deleteById(housingComplex.getId());
-                                RVData.getInstance().saveData(MapActivity.this);
-
-                                RVCloudSync.syncDataIfLoggedIn(MapActivity.this);
-                            }
-                        }, true, true);
-        fadeInOverlay(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                InputUtil.hideSoftKeyboard(MapActivity.this);
-                fadeOutOverlay();
-                fadeOutDialogFrame(normalFadeOutListener);
-
-                return true;
-            }
-        });
-        fadeInDialogFrame(housingComplexDialog);
-        fadeInOverlay(normalOverlayTouchListener);
+                        RVCloudSync.syncDataIfLoggedIn(MapActivity.this);
+                    }
+                }, true, true).show(getFragmentManager(), null);
 
         enableLogoButton(false);
         enableSearchText(false);

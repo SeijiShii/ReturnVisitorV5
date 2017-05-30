@@ -41,8 +41,6 @@
 
         </LinearLayout>
 
-
-
         <!-- Name Text -->
         <EditText
             android:layout_width="match_parent"
@@ -97,7 +95,8 @@
         <ListView
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:id="@+id/room_list_view"/>
+            android:id="@+id/room_list_view"
+            android:layout_margin="5dp"/>
 
         <!-- OK -->
         <RelativeLayout

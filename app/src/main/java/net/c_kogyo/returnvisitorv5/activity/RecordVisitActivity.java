@@ -38,10 +38,8 @@ import net.c_kogyo.returnvisitorv5.data.Publication;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
-import net.c_kogyo.returnvisitorv5.data.Work;
 import net.c_kogyo.returnvisitorv5.dialogcontents.AddPersonDialog;
-import net.c_kogyo.returnvisitorv5.dialogcontents.AddWorkDialog;
-import net.c_kogyo.returnvisitorv5.dialogcontents.HousingComplexDialog;
+import net.c_kogyo.returnvisitorv5.dialog.HousingComplexDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.PersonDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.PlacementDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.SetPlaceDialog;
@@ -53,7 +51,6 @@ import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 import net.c_kogyo.returnvisitorv5.view.BaseAnimateView;
 import net.c_kogyo.returnvisitorv5.view.ClearEditText;
 import net.c_kogyo.returnvisitorv5.view.PlacementCell;
-import net.c_kogyo.returnvisitorv5.view.PriorityRater;
 import net.c_kogyo.returnvisitorv5.view.VisitDetailView;
 
 import java.text.DateFormat;
@@ -1024,9 +1021,7 @@ public class RecordVisitActivity extends AppCompatActivity {
 
     private void showHousingComplexDialog(Place housingComplex) {
 
-        HousingComplexDialog housingComplexDialog
-                = new HousingComplexDialog(this,
-                housingComplex,
+        HousingComplexDialog.getInstance( housingComplex,
                 new HousingComplexDialog.HousingComplexDialogListener() {
                     @Override
                     public void onClickAddRoomButton(Place newRoom) {
@@ -1054,18 +1049,8 @@ public class RecordVisitActivity extends AppCompatActivity {
                     public void onDeleteHousingComplex(Place housingComplex) {
 
                     }
-                }, false, false);
-        dialogFrame.addView(housingComplexDialog);
-        fadeDialogOverlay(true, null);
-        dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                InputUtil.hideSoftKeyboard(RecordVisitActivity.this);
-                fadeDialogOverlay(false, null);
-                return true;
-            }
-        });
-
+                }, false, false)
+                            .show(getFragmentManager(), null);
     }
 
     // DONE: 2017/03/26 PriorityRaterの挙動がいまいち
