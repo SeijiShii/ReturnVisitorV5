@@ -33,6 +33,10 @@ public class VisitSuggestion {
         return latestVisit;
     }
 
+    public Visit getLatestSeenVisit() {
+        return latestSeenVisit;
+    }
+
     public Visit.Priority getPriority() {
 
         for (VisitDetail visitDetail : latestVisit.getVisitDetails()) {

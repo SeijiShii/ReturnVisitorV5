@@ -83,13 +83,16 @@ public class SuggestionCell extends FrameLayout {
         }
         final DateFormat format = android.text.format.DateFormat.getMediumDateFormat(getContext());
         String lastVisitDate = getContext().getString(R.string.last_visit_date,
-                format.format(mVisitSuggestion.getLatestVisit().getDatetime().getTime()));
+                format.format(mVisitSuggestion.getLatestVisit().getDatetime().getTime()),
+                CalendarUtil.daysPast(mVisitSuggestion.getLatestVisit().getDatetime(), Calendar.getInstance()));
         lastVisitText.setText(lastVisitDate);
 
         int days = mVisitSuggestion.getPassedDaysFromLastSeen();
         String lastSeenMassage;
         if (days >= 0) {
-            lastSeenMassage = getContext().getString(R.string.last_seen, days);
+            lastSeenMassage = getContext().getString(R.string.last_seen,
+                    format.format(mVisitSuggestion.getLatestSeenVisit().getDatetime().getTime()),
+                    days);
         } else {
             lastSeenMassage = getContext().getString(R.string.never_seen);
         }
