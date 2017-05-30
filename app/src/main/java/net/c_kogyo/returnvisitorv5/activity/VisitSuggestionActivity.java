@@ -16,13 +16,18 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
+
+import com.google.android.gms.maps.MapView;
 
 import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.DismissedSuggestion;
 import net.c_kogyo.returnvisitorv5.data.Place;
+import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitSuggestion;
+import net.c_kogyo.returnvisitorv5.dialog.ShowInMapDialog;
 import net.c_kogyo.returnvisitorv5.util.AdMobHelper;
 import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
@@ -57,6 +62,7 @@ public class VisitSuggestionActivity extends AppCompatActivity {
         initMenuButton();
 
         initSuggestionList();
+
     }
 
     @Override
@@ -174,14 +180,31 @@ public class VisitSuggestionActivity extends AppCompatActivity {
         finish();
     }
 
-    private void moveToMapWithPlace(Visit visit) {
-        String placeId = visit.getPlaceId();
+    private void moveToMapWithPlace(Place place) {
+        String placeId = place.getId();
 
         Intent intent = new Intent(VisitSuggestionActivity.this, MapActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra(Place.PLACE, placeId);
 
         startActivity(intent);
+    }
+
+    private void showMapDialog(Visit visit) {
+
+        if (!RVData.getInstance().placeList.hasItem(visit.getPlaceId())) {
+            Toast.makeText(this, R.string.place_not_found, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        ShowInMapDialog mapDialog = ShowInMapDialog.newInstance(visit.getPlaceId(),
+                new ShowInMapDialog.MapDialogListener() {
+                    @Override
+                    public void onMarkerClick(Place place) {
+                        moveToMapWithPlace(place);
+                    }
+                });
+        mapDialog.show(getFragmentManager(), null);
     }
 
     private ListView suggestionList;
@@ -286,7 +309,7 @@ public class VisitSuggestionActivity extends AppCompatActivity {
 
                             @Override
                             public void onClickShowInMap(VisitSuggestion suggestion) {
-                                moveToMapWithPlace(suggestion.getLatestVisit());
+                                showMapDialog(suggestion.getLatestVisit());
                             }
                         });
             } else {

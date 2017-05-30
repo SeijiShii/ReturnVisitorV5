@@ -195,7 +195,7 @@ public abstract class VisitCell extends BaseAnimateView {
         PopupMenu visitCellPopup = new PopupMenu(getContext(), editButton);
         visitCellPopup.inflate(R.menu.visit_cell_menu);
         if (!(getContext() instanceof MapActivity)) {
-            visitCellPopup.getMenu().add(Menu.NONE, SHOW_IN_MAP_MENU, Menu.NONE, R.string.show_in_map_menu);
+            visitCellPopup.getMenu().add(Menu.NONE, SHOW_IN_MAP_MENU, Menu.NONE, R.string.show_in_map);
         }
         visitCellPopup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override

@@ -17,7 +17,7 @@ import java.util.ArrayList;
 
 public class PlaceMarkers {
 
-    private class PlaceMarker {
+    class PlaceMarker {
 
         String placeId;
         Marker marker;
@@ -26,6 +26,7 @@ public class PlaceMarkers {
             this.placeId = placeId;
             this.marker = marker;
         }
+
     }
 
     private ArrayList<PlaceMarker> markers;
@@ -114,5 +115,22 @@ public class PlaceMarkers {
         marker.marker.remove();
         markers.remove(marker);
     }
+
+    public static Marker addSingleMarker(Place place, GoogleMap map) {
+
+        MarkerOptions options = new MarkerOptions()
+                .position(place.getLatLng())
+                .draggable(false);
+        if (place.getCategory() == Place.Category.HOUSE) {
+            options.icon(BitmapDescriptorFactory.fromResource(Constants.markerRes[place.getPriority().num()]));
+        } else if (place.getCategory() == Place.Category.HOUSING_COMPLEX) {
+            options.icon(BitmapDescriptorFactory.fromResource(Constants.complexRes[place.getPriority().num()]));
+        } else if (place.getCategory() == Place.Category.ROOM) {
+            options.icon(BitmapDescriptorFactory.fromResource(Constants.buttonRes[place.getPriority().num()]));
+        }
+
+        return map.addMarker(options);
+    }
+
 
 }

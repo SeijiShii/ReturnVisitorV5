@@ -75,7 +75,7 @@ public class SetPlaceDialog extends FrameLayout
 
     private void initMapFrame() {
 
-        FrameLayout mapFrame = (FrameLayout) view.findViewById(R.id.map_frame);
+        FrameLayout mapFrame = (FrameLayout) view.findViewById(R.id.map_view);
 
         if (mMapView == null)
             return;
