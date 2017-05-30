@@ -17,24 +17,16 @@
             android:layout_height="match_parent"
             android:id="@+id/map_view"/>
 
-        <!-- Dark overlay -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/overlay"
-            android:background="@drawable/gradient_overlay"
-            android:visibility="invisible"/>
-
         <!-- Tool layer -->
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="match_parent">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:layout_alignParentTop="true">
 
                 <RelativeLayout
                     android:layout_width="50dp"
@@ -70,23 +62,7 @@
 
             </LinearLayout>
 
-            <!-- Dialog Frame -->
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1">
-
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/dialog_frame"
-                    android:background="@drawable/gray_fog_circle"
-                    android:layout_margin="10dp"
-                    android:visibility="invisible"
-                    android:layout_centerInParent="true"/>
-
-            </RelativeLayout>
-        </LinearLayout>
+        </RelativeLayout>
 
         <!-- Drawer layer -->
         <!-- Drawer Overlay -->

@@ -1,107 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Dialog title -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/ui_height_small"
-        android:textColor="@color/textColorGray"
-        android:textSize="@dimen/text_size_large"
-        android:gravity="center"
-        android:text="@string/add_work_title"/>
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <LinearLayout
+        <!-- Date mText -->
+        <TextView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="@dimen/ui_height_small"
+            android:id="@+id/date_text"
+            android:gravity="center"
+            android:textColor="@color/textColorGray"
+            android:textSize="@dimen/text_size_middle"
+            android:background="@drawable/gray_trans_circle"
+            android:layout_margin="5dp"/>
 
-            <!-- Date mText -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/ui_height_small"
-                android:id="@+id/date_text"
-                android:gravity="center"
-                android:textColor="@color/textColorGray"
-                android:textSize="@dimen/text_size_middle"
-                android:background="@drawable/gray_trans_circle"
-                android:layout_margin="5dp"/>
+        <!-- Start time Text -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/ui_height_small"
+            android:id="@+id/start_time_text"
+            android:gravity="center"
+            android:textColor="@color/textColorGray"
+            android:textSize="@dimen/text_size_middle"
+            android:background="@drawable/gray_trans_circle"
+            android:layout_margin="5dp"/>
 
-            <!-- Start time mText -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/ui_height_small"
-                android:id="@+id/start_time_text"
-                android:gravity="center"
-                android:textColor="@color/textColorGray"
-                android:textSize="@dimen/text_size_middle"
-                android:background="@drawable/gray_trans_circle"
-                android:layout_margin="5dp"/>
+        <!-- End time Text -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/ui_height_small"
+            android:id="@+id/end_time_text"
+            android:gravity="center"
+            android:textColor="@color/textColorGray"
+            android:textSize="@dimen/text_size_middle"
+            android:background="@drawable/gray_trans_circle"
+            android:layout_margin="5dp"/>
 
-            <!-- End time mText -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/ui_height_small"
-                android:id="@+id/end_time_text"
-                android:gravity="center"
-                android:textColor="@color/textColorGray"
-                android:textSize="@dimen/text_size_middle"
-                android:background="@drawable/gray_trans_circle"
-                android:layout_margin="5dp"/>
+        <!-- Duration Text -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/ui_height_small"
+            android:id="@+id/duration_text"
+            android:gravity="center"
+            android:textColor="@color/textColorGray"
+            android:textSize="@dimen/text_size_middle"
+            android:layout_margin="5dp"/>
 
-            <!-- Duration mText -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/ui_height_small"
-                android:id="@+id/duration_text"
-                android:gravity="center"
-                android:textColor="@color/textColorGray"
-                android:textSize="@dimen/text_size_middle"
-                android:layout_margin="5dp"/>
 
-            <!-- OK -->
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/ui_height_small">
+    </LinearLayout>
 
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_alignParentRight="true"
-                    android:id="@+id/ok_button"
-                    android:background="@drawable/trans_blue_selector"
-                    android:textSize="@dimen/text_size_middle"
-                    android:textColor="@color/colorPrimary"
-                    android:text="@string/ok"/>
-
-            </RelativeLayout>
-
-            <!-- Cancel -->
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/ui_height_small">
-
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_alignParentRight="true"
-                    android:id="@+id/cancel_button"
-                    android:background="@drawable/trans_orange_selector"
-                    android:textSize="@dimen/text_size_middle"
-                    android:textColor="@color/colorAccent"
-                    android:text="@string/cancel"/>
-
-            </RelativeLayout>
-
-        </LinearLayout>
-
-    </ScrollView>
-
-</LinearLayout>
+</ScrollView>

@@ -9,15 +9,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Dialog title -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/ui_height_small"
-            android:textColor="@color/textColorGray"
-            android:textSize="@dimen/text_size_large"
-            android:gravity="center"
-            android:text="@string/login_title"/>
-
         <!-- User Name Text -->
         <EditText
             android:layout_width="match_parent"

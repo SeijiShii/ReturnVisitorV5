@@ -29,7 +29,7 @@ import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.Work;
-import net.c_kogyo.returnvisitorv5.dialogcontents.AddWorkDialog;
+import net.c_kogyo.returnvisitorv5.dialog.AddWorkDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.DayAggregationDialog;
 import net.c_kogyo.returnvisitorv5.fragment.WorkFragment;
 import net.c_kogyo.returnvisitorv5.util.AdMobHelper;
@@ -576,7 +576,7 @@ public class WorkPagerActivity extends AppCompatActivity {
     }
 
     private void showAddWorkDialog() {
-        AddWorkDialog addWorkDialog = new AddWorkDialog(this, new AddWorkDialog.AddWorkDialogListener() {
+        AddWorkDialog.getInstance(new AddWorkDialog.AddWorkDialogListener() {
             @Override
             public void onOkClick(final Work work) {
                 fadeDialogOverlay(false, new DialogPostAnimationListener() {
@@ -587,22 +587,17 @@ public class WorkPagerActivity extends AppCompatActivity {
                 });
             }
 
-            @Override
-            public void onCancelClick() {
-                fadeDialogOverlay(false, null);
-            }
         },
                 false,
-                mDatePagerAdapter.getDayItem(mPager.getCurrentItem()));
-        dialogFrame.addView(addWorkDialog);
-        fadeDialogOverlay(true ,null);
-        dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                fadeDialogOverlay(false, null);
-                return true;
-            }
-        });
+                mDatePagerAdapter.getDayItem(mPager.getCurrentItem())).show(getFragmentManager(), null);
+//        fadeDialogOverlay(true ,null);
+//        dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                fadeDialogOverlay(false, null);
+//                return true;
+//            }
+//        });
     }
 
     private void onAddWork(Work work) {

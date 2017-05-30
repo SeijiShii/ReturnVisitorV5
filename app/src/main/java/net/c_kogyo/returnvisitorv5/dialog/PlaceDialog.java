@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Point;
@@ -34,6 +35,8 @@ import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 import net.c_kogyo.returnvisitorv5.view.BaseAnimateView;
 import net.c_kogyo.returnvisitorv5.view.PlaceCell;
 import net.c_kogyo.returnvisitorv5.view.VisitCell;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by SeijiShii on 2017/03/14.
@@ -222,6 +225,25 @@ public class PlaceDialog extends DialogFragment {
         void onDeleteClick(Place place);
 
         void onEditVisitClick(Visit visit);
+    }
+
+    public static AtomicBoolean isShowing = new AtomicBoolean(false);
+
+    @Override
+    public void show(FragmentManager manager, String tag) {
+        if (isShowing.getAndSet(true)) return;
+
+        try {
+            super.show(manager, tag);
+        } catch (Exception e) {
+            isShowing.set(false);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        isShowing.set(false);
     }
 
 }

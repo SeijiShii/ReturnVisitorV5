@@ -54,10 +54,10 @@ import net.c_kogyo.returnvisitorv5.data.PlaceMarkers;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.Work;
-import net.c_kogyo.returnvisitorv5.dialogcontents.AddWorkDialog;
+import net.c_kogyo.returnvisitorv5.dialog.AddWorkDialog;
 import net.c_kogyo.returnvisitorv5.dialog.HousingComplexDialog;
-import net.c_kogyo.returnvisitorv5.dialogcontents.LoginDialog;
-import net.c_kogyo.returnvisitorv5.dialogcontents.MapLongClickDialog;
+import net.c_kogyo.returnvisitorv5.dialog.LoginDialog;
+import net.c_kogyo.returnvisitorv5.dialog.MapLongClickDialog;
 import net.c_kogyo.returnvisitorv5.dialog.PlaceDialog;
 import net.c_kogyo.returnvisitorv5.dialog.SearchDialog;
 import net.c_kogyo.returnvisitorv5.service.TimeCountIntentService;
@@ -135,8 +135,7 @@ public class MapActivity extends AppCompatActivity
         AdMobHelper.setAdView(this);
 
         initMapView(savedInstanceState);
-        initOverlay();
-        initDialogFrame();
+
         initDrawerOverlay();
 
         loadLoginState();
@@ -502,11 +501,7 @@ public class MapActivity extends AppCompatActivity
 
                 // DONE: 2017/03/17 record single place action
                 placeMarkers.removeByPlace(tmpPlace);
-                fadeOutOverlay();
-                fadeOutDialogFrame(normalFadeOutListener);
 
-                enableLogoButton(true);
-                enableSearchText(true);
             }
 
             @Override
@@ -575,69 +570,6 @@ public class MapActivity extends AppCompatActivity
 
         RVCloudSync.syncDataIfLoggedIn(this);
 
-    }
-
-    private View overlay;
-    private void initOverlay() {
-        overlay = findViewById(R.id.overlay);
-    }
-
-    private void fadeInOverlay(View.OnTouchListener onTouchListener) {
-
-        if (overlay.getVisibility() == View.VISIBLE) return;
-
-        ViewUtil.fadeView(overlay, true, onTouchListener, null, 500);
-    }
-
-    private void fadeOutOverlay() {
-
-        if (overlay.getVisibility() == View.INVISIBLE)
-            return;
-
-        ViewUtil.fadeView(overlay, false, null,
-                new ViewUtil.PostFadeViewListener() {
-                    @Override
-                    public void postFade(View view) {
-
-                    }
-                }, 500);
-      }
-
-    private void fadeInDialogFrame(View dialogView) {
-
-        if (dialogFrame.getVisibility() == View.VISIBLE)
-            return;
-
-        dialogFrame.addView(dialogView);
-        ViewUtil.fadeView(dialogFrame, true,
-                new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        return true;
-                    }
-                }, null, 500);
-    }
-
-    private void fadeOutDialogFrame(ViewUtil.PostFadeViewListener postFadeViewListener) {
-
-        ViewUtil.fadeView(dialogFrame, false, null, postFadeViewListener, 500);
-
-    }
-
-    ViewUtil.PostFadeViewListener normalFadeOutListener = new ViewUtil.PostFadeViewListener() {
-        @Override
-        public void postFade(View view) {
-            dialogFrame.removeAllViews();
-            dialogFrame.setVisibility(View.INVISIBLE);
-
-            enableLogoButton(true);
-            enableSearchText(true);
-        }
-    };
-
-    private FrameLayout dialogFrame;
-    private void initDialogFrame() {
-        dialogFrame = (FrameLayout) findViewById(R.id.dialog_frame);
     }
 
     @Override
@@ -748,8 +680,6 @@ public class MapActivity extends AppCompatActivity
                             }
                         }).show(getFragmentManager(), null);
 
-        enableLogoButton(false);
-        enableSearchText(false);
     }
 
     // Method for Record Visit Activity
@@ -823,8 +753,6 @@ public class MapActivity extends AppCompatActivity
                     }
                 }, true, true).show(getFragmentManager(), null);
 
-        enableLogoButton(false);
-        enableSearchText(false);
     }
 
     private void recordNotHome(Place place) {
@@ -1164,32 +1092,15 @@ public class MapActivity extends AppCompatActivity
     }
 
     private void showAddWorkDialog() {
-        AddWorkDialog addWorkDialog
-                = new AddWorkDialog(this,
-                new AddWorkDialog.AddWorkDialogListener() {
+        AddWorkDialog.getInstance(new AddWorkDialog.AddWorkDialogListener() {
                     @Override
                     public void onOkClick(Work work) {
                         startWorkPagerActivityWithNewWork(work);
 
-                        fadeOutOverlay();
-                        fadeOutDialogFrame(normalFadeOutListener);
-
-                    }
-
-                    @Override
-                    public void onCancelClick() {
-                        fadeOutOverlay();
-                        fadeOutDialogFrame(normalFadeOutListener);
-
                     }
                 },
                 true,
-                Calendar.getInstance());
-        fadeInDialogFrame(addWorkDialog);
-        fadeInOverlay(normalOverlayTouchListener);
-
-        enableLogoButton(false);
-        enableSearchText(false);
+                Calendar.getInstance()).show(getFragmentManager(), null);
     }
 
     private void initSuggestionButton() {
@@ -1302,34 +1213,11 @@ public class MapActivity extends AppCompatActivity
         showLoginDialog();
     }
 
+//    private static String LOGIN_DIALOG = "login_dialog";
     private LoginDialog loginDialog;
     private void showLoginDialog() {
-        loginDialog = new LoginDialog(this,
-                new LoginDialog.LoginDialogListener() {
 
-            @Override
-            public void onStartLogin() {
-                // DONE: 2017/05/11  onStartLogin()
-                // DONE: 2017/05/13 ログイン通信中はダイアログを消せないようにする
-                overlay.setOnTouchListener(new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        return true;
-                    }
-                });
-            }
-
-            @Override
-            public void onStartCreateAccount() {
-
-            }
-
-            @Override
-            public void onClickClose() {
-                fadeOutOverlay();
-                fadeOutDialogFrame(normalFadeOutListener);
-
-            }
+        loginDialog = LoginDialog.getInstance(new LoginDialog.LoginDialogListener() {
 
             @Override
             public void onLogoutClick() {
@@ -1337,12 +1225,7 @@ public class MapActivity extends AppCompatActivity
                 confirmLogout();
             }
         });
-
-        fadeInDialogFrame(loginDialog);
-        fadeInOverlay(normalOverlayTouchListener);
-
-        enableLogoButton(false);
-        enableSearchText(false);
+        loginDialog.show(getFragmentManager(), null);
     }
 
     private void confirmLogout() {
@@ -1513,7 +1396,6 @@ public class MapActivity extends AppCompatActivity
 
         if (loginDialog != null) {
             loginDialog.onLoginResult(result);
-            overlay.setOnTouchListener(normalOverlayTouchListener);
         }
 
         refreshLoginButton();
@@ -1551,19 +1433,9 @@ public class MapActivity extends AppCompatActivity
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (s.length() <= 0) {
-                    dummyFocusView.requestFocus();
-                    InputUtil.hideSoftKeyboard(MapActivity.this);
-                    if (isSearchDialogShowing) {
-                        fadeOutDialogFrame(normalFadeOutListener);
-                    }
-                } else {
-                    if (dialogFrame.getVisibility() == View.INVISIBLE && !isSearchDialogShowing) {
+                if (s.length() > 0) {
+                    if (getFragmentManager().findFragmentByTag(SEARCH_DIALOG) == null) {
                         showSearchDialog(s.toString());
-                    } else {
-                        if (isSearchDialogShowing) {
-                            searchDialog.changeSearchWord(s.toString());
-                        }
                     }
                 }
             }
@@ -1606,14 +1478,12 @@ public class MapActivity extends AppCompatActivity
         });
     }
 
-    private boolean isSearchDialogShowing = false;
-    private SearchDialog searchDialog;
+    private String SEARCH_DIALOG = "search_dialog";
     private void showSearchDialog(String initialSearchWord) {
 
-        searchDialog = SearchDialog.getInstance(new SearchDialog.SearchDialogListener() {
+        final SearchDialog searchDialog = SearchDialog.getInstance(new SearchDialog.SearchDialogListener() {
             @Override
             public void onCancel() {
-                fadeOutOverlay();
                 if (searchText.getText().length() > 0) {
                     searchText.setText("");
                 }
@@ -1629,38 +1499,37 @@ public class MapActivity extends AppCompatActivity
                     mMap.animateCamera(CameraUpdateFactory.newLatLng(place.getLatLng()));
                 }
 
-                isSearchDialogShowing = false;
                 if (searchText.getText().length() > 0) {
                     searchText.setText("");
                 }
+
             }
 
             @Override
             public void onClickPlace(final Place place) {
 
-                isSearchDialogShowing = false;
                 if (searchText.getText().length() > 0) {
                     searchText.setText("");
                 }
-                dialogFrame.removeAllViews();
 
-                fadeInOverlay(normalOverlayTouchListener);
                 showDialogFitToPlace(place);
                 mMap.animateCamera(CameraUpdateFactory.newLatLng(place.getLatLng()));
+            }
 
+            @Override
+            public void onTextChanged(String text) {
+                searchText.setText(text);
             }
         },initialSearchWord);
-        searchDialog.show(getFragmentManager(), null);
-        isSearchDialogShowing = true;
-        enableLogoButton(false);
+        searchDialog.show(getFragmentManager(), SEARCH_DIALOG);
 
         final Handler handler = new Handler();
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while (isSearchDialogShowing) {
+                while (getFragmentManager().findFragmentByTag(SEARCH_DIALOG) != null) {
                     try {
-                        Thread.sleep(100);
+                        Thread.sleep(50);
                     } catch (InterruptedException e) {
 
                     }
@@ -1675,35 +1544,6 @@ public class MapActivity extends AppCompatActivity
                 });
             }
         }).start();
-    }
-
-
-    private View.OnTouchListener normalOverlayTouchListener = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View v, MotionEvent event) {
-            fadeOutOverlay();
-            fadeOutDialogFrame(normalFadeOutListener);
-            return true;
-        }
-    };
-
-    private void enableLogoButton(boolean enabled) {
-        ViewUtil.halfFadeView(logoButton, enabled, null, null, 500);
-        if (enabled) {
-            ViewUtil.setOnClickListener(logoButton, new ViewUtil.OnViewClickListener() {
-                @Override
-                public void onViewClick() {
-                    openCloseDrawer();
-                }
-            });
-        } else {
-            logoButton.setOnClickListener(null);
-        }
-    }
-
-    private void enableSearchText(boolean enabled) {
-        ViewUtil.halfFadeView(searchText, enabled, null, null, 500);
-        searchText.setEnabled(enabled);
     }
 
     private void showDialogFitToPlace(Place place) {

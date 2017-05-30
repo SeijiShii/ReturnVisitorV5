@@ -1,9 +1,15 @@
-package net.c_kogyo.returnvisitorv5.dialogcontents;
+package net.c_kogyo.returnvisitorv5.dialog;
 
 import android.app.Activity;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -20,31 +26,47 @@ import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
 import net.c_kogyo.returnvisitorv5.util.InputUtil;
 import net.c_kogyo.returnvisitorv5.view.RightTextSwitch;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
+
 /**
  * Created by SeijiShii on 2017/05/10.
  */
 
-public class LoginDialog extends FrameLayout {
+public class LoginDialog extends DialogFragment {
 
-    private LoginDialogListener mListener;
+    private static LoginDialogListener mListener;
     private static final int TEXT_LENGTH = 8;
 
-    public LoginDialog(@NonNull Context context,
-                       LoginDialogListener listener) {
-        super(context);
-
+    private static LoginDialog instance;
+    
+    public static LoginDialog getInstance(LoginDialogListener listener) {
+        
         mListener = listener;
-
-        initCommon();
+        
+        if (instance == null) {
+            instance = new LoginDialog();
+        }
+        return instance;
     }
 
-    public LoginDialog(@NonNull Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        
+        initCommon();
+        builder.setView(view);
+        
+        builder.setTitle(R.string.login_title);
+        return builder.create();
     }
 
     private View view;
     private void initCommon() {
-        view = LayoutInflater.from(getContext()).inflate(R.layout.login_dialog, this);
+        view = View.inflate(getActivity(), R.layout.login_dialog, null);
 
         mShowPassword = false;
 
@@ -141,7 +163,7 @@ public class LoginDialog extends FrameLayout {
     private void initLoginButton() {
         loginButton = (Button) view.findViewById(R.id.login_button);
         refreshLoginButton();
-        loginButton.setOnClickListener(new OnClickListener() {
+        loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (MapActivity.isLoggedIn()) {
@@ -175,7 +197,7 @@ public class LoginDialog extends FrameLayout {
     private void initCreateAccountButton() {
         createAccountButton = (Button) view.findViewById(R.id.create_user_button);
 
-        createAccountButton.setOnClickListener(new OnClickListener() {
+        createAccountButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onClickCreateAccount();
@@ -197,12 +219,10 @@ public class LoginDialog extends FrameLayout {
     private void initCloseButton() {
         closeButton = (Button) view.findViewById(R.id.close_button);
         // DONE: 2017/05/11 change layout to CLOSE
-        closeButton.setOnClickListener(new OnClickListener() {
+        closeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mListener != null) {
-                    mListener.onClickClose();
-                }
+                dismiss();
             }
         });
     }
@@ -219,17 +239,12 @@ public class LoginDialog extends FrameLayout {
 
     private void onLogInClick() {
 
-        InputUtil.hideSoftKeyboard((Activity) getContext());
+        setCancelable(false);
+
+        InputUtil.hideSoftKeyboard(getActivity());
 
         String userName = userNameTextView.getText().toString();
         String password = passwordTextView.getText().toString();
-
-        // test
-//        try {
-//            RVCloudSync.getInstance().startSendingUserData("seijishii", "fugafuga");
-//        } catch (RVCloudSync.RVCloudSyncException e) {
-//            e.printStackTrace();
-//        }
 
         if (validateTexts(userName, password)) {
             try {
@@ -237,13 +252,11 @@ public class LoginDialog extends FrameLayout {
                         .startSendingUserData(userName,
                                                 password,
                                                 RVCloudSync.RVCloudSyncMethod.LOGIN,
-                                                getContext(),
+                                                getActivity(),
                                                 false);
                 messageTextView.setText(R.string.start_login);
 
                 if (mListener != null) {
-                    mListener.onStartLogin();
-
                     progressBar.setVisibility(VISIBLE);
 
                     enableLoginButton(false);
@@ -261,17 +274,13 @@ public class LoginDialog extends FrameLayout {
     }
 
     private void onClickCreateAccount() {
-        InputUtil.hideSoftKeyboard((Activity) getContext());
+
+        setCancelable(false);
+
+        InputUtil.hideSoftKeyboard(getActivity());
 
         String userName = userNameTextView.getText().toString();
         String password = passwordTextView.getText().toString();
-
-        // test
-//        try {
-//            RVCloudSync.getInstance().startSendingUserData("seijishii", "fugafuga");
-//        } catch (RVCloudSync.RVCloudSyncException e) {
-//            e.printStackTrace();
-//        }
 
         if (validateTexts(userName, password)) {
             try {
@@ -279,12 +288,11 @@ public class LoginDialog extends FrameLayout {
                         startSendingUserData(userName,
                                                 password,
                                                 RVCloudSync.RVCloudSyncMethod.CREATE_USER,
-                                                getContext(),
+                                                getActivity(),
                                                 false);
                 messageTextView.setText(R.string.creating_user);
 
                 if (mListener != null) {
-                    mListener.onStartCreateAccount();
 
                     progressBar.setVisibility(VISIBLE);
 
@@ -303,16 +311,16 @@ public class LoginDialog extends FrameLayout {
         StringBuilder builder = new StringBuilder();
 
         if (userName.length() < TEXT_LENGTH ) {
-            builder.append(getContext().getString(R.string.short_user_name, userName));
+            builder.append(getActivity().getString(R.string.short_user_name, userName));
 
             if (password.length() < TEXT_LENGTH) {
-                builder.append("\n").append(getContext().getString(R.string.short_password));
+                builder.append("\n").append(getActivity().getString(R.string.short_password));
             }
             messageTextView.setText(builder.toString());
             return false;
 
         } else if (password.length() < TEXT_LENGTH) {
-            builder.append(getContext().getString(R.string.short_password));
+            builder.append(getActivity().getString(R.string.short_password));
             messageTextView.setText(builder.toString());
             return false;
         }
@@ -321,18 +329,14 @@ public class LoginDialog extends FrameLayout {
 
     public interface LoginDialogListener {
 
-        void onStartLogin();
-
-        void onStartCreateAccount();
-
         void onLogoutClick();
-
-        void onClickClose();
 
     }
 
     public void onLoginResult(RVCloudSync.RequestResult result){
         // DONE: 2017/05/11  onRequestResult(RVCloudSync.ResultStatus statusCode)
+
+        setCancelable(true);
 
         progressBar.setVisibility(INVISIBLE);
         enableCloseButton(true);
@@ -341,21 +345,21 @@ public class LoginDialog extends FrameLayout {
         switch (result.statusCode) {
             case STATUS_202_AUTHENTICATED:
                 MapActivity.setIsLoggedIn(true);
-                message = getContext().getString(R.string.login_success, result.userData.userName);
+                message = getActivity().getString(R.string.login_success, result.userData.userName);
                 break;
 
             case STATUS_401_UNAUTHORIZED:
                 MapActivity.setIsLoggedIn(false);
-                message = getContext().getString(R.string.login_failed) + "\n"
-                        + getContext().getString(R.string.wrong_password, result.userData.userName);
+                message = getActivity().getString(R.string.login_failed) + "\n"
+                        + getActivity().getString(R.string.wrong_password, result.userData.userName);
                 enableUserNameText(true);
                 enablePasswordText(true);
                 break;
 
             case STATUS_404_NOT_FOUND:
                 MapActivity.setIsLoggedIn(false);
-                message = getContext().getString(R.string.login_failed) + "\n"
-                        + getContext().getString(R.string.user_not_found, result.userData.userName);
+                message = getActivity().getString(R.string.login_failed) + "\n"
+                        + getActivity().getString(R.string.user_not_found, result.userData.userName);
                 enableAccountButton(true);
                 enableUserNameText(true);
                 enablePasswordText(true);
@@ -363,13 +367,13 @@ public class LoginDialog extends FrameLayout {
 
             case STATUS_201_CREATED:
                 MapActivity.setIsLoggedIn(true);
-                message = getContext().getString(R.string.create_user_success, result.userData.userName);
+                message = getActivity().getString(R.string.create_user_success, result.userData.userName);
                 break;
 
             case STATUS_400_DUPLICATE_USER_NAME:
                 MapActivity.setIsLoggedIn(false);
-                message = getContext().getString(R.string.create_user_failed) + "\n"
-                        + getContext().getString(R.string.duplicate_user, result.userData.userName);
+                message = getActivity().getString(R.string.create_user_failed) + "\n"
+                        + getActivity().getString(R.string.duplicate_user, result.userData.userName);
                 enableAccountButton(true);
                 enableUserNameText(true);
                 enablePasswordText(true);
@@ -377,8 +381,8 @@ public class LoginDialog extends FrameLayout {
 
             case STATUS_400_SHORT_PASSWORD:
                 MapActivity.setIsLoggedIn(false);
-                message = getContext().getString(R.string.create_user_failed) + "\n"
-                        + getContext().getString(R.string.short_password);
+                message = getActivity().getString(R.string.create_user_failed) + "\n"
+                        + getActivity().getString(R.string.short_password);
                 enableAccountButton(true);
                 enableUserNameText(true);
                 enablePasswordText(true);
@@ -386,8 +390,8 @@ public class LoginDialog extends FrameLayout {
 
             case STATUS_400_SHORT_USER_NAME:
                 MapActivity.setIsLoggedIn(false);
-                message = getContext().getString(R.string.create_user_failed) + "\n"
-                        + getContext().getString(R.string.short_user_name, result.userData.userName);
+                message = getActivity().getString(R.string.create_user_failed) + "\n"
+                        + getActivity().getString(R.string.short_user_name, result.userData.userName);
                 enableAccountButton(true);
                 enableUserNameText(true);
                 enablePasswordText(true);
@@ -395,8 +399,8 @@ public class LoginDialog extends FrameLayout {
 
             case REQUEST_TIME_OUT:
                 MapActivity.setIsLoggedIn(false);
-                message = getContext().getString(R.string.login_failed) + "\n"
-                        + getContext().getString(R.string.request_time_out);
+                message = getActivity().getString(R.string.login_failed) + "\n"
+                        + getActivity().getString(R.string.request_time_out);
                 enableAccountButton(true);
                 enableUserNameText(true);
                 enablePasswordText(true);
@@ -404,8 +408,8 @@ public class LoginDialog extends FrameLayout {
 
             case SERVER_NOT_AVAILABLE:
                 MapActivity.setIsLoggedIn(false);
-                message = getContext().getString(R.string.login_failed) + "\n"
-                        + getContext().getString(R.string.server_not_available);
+                message = getActivity().getString(R.string.login_failed) + "\n"
+                        + getActivity().getString(R.string.server_not_available);
                 enableAccountButton(true);
                 enableUserNameText(true);
                 enablePasswordText(true);
@@ -442,5 +446,23 @@ public class LoginDialog extends FrameLayout {
     // DONE: 2017/05/13 ログインダイアログのUIの動きについてはまだいろいろ考える必要がある。
     // DONE: 2017/05/13  editTextの活性
 
+    public static AtomicBoolean isShowing = new AtomicBoolean(false);
+
+    @Override
+    public void show(FragmentManager manager, String tag) {
+        if (isShowing.getAndSet(true)) return;
+
+        try {
+            super.show(manager, tag);
+        } catch (Exception e) {
+            isShowing.set(false);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        isShowing.set(false);
+    }
 
 }

@@ -3,6 +3,7 @@ package net.c_kogyo.returnvisitorv5.dialog;
 import android.Manifest;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,6 +23,8 @@ import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.PlaceMarkers;
 import net.c_kogyo.returnvisitorv5.data.RVData;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static net.c_kogyo.returnvisitorv5.activity.MapActivity.MY_LOCATION_TAG;
 
@@ -218,6 +221,8 @@ public class ShowInMapDialog extends DialogFragment
         super.onResume();
 
         mMapView.onResume();
+        isShowing.set(false);
+
     }
 
     @Override
@@ -242,4 +247,19 @@ public class ShowInMapDialog extends DialogFragment
     public interface MapDialogListener {
         void onMarkerClick(Place place);
     }
+
+    public static AtomicBoolean isShowing = new AtomicBoolean(false);
+
+    @Override
+    public void show(FragmentManager manager, String tag) {
+        if (isShowing.getAndSet(true)) return;
+
+        try {
+            super.show(manager, tag);
+        } catch (Exception e) {
+            isShowing.set(false);
+        }
+    }
+
+
 }

@@ -1,10 +1,17 @@
-package net.c_kogyo.returnvisitorv5.dialogcontents;
+package net.c_kogyo.returnvisitorv5.dialog;
 
 import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,34 +28,61 @@ import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 
 import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by SeijiShii on 2017/04/14.
  */
 
-public class AddWorkDialog extends FrameLayout {
+public class AddWorkDialog extends DialogFragment {
 
     // DONE: 2017/05/08 日付を設定できるかできないか
-    private AddWorkDialogListener mListener;
-    private boolean mIsDateChangeable;
+    private static AddWorkDialogListener mListener;
+    private static boolean mIsDateChangeable;
     private Work mWork;
-    private Calendar mDate;
+    private static Calendar mDate;
+    
+    private static AddWorkDialog instance;
 
-    public AddWorkDialog(@NonNull Context context,
-                         AddWorkDialogListener listener,
-                         boolean isDateChangeable,
-                         Calendar date) {
-        super(context);
 
+    public static AddWorkDialog getInstance(AddWorkDialogListener listener,
+                                             boolean isDateChangeable,
+                                             Calendar date) {
+        
         mListener = listener;
         mIsDateChangeable = isDateChangeable;
         mDate = (Calendar) date.clone();
-
-        initCommon();
+        
+        
+        if (instance == null) {
+            instance = new AddWorkDialog();
+        }
+        return instance;
     }
 
-    public AddWorkDialog(@NonNull Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        
+        initCommon();
+        builder.setView(view);
+
+        builder.setTitle(R.string.add_work_title);
+
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (mListener != null) {
+                    mListener.onOkClick(mWork);
+                }
+            }
+        });
+
+        builder.setNegativeButton(R.string.cancel, null);
+
+        return builder.create();
+        
     }
 
     private View view;
@@ -57,19 +91,17 @@ public class AddWorkDialog extends FrameLayout {
         mWork = new Work(Calendar.getInstance());
         mWork.setDate(mDate);
 
-        view = LayoutInflater.from(getContext()).inflate(R.layout.add_work_dialog, this);
+        view = View.inflate(getActivity(), R.layout.add_work_dialog ,null);
         initDateText();
         initStartTimeText();
         initEndTimeText();
         initDurationText();
-        initOkButton();
-        initCancelButton();
     }
 
     private TextView dateText;
     private void initDateText() {
         dateText = (TextView) view.findViewById(R.id.date_text);
-        DateFormat format = android.text.format.DateFormat.getMediumDateFormat(getContext());
+        DateFormat format = android.text.format.DateFormat.getMediumDateFormat(getActivity());
         dateText.setText(format.format(mWork.getStart().getTime()));
         if (mIsDateChangeable) {
             ViewUtil.setOnClickListener(dateText, new ViewUtil.OnViewClickListener() {
@@ -84,7 +116,7 @@ public class AddWorkDialog extends FrameLayout {
     }
 
     private void showDatePicker() {
-        new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
+        new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                 mWork.getStart().set(Calendar.YEAR, year);
@@ -96,7 +128,7 @@ public class AddWorkDialog extends FrameLayout {
                 mWork.getStart().set(Calendar.DAY_OF_MONTH, dayOfMonth);
                 mWork.getEnd().set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
-                DateFormat format = android.text.format.DateFormat.getMediumDateFormat(getContext());
+                DateFormat format = android.text.format.DateFormat.getMediumDateFormat(getActivity());
                 dateText.setText(format.format(mWork.getStart().getTime()));
 
             }
@@ -119,7 +151,7 @@ public class AddWorkDialog extends FrameLayout {
     }
 
     private void showStartTimePicker() {
-        new TimePickerDialog(getContext(), new TimePickerDialog.OnTimeSetListener() {
+        new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
 
@@ -155,7 +187,7 @@ public class AddWorkDialog extends FrameLayout {
     }
 
     private void showEndTimePicker() {
-        new TimePickerDialog(getContext(), new TimePickerDialog.OnTimeSetListener() {
+        new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
 
@@ -184,38 +216,31 @@ public class AddWorkDialog extends FrameLayout {
     }
 
     private void refreshDurationText() {
-        String durationString = getContext().getString(R.string.duration_string, DateTimeText.getDurationString(mWork.getDuration(), false));
+        String durationString = getActivity().getString(R.string.duration_string, DateTimeText.getDurationString(mWork.getDuration(), false));
         durationText.setText(durationString);
-    }
-
-    private void initOkButton() {
-        Button okButton = (Button) view.findViewById(R.id.ok_button);
-        okButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mListener != null) {
-                    mListener.onOkClick(mWork);
-                }
-            }
-        });
-    }
-
-    private void initCancelButton() {
-        Button cancelButton = (Button) view.findViewById(R.id.cancel_button);
-        cancelButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mListener != null) {
-                    mListener.onCancelClick();
-                }
-            }
-        });
     }
 
     public interface AddWorkDialogListener {
 
         void onOkClick(Work work);
+    }
 
-        void onCancelClick();
+    public static AtomicBoolean isShowing = new AtomicBoolean(false);
+
+    @Override
+    public void show(FragmentManager manager, String tag) {
+        if (isShowing.getAndSet(true)) return;
+
+        try {
+            super.show(manager, tag);
+        } catch (Exception e) {
+            isShowing.set(false);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        isShowing.set(false);
     }
 }

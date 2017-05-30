@@ -25,7 +25,7 @@ import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Work;
-import net.c_kogyo.returnvisitorv5.dialogcontents.AddWorkDialog;
+import net.c_kogyo.returnvisitorv5.dialog.AddWorkDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.MonthAggregationDialog;
 import net.c_kogyo.returnvisitorv5.fragment.CalendarFragment;
 import net.c_kogyo.returnvisitorv5.util.AdMobHelper;
@@ -38,9 +38,6 @@ import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.IS_LOGGED_IN;
-import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.PASSWORD;
-import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.USER_NAME;
 import static net.c_kogyo.returnvisitorv5.util.ViewUtil.setOnClickListener;
 
 /**
@@ -561,29 +558,15 @@ public class CalendarPagerActivity extends AppCompatActivity {
     // TODO: 2017/05/06 AdView to Real
     // DONE: 2017/05/08 Add Work
     private void showAddWorkDialog() {
-        AddWorkDialog addWorkDialog
-                = new AddWorkDialog(this, new AddWorkDialog.AddWorkDialogListener() {
+
+        AddWorkDialog.getInstance(new AddWorkDialog.AddWorkDialogListener() {
                     @Override
                     public void onOkClick(Work work) {
                         startWorkPagerActivityWithNewWork(work);
                     }
-
-                    @Override
-                    public void onCancelClick() {
-                        fadeDialogOverlay(false);
-                    }
                 },
                 true,
                 Calendar.getInstance());
-        dialogFrame.addView(addWorkDialog);
-        dialogOverlay.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                fadeDialogOverlay(false);
-                return true;
-            }
-        });
-        fadeDialogOverlay(true);
     }
 
     private void startWorkPagerActivityWithNewWork(Work work) {

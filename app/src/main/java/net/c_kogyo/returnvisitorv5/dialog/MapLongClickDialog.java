@@ -1,4 +1,4 @@
-package net.c_kogyo.returnvisitorv5.dialogcontents;
+package net.c_kogyo.returnvisitorv5.dialog;
 
 import android.content.Context;
 import android.support.annotation.NonNull;

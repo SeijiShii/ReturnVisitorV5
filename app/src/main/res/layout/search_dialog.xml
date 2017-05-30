@@ -2,7 +2,19 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="5dp">
+
+    <!-- Search Text -->
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_height_small"
+        android:id="@+id/search_text"
+        android:background="@drawable/gray_trans_circle"
+        android:layout_margin="5dp"
+        android:gravity="center_vertical|left"
+        android:hint="@string/search"
+        android:inputType="text"/>
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -31,22 +43,5 @@
             android:id="@+id/search_list_view"/>
 
     </FrameLayout>
-
-    <!-- Close Button -->
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/ui_height_small">
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentRight="true"
-            android:id="@+id/close_button"
-            android:background="@drawable/trans_orange_selector"
-            android:textSize="@dimen/text_size_middle"
-            android:textColor="@color/colorAccent"
-            android:text="@string/close"/>
-
-    </RelativeLayout>
 
 </LinearLayout>
