@@ -58,7 +58,7 @@ import net.c_kogyo.returnvisitorv5.dialogcontents.AddWorkDialog;
 import net.c_kogyo.returnvisitorv5.dialog.HousingComplexDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.LoginDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.MapLongClickDialog;
-import net.c_kogyo.returnvisitorv5.dialogcontents.PlaceDialog;
+import net.c_kogyo.returnvisitorv5.dialog.PlaceDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.SearchDialog;
 import net.c_kogyo.returnvisitorv5.service.TimeCountIntentService;
 import net.c_kogyo.returnvisitorv5.service.TimeCountService;
@@ -723,15 +723,10 @@ public class MapActivity extends AppCompatActivity
 
     private void showPlaceDialog(Place place) {
 
-        PlaceDialog placeDialog
-                = new PlaceDialog(this,
-                        place,
+        PlaceDialog.getInstance(place,
                         new PlaceDialog.PlaceDialogListener() {
                             @Override
                             public void onRecordVisitClick(Place place) {
-
-                                fadeOutDialogFrame(normalFadeOutListener);
-                                fadeOutOverlay();
 
                                 // DONE: 2017/03/16 Record Visitへの遷移
                                 startRecordVisitActivityForNewVisit(place);
@@ -739,16 +734,7 @@ public class MapActivity extends AppCompatActivity
                             }
 
                             @Override
-                            public void onCancelClick() {
-                                fadeOutDialogFrame(normalFadeOutListener);
-                                fadeOutOverlay();
-
-                            }
-
-                            @Override
                             public void onDeleteClick(Place place) {
-                                fadeOutDialogFrame(normalFadeOutListener);
-                                fadeOutOverlay();
 
                                 placeMarkers.removeByPlace(place);
                                 RVData.getInstance().placeList.deleteById(place.getId());
@@ -759,14 +745,9 @@ public class MapActivity extends AppCompatActivity
 
                             @Override
                             public void onEditVisitClick(Visit visit) {
-                                fadeOutDialogFrame(normalFadeOutListener);
-                                fadeOutOverlay();
-
                                 startRecordVisitActivityToEditVisit(visit);
                             }
-                        });
-        fadeInDialogFrame(placeDialog);
-        fadeInOverlay(normalOverlayTouchListener);
+                        }).show(getFragmentManager(), null);
 
         enableLogoButton(false);
         enableSearchText(false);
@@ -796,60 +777,50 @@ public class MapActivity extends AppCompatActivity
         startActivityForResult(newVisitIntent, NEW_VISIT_REQUEST_CODE);
     }
 
-    private void showHousingComplexDialog(Place housingComplex) {
+    private void showHousingComplexDialog(final Place housingComplex) {
 
         housingComplex.setCategory(Place.Category.HOUSING_COMPLEX);
-        RVData.getInstance().placeList.setOrAdd(housingComplex);
-        RVCloudSync.syncDataIfLoggedIn(this);
 
         HousingComplexDialog.getInstance(housingComplex,
                 new HousingComplexDialog.HousingComplexDialogListener() {
                     @Override
                     public void onClickAddRoomButton(Place newRoom) {
-                        fadeOutOverlay();
-                        fadeOutDialogFrame(normalFadeOutListener);
 
                         startRecordVisitActivityForNewVisit(newRoom);
                     }
 
                     @Override
                     public void onClickRoomCell(final Place room) {
-                        fadeOutOverlay();
-                        fadeOutDialogFrame(new ViewUtil.PostFadeViewListener() {
-                            @Override
-                            public void postFade(View view) {
-                                overlay.setVisibility(View.INVISIBLE);
-                                dialogFrame.removeAllViews();
-                                showPlaceDialog(room);
-                            }
-                        });
+
+                        showPlaceDialog(room);
                     }
 
                     @Override
-                    public void onClickOkButton(Place housingComplex) {
+                    public void onOkClick(Place housingComplex) {
+
+                        RVData.getInstance().placeList.setOrAdd(housingComplex);
+                        RVCloudSync.syncDataIfLoggedIn(MapActivity.this);
+
                         placeMarkers.refreshMarker(housingComplex);
-                        fadeOutOverlay();
-                        fadeOutDialogFrame(normalFadeOutListener);
-
-                    }
-
-                    @Override
-                    public void onClickCancelButton() {
-                        fadeOutOverlay();
-                        fadeOutDialogFrame(normalFadeOutListener);
-
                     }
 
                     @Override
                     public void onDeleteHousingComplex(Place housingComplex) {
-                        fadeOutOverlay();
-                        fadeOutDialogFrame(normalFadeOutListener);
 
                         placeMarkers.removeByPlace(housingComplex);
                         RVData.getInstance().placeList.deleteById(housingComplex.getId());
                         RVData.getInstance().saveData(MapActivity.this);
 
                         RVCloudSync.syncDataIfLoggedIn(MapActivity.this);
+                    }
+
+                    @Override
+                    public void onCancelClick() {
+                        if (housingComplex.getChildCount() == 0) {
+                            placeMarkers.removeByPlace(housingComplex);
+                        } else {
+                            placeMarkers.refreshMarker(housingComplex);
+                        }
                     }
                 }, true, true).show(getFragmentManager(), null);
 

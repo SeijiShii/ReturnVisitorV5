@@ -1,13 +1,17 @@
-package net.c_kogyo.returnvisitorv5.dialogcontents;
+package net.c_kogyo.returnvisitorv5.dialog;
 
 import android.animation.Animator;
 import android.app.Activity;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Point;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -35,32 +39,52 @@ import net.c_kogyo.returnvisitorv5.view.VisitCell;
  * Created by SeijiShii on 2017/03/14.
  */
 
-public class PlaceDialog extends FrameLayout {
+public class PlaceDialog extends DialogFragment {
 
-    private Place mPlace;
-    private PlaceDialogListener mListener;
-
-    public PlaceDialog(@NonNull Context context, Place place, PlaceDialogListener listener) {
-        super(context);
+    private static Place mPlace;
+    private static PlaceDialogListener mListener;
+    private static PlaceDialog instance;
+    
+    public static PlaceDialog getInstance(Place place, PlaceDialogListener listener) {
 
         mListener = listener;
         mPlace = place;
 
-        initCommon();
+        if (instance == null) {
+            instance = new PlaceDialog();
+        }
+        return instance;
     }
 
-    public PlaceDialog(@NonNull Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        
+        initCommon();
+        builder.setView(view);
+
+        builder.setPositiveButton(R.string.record_visit, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (mListener != null) {
+                    mListener.onRecordVisitClick(mPlace);
+                }
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, null);
+
+        return builder.create();
+        
+        
     }
 
     private View view;
     private void initCommon() {
-        view = LayoutInflater.from(getContext()).inflate(R.layout.place_dialog, this);
+        view = View.inflate(getActivity(), R.layout.place_dialog, null);
 
         initPlaceCell();
         initVisitListView();
-        initRecordVisitButton();
-        initCancelButton();
     }
 
     private PlaceCell placeCell;
@@ -74,7 +98,7 @@ public class PlaceDialog extends FrameLayout {
                 }
             }
         });
-        placeCell.setOnTouchListener(new OnTouchListener() {
+        placeCell.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 return true;
@@ -102,8 +126,8 @@ public class PlaceDialog extends FrameLayout {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        Point point = ViewUtil.getDisplaySize((Activity) getContext());
-                        int height = point.y - (int) (getContext().getResources().getDisplayMetrics().density * 300);
+                        Point point = ViewUtil.getDisplaySize((Activity) getActivity());
+                        int height = point.y - (int) (getActivity().getResources().getDisplayMetrics().density * 300);
                         visitListView.getLayoutParams().height = height;
                         visitListView.requestLayout();
                     }
@@ -113,38 +137,12 @@ public class PlaceDialog extends FrameLayout {
 
     }
 
-    private void initRecordVisitButton() {
-        Button recordVisitButton = (Button) view.findViewById(R.id.record_visit_button);
-        recordVisitButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // DONE: 2017/03/16 Record Visitへの遷移
-                if (mListener != null) {
-                    mListener.onRecordVisitClick(mPlace);
-                }
-            }
-        });
-    }
-
-    private void initCancelButton() {
-        Button cancelButton = (Button) view.findViewById(R.id.cancel_button);
-        cancelButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // DONE: 2017/03/16 Cancel Action
-                if (mListener != null) {
-                    mListener.onCancelClick();
-                }
-            }
-        });
-    }
-
     class VisitListAdapter extends BaseAdapter {
 
         int initialHeight;
         VisitListAdapter() {
-            initialHeight = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small)
-                    + (int)(getContext().getResources().getDisplayMetrics().density * 5);
+            initialHeight = getActivity().getResources().getDimensionPixelSize(R.dimen.ui_height_small)
+                    + (int)(getActivity().getResources().getDisplayMetrics().density * 5);
         }
 
         @Override
@@ -166,7 +164,7 @@ public class PlaceDialog extends FrameLayout {
         public View getView(int i, View view, ViewGroup viewGroup) {
 
             if (view == null) {
-                view = new VisitCell(getContext(),
+                view = new VisitCell(getActivity(),
                         (Visit) getItem(i),
                         initialHeight,
                         new VisitCell.VisitCellListener() {
@@ -174,10 +172,10 @@ public class PlaceDialog extends FrameLayout {
                             public void postCompressVisitCell(VisitCell visitCell) {
 
                                 RVData.getInstance().visitList.deleteById(visitCell.getVisit().getId());
-                                RVData.getInstance().saveData(getContext());
+                                RVData.getInstance().saveData(getActivity());
                                 notifyDataSetChanged();
 
-                                RVCloudSync.syncDataIfLoggedIn(getContext());
+                                RVCloudSync.syncDataIfLoggedIn(getActivity());
                             }
 
                             @Override
@@ -220,8 +218,6 @@ public class PlaceDialog extends FrameLayout {
     public interface PlaceDialogListener {
 
         void onRecordVisitClick(Place place);
-
-        void onCancelClick();
 
         void onDeleteClick(Place place);
 

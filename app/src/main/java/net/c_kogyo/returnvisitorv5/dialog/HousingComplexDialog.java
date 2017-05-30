@@ -81,6 +81,24 @@ public class HousingComplexDialog extends DialogFragment {
         initCommon();
         builder.setView(view);
 
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (mListener != null) {
+                    mListener.onOkClick(mHousingComplex);
+                }
+            }
+        });
+
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (mListener != null) {
+                    mListener.onCancelClick();
+                }
+            }
+        });
+
         return builder.create();
     }
 
@@ -98,8 +116,6 @@ public class HousingComplexDialog extends DialogFragment {
         initRoomText();
         initAddRoomButton();
         initRoomListView();
-        initOKButton();
-        initCancelButton();
 
         initBroadcasting();
         inquireAddress();
@@ -131,6 +147,7 @@ public class HousingComplexDialog extends DialogFragment {
                                         if (mListener != null) {
                                             mListener.onDeleteHousingComplex(mHousingComplex);
                                         }
+                                        dismiss();
                                     }
                                 }, mHousingComplex);
                                 return true;
@@ -193,6 +210,8 @@ public class HousingComplexDialog extends DialogFragment {
                 if (mListener != null) {
                     mListener.onClickAddRoomButton(newRoom);
                 }
+
+                dismiss();
             }
         });
     }
@@ -209,6 +228,8 @@ public class HousingComplexDialog extends DialogFragment {
                 if (mListener != null) {
                     mListener.onClickRoomCell(room);
                 }
+
+                dismiss();
             }
         });
 
@@ -239,48 +260,17 @@ public class HousingComplexDialog extends DialogFragment {
         roomListView.getLayoutParams().height = height;
     }
 
-    private void initOKButton() {
-        Button okButton = (Button) view.findViewById(R.id.ok_button);
-
-        if (mShowOkButton) {
-            okButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    confirmEdit();
-                    if (mListener != null) {
-                        mListener.onClickOkButton(mHousingComplex);
-                    }
-                }
-            });
-        } else {
-            okButton.setLayoutParams(new RelativeLayout.LayoutParams(0, 0));
-        }
-
-    }
-
-    private void initCancelButton() {
-        Button cancelButton = (Button) view.findViewById(R.id.cancel_button);
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mListener != null) {
-                    mListener.onClickCancelButton();
-                }
-            }
-        });
-    }
-
     public interface HousingComplexDialogListener {
 
         void onClickAddRoomButton(Place addedRoom);
 
         void onClickRoomCell(Place room);
 
-        void onClickOkButton(Place housingComplex);
-
-        void onClickCancelButton();
-
         void onDeleteHousingComplex(Place housingComplex);
+
+        void onOkClick(Place housingComplex);
+
+        void onCancelClick();
     }
 
     private void initBroadcasting() {

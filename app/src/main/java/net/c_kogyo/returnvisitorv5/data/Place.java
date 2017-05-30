@@ -284,4 +284,13 @@ public class Place extends DataItem {
     public void setCategory(Category category) {
         this.category = category;
     }
+
+    public int getChildCount() {
+
+        if (category == Category.HOUSING_COMPLEX) {
+            return RVData.getInstance().placeList.getRoomList(id).size();
+        }
+
+        return -1;
+    }
 }

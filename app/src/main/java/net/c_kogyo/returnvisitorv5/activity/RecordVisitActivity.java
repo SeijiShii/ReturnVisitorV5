@@ -1036,17 +1036,17 @@ public class RecordVisitActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onClickOkButton(Place housingComplex) {
-//
-                    }
+                    public void onOkClick(Place housingComplex) {
 
-                    @Override
-                    public void onClickCancelButton() {
-                        fadeDialogOverlay(false, null);
                     }
 
                     @Override
                     public void onDeleteHousingComplex(Place housingComplex) {
+
+                    }
+
+                    @Override
+                    public void onCancelClick() {
 
                     }
                 }, false, false)
