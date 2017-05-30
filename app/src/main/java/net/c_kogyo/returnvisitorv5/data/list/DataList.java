@@ -176,5 +176,9 @@ public class DataList<T extends DataItem> implements Iterable<T>{
         return items;
     }
 
+    public boolean hasItem(String id) {
+        return getById(id) != null;
+    }
+
 }
 
