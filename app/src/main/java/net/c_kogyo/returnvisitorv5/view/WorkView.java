@@ -25,7 +25,7 @@ import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.Work;
-import net.c_kogyo.returnvisitorv5.service.TimeCountService;
+import net.c_kogyo.returnvisitorv5.service.TimeCountIntentService;
 import net.c_kogyo.returnvisitorv5.util.ConfirmDialog;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
@@ -51,12 +51,12 @@ public class WorkView extends BaseAnimateView {
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            if (intent.getAction().equals(TimeCountService.TIME_COUNTING_ACTION_TO_ACTIVITY)) {
+            if (intent.getAction().equals(TimeCountIntentService.TIME_COUNTING_ACTION_TO_ACTIVITY)) {
 
                 updateDurationText(intent);
                 updateEndTimeText();
 
-            } else if (intent.getAction().equals(TimeCountService.STOP_TIME_COUNT_ACTION_TO_ACTIVITY)) {
+            } else if (intent.getAction().equals(TimeCountIntentService.STOP_TIME_COUNT_ACTION_TO_ACTIVITY)) {
 
                 updateEndTimeText();
                 refreshEndTimeText();
@@ -78,8 +78,8 @@ public class WorkView extends BaseAnimateView {
 
         broadcastManager = LocalBroadcastManager.getInstance(mContext);
 
-        broadcastManager.registerReceiver(receiver, new IntentFilter(TimeCountService.TIME_COUNTING_ACTION_TO_ACTIVITY));
-        broadcastManager.registerReceiver(receiver, new IntentFilter(TimeCountService.STOP_TIME_COUNT_ACTION_TO_ACTIVITY));
+        broadcastManager.registerReceiver(receiver, new IntentFilter(TimeCountIntentService.TIME_COUNTING_ACTION_TO_ACTIVITY));
+        broadcastManager.registerReceiver(receiver, new IntentFilter(TimeCountIntentService.STOP_TIME_COUNT_ACTION_TO_ACTIVITY));
 
         visitCellInitHeight = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small)
                 + (int)(getContext().getResources().getDisplayMetrics().density * 5);
@@ -214,7 +214,7 @@ public class WorkView extends BaseAnimateView {
                         }, mWork);
                         return true;
                     case STOP_COUNT_MENU_ID:
-                        TimeCountService.stopTimeCount();
+                        TimeCountIntentService.stopTimeCount();
                         return true;
                 }
                 return false;
@@ -225,10 +225,10 @@ public class WorkView extends BaseAnimateView {
 
     private boolean isWorkCountingTime() {
 
-        if (!TimeCountService.isTimeCounting())
+        if (!TimeCountIntentService.isTimeCounting())
             return false;
 
-        Work work = TimeCountService.getWork();
+        Work work = TimeCountIntentService.getWork();
         if (work == null)
             return false;
 
@@ -244,8 +244,8 @@ public class WorkView extends BaseAnimateView {
     }
 
     private void refreshEndTimeText() {
-        if (TimeCountService.isTimeCounting() && TimeCountService.getWork() != null ) {
-            if (TimeCountService.getWork().equals(mWork)){
+        if (TimeCountIntentService.isTimeCounting() && TimeCountIntentService.getWork() != null ) {
+            if (TimeCountIntentService.getWork().equals(mWork)){
                 endTimeText.setBackground(null);
                 endTimeText.setClickable(false);
                 ViewUtil.setOnClickListener(endTimeText, null);
@@ -285,7 +285,7 @@ public class WorkView extends BaseAnimateView {
 
         if (isWorkCountingTime() && intent != null) {
 
-            long duration = intent.getLongExtra(TimeCountService.DURATION, 0);
+            long duration = intent.getLongExtra(TimeCountIntentService.DURATION, 0);
             String durationString = DateTimeText.getDurationString(duration, true);
 
             durationText.setText(durationString);

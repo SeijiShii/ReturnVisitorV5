@@ -13,7 +13,6 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import net.c_kogyo.returnvisitorv5.R;
-import net.c_kogyo.returnvisitorv5.service.TimeCountService;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 
 import java.util.Calendar;

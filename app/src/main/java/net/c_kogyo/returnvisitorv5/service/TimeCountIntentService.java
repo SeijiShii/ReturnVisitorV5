@@ -37,22 +37,22 @@ public class TimeCountIntentService extends IntentService {
     private LocalBroadcastManager broadcastManager;
     private BroadcastReceiver receiver;
 
-//    public static final String START_COUNTING_ACTION_TO_SERVICE
-//            = TimeCountService.class.getName() + "_start_counting_action_to_service";
-//    public static final String RESTART_COUNTING_ACTION_TO_SERVICE
-//            = TimeCountService.class.getName() + "_restart_counting_action_to_service";
+    public static final String START_COUNTING_ACTION_TO_SERVICE
+            = TimeCountIntentService.class.getName() + "_start_counting_action_to_service";
+    public static final String RESTART_COUNTING_ACTION_TO_SERVICE
+            = TimeCountIntentService.class.getName() + "_restart_counting_action_to_service";
     public static final String TIME_COUNTING_ACTION_TO_ACTIVITY
-            = TimeCountService.class.getName() + "_time_counting_action_to_activity";
+            = TimeCountIntentService.class.getName() + "_time_counting_action_to_activity";
     public static final String STOP_TIME_COUNT_ACTION_TO_ACTIVITY
-            = TimeCountService.class.getName() + "_stop_time_count_action_to_activity";
+            = TimeCountIntentService.class.getName() + "_stop_time_count_action_to_activity";
     public static final String START_TIME
-            = TimeCountService.class.getName() + "_start_time";
+            = TimeCountIntentService.class.getName() + "_start_time";
     public static final String DURATION
-            = TimeCountService.class.getName() + "_duration";
+            = TimeCountIntentService.class.getName() + "_duration";
     public static final String COUNTING_WORK_ID
-            = TimeCountService.class.getName() + "_counting_work_id";
+            = TimeCountIntentService.class.getName() + "_counting_work_id";
     public static final String CHANGE_START_ACTION_TO_SERVICE
-            = TimeCountService.class.getName() + "_change_start_action_to_service";
+            = TimeCountIntentService.class.getName() + "_change_start_action_to_service";
 
     public TimeCountIntentService() {
         super("TimeCountIntentService");
@@ -90,13 +90,24 @@ public class TimeCountIntentService extends IntentService {
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
 
+        if (intent != null) {
+
+            if (intent.getAction().equals(START_COUNTING_ACTION_TO_SERVICE)) {
+                mWork = new Work(Calendar.getInstance());
+                RVData.getInstance().workList.setOrAdd(mWork);
+                RVData.getInstance().saveData(this);
+                RVCloudSync.syncDataIfLoggedIn(this);
+            } else if (intent.getAction().equals(RESTART_COUNTING_ACTION_TO_SERVICE)) {
+                String workId = intent.getStringExtra(COUNTING_WORK_ID);
+                mWork = RVData.getInstance().workList.getById(workId);
+                if (mWork == null) {
+                    stopTimeCount();
+                }
+            }
+        }
+
         timeCounting = true;
         int minCounter = 0;
-
-        mWork = new Work(Calendar.getInstance());
-        RVData.getInstance().workList.setOrAdd(mWork);
-        RVData.getInstance().saveData(this);
-        RVCloudSync.syncDataIfLoggedIn(this);
 
         initNotification(mWork.getDuration());
 
@@ -107,7 +118,6 @@ public class TimeCountIntentService extends IntentService {
             } catch (InterruptedException e) {
                 //
             }
-
 
             if (mWork != null) {
                 final Intent timeBroadCastIntent = new Intent();
@@ -170,7 +180,7 @@ public class TimeCountIntentService extends IntentService {
         PendingIntent dummyPendingIntent = PendingIntent.getService(this, 0, dummyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(dummyPendingIntent);
 
-        Intent deleteIntent = new Intent(this, TimeCountService.class);
+        Intent deleteIntent = new Intent(this, TimeCountIntentService.class);
         deleteIntent.setAction(ACTION_DELETE);
         PendingIntent deletePendingIntent = PendingIntent.getService(this, 0, deleteIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setDeleteIntent(deletePendingIntent);

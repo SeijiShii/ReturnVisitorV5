@@ -59,9 +59,8 @@ import net.c_kogyo.returnvisitorv5.dialog.HousingComplexDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.LoginDialog;
 import net.c_kogyo.returnvisitorv5.dialogcontents.MapLongClickDialog;
 import net.c_kogyo.returnvisitorv5.dialog.PlaceDialog;
-import net.c_kogyo.returnvisitorv5.dialogcontents.SearchDialog;
+import net.c_kogyo.returnvisitorv5.dialog.SearchDialog;
 import net.c_kogyo.returnvisitorv5.service.TimeCountIntentService;
-import net.c_kogyo.returnvisitorv5.service.TimeCountService;
 import net.c_kogyo.returnvisitorv5.util.AdMobHelper;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 import net.c_kogyo.returnvisitorv5.util.ErrorLogIntentService;
@@ -325,7 +324,7 @@ public class MapActivity extends AppCompatActivity
         super.onResume();
 
         mapView.onResume();
-//        restartTimeCountIfNeeded();
+        restartTimeCountIfNeeded();
 
     }
 
@@ -987,33 +986,50 @@ public class MapActivity extends AppCompatActivity
         timeCountHandler = new Handler();
 
         countTimeFrame = (CountTimeFrame) findViewById(R.id.count_time_frame);
-        countTimeFrame.setExtracted(TimeCountService.isTimeCounting());
+        countTimeFrame.setExtracted(TimeCountIntentService.isTimeCounting());
         countTimeFrame.setListener(new CountTimeFrame.CountTimeFrameListener() {
             @Override
             public void onClickStartButton() {
                 Intent startTimeCountIntent = new Intent(getApplicationContext(), TimeCountIntentService.class);
-//                startTimeCountIntent.setAction(TimeCountService.START_COUNTING_ACTION_TO_SERVICE);
+                startTimeCountIntent.setAction(TimeCountIntentService.START_COUNTING_ACTION_TO_SERVICE);
                 startService(startTimeCountIntent);
             }
 
             @Override
             public void onClickStopButton() {
-                TimeCountService.stopTimeCount();
+                TimeCountIntentService.stopTimeCount();
             }
 
             @Override
             public void onChangeStart(Calendar calendar) {
-                Intent changeStartIntent = new Intent(TimeCountService.CHANGE_START_ACTION_TO_SERVICE);
-                changeStartIntent.putExtra(TimeCountService.START_TIME, calendar.getTimeInMillis());
+                Intent changeStartIntent = new Intent(TimeCountIntentService.CHANGE_START_ACTION_TO_SERVICE);
+                changeStartIntent.putExtra(TimeCountIntentService.START_TIME, calendar.getTimeInMillis());
                 LocalBroadcastManager.getInstance(MapActivity.this).sendBroadcast(changeStartIntent);
             }
         });
     }
 
+    private void restartTimeCountIfNeeded() {
+        SharedPreferences preferences
+            = getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
+        boolean isCounting = preferences.getBoolean(Constants.SharedPrefTags.IS_COUNTING_TIME, false);
+        if (isCounting) {
+        String workId = preferences.getString(Constants.SharedPrefTags.COUNTING_WORK_ID, null);
+
+        if (workId == null) return;
+
+        Intent restartCountIntent = new Intent(this, TimeCountIntentService.class);
+        restartCountIntent.setAction(TimeCountIntentService.RESTART_COUNTING_ACTION_TO_SERVICE);
+        restartCountIntent.putExtra(TimeCountIntentService.COUNTING_WORK_ID, workId);
+        startService(restartCountIntent);
+        }
+    }
+
+
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-           if (intent.getAction().equals(TimeCountService.STOP_TIME_COUNT_ACTION_TO_ACTIVITY)) {
+           if (intent.getAction().equals(TimeCountIntentService.STOP_TIME_COUNT_ACTION_TO_ACTIVITY)) {
                countTimeFrame.updateUI(false, 0, null, null);
 
                SharedPreferences preferences = getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
@@ -1028,19 +1044,19 @@ public class MapActivity extends AppCompatActivity
                    }
                });
 
-           } else if (intent.getAction().equals(TimeCountService.TIME_COUNTING_ACTION_TO_ACTIVITY)) {
+           } else if (intent.getAction().equals(TimeCountIntentService.TIME_COUNTING_ACTION_TO_ACTIVITY)) {
 
-               long startTime = intent.getLongExtra(TimeCountService.START_TIME, 0);
+               long startTime = intent.getLongExtra(TimeCountIntentService.START_TIME, 0);
                Calendar start = Calendar.getInstance();
                start.setTimeInMillis(startTime);
                String startText = getString(R.string.start_time_text, DateTimeText.getTimeText(start, false));
 
-               long duration = intent.getLongExtra(TimeCountService.DURATION, 0);
+               long duration = intent.getLongExtra(TimeCountIntentService.DURATION, 0);
                String durationText = getString(R.string.duration_string, DateTimeText.getDurationString(duration, true));
 
                countTimeFrame.updateUI(true, startTime, startText, durationText);
 
-               String countingWorkId = intent.getStringExtra(TimeCountService.COUNTING_WORK_ID);
+               String countingWorkId = intent.getStringExtra(TimeCountIntentService.COUNTING_WORK_ID);
                if (countingWorkId != null) {
                    SharedPreferences preferences = getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
                    SharedPreferences.Editor editor = preferences.edit();
@@ -1055,8 +1071,8 @@ public class MapActivity extends AppCompatActivity
     private void initLocalBroadcast() {
         LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this);
 
-        manager.registerReceiver(receiver, new IntentFilter(TimeCountService.TIME_COUNTING_ACTION_TO_ACTIVITY));
-        manager.registerReceiver(receiver, new IntentFilter(TimeCountService.STOP_TIME_COUNT_ACTION_TO_ACTIVITY));
+        manager.registerReceiver(receiver, new IntentFilter(TimeCountIntentService.TIME_COUNTING_ACTION_TO_ACTIVITY));
+        manager.registerReceiver(receiver, new IntentFilter(TimeCountIntentService.STOP_TIME_COUNT_ACTION_TO_ACTIVITY));
     }
 
 //    private void restartTimeCountIfNeeded() {
@@ -1545,7 +1561,7 @@ public class MapActivity extends AppCompatActivity
                     if (dialogFrame.getVisibility() == View.INVISIBLE && !isSearchDialogShowing) {
                         showSearchDialog(s.toString());
                     } else {
-                        if (searchDialog != null && isSearchDialogShowing) {
+                        if (isSearchDialogShowing) {
                             searchDialog.changeSearchWord(s.toString());
                         }
                     }
@@ -1590,14 +1606,13 @@ public class MapActivity extends AppCompatActivity
         });
     }
 
-    private SearchDialog searchDialog;
     private boolean isSearchDialogShowing = false;
+    private SearchDialog searchDialog;
     private void showSearchDialog(String initialSearchWord) {
-        searchDialog = new SearchDialog(this, new SearchDialog.SearchDialogListener() {
+
+        searchDialog = SearchDialog.getInstance(new SearchDialog.SearchDialogListener() {
             @Override
             public void onCancel() {
-                fadeOutDialogFrame(normalFadeOutListener);
-                isSearchDialogShowing = false;
                 fadeOutOverlay();
                 if (searchText.getText().length() > 0) {
                     searchText.setText("");
@@ -1606,17 +1621,14 @@ public class MapActivity extends AppCompatActivity
 
             @Override
             public void onClickPerson(final Person person) {
-                fadeOutDialogFrame(new ViewUtil.PostFadeViewListener() {
-                    @Override
-                    public void postFade(View view) {
-                        ArrayList<Place> places = RVData.getInstance().placeList.getByPerson(person);
-                        if (places.size() > 0) {
-                            Place place = places.get(0);
-                            showDialogFitToPlace(place);
-                            mMap.animateCamera(CameraUpdateFactory.newLatLng(place.getLatLng()));
-                        }
-                    }
-                });
+
+                ArrayList<Place> places = RVData.getInstance().placeList.getByPerson(person);
+                if (places.size() > 0) {
+                    Place place = places.get(0);
+                    showDialogFitToPlace(place);
+                    mMap.animateCamera(CameraUpdateFactory.newLatLng(place.getLatLng()));
+                }
+
                 isSearchDialogShowing = false;
                 if (searchText.getText().length() > 0) {
                     searchText.setText("");
@@ -1625,40 +1637,44 @@ public class MapActivity extends AppCompatActivity
 
             @Override
             public void onClickPlace(final Place place) {
-                fadeOutDialogFrame(new ViewUtil.PostFadeViewListener() {
-                    @Override
-                    public void postFade(View view) {
 
-                        isSearchDialogShowing = false;
-                        if (searchText.getText().length() > 0) {
-                            searchText.setText("");
-                        }
-                        dialogFrame.removeAllViews();
-
-                        fadeInOverlay(normalOverlayTouchListener);
-                        showDialogFitToPlace(place);
-                        mMap.animateCamera(CameraUpdateFactory.newLatLng(place.getLatLng()));
-
-                    }
-                });
-
-            }
-        },initialSearchWord);
-        fadeInDialogFrame(searchDialog);
-        isSearchDialogShowing = true;
-        fadeInOverlay(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-
-                fadeOutDialogFrame(normalFadeOutListener);
+                isSearchDialogShowing = false;
                 if (searchText.getText().length() > 0) {
                     searchText.setText("");
                 }
-                return true;
-            }
-        });
+                dialogFrame.removeAllViews();
 
+                fadeInOverlay(normalOverlayTouchListener);
+                showDialogFitToPlace(place);
+                mMap.animateCamera(CameraUpdateFactory.newLatLng(place.getLatLng()));
+
+            }
+        },initialSearchWord);
+        searchDialog.show(getFragmentManager(), null);
+        isSearchDialogShowing = true;
         enableLogoButton(false);
+
+        final Handler handler = new Handler();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (isSearchDialogShowing) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+
+                    }
+                }
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (searchText.getText().length() > 0) {
+                            searchText.setText("");
+                        }
+                    }
+                });
+            }
+        }).start();
     }
 
 
