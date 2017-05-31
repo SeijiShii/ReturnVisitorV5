@@ -54,6 +54,19 @@ public abstract class VisitCell extends BaseAnimateView {
         mInitialHeight = initialHeight;
         mHeaderContent = headerContent;
         initCommon();
+        super.setListener(new BaseAnimateViewListener() {
+            @Override
+            public void onUpdateHeight() {
+                if (mListener != null) {
+                    mListener.onUpdateHeight();
+                }
+            }
+
+            @Override
+            public void postInitialExtract(BaseAnimateView view) {
+
+            }
+        });
     }
 
     public VisitCell(Context context, AttributeSet attrs, int resId) {
@@ -71,7 +84,7 @@ public abstract class VisitCell extends BaseAnimateView {
         initEditButton();
 
         if (mInitialHeight <= 0) {
-            extractPostDrawn(mCollapseHeight, null);
+            extractPostDrawn(mCollapseHeight);
         }
     }
 
@@ -136,19 +149,10 @@ public abstract class VisitCell extends BaseAnimateView {
     private boolean isViewOpen = false;
     private void openCloseCell() {
 
-        HeightUpdateListener listener = new HeightUpdateListener() {
-            @Override
-            public void onUpdate() {
-                if (mListener != null) {
-                    mListener.onUpdateHeight();
-                }
-            }
-        };
-
         if (isViewOpen) {
-            VisitCell.this.changeViewHeight(mCollapseHeight, true, listener, null);
+            VisitCell.this.changeViewHeight(mCollapseHeight, true, false, null);
         } else {
-            VisitCell.this.changeViewHeight(mExtractHeight, true, listener, null);
+            VisitCell.this.changeViewHeight(mExtractHeight, true, false, null);
         }
 
         rotateOpenCloseMark();
@@ -213,27 +217,13 @@ public abstract class VisitCell extends BaseAnimateView {
                         ConfirmDialog.confirmAndDeleteVisit(getContext(), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                compress(new Animator.AnimatorListener() {
-                                    @Override
-                                    public void onAnimationStart(Animator animation) {
 
-                                    }
-
+                                compress(new PostAnimationListener() {
                                     @Override
-                                    public void onAnimationEnd(Animator animation) {
+                                    public void postAnimate(BaseAnimateView view) {
                                         if (mListener != null) {
                                             mListener.postCompressVisitCell(VisitCell.this);
                                         }
-                                    }
-
-                                    @Override
-                                    public void onAnimationCancel(Animator animation) {
-
-                                    }
-
-                                    @Override
-                                    public void onAnimationRepeat(Animator animation) {
-
                                     }
                                 });
 
@@ -263,10 +253,6 @@ public abstract class VisitCell extends BaseAnimateView {
 
     public Visit getVisit() {
         return mVisit;
-    }
-
-    public void compress(Animator.AnimatorListener listener) {
-        this.changeViewHeight(0, true, null, listener);
     }
 
     public interface VisitCellListener {

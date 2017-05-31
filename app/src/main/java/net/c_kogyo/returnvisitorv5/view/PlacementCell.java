@@ -11,7 +11,6 @@ import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.Placement;
-import net.c_kogyo.returnvisitorv5.data.Publication;
 
 /**
  * Created by SeijiShii on 2017/03/12.
@@ -20,7 +19,7 @@ import net.c_kogyo.returnvisitorv5.data.Publication;
 public class PlacementCell extends BaseAnimateView {
 
     private Placement mPlacement;
-    private PlacementCellListener mCellListener;
+    private PlacementCellListener mListener;
     private boolean mExtracted;
 
     public PlacementCell(Context context,
@@ -33,9 +32,22 @@ public class PlacementCell extends BaseAnimateView {
 
         mExtracted = extracted;
         mPlacement = placement;
-        mCellListener = listener;
+        mListener = listener;
 
         initCommon();
+        super.setListener(new BaseAnimateViewListener() {
+            @Override
+            public void onUpdateHeight() {
+
+            }
+
+            @Override
+            public void postInitialExtract(BaseAnimateView view) {
+                if (mListener != null) {
+                    mListener.postExtract(PlacementCell.this);
+                }
+            }
+        });
     }
 
     public PlacementCell(Context context, AttributeSet attrs, int resId) {
@@ -55,33 +67,12 @@ public class PlacementCell extends BaseAnimateView {
         initDeleteButton();
 
         if (!mExtracted) {
-            extractPostDrawn(mExtractHeight, new Animator.AnimatorListener() {
-                @Override
-                public void onAnimationStart(Animator animator) {
+            extractPostDrawn(mExtractHeight);
 
-                }
-
-                @Override
-                public void onAnimationEnd(Animator animator) {
-                    if (mCellListener != null) {
-                        mCellListener.postExtract(PlacementCell.this);
-                    }
-                }
-
-                @Override
-                public void onAnimationCancel(Animator animator) {
-
-                }
-
-                @Override
-                public void onAnimationRepeat(Animator animator) {
-
-                }
-            });
         } else {
             this.getLayoutParams().height = mExtractHeight;
-            if (mCellListener != null) {
-                mCellListener.postExtract(this);
+            if (mListener != null) {
+                mListener.postExtract(this);
             }
         }
     }
@@ -98,34 +89,15 @@ public class PlacementCell extends BaseAnimateView {
         deleteButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                PlacementCell.this.changeViewHeight(0,
-                        true,
-                        null,
-                        new Animator.AnimatorListener() {
-                            @Override
-                            public void onAnimationStart(Animator animator) {
-
-                            }
-
-                            @Override
-                            public void onAnimationEnd(Animator animator) {
-
-                                if (mCellListener != null) {
-                                    mCellListener.postCompress(PlacementCell.this);
-                                }
-                            }
-
-                            @Override
-                            public void onAnimationCancel(Animator animator) {
-
-                            }
-
-                            @Override
-                            public void onAnimationRepeat(Animator animator) {
-
-                            }
-                        });
-            }
+                PlacementCell.this.compress(new PostAnimationListener() {
+                    @Override
+                    public void postAnimate(BaseAnimateView view) {
+                        if (mListener != null) {
+                            mListener.postCompress(PlacementCell.this);
+                        }
+                    }
+                });
+             }
         });
     }
 
@@ -140,8 +112,4 @@ public class PlacementCell extends BaseAnimateView {
         void postCompress(PlacementCell cell);
     }
 
-    @Override
-    public void postViewExtract(BaseAnimateView view) {
-
-    }
 }

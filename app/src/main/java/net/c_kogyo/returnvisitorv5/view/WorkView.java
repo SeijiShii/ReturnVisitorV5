@@ -392,13 +392,13 @@ public class WorkView extends BaseAnimateView {
     }
 
     private VisitCell generateVisitCell(Visit visit, int initHeight) {
-        return new VisitCell(getContext(), visit, initHeight,new VisitCell.VisitCellListener() {
-            @Override
-            public void postCompressVisitCell(final VisitCell visitCell1) {
 
-                RVData.getInstance().visitList.deleteById(visitCell1.getVisit().getId());
+        return new VisitCell(getContext(), visit, initHeight, new VisitCell.VisitCellListener() {
+            @Override
+            public void postCompressVisitCell(VisitCell visitCell) {
+                RVData.getInstance().visitList.deleteById(visitCell.getVisit().getId());
                 RVData.getInstance().saveData(getContext());
-                visitCellContainer.removeView(visitCell1);
+                visitCellContainer.removeView(visitCell);
 
                 RVCloudSync.syncDataIfLoggedIn(getContext());
             }
@@ -421,15 +421,9 @@ public class WorkView extends BaseAnimateView {
             public void onUpdateHeight() {
                 WorkView.this.requestLayout();
             }
-        }, VisitCell.HeaderContent.BOTH)
-        {
+        }, VisitCell.HeaderContent.BOTH) {
             @Override
             public void setLayoutParams(BaseAnimateView view) {
-                view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0));
-            }
-
-            @Override
-            public void postViewExtract(BaseAnimateView view) {
 
             }
         };
@@ -444,28 +438,13 @@ public class WorkView extends BaseAnimateView {
         final VisitCell visitCell = getVisitCell(visit.getId());
         if (visitCell == null) return;
 
-        visitCell.changeViewHeight(0, true, null, new Animator.AnimatorListener() {
+        visitCell.compress(new PostAnimationListener() {
             @Override
-            public void onAnimationStart(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
+            public void postAnimate(BaseAnimateView view) {
                 visitCellContainer.removeView(visitCell);
                 if (postRemoveVisitCellListener != null) {
                     postRemoveVisitCellListener.postRemoveVisitCell();
                 }
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-
             }
         });
     }
@@ -527,11 +506,6 @@ public class WorkView extends BaseAnimateView {
         return visits;
     }
 
-
-    public void compress(Animator.AnimatorListener listener) {
-        this.changeViewHeight(0, true, null, listener);
-    }
-
     public interface WorkViewListener {
 
         void onChangeTime(Work work, ArrayList<Visit> visitsAdded, ArrayList<Visit> visitsRemoved);
@@ -551,9 +525,4 @@ public class WorkView extends BaseAnimateView {
 
     // DONE: 2017/05/07 時間調整時にDurationが変わらない。
 
-
-    @Override
-    public void postViewExtract(BaseAnimateView view) {
-
-    }
 }

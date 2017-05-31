@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,9 +24,10 @@ public abstract class BaseAnimateView extends FrameLayout {
     int mInitialHeight;
     float multi;
 
+    private BaseAnimateViewListener mListener;
+
     public BaseAnimateView(Context context, int initialHeight,int resId) {
         super(context);
-
         this.mInitialHeight = initialHeight;
         this.mResId = resId;
 
@@ -44,6 +46,11 @@ public abstract class BaseAnimateView extends FrameLayout {
         mInitialHeight = a.getDimensionPixelSize(R.styleable.BaseAnimateView_initialHeight, 0);
 
         initCommon();
+    }
+
+    public void setListener(@Nullable BaseAnimateViewListener listener) {
+
+        mListener = listener;
     }
 
     private View view;
@@ -69,7 +76,7 @@ public abstract class BaseAnimateView extends FrameLayout {
         super.dispatchDraw(canvas);
     }
 
-    public void extractPostDrawn(final int extractHeight, final Animator.AnimatorListener listener) {
+    public void extractPostDrawn(final int extractHeight) {
 
         final Handler handler = new Handler();
 
@@ -87,14 +94,7 @@ public abstract class BaseAnimateView extends FrameLayout {
                     @Override
                     public void run() {
                         // DONE: 2017/04/03 要検証
-//                        if (extractHeight == LayoutParams.WRAP_CONTENT) {
-//                            BaseAnimateView.this.measure(0, 0);
-//                            int height2 = getMeasuredHeight();
-//                            changeViewHeight(height2, true, null, listener);
-//                        } else {
-//                            changeViewHeight(extractHeight, true, null, listener);
-//                        }
-                        changeViewHeight(extractHeight, true, null, listener);
+                        changeViewHeight(extractHeight, true, true, null);
                     }
                 });
             }
@@ -104,17 +104,21 @@ public abstract class BaseAnimateView extends FrameLayout {
 
     public void changeViewHeight(int targetHeight,
                                  boolean toAnimate,
-                                 final HeightUpdateListener heightUpdateListener,
-                                 Animator.AnimatorListener animatorListener) {
+                                 boolean isInitialExtract,
+                                 @Nullable PostAnimationListener postAnimationListener) {
         int originHeight = getMeasuredHeight();
-        changeViewHeight(originHeight, targetHeight, toAnimate, heightUpdateListener, animatorListener);
+        changeViewHeight(originHeight,
+                targetHeight,
+                toAnimate,
+                isInitialExtract,
+                postAnimationListener);
     }
 
-    private void changeViewHeight(int originHeight,
-                                  int targetHeight,
+    private void changeViewHeight(final int originHeight,
+                                  final int targetHeight,
                                   boolean toAnimate,
-                                  final HeightUpdateListener heightUpdateListener,
-                                  Animator.AnimatorListener animatorListener) {
+                                  final boolean isInitialExtract,
+                                  @Nullable final PostAnimationListener postAnimationListener) {
 
         if (!toAnimate) {
             BaseAnimateView.this.getLayoutParams().height = targetHeight;
@@ -128,50 +132,67 @@ public abstract class BaseAnimateView extends FrameLayout {
                     BaseAnimateView.this.getLayoutParams().height = (int) animation.getAnimatedValue();
                     BaseAnimateView.this.requestLayout();
 
-                    if (heightUpdateListener != null) heightUpdateListener.onUpdate();
+                    if (mListener != null) {
+                        mListener.onUpdateHeight();
+                    }
                 }
             });
 
             int duration =  (int) (Math.abs(targetHeight - originHeight) * multi);
             animator.setDuration(duration);
 
-            if (animatorListener != null)
-                animator.addListener(animatorListener);
+            animator.addListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animation) {
 
-            if (targetHeight > 0) {
-                animator.addListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animation) {
+                }
 
+                @Override
+                public void onAnimationEnd(Animator animation) {
+
+                    if (isInitialExtract && originHeight <= 0 && targetHeight > 0) {
+                        if (mListener != null) {
+                            mListener.postInitialExtract(BaseAnimateView.this);
+                        }
                     }
-
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        postViewExtract(BaseAnimateView.this);
+                    if (postAnimationListener != null) {
+                        postAnimationListener.postAnimate(BaseAnimateView.this);
                     }
+                }
 
-                    @Override
-                    public void onAnimationCancel(Animator animation) {
+                @Override
+                public void onAnimationCancel(Animator animation) {
 
-                    }
+                }
 
-                    @Override
-                    public void onAnimationRepeat(Animator animation) {
+                @Override
+                public void onAnimationRepeat(Animator animation) {
 
-                    }
-                });
-            }
+                }
+            });
 
             animator.start();
         }
 
     }
 
-    public interface HeightUpdateListener {
-        void onUpdate();
+    public void compress(PostAnimationListener postAnimationListener) {
+        changeViewHeight(0, true, false, postAnimationListener);
     }
 
     public abstract void setLayoutParams(BaseAnimateView view);
 
-    public abstract void postViewExtract(BaseAnimateView view);
+    public interface BaseAnimateViewListener {
+
+        void onUpdateHeight();
+
+        void postInitialExtract(BaseAnimateView view);
+
+    }
+
+    public interface PostAnimationListener {
+
+        void postAnimate(BaseAnimateView view);
+    }
+
 }

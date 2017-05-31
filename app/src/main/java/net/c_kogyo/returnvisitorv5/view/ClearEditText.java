@@ -54,14 +54,14 @@ public class ClearEditText extends BaseAnimateView{
             @Override
             public void onClick(View view) {
                 editText.setText("");
-                ClearEditText.this.changeViewHeight(0, true, null, null);
+                ClearEditText.this.changeViewHeight(0, true, false, null);
             }
         });
     }
 
     public void extract() {
         int target = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small);
-        changeViewHeight(target, true, null, null);
+        changeViewHeight(target, true, false, null);
     }
 
     @Override
@@ -81,8 +81,4 @@ public class ClearEditText extends BaseAnimateView{
         this.editText.setText(text);
     }
 
-    @Override
-    public void postViewExtract(BaseAnimateView view) {
-
-    }
 }

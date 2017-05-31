@@ -1,11 +1,8 @@
 package net.c_kogyo.returnvisitorv5.view;
 
-import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.support.annotation.Nullable;
-import android.support.v4.view.ViewPager;
 import android.support.v7.widget.PopupMenu;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -13,7 +10,6 @@ import android.util.AttributeSet;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -25,7 +21,6 @@ import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.NoteCompItem;
 import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Placement;
-import net.c_kogyo.returnvisitorv5.data.Publication;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
@@ -45,9 +40,7 @@ public class VisitDetailView extends BaseAnimateView {
     private VisitDetailViewListener mListener;
     private DrawCondition mCondition;
 
-    private int mCollapseHeight,
-//            mExtractHeight,
-            fixedHeight, noteLineHeight;
+    private int mCollapseHeight;
 
     public enum DrawCondition{
         EXTRACT_POST_DRAWN_FROM_0,
@@ -65,11 +58,23 @@ public class VisitDetailView extends BaseAnimateView {
                 R.layout.visit_detail_view);
         mVisitDetail = visitDetail;
         mPerson = person;
-
         mListener = listener;
         mCondition = condition;
 
         initCommon();
+        super.setListener(new BaseAnimateViewListener() {
+            @Override
+            public void onUpdateHeight() {
+
+            }
+
+            @Override
+            public void postInitialExtract(BaseAnimateView view) {
+                if (mListener!= null) {
+                    mListener.postInitialExtract(VisitDetailView.this);
+                }
+            }
+        });
     }
 
     public VisitDetailView(Context context, AttributeSet attrs) {
@@ -109,11 +114,13 @@ public class VisitDetailView extends BaseAnimateView {
         switch (mCondition) {
             case EXTRACT_POST_DRAWN_FROM_0:
                 isViewOpen = true;
-                extractPostDrawn(getExtractHeight(), null);
+//                extractPostDrawn(getExtractHeight(), null);
+                extractPostDrawn(ViewGroup.LayoutParams.WRAP_CONTENT);
                 break;
             case EXTRACT:
                 isViewOpen = true;
-                this.getLayoutParams().height = getExtractHeight();
+//                this.getLayoutParams().height = getExtractHeight();
+                this.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
                 break;
             case COLLAPSE:
                 isViewOpen = false;
@@ -130,9 +137,9 @@ public class VisitDetailView extends BaseAnimateView {
             public void onViewClick() {
                 // 開閉アニメーション DONE
                 if (isViewOpen) {
-                    VisitDetailView.this.changeViewHeight(mCollapseHeight, true, null, null);
+                    VisitDetailView.this.changeViewHeight(mCollapseHeight, true, false, null);
                 } else {
-                    VisitDetailView.this.changeViewHeight(getExtractHeight(), true, null, null);
+                    VisitDetailView.this.changeViewHeight(ViewGroup.LayoutParams.WRAP_CONTENT, true, false, null);
                 }
 
                 rotateOpenCloseButton();
@@ -184,9 +191,8 @@ public class VisitDetailView extends BaseAnimateView {
 
     }
 
-    private Button placementButton;
     private void initPlacementButton() {
-        placementButton = (Button) getViewById(R.id.add_placement_button);
+        Button placementButton = (Button) getViewById(R.id.add_placement_button);
         placementButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -219,22 +225,21 @@ public class VisitDetailView extends BaseAnimateView {
                         new PlacementCell.PlacementCellListener() {
             @Override
             public void postExtract(PlacementCell cell) {
-                changeToTheHeight();
+                extract();
             }
 
             @Override
             public void postCompress(PlacementCell cell) {
                 placementContainer.removeView(cell);
                 mVisitDetail.getPlacements().remove(cell.getPlacement());
-                changeToTheHeight();
+                extract();
             }
         });
         placementContainer.addView(placementCell);
     }
     
-    private Button tagButton;
     private void initTagButton() {
-        tagButton = (Button) getViewById(R.id.tag_button);
+        Button tagButton = (Button) getViewById(R.id.tag_button);
         tagButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -246,9 +251,8 @@ public class VisitDetailView extends BaseAnimateView {
         });
     }
 
-    private PriorityRater priorityRater;
     private void initPriorityRater() {
-        priorityRater = (PriorityRater) getViewById(R.id.priority_rater);
+        PriorityRater priorityRater = (PriorityRater) getViewById(R.id.priority_rater);
         priorityRater.setPriority(mVisitDetail.getPriority());
         priorityRater.setOnPrioritySetListener(new PriorityRater.OnPrioritySetListener() {
             @Override
@@ -264,7 +268,7 @@ public class VisitDetailView extends BaseAnimateView {
     private AutoCompleteTextView noteText;
     private void initNoteText() {
         noteText = (AutoCompleteTextView) getViewById(R.id.note_text);
-        noteLineHeight = (int) (noteText.getPaint().getFontMetrics().bottom - noteText.getPaint().getFontMetrics().top);
+//        noteLineHeight = (int) (noteText.getPaint().getFontMetrics().bottom - noteText.getPaint().getFontMetrics().top);
 
         // DONE: 2017/02/27 AutoCompleteTextViewアダプタ
         // PENDING: 2017/03/08 要動作検証
@@ -288,7 +292,7 @@ public class VisitDetailView extends BaseAnimateView {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-                changeToTheHeight();
+                extract();
 
             }
 
@@ -299,9 +303,17 @@ public class VisitDetailView extends BaseAnimateView {
         });
     }
 
-    private void changeToTheHeight() {
+    private void extract() {
 
-        VisitDetailView.this.changeViewHeight(getExtractHeight(), true, null, null);
+        measure(0, 0);
+        int height = getMeasuredHeight();
+
+        VisitDetailView.this.changeViewHeight(height, true, false, new PostAnimationListener() {
+            @Override
+            public void postAnimate(BaseAnimateView view) {
+                VisitDetailView.this.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            }
+        });
     }
 
     private void initRVSwitch() {
@@ -353,29 +365,29 @@ public class VisitDetailView extends BaseAnimateView {
 
     public void refreshTagFrame() {
         initTagFrame();
-        changeToTheHeight();
+        extract();
     }
 
-    public int getExtractHeight() {
-
-        // DONE: 2017/03/12 高さが合わない
-        int rowHeight = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small);
-        int padding = getContext().getResources().getDimensionPixelSize(R.dimen.padding_normal);
-
-        fixedHeight = rowHeight * 9 + padding * 2;
-
-        int lineCount;
-        if (noteText.getLineCount() <= 0) {
-            lineCount = 1;
-        } else {
-            lineCount = noteText.getLineCount();
-        }
-        int noteHeight = noteLineHeight * lineCount;
-        int plcHeight = rowHeight * mVisitDetail.getPlacements().size();
-
-        return fixedHeight + plcHeight + noteHeight + tagFrame.getFrameHeight();
-
-    }
+//    public int getExtractHeight() {
+//
+//        // DONE: 2017/03/12 高さが合わない
+//        int rowHeight = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small);
+//        int padding = getContext().getResources().getDimensionPixelSize(R.dimen.padding_normal);
+//
+//        fixedHeight = rowHeight * 9 + padding * 2;
+//
+//        int lineCount;
+//        if (noteText.getLineCount() <= 0) {
+//            lineCount = 1;
+//        } else {
+//            lineCount = noteText.getLineCount();
+//        }
+//        int noteHeight = noteLineHeight * lineCount;
+//        int plcHeight = rowHeight * mVisitDetail.getPlacements().size();
+//
+//        return fixedHeight + plcHeight + noteHeight + tagFrame.getFrameHeight();
+//
+//    }
 
     private Button editButton;
     private void initEditButton() {
@@ -401,22 +413,25 @@ public class VisitDetailView extends BaseAnimateView {
                         }
                         return true;
                     case R.id.remove_person:
-                        VisitDetailView.this.compress(new PostCompressListener() {
+
+                        VisitDetailView.this.compress(new PostAnimationListener() {
                             @Override
-                            public void postCompress() {
+                            public void postAnimate(BaseAnimateView view) {
                                 if (mListener != null) {
                                     mListener.postRemoveVisitDetail(mVisitDetail);
                                 }
                             }
                         });
+
                         return true;
                     case R.id.delete_person:
                         ConfirmDialog.confirmAndDeletePerson(getContext(), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                VisitDetailView.this.compress(new PostCompressListener() {
+
+                                VisitDetailView.this.compress(new PostAnimationListener() {
                                     @Override
-                                    public void postCompress() {
+                                    public void postAnimate(BaseAnimateView view) {
                                         if (mListener != null) {
                                             mListener.postDeletePerson(mPerson);
                                         }
@@ -445,7 +460,7 @@ public class VisitDetailView extends BaseAnimateView {
 
         void onPrioritySet(Visit.Priority priority);
 
-        void postExtractView(VisitDetailView visitDetailView);
+        void postInitialExtract(VisitDetailView visitDetailView);
 
         void postRemoveVisitDetail(VisitDetail visitDetail);
 
@@ -456,46 +471,4 @@ public class VisitDetailView extends BaseAnimateView {
     // DONE: 2017/05/06 描画時に高さ0, collapse, extractを選べるようにする
 
 
-    @Override
-    public void postViewExtract(BaseAnimateView view) {
-        if (mListener!= null) {
-            mListener.postExtractView((VisitDetailView) view);
-        }
-    }
-
-    private void compress(@Nullable final PostCompressListener compressListener) {
-
-        this.changeViewHeight(0, true, null, new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-
-                ViewParent parent = VisitDetailView.this.getParent();
-                ((LinearLayout) parent).removeView(VisitDetailView.this);
-
-                if (compressListener != null) {
-                    compressListener.postCompress();
-                }
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-
-            }
-        });
-
-    }
-
-    interface PostCompressListener {
-        void postCompress();
-    }
 }

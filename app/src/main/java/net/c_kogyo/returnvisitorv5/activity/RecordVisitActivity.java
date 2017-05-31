@@ -419,7 +419,7 @@ public class RecordVisitActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void postExtractView(VisitDetailView visitDetailView) {
+                    public void postInitialExtract(VisitDetailView visitDetailView) {
                         if (condition == VisitDetailView.DrawCondition.EXTRACT_POST_DRAWN_FROM_0) {
                             ViewUtil.scrollToView(scrollView, visitDetailView);
                         }
@@ -485,25 +485,10 @@ public class RecordVisitActivity extends AppCompatActivity {
         final VisitDetailView detailView = getVisitDetailView(visitDetail);
         if (detailView == null) return;
 
-        detailView.changeViewHeight(0, true, null, new Animator.AnimatorListener() {
+        detailView.compress(new BaseAnimateView.PostAnimationListener() {
             @Override
-            public void onAnimationStart(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
+            public void postAnimate(BaseAnimateView view) {
                 visitDetailFrame.removeView(detailView);
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-
             }
         });
     }

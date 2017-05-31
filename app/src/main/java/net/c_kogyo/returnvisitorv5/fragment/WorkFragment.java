@@ -82,7 +82,6 @@ public class WorkFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-
         setParcelableData();
 
         Log.d(TAG, "WorkFragment, onCreateView, mDate: " + DateTimeText.getDateTimeText(mDate, getContext()));
@@ -228,14 +227,9 @@ public class WorkFragment extends Fragment {
             public void setLayoutParams(BaseAnimateView view) {
                 view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0));
             }
-
-            @Override
-            public void postViewExtract(BaseAnimateView view) {
-                ViewUtil.scrollToView(scrollView, view);
-            }
         };
         if (fromZero) {
-            cell.extractPostDrawn(mVisitCellHeight, null);
+            cell.extractPostDrawn(mVisitCellHeight);
         }
         return cell;
     }
@@ -317,7 +311,7 @@ public class WorkFragment extends Fragment {
                 };
 
         if (fromZero) {
-            workView.extractPostDrawn(ViewGroup.LayoutParams.WRAP_CONTENT, null);
+            workView.extractPostDrawn(ViewGroup.LayoutParams.WRAP_CONTENT);
         }
         return workView;
     }
@@ -589,29 +583,14 @@ public class WorkFragment extends Fragment {
         final WorkView workView = getWorkView(work.getId());
         if (workView == null) return;
 
-        workView.compress(new Animator.AnimatorListener() {
+        workView.compress(new BaseAnimateView.PostAnimationListener() {
             @Override
-            public void onAnimationStart(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
+            public void postAnimate(BaseAnimateView view) {
                 container.removeView(workView);
                 if (mWorkFragmentListener != null) {
                     mWorkFragmentListener.postRemoveWorkView(work);
                 }
                 verifyItemRemains();
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-
             }
         });
 
@@ -643,14 +622,9 @@ public class WorkFragment extends Fragment {
 
     private void removeVisitCell(final VisitCell visitCell, final PostRemoveVisitCellListener postRemoveVisitCellListener) {
 
-        visitCell.compress(new Animator.AnimatorListener() {
+        visitCell.compress(new BaseAnimateView.PostAnimationListener() {
             @Override
-            public void onAnimationStart(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
+            public void postAnimate(BaseAnimateView view) {
                 ViewParent parent = visitCell.getParent();
                 LinearLayout linearLayout = (LinearLayout) parent;
                 linearLayout.removeView(visitCell);
@@ -658,16 +632,6 @@ public class WorkFragment extends Fragment {
                     postRemoveVisitCellListener.postRemoveVisitCell();
                 }
                 verifyItemRemains();
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-
             }
         });
     }

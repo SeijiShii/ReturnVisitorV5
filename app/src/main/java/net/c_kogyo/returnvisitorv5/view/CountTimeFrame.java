@@ -134,12 +134,12 @@ public class CountTimeFrame extends BaseAnimateView {
     }
     private boolean isExtracted;
     public void extract() {
-        changeViewHeight(mExtractHeight, true, null, null);
+        changeViewHeight(mExtractHeight, true, false, null);
         isExtracted = true;
     }
 
     public void collapse() {
-        changeViewHeight(mCollapseHeight, true, null, null);
+        changeViewHeight(mCollapseHeight, true, false, null);
         isExtracted = false;
     }
 
@@ -174,8 +174,4 @@ public class CountTimeFrame extends BaseAnimateView {
         void onChangeStart(Calendar calendar);
     }
 
-    @Override
-    public void postViewExtract(BaseAnimateView view) {
-
-    }
 }
