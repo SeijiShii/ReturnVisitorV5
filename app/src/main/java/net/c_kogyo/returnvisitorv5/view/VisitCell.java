@@ -1,9 +1,9 @@
 package net.c_kogyo.returnvisitorv5.view;
 
-import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.PopupMenu;
 import android.util.AttributeSet;
 import android.view.Menu;
@@ -20,6 +20,7 @@ import net.c_kogyo.returnvisitorv5.activity.MapActivity;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
+import net.c_kogyo.returnvisitorv5.data.VisitDetail;
 import net.c_kogyo.returnvisitorv5.util.ConfirmDialog;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
@@ -37,7 +38,8 @@ public abstract class VisitCell extends BaseAnimateView {
     }
 
     private Visit mVisit;
-    private int mInitialHeight, mCollapseHeight, mExtractHeight;
+    private int mInitialHeight, mCollapseHeight;
+//            , mExtractHeight;
     private VisitCellListener mListener;
     private HeaderContent mHeaderContent;
 
@@ -77,10 +79,9 @@ public abstract class VisitCell extends BaseAnimateView {
 
         mCollapseHeight = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small)
                 + (int)(getContext().getResources().getDisplayMetrics().density * 5);
-        mExtractHeight = (int) (getContext().getResources().getDisplayMetrics().density * 270);
+//        mExtractHeight = (int) (getContext().getResources().getDisplayMetrics().density * 270);
 
-        initHeaderRow();
-        initVisitDataText();
+        initViews();
         initEditButton();
 
         if (mInitialHeight <= 0) {
@@ -89,7 +90,13 @@ public abstract class VisitCell extends BaseAnimateView {
     }
 
     private LinearLayout headerRow;
-    private void initHeaderRow() {
+    private ImageView marker;
+    private TextView headerText;
+    private ImageView openCloseMark;
+    private TextView visitDataText;
+    private LinearLayout visitDetailContainer;
+
+    private void initViews() {
         headerRow = (LinearLayout) getViewById(R.id.head_row);
         ViewUtil.setOnClickListener(headerRow, new ViewUtil.OnViewClickListener() {
             @Override
@@ -98,21 +105,13 @@ public abstract class VisitCell extends BaseAnimateView {
             }
         });
 
-        initMarker();
-        initHeaderText();
-        initOpenCloseMark();
-    }
-
-    private ImageView marker;
-    private void initMarker() {
         marker = (ImageView) getViewById(R.id.marker);
-        marker.setBackgroundResource(Constants.buttonRes[mVisit.getPriority().num()]);
-    }
-
-    private TextView headerText;
-    private void initHeaderText() {
         headerText = (TextView) getViewById(R.id.header_text);
-        refreshHeaderText();
+        openCloseMark = (ImageView) getViewById(R.id.open_close_mark);
+        visitDetailContainer = (LinearLayout) getViewById(R.id.visit_detail_container);
+        visitDataText = (TextView) getViewById(R.id.visit_data_text);
+
+        refreshVisit(null);
     }
 
     private void refreshHeaderText() {
@@ -141,18 +140,13 @@ public abstract class VisitCell extends BaseAnimateView {
         headerText.setText(text);
     }
 
-    private ImageView openCloseMark;
-    private void initOpenCloseMark() {
-        openCloseMark = (ImageView) getViewById(R.id.open_close_mark);
-    }
-
     private boolean isViewOpen = false;
     private void openCloseCell() {
 
         if (isViewOpen) {
             VisitCell.this.changeViewHeight(mCollapseHeight, true, false, null);
         } else {
-            VisitCell.this.changeViewHeight(mExtractHeight, true, false, null);
+            extract();
         }
 
         rotateOpenCloseMark();
@@ -175,12 +169,6 @@ public abstract class VisitCell extends BaseAnimateView {
         ObjectAnimator animator = ObjectAnimator.ofFloat(openCloseMark, "rotation", originAngle, targetAngle);
         animator.setDuration(300);
         animator.start();
-    }
-
-    private TextView visitDataText;
-    private void initVisitDataText() {
-        visitDataText = (TextView) getViewById(R.id.visit_data_text);
-        visitDataText.setText(mVisit.toStringWithLineBreak(getContext()));
     }
 
     private Button editButton;
@@ -242,17 +230,37 @@ public abstract class VisitCell extends BaseAnimateView {
         visitCellPopup.show();
     }
 
-    public void refreshVisit(Visit visit) {
-        mVisit = visit;
+    public void refreshVisit(@Nullable  Visit visit) {
+
+        if (visit != null) {
+            mVisit = visit;
+        }
 
         marker.setBackgroundResource(Constants.buttonRes[mVisit.getPriority().num()]);
-        headerText.setText(DateTimeText.getDateTimeText(mVisit.getDatetime(), getContext()));
-        visitDataText.setText(mVisit.toStringWithLineBreak(getContext()));
+        refreshHeaderText();
+        visitDataText.setText(mVisit.getPlacementsString());
 
+        setVisitDetailCells();
     }
 
     public Visit getVisit() {
         return mVisit;
+    }
+
+    private void extract() {
+
+        measure(0, 0);
+        int height = getMeasuredHeight();
+        changeViewHeight(height, true, false, null);
+
+    }
+
+    private void setVisitDetailCells() {
+        visitDetailContainer.removeAllViews();
+        for (VisitDetail visitDetail : mVisit.getVisitDetails()) {
+            VisitDetailCell cell = new VisitDetailCell(getContext(), visitDetail);
+            visitDetailContainer.addView(cell);
+        }
     }
 
     public interface VisitCellListener {

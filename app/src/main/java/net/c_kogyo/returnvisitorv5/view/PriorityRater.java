@@ -129,4 +129,6 @@ public class PriorityRater extends FrameLayout {
     public interface OnPrioritySetListener {
         void onPrioritySet(Visit.Priority priority);
     }
+
+    // TODO: 2017/05/31 改善
 }

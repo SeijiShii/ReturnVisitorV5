@@ -261,26 +261,34 @@ public class Visit extends DataItem implements Cloneable{
         return visitDetails;
     }
 
-    public String toStringWithLineBreak(Context context) {
+//    public String toStringWithLineBreak(Context context, boolean withDetails) {
+//        StringBuilder builder = new StringBuilder();
+//
+//        builder.append(DateTimeText.getDateTimeText(datetime, context));
+//
+//        builder.append("\n").append(context.getResources().getStringArray(R.array.priority_array)[getPriority().num()]);
+//
+//        if (withDetails) {
+//            if (visitDetails.size() >= 0) {
+//                for (VisitDetail visitDetail : visitDetails) {
+//                    builder.append("\n").append(visitDetail.toString(context, 4, false));
+//                    builder.append("\n");
+//                }
+//            }
+//        }
+//
+//        builder.append(getPlacementsString());
+//
+//        return builder.toString();
+//    }
+
+    public String getPlacementsString() {
         StringBuilder builder = new StringBuilder();
-
-        builder.append(DateTimeText.getDateTimeText(datetime, context));
-
-        builder.append("\n").append(context.getResources().getStringArray(R.array.priority_array)[getPriority().num()]);
-
-        if (visitDetails.size() >= 0) {
-            for (VisitDetail visitDetail : visitDetails) {
-                builder.append("\n").append(visitDetail.toString(context, 4));
-                builder.append("\n");
-            }
-        }
-
         if (placements.size() >= 0) {
             for (Placement placement : placements) {
                 builder.append("\n    ").append(placement.getPublicationData());
             }
         }
-
         return builder.toString();
     }
 

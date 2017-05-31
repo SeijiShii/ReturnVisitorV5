@@ -213,7 +213,7 @@ public class VisitDetail extends DataItem  implements Cloneable{
         this.placeId = placeId;
     }
 
-    public String toString(Context context, int indents) {
+    public String toString(Context context, int indents, boolean withTags) {
 
         StringBuilder builder0 = new StringBuilder();
         for (int i = 0 ; i < indents ; i++) {
@@ -226,6 +226,7 @@ public class VisitDetail extends DataItem  implements Cloneable{
         Person person = RVData.getInstance().personList.getById(personId);
         if (person != null) {
             builder.append(spaces).append(person.toString(context));
+            builder.append("\n").append(spaces).append(context.getResources().getStringArray(R.array.priority_array)[getPriority().num()]);
         }
 
         builder.append("\n").append(spaces);
@@ -244,12 +245,14 @@ public class VisitDetail extends DataItem  implements Cloneable{
             builder.append("\n").append(spaces).append(context.getString(R.string.study));
         }
 
-        if (tagIds.size() > 0 ) {
-            builder.append("\n").append(context.getString(R.string.tag)).append(":");
-            for (String id : tagIds) {
-                Tag tag = RVData.getInstance().tagList.getById(id);
-                if (tag != null) {
-                    builder.append(" ").append(tag.getName());
+        if (withTags) {
+            if (tagIds.size() > 0 ) {
+                builder.append("\n").append(context.getString(R.string.tag)).append(":");
+                for (String id : tagIds) {
+                    Tag tag = RVData.getInstance().tagList.getById(id);
+                    if (tag != null) {
+                        builder.append(" ").append(tag.getName());
+                    }
                 }
             }
         }
