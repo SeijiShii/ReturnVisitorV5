@@ -239,7 +239,17 @@ public class Person extends DataItem implements Cloneable{
         builder.append(context.getResources().getStringArray(R.array.sex_array)[this.sex.num()]).append(" ");
         builder.append(context.getResources().getStringArray(R.array.age_array)[this.age.num()]).append(" ");
 
-        // TODO: 2017/05/26 タグも対象とするか
+        // DONE: 2017/05/26 タグも対象とするか
+        Visit visit = RVData.getInstance().visitList.getLatestVisitToPerson(id);
+        if (visit != null) {
+            VisitDetail visitDetail = visit.getVisitDetail(id);
+            if (visitDetail != null) {
+                ArrayList<Tag> tags = RVData.getInstance().tagList.getList(visitDetail.getTagIds());
+                for (Tag tag : tags) {
+                    builder.append(" ").append(tag.getName());
+                }
+            }
+        }
 
         return builder.toString();
     }
