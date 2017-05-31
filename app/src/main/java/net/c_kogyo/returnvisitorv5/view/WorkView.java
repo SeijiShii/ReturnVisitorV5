@@ -424,7 +424,7 @@ public class WorkView extends BaseAnimateView {
         }, VisitCell.HeaderContent.BOTH) {
             @Override
             public void setLayoutParams(BaseAnimateView view) {
-
+                view.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             }
         };
     }
