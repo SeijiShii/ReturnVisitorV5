@@ -9,12 +9,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.data.Visit;
+import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 
 import static net.c_kogyo.returnvisitorv5.Constants.buttonRes;
 
@@ -59,47 +62,34 @@ public class PriorityRater extends FrameLayout {
     }
 
     private LinearLayout priorityFrame;
-    private Button[] raterButtons;
+    private RaterButton[] raterButtons;
+//    private Button[] raterButtons;
     private void initPriorityFrame() {
         priorityFrame = (LinearLayout) view.findViewById(R.id.priority_frame);
 
-        final int raterSize = (int) (getContext().getResources().getDisplayMetrics().density * 25);
-        final int buttonMargin = (int) (getContext().getResources().getDisplayMetrics().density * 10);
+//        final int raterSize = (int) (getContext().getResources().getDisplayMetrics().density * 25);
+//        final int buttonMargin = (int) (getContext().getResources().getDisplayMetrics().density * 10);
 
         // 2017/02/27 Implement priorityFrame
         priorityFrame.removeAllViews();
 
-        raterButtons = new Button[Visit.Priority.values().length];
+        raterButtons = new RaterButton[Visit.Priority.values().length];
         for ( int i = 0 ; i < Visit.Priority.values().length ; i++ ) {
-            raterButtons[i] = new Button(getContext());
-            raterButtons[i].setBackgroundResource(buttonRes[0]);
+            raterButtons[i] = new RaterButton(getContext(), buttonRes[0]);
             raterButtons[i].setTag(i);
 
-            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(raterSize, raterSize);
-
-            raterButtons[i].setLayoutParams(params);
             priorityFrame.addView(raterButtons[i]);
 
-            if ( i < Visit.Priority.values().length - 1 ) {
-                View view = new View(getContext());
-                FrameLayout.LayoutParams params2 = new FrameLayout.LayoutParams(buttonMargin, ViewGroup.LayoutParams.MATCH_PARENT);
-                view.setLayoutParams(params2);
-                priorityFrame.addView(view);
-            }
-
-            raterButtons[i].setOnClickListener(new View.OnClickListener() {
+            ViewUtil.setOnClickListener(raterButtons[i], new ViewUtil.OnViewClickListener() {
                 @Override
-                public void onClick(View view) {
-
-                    int tag = Integer.parseInt(view.getTag().toString());
+                public void onViewClick(View v) {
+                    int tag = Integer.parseInt(v.getTag().toString());
                     Visit.Priority priority = Visit.Priority.getEnum(tag);
 
                     if (mListener != null) {
                         mListener.onPrioritySet(priority);
                     }
-
                     refreshRater(priority);
-
                 }
             });
         }
@@ -128,6 +118,46 @@ public class PriorityRater extends FrameLayout {
 
     public interface OnPrioritySetListener {
         void onPrioritySet(Visit.Priority priority);
+    }
+
+    private class RaterButton extends RelativeLayout{
+
+        int mResId;
+
+        public RaterButton(Context context, int resId) {
+            super(context);
+
+            mResId = resId;
+
+            initCommon();
+        }
+
+        public RaterButton(Context context, AttributeSet attrs) {
+            super(context, attrs);
+        }
+
+        ImageView buttonImage;
+
+        private void initCommon() {
+            int dp35 = (int) (getContext().getResources().getDisplayMetrics().density * 35);
+            setLayoutParams(new ViewGroup.LayoutParams(dp35, dp35));
+
+            buttonImage = new ImageView(getContext());
+            int dp25 = (int)(getContext().getResources().getDisplayMetrics().density * 25);
+            RelativeLayout.LayoutParams params = new LayoutParams(dp25, dp25);
+            params.addRule(CENTER_IN_PARENT);
+            buttonImage.setLayoutParams(params);
+
+            addView(buttonImage);
+
+            buttonImage.setBackgroundResource(mResId);
+        }
+
+        public void setBackgroundResource(int resId) {
+            buttonImage.setBackgroundResource(resId);
+        }
+
+
     }
 
     // TODO: 2017/05/31 改善
