@@ -142,7 +142,7 @@ public class PlaceDialog extends DialogFragment {
 
     }
 
-    class VisitListAdapter extends BaseAdapter {
+    private class VisitListAdapter extends BaseAdapter {
 
         int initialHeight;
         VisitListAdapter() {
