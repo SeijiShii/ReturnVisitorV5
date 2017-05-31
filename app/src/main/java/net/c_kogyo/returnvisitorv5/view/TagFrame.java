@@ -20,15 +20,14 @@ import java.util.ArrayList;
  * Created by SeijiShii on 2017/02/21.
  */
 
-public class TagFrame extends LinearLayout implements View.OnTouchListener {
+public class TagFrame extends LinearLayout{
 
     private final static int LINE_HEIGHT = 35;
     private final static int MARGIN = 5;
 
-    private int lineHeight, frameHeight, frameWidth, margin;
+    private int lineHeight, frameWidth, margin;
     private ArrayList<String> mTagIds;
     private ArrayList<Tag> mTags;
-//    private ArrayList<SmallTagView> mTagViews;
     private TagFrameCallback mCallback;
 
     public TagFrame(Context context,
@@ -47,29 +46,14 @@ public class TagFrame extends LinearLayout implements View.OnTouchListener {
         super(context, attrs);
     }
 
-    private int mPaddingInt;
-    public void setTagIdsAndInitialize(ArrayList<String> tagIds,
-                                       TagFrameCallback callback,
-                                       int paddingInt) {
+    public void setTagIdsAndInitialize(ArrayList<String> tagIds, TagFrameCallback callback) {
         this.mTagIds = tagIds;
-        this.mPaddingInt = paddingInt;
-
-        this.mCallback = callback;
-        if (mCallback != null) {
-            this.setOnTouchListener(this);
-        }
-
         this.mCallback = callback;
 
         initCommon();
     }
 
     private void initCommon() {
-
-        Point size = new Point();
-        ((Activity) getContext()).getWindowManager().getDefaultDisplay().getSize(size);
-        int padding = (int) (getContext().getResources().getDisplayMetrics().density * mPaddingInt);
-        frameWidth = size.x - padding;
 
         this.removeAllViews();
 
@@ -79,15 +63,12 @@ public class TagFrame extends LinearLayout implements View.OnTouchListener {
         this.setOrientation(VERTICAL);
         this.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
-        frameHeight = 0;
-
         setTags();
         if (mTags.size() <= 0) {
             return;
         }
-//        addTestTags();
-        putTagsInLine();
 
+        waitAndSetWidth();
     }
 
     private LinearLayout generateNewLine() {
@@ -99,10 +80,36 @@ public class TagFrame extends LinearLayout implements View.OnTouchListener {
         return newLine;
     }
 
+    private void waitAndSetWidth() {
+
+        setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        final Handler handler = new Handler();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (getWidth() <= 0) {
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+
+                    }
+                }
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        frameWidth = getWidth();
+                        putTagsInLine();
+                    }
+                });
+            }
+        }).start();
+
+    }
+
     private void putTagsInLine() {
 
         this.addView(generateNewLine());
-        frameHeight = lineHeight;
 
         int widthSum = 0;
 
@@ -114,13 +121,15 @@ public class TagFrame extends LinearLayout implements View.OnTouchListener {
                 // これから追加するタグの幅とすでにセットされているタグの幅を足したとき、フレームの幅を超えるようなら行を追加する
                 this.addView(generateNewLine());
                 widthSum = 0;
-                frameHeight += lineHeight;
             }
             // 最後の行にタグを追加する
             ((LinearLayout)(this.getChildAt(this.getChildCount() - 1))).addView(tagView);
             widthSum += (tagView.getViewWidth() + margin);
         }
 
+        if (mCallback != null) {
+            mCallback.postDrawn();
+        }
     }
 
     private void setTags() {
@@ -134,71 +143,10 @@ public class TagFrame extends LinearLayout implements View.OnTouchListener {
             }
         }
 
-        // ここからはテスト部分
-//        addTestTags();
-
     }
 
-    private void addTestTags() {
-
-        String[] texts = {"コンテンツの本文",
-                "とかはこれでいい",
-                "のですが、",
-                "ヘッダー部分など", "" +
-                "システム", "全体の文字スケールに", "" +
-                "影響されたくない",
-                "部分もあります。 ", "そういう場合に ",
-                "dp など sp 以外の",
-                "単位で指定するには、",
-                "引数を2つとる",
-                "setTextSize()",
-                "を使います"};
-
-        mTags = new ArrayList<>();
-        for (String text : texts) {
-            mTags.add(new Tag(text));
-        }
+    public interface TagFrameCallback {
+        void postDrawn();
     }
 
-    @Override
-    public boolean onTouch(View view, MotionEvent motionEvent) {
-
-        switch (motionEvent.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                this.setAlpha(0.3f);
-                return true;
-
-            case MotionEvent.ACTION_UP:
-                this.setAlpha(1f);
-                if (mCallback != null) {
-                    mCallback.onClickFrame();
-                }
-                return true;
-
-            case MotionEvent.ACTION_CANCEL:
-                this.setAlpha(1f);
-                return true;
-
-        }
-
-        return false;
-    }
-
-//    public int getFrameHeight() {
-//        return frameHeight;
-//    }
-
-    interface TagFrameCallback {
-
-//        void onSetHeight(int frameHeight);
-
-        void onClickFrame();
-    }
-
-    // DONE: 2017/03/07 タグの内容が変更されたときの高さの変更がうまくいっていない
-
-
-    public int getFrameHeight() {
-        return frameHeight;
-    }
 }

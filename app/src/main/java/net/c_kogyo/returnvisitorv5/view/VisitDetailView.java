@@ -344,14 +344,19 @@ public class VisitDetailView extends BaseAnimateView {
         tagFrame = (TagFrame) getViewById(R.id.tag_frame);
         tagFrame.setTagIdsAndInitialize(mVisitDetail.getTagIds(),
                 new TagFrame.TagFrameCallback() {
+                    @Override
+                    public void postDrawn() {
+                        extract();
+                    }
+                });
+        ViewUtil.setOnClickListener(tagFrame, new ViewUtil.OnViewClickListener() {
             @Override
-            public void onClickFrame() {
-
+            public void onViewClick() {
                 if (mListener != null) {
                     mListener.onTagButtonClick(mVisitDetail);
                 }
             }
-        }, 40);
+        });
     }
 
 
