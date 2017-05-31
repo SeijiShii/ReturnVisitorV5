@@ -87,7 +87,7 @@ public class VisitSuggestionActivity extends AppCompatActivity {
 
         ViewUtil.setOnClickListener(filterToggleBar, new ViewUtil.OnViewClickListener() {
             @Override
-            public void onViewClick() {
+            public void onViewClick(View v) {
                 openCloseFilter();
             }
         });
@@ -133,7 +133,7 @@ public class VisitSuggestionActivity extends AppCompatActivity {
         final ImageView logoButton = (ImageView) findViewById(R.id.logo_button);
         ViewUtil.setOnClickListener(logoButton, new ViewUtil.OnViewClickListener() {
             @Override
-            public void onViewClick() {
+            public void onViewClick(View v) {
                 returnToMapActivity();
             }
         });
@@ -144,7 +144,7 @@ public class VisitSuggestionActivity extends AppCompatActivity {
         menuButton = (ImageView) findViewById(R.id.menu_button);
         ViewUtil.setOnClickListener(menuButton, new ViewUtil.OnViewClickListener() {
             @Override
-            public void onViewClick() {
+            public void onViewClick(View v) {
                 showPopup();
             }
         });

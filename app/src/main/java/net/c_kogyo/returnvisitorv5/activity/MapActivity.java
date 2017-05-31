@@ -636,7 +636,7 @@ public class MapActivity extends AppCompatActivity
             targetAlpha = 1f;
             ViewUtil.setOnClickListener(logoButton, new ViewUtil.OnViewClickListener() {
                 @Override
-                public void onViewClick() {
+                public void onViewClick(View v) {
                     openCloseDrawer();
                 }
             });

@@ -106,7 +106,7 @@ public class AddWorkDialog extends DialogFragment {
         if (mIsDateChangeable) {
             ViewUtil.setOnClickListener(dateText, new ViewUtil.OnViewClickListener() {
                 @Override
-                public void onViewClick() {
+                public void onViewClick(View v) {
                     showDatePicker();
                 }
             });
@@ -144,7 +144,7 @@ public class AddWorkDialog extends DialogFragment {
         startTimeText.setText(DateTimeText.getTimeText(mWork.getStart(), false));
         ViewUtil.setOnClickListener(startTimeText, new ViewUtil.OnViewClickListener() {
             @Override
-            public void onViewClick() {
+            public void onViewClick(View v) {
                 showStartTimePicker();
             }
         });
@@ -180,7 +180,7 @@ public class AddWorkDialog extends DialogFragment {
         endTimeText.setText(DateTimeText.getTimeText(mWork.getEnd(), false));
         ViewUtil.setOnClickListener(endTimeText, new ViewUtil.OnViewClickListener() {
             @Override
-            public void onViewClick() {
+            public void onViewClick(View v) {
                 showEndTimePicker();
             }
         });

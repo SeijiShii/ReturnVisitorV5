@@ -100,7 +100,7 @@ public abstract class VisitCell extends BaseAnimateView {
         headerRow = (LinearLayout) getViewById(R.id.head_row);
         ViewUtil.setOnClickListener(headerRow, new ViewUtil.OnViewClickListener() {
             @Override
-            public void onViewClick() {
+            public void onViewClick(View v) {
                 openCloseCell();
             }
         });

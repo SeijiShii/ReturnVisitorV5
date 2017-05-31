@@ -82,7 +82,7 @@ public class CountTimeFrame extends BaseAnimateView {
         startTimeText = (TextView) getViewById(R.id.start_time_text);
         ViewUtil.setOnClickListener(startTimeText, new ViewUtil.OnViewClickListener() {
             @Override
-            public void onViewClick() {
+            public void onViewClick(View v) {
                 showTimePickerDialog();
             }
         });

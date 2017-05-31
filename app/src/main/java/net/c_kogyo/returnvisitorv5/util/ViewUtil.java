@@ -36,7 +36,7 @@ public class ViewUtil {
                             return true;
                         case MotionEvent.ACTION_UP:
                             v.setAlpha(1f);
-                            listener.onViewClick();
+                            listener.onViewClick(v);
                             return true;
                     }
                     return false;
@@ -47,7 +47,7 @@ public class ViewUtil {
 
     public interface OnViewClickListener {
 
-        void onViewClick();
+        void onViewClick(View view);
     }
 
     /**

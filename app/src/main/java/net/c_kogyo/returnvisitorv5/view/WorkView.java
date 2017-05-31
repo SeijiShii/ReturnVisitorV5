@@ -103,7 +103,7 @@ public class WorkView extends BaseAnimateView {
         startTimeText = (TextView) getViewById(R.id.start_time_text);
         ViewUtil.setOnClickListener(startTimeText, new ViewUtil.OnViewClickListener() {
             @Override
-            public void onViewClick() {
+            public void onViewClick(View v) {
                 showStartTimePickerDialog(mWork.getStart());
             }
         });
@@ -186,7 +186,7 @@ public class WorkView extends BaseAnimateView {
         menuButton = (ImageView) getViewById(R.id.work_view_menu_button);
         ViewUtil.setOnClickListener(menuButton, new ViewUtil.OnViewClickListener() {
             @Override
-            public void onViewClick() {
+            public void onViewClick(View v) {
                 onClickMenuButton();
             }
         });
@@ -254,7 +254,7 @@ public class WorkView extends BaseAnimateView {
             endTimeText.setBackgroundResource(R.drawable.white_trans_circle);
             ViewUtil.setOnClickListener(endTimeText, new ViewUtil.OnViewClickListener() {
                 @Override
-                public void onViewClick() {
+                public void onViewClick(View v) {
                     showEndTimePickerDialog(mWork.getEnd());
                 }
             });

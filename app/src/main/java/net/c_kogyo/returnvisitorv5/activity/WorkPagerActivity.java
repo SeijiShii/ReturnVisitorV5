@@ -155,7 +155,7 @@ public class WorkPagerActivity extends AppCompatActivity {
         leftButton = (ImageView) findViewById(R.id.left_button);
         setOnClickListener(leftButton, new ViewUtil.OnViewClickListener() {
             @Override
-            public void onViewClick() {
+            public void onViewClick(View v) {
                 onClickLeftButton();
             }
         });
@@ -205,7 +205,7 @@ public class WorkPagerActivity extends AppCompatActivity {
         rightButton = (ImageView) findViewById(R.id.right_button);
         setOnClickListener(rightButton, new ViewUtil.OnViewClickListener() {
             @Override
-            public void onViewClick() {
+            public void onViewClick(View v) {
                 onClickRightButton();
             }
         });
@@ -254,7 +254,7 @@ public class WorkPagerActivity extends AppCompatActivity {
         dateText = (TextView) findViewById(R.id.date_text);
         setOnClickListener(dateText, new ViewUtil.OnViewClickListener() {
             @Override
-            public void onViewClick() {
+            public void onViewClick(View v) {
                 onClickDateText();
             }
         });
@@ -372,7 +372,7 @@ public class WorkPagerActivity extends AppCompatActivity {
         menuButton = (ImageView) findViewById(R.id.work_menu_button);
         setOnClickListener(menuButton, new ViewUtil.OnViewClickListener() {
             @Override
-            public void onViewClick() {
+            public void onViewClick(View v) {
                 showPopupMenu();
             }
         });
@@ -382,7 +382,7 @@ public class WorkPagerActivity extends AppCompatActivity {
         ImageView logoButton = (ImageView) findViewById(R.id.logo_button);
         setOnClickListener(logoButton, new ViewUtil.OnViewClickListener() {
             @Override
-            public void onViewClick() {
+            public void onViewClick(View v) {
                 returnToMapActivity();
             }
         });

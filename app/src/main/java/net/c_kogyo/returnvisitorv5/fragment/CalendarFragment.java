@@ -264,7 +264,7 @@ public class CalendarFragment extends Fragment {
             if (AggregationOfDay.hasWorkOrVisit(mDate)) {
                 ViewUtil.setOnClickListener(this, new ViewUtil.OnViewClickListener() {
                     @Override
-                    public void onViewClick() {
+                    public void onViewClick(View v) {
                         if (mCellListener != null) {
                             mCellListener.onTouch(mDate);
                         }

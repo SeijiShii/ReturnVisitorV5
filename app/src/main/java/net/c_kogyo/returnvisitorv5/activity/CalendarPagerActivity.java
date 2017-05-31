@@ -155,7 +155,7 @@ public class CalendarPagerActivity extends AppCompatActivity {
             targetAlpha = 1f;
             ViewUtil.setOnClickListener(leftButton, new ViewUtil.OnViewClickListener() {
                 @Override
-                public void onViewClick() {
+                public void onViewClick(View v) {
                     mPager.setCurrentItem(mPager.getCurrentItem() - 1, true);
                     refreshPagerState();
                     refreshButtons();
@@ -196,7 +196,7 @@ public class CalendarPagerActivity extends AppCompatActivity {
             targetAlpha = 1f;
             ViewUtil.setOnClickListener(rightButton, new ViewUtil.OnViewClickListener() {
                 @Override
-                public void onViewClick() {
+                public void onViewClick(View v) {
                     mPager.setCurrentItem(mPager.getCurrentItem() + 1, true);
                     refreshPagerState();
                     refreshButtons();
@@ -329,7 +329,7 @@ public class CalendarPagerActivity extends AppCompatActivity {
         ImageView logoButton = (ImageView) findViewById(R.id.logo_button);
         setOnClickListener(logoButton, new ViewUtil.OnViewClickListener() {
             @Override
-            public void onViewClick() {
+            public void onViewClick(View v) {
                 returnToMapActivity();
             }
         });
@@ -349,7 +349,7 @@ public class CalendarPagerActivity extends AppCompatActivity {
         menuButton = (ImageView) findViewById(R.id.work_menu_button);
         setOnClickListener(menuButton, new ViewUtil.OnViewClickListener() {
             @Override
-            public void onViewClick() {
+            public void onViewClick(View v) {
                 showPopupMenu();
             }
         });

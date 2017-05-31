@@ -694,7 +694,7 @@ public class RecordVisitActivity extends AppCompatActivity {
         final ImageView logoButton = (ImageView) findViewById(R.id.logo_button);
         ViewUtil.setOnClickListener(logoButton, new ViewUtil.OnViewClickListener() {
             @Override
-            public void onViewClick() {
+            public void onViewClick(View v) {
                 returnToMapActivity();
             }
         });

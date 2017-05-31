@@ -134,7 +134,7 @@ public class VisitDetailView extends BaseAnimateView {
         LinearLayout firstRow = (LinearLayout) getViewById(R.id.first_row);
         ViewUtil.setOnClickListener(firstRow, new ViewUtil.OnViewClickListener() {
             @Override
-            public void onViewClick() {
+            public void onViewClick(View v) {
                 // 開閉アニメーション DONE
                 if (isViewOpen) {
                     VisitDetailView.this.changeViewHeight(mCollapseHeight, true, false, null);
@@ -351,7 +351,7 @@ public class VisitDetailView extends BaseAnimateView {
                 });
         ViewUtil.setOnClickListener(tagFrame, new ViewUtil.OnViewClickListener() {
             @Override
-            public void onViewClick() {
+            public void onViewClick(View v) {
                 if (mListener != null) {
                     mListener.onTagButtonClick(mVisitDetail);
                 }

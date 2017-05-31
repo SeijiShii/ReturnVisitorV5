@@ -51,7 +51,7 @@ public class SearchCell extends FrameLayout {
 
         ViewUtil.setOnClickListener(this, new ViewUtil.OnViewClickListener() {
             @Override
-            public void onViewClick() {
+            public void onViewClick(View v) {
                 if (mListener != null) {
                     mListener.onClick(mObject);
                 }
