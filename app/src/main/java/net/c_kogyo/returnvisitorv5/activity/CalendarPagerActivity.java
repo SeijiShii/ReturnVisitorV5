@@ -445,7 +445,7 @@ public class CalendarPagerActivity extends AppCompatActivity {
 
 
 
-    // TODO: 2017/05/06 AdView to Real
+    // DONE: 2017/05/06 AdView to Real
     // DONE: 2017/05/08 Add Work
     private void showAddWorkDialog() {
 

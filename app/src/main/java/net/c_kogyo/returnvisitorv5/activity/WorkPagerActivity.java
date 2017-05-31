@@ -501,7 +501,7 @@ public class WorkPagerActivity extends AppCompatActivity {
         }
     }
 
-    // TODO: 2017/05/06 AdView to Real
+    // DONE: 2017/05/06 AdView to Real
 
     private Work addedWork;
     private void setAddedWork() {

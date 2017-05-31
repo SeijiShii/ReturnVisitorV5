@@ -160,5 +160,5 @@ public class PriorityRater extends FrameLayout {
 
     }
 
-    // TODO: 2017/05/31 改善
+    // DONE: 2017/05/31 改善
 }
