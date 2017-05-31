@@ -1,7 +1,6 @@
 package net.c_kogyo.returnvisitorv5.view;
 
 import android.animation.ValueAnimator;
-import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
@@ -9,8 +8,6 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.MarginLayoutParamsCompat;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.util.TypedValue;
@@ -23,21 +20,16 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
 import net.c_kogyo.returnvisitorv5.R;
-import net.c_kogyo.returnvisitorv5.data.Placement;
-import net.c_kogyo.returnvisitorv5.data.Publication;
-import net.c_kogyo.returnvisitorv5.fragment.DefaultPublicationListFragment;
-import net.c_kogyo.returnvisitorv5.fragment.RankedPublicationListFragment;
-import net.c_kogyo.returnvisitorv5.fragment.SwitchablePagerBaseFragment;
+import net.c_kogyo.returnvisitorv5.data.FragmentTitlePair;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
  * Created by SeijiShii on 2017/05/24.
  */
 
-public class SwitchablePager <T extends SwitchablePagerBaseFragment> extends LinearLayout implements View.OnClickListener {
+public class SwitchablePager  extends LinearLayout implements View.OnClickListener {
 
     public SwitchablePager(Context context) {
         super(context);
@@ -65,15 +57,14 @@ public class SwitchablePager <T extends SwitchablePagerBaseFragment> extends Lin
         viewPager = (ViewPager) view.findViewById(R.id.view_pager);
     }
 
-    private ArrayList<Object> mContents;
-    private ViewContentAdapter mAdapter;
+    private ArrayList<FragmentTitlePair> mContents;
 
     private Handler handler;
-    public void setContents(List<Object> contents, FragmentManager fragmentManager) {
+    public void setContents(List<FragmentTitlePair> contents, FragmentManager fragmentManager) {
 
         mContents = new ArrayList<>(contents);
 
-        mAdapter = new ViewContentAdapter(fragmentManager);
+        ViewContentAdapter mAdapter = new ViewContentAdapter(fragmentManager);
         viewPager.setAdapter(mAdapter);
 
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -130,7 +121,7 @@ public class SwitchablePager <T extends SwitchablePagerBaseFragment> extends Lin
             params.weight = 1;
             buttons[i].setLayoutParams(params);
 
-            buttons[i].setText(((T) mContents.get(i)).getTitle());
+            buttons[i].setText(mContents.get(i).title);
             buttons[i].setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f);
             buttons[i].setGravity(Gravity.CENTER);
             buttons[i].setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
@@ -206,20 +197,20 @@ public class SwitchablePager <T extends SwitchablePagerBaseFragment> extends Lin
         }
     }
 
-    class ViewContentAdapter extends FragmentPagerAdapter {
+    private class ViewContentAdapter extends FragmentPagerAdapter {
 
-        public ViewContentAdapter(FragmentManager fm) {
+        private ViewContentAdapter(FragmentManager fm) {
             super(fm);
         }
 
         @Override
         public Fragment getItem(int position) {
-            return (SwitchablePagerBaseFragment)(mContents.get(position));
+            return mContents.get(position).fragment;
         }
 
         @Override
         public int getCount() {
-            return 0;
+            return mContents.size();
         }
     }
 

@@ -1,9 +1,8 @@
 package net.c_kogyo.returnvisitorv5.fragment;
 
-import android.content.Context;
+import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,13 +12,12 @@ import android.widget.ListView;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.Publication;
-import net.c_kogyo.returnvisitorv5.view.ViewContent;
 
 /**
  * Created by SeijiShii on 2017/05/25.
  */
 
-public class DefaultPublicationListFragment extends SwitchablePagerBaseFragment {
+public class DefaultPublicationListFragment extends Fragment {
 
     private static DefaultPublicationListListener mListener;
 
@@ -30,29 +28,25 @@ public class DefaultPublicationListFragment extends SwitchablePagerBaseFragment 
         return new DefaultPublicationListFragment();
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        title = context.getString(R.string.default_title);
-    }
-
+    private View view;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
+        view = inflater.inflate(R.layout.default_publication_list_fragment, container, false);
+
         initDefaultListView();
 
-        return defaultListView;
+        return view;
     }
 
-    private ListView defaultListView;
     private void initDefaultListView() {
-        String[] defaultArray = getContext().getResources().getStringArray(R.array.placement_array);
+        String[] defaultArray = getActivity().getResources().getStringArray(R.array.placement_array);
         ArrayAdapter<String> defaultListAdapter
-                = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, defaultArray);
+                = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, defaultArray);
 
-        defaultListView = new ListView(getContext());
-        defaultListView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        ListView defaultListView = (ListView) view.findViewById(R.id.list_view);
+//        defaultListView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
         defaultListView.setAdapter(defaultListAdapter);
         defaultListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

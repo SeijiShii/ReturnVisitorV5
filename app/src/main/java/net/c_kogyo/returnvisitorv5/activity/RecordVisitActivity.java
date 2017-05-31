@@ -1,7 +1,6 @@
 package net.c_kogyo.returnvisitorv5.activity;
 
 import android.animation.Animator;
-import android.animation.ValueAnimator;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.BroadcastReceiver;
@@ -16,10 +15,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -609,7 +606,7 @@ public class RecordVisitActivity extends AppCompatActivity {
 
     private void showPlacementDialog(String parentId) {
 
-        PlacementDialog.getInstance(parentId, new PlacementDialog.PlacementDialogListener() {
+        PlacementDialog.newInstance(parentId, new PlacementDialog.PlacementDialogListener() {
             @Override
             public void onDecidePlacement(Placement placement, String parentId) {
                 addPlacement(placement, parentId);

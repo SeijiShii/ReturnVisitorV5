@@ -73,6 +73,7 @@ public class PlaceDialog extends DialogFragment {
                 if (mListener != null) {
                     mListener.onRecordVisitClick(mPlace);
                 }
+                dismiss();
             }
         });
         builder.setNegativeButton(R.string.cancel, null);
@@ -99,6 +100,7 @@ public class PlaceDialog extends DialogFragment {
                 if (mListener != null) {
                     mListener.onDeleteClick(mPlace);
                 }
+                dismiss();
             }
         });
         placeCell.setOnTouchListener(new View.OnTouchListener() {
@@ -186,6 +188,7 @@ public class PlaceDialog extends DialogFragment {
                                 if (mListener != null) {
                                     mListener.onEditVisitClick(visit);
                                 }
+                                dismiss();
                             }
 
                             @Override
