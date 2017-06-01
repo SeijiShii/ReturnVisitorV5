@@ -51,6 +51,26 @@ public class VisitSuggestion {
         return latestVisit.getPriority();
     }
 
+    public ArrayList<String> getTagIds() {
+        if (person == null) {
+            return new ArrayList<>();
+        }
+
+        if (latestSeenVisit != null) {
+            VisitDetail detail = latestSeenVisit.getVisitDetail(person.getId());
+            if (detail != null) {
+                return detail.getTagIds();
+            }
+        }
+
+        VisitDetail detail = latestVisit.getVisitDetail(person.getId());
+        if (detail != null) {
+            return detail.getTagIds();
+        }
+
+        return new ArrayList<>();
+    }
+
     public int getPassedDaysFromLastSeen(){
         if (latestSeenVisit != null) {
             return CalendarUtil.daysPast(latestSeenVisit.getDatetime(), Calendar.getInstance());

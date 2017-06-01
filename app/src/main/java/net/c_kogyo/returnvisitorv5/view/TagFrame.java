@@ -63,6 +63,10 @@ public class TagFrame extends LinearLayout{
         this.setOrientation(VERTICAL);
         this.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
+        if (mTagIds.size() <= 0) {
+            return;
+        }
+
         setTags();
         if (mTags.size() <= 0) {
             return;
@@ -109,6 +113,7 @@ public class TagFrame extends LinearLayout{
 
     private void putTagsInLine() {
 
+        this.removeAllViews();
         this.addView(generateNewLine());
 
         int widthSum = 0;

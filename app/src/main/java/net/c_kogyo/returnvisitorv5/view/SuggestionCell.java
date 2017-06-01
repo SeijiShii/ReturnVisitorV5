@@ -51,6 +51,7 @@ public class SuggestionCell extends FrameLayout {
     private View view;
     private ImageView marker;
     private TextView dataText, lastVisitText, lastSeenText;
+    private TagFrame tagFrame;
     private void initCommon() {
         view = View.inflate(getContext(), R.layout.suggestion_cell, this);
 
@@ -58,6 +59,7 @@ public class SuggestionCell extends FrameLayout {
         dataText = (TextView) view.findViewById(R.id.data_text);
         lastVisitText = (TextView) view.findViewById(R.id.last_visit_date_text);
         lastSeenText = (TextView) view.findViewById(R.id.last_seen_text);
+        tagFrame = (TagFrame) view.findViewById(R.id.tag_frame);
 
         refreshData(null);
 
@@ -94,6 +96,13 @@ public class SuggestionCell extends FrameLayout {
         }
         lastSeenText.setText(lastSeenMassage);
 
+        tagFrame.setTagIdsAndInitialize(mVisitSuggestion.getTagIds(), new TagFrame.TagFrameCallback() {
+            @Override
+            public void postDrawn() {
+
+            }
+        });
+
     }
 
     private Button menuButton;
@@ -129,7 +138,6 @@ public class SuggestionCell extends FrameLayout {
         });
         popupMenu.show();
     }
-
 
     private void compress() {
 

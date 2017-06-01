@@ -72,6 +72,10 @@ public class SwitchableTagFrame extends LinearLayout {
         }
 
         setAllTags();
+        if (mAllTags.size() <= 0) {
+            return;
+        }
+
         waitAndSetWidth();
     }
 
@@ -113,6 +117,7 @@ public class SwitchableTagFrame extends LinearLayout {
 
     private void putTagsInLine() {
 
+        this.removeAllViews();
         this.addView(generateNewLine());
 
         int widthSum = 0;

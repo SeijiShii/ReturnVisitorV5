@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="90dp">
+    android:layout_height="wrap_content">
 
     <!-- First Low -->
     <LinearLayout
@@ -39,6 +39,7 @@
 
     </LinearLayout>
 
+    <!-- Last Visit -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="25dp"
@@ -47,6 +48,7 @@
         android:gravity="center"
         android:id="@+id/last_visit_date_text"/>
 
+    <!-- Last Seen Visit -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="25dp"
@@ -54,5 +56,10 @@
         android:textColor="@color/colorPrimaryDark"
         android:gravity="center"
         android:id="@+id/last_seen_text"/>
+
+    <net.c_kogyo.returnvisitorv5.view.TagFrame
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tag_frame"/>
 
 </LinearLayout>
