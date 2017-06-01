@@ -8,10 +8,14 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -32,6 +36,7 @@ import net.c_kogyo.returnvisitorv5.util.AdMobHelper;
 import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 import net.c_kogyo.returnvisitorv5.view.PriorityFilterPane;
+import net.c_kogyo.returnvisitorv5.view.SearchFilterPane;
 import net.c_kogyo.returnvisitorv5.view.SuggestionCell;
 import net.c_kogyo.returnvisitorv5.view.TagFilterPane;
 
@@ -40,6 +45,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 
 /**
@@ -132,6 +138,9 @@ public class VisitSuggestionActivity extends AppCompatActivity {
                     case R.id.filter_on_tags:
                         filterOnTag();
                         return true;
+                    case R.id.search_filter:
+                        filterBySearch();
+                        return true;
                     case R.id.reset_filter:
                         resetFilter();
                         return true;
@@ -144,6 +153,9 @@ public class VisitSuggestionActivity extends AppCompatActivity {
         }
         if (isTagFilterOpen) {
             popupMenu.getMenu().getItem(2).setEnabled(false);
+        }
+        if (isSearchFilterOpen) {
+            popupMenu.getMenu().getItem(3).setEnabled(false);
         }
 
         popupMenu.show();
@@ -252,6 +264,54 @@ public class VisitSuggestionActivity extends AppCompatActivity {
         }
     }
 
+    private SearchFilterPane searchFilterPane;
+    private boolean isSearchFilterOpen;
+    private void filterBySearch() {
+
+        searchFilterPane = new SearchFilterPane(this, new SearchFilterPane.SearchFilterPaneListener() {
+            @Override
+            public void afterTextChanged(String s) {
+                String[] words = s.split(" ");
+
+                filter.setSearchWords(new ArrayList<String>(Arrays.asList(words)));
+                refreshListByFilter(true);
+            }
+        });
+
+        filterContentFrame.removeAllViews();
+        filterContentFrame.addView(searchFilterPane);
+
+        isSearchFilterOpen = true;
+        final int height = getResources().getDimensionPixelSize(R.dimen.search_filter_height);
+
+        if (filterFrame.getHeight() <= 0) {
+            openFilterPane(height);
+        } else {
+            closeFilterPane(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    openFilterPane(height);
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation) {
+
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animation) {
+
+                }
+            });
+        }
+
+    }
+
     private void openFilterPane(int paneHeight) {
 
         int barHeight = getResources().getDimensionPixelSize(R.dimen.filter_bar_height);
@@ -300,6 +360,7 @@ public class VisitSuggestionActivity extends AppCompatActivity {
 
         isPriorityFilterOpen = false;
         isTagFilterOpen = false;
+        isSearchFilterOpen = false;
 
     }
 

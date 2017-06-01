@@ -3,5 +3,6 @@
     <item android:id="@+id/reload_dismissed" android:title="@string/reload_dismissed"/>
     <item android:id="@+id/filter_on_priority" android:title="@string/filter_on_priority"/>
     <item android:id="@+id/filter_on_tags" android:title="@string/filter_on_tags"/>
-    <item android:id="@+id/reset_filter" android:title="@string/reset_filter"/>
+    <item android:id="@+id/search_filter" android:title="@string/search"/>
+    <item android:id="@+id/reset_filter" android:title="@string/reset_filter"/>"
 </menu>
