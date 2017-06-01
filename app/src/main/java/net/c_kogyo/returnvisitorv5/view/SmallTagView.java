@@ -7,6 +7,7 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
@@ -19,7 +20,7 @@ import net.c_kogyo.returnvisitorv5.data.Tag;
 
 public class SmallTagView extends AppCompatTextView{
 
-    private Tag mTag;
+    protected Tag mTag;
     private final int TAG_HEIGHT = 30;
     private int viewWidth;
 
@@ -37,10 +38,12 @@ public class SmallTagView extends AppCompatTextView{
 
     private void initCommon() {
 
-        this.setBackgroundResource(R.drawable.green_grade_circle);
+        this.setBackgroundResource(R.drawable.green_white_circle);
 
         int height = (int) (TAG_HEIGHT * getContext().getResources().getDisplayMetrics().density);
-        this.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, height));
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, height);
+        params.setMargins(2, 0, 2, 0);
+        this.setLayoutParams(params);
 
         this.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f);
         this.setText(mTag.getName());

@@ -9,6 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 import static net.c_kogyo.returnvisitorv5.data.Visit.PLACE_ID;
 
@@ -269,6 +270,12 @@ public class VisitDetail extends DataItem  implements Cloneable{
         }
 
         return builder.toString();
+    }
+
+    public String toStringForSearch(Context context) {
+
+        String s = toString(context, 0, true);
+        return s.replaceAll("\n", " ");
     }
 
     @Override

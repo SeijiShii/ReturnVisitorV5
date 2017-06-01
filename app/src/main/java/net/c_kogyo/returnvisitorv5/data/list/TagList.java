@@ -1,5 +1,7 @@
 package net.c_kogyo.returnvisitorv5.data.list;
 
+import android.content.Context;
+
 import net.c_kogyo.returnvisitorv5.data.Tag;
 
 import java.util.ArrayList;
@@ -22,5 +24,25 @@ public class TagList extends DataList<Tag> {
             }
         });
         return list;
+    }
+
+    public ArrayList<String> getAllIds() {
+        ArrayList<String> ids = new ArrayList<>();
+        for (Tag tag : list) {
+            ids.add(tag.getId());
+        }
+        return ids;
+    }
+
+    public ArrayList<String> getSearchedTagIds(String searchWord, Context context) {
+
+        if (searchWord.length() <= 0)
+            return getAllIds();
+
+        ArrayList<String> ids = new ArrayList<>();
+        for (Tag tag : getSearchedItems(searchWord, context)) {
+            ids.add(tag.getId());
+        }
+        return ids;
     }
 }

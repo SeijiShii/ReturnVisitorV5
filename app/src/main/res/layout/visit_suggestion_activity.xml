@@ -6,149 +6,117 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <FrameLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:orientation="vertical">
 
+        <!-- Header Row -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="@dimen/ui_height_small"
+            android:orientation="horizontal"
+            android:background="@color/colorPrimaryDark"
+            android:id="@+id/header_row">
 
-            <!-- Header Row -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/ui_height_small"
-                android:orientation="horizontal"
-                android:background="@color/colorPrimaryDark"
-                android:id="@+id/header_row">
+            <!-- Logo Button -->
+            <RelativeLayout
+                android:layout_width="40dp"
+                android:layout_height="match_parent">
 
-                <!-- Logo Button -->
-                <RelativeLayout
-                    android:layout_width="40dp"
-                    android:layout_height="match_parent">
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/logo_button"
+                    android:background="@drawable/v5_logo_036"
+                    android:layout_centerInParent="true"/>
 
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/logo_button"
-                        android:background="@drawable/v5_logo_036"
-                        android:layout_centerInParent="true"/>
+            </RelativeLayout>
 
-                </RelativeLayout>
+            <!-- Title and Date -->
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
 
-                <!-- Title and Date -->
-                <RelativeLayout
-                    android:layout_width="0dp"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:layout_weight="1">
+                    android:gravity="center"
+                    android:textSize="25sp"
+                    android:textStyle="bold"
+                    android:text="@string/suggestion"
+                    android:textColor="@color/colorPrimary"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginLeft="5dp"/>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:textSize="25sp"
-                        android:textStyle="bold"
-                        android:text="@string/suggestion"
-                        android:textColor="@color/colorPrimary"
-                        android:layout_alignParentLeft="true"
-                        android:layout_marginLeft="5dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:textSize="20sp"
+                    android:textColor="#FFF"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="5dp"
+                    android:id="@+id/date_text"/>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:textSize="20sp"
-                        android:textColor="#FFF"
-                        android:layout_alignParentRight="true"
-                        android:layout_marginRight="5dp"
-                        android:id="@+id/date_text"/>
+            </RelativeLayout>
 
-                </RelativeLayout>
+            <!-- Menu Button -->
+            <RelativeLayout
+                android:layout_width="40dp"
+                android:layout_height="match_parent">
 
-                <!-- Menu Button -->
-                <RelativeLayout
+                <ImageView
                     android:layout_width="40dp"
-                    android:layout_height="match_parent">
+                    android:layout_height="40dp"
+                    android:background="@drawable/white_menu_button"
+                    android:id="@+id/menu_button"
+                    android:layout_centerInParent="true"/>
 
-                    <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:background="@drawable/white_menu_button"
-                        android:id="@+id/menu_button"
-                        android:layout_centerInParent="true"/>
-
-                </RelativeLayout>
-
-            </LinearLayout>
-
-            <ListView
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:id="@+id/suggestion_list_view"/>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="25dp"
-                android:background="@color/colorPrimaryDark"/>
-
+            </RelativeLayout>
 
         </LinearLayout>
 
-        <!-- Dialog overlay -->
-        <FrameLayout
+        <ListView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#B000"
-            android:id="@+id/dialog_overlay"
-            android:visibility="invisible"/>
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:id="@+id/suggestion_list_view"/>
 
-        <!-- Filter Button layer -->
-        <RelativeLayout
+        <!-- Filter frame -->
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            android:id="@+id/filter_frame">
 
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/filter_frame_height_close"
-                android:orientation="vertical"
-                android:layout_alignParentBottom="true"
+                android:layout_height="@dimen/filter_bar_height"
                 android:background="@color/colorPrimary"
-                android:id="@+id/filter_frame">
+                android:id="@+id/filter_toggle_bar">
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/filter_frame_height_close"
-                    android:id="@+id/filter_toggle_bar">
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/white_down_arrow"
+                    android:layout_centerInParent="true"
+                    android:id="@+id/toggle_arrow"/>
 
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/white_upper_arrow"
-                        android:layout_centerInParent="true"
-                        android:id="@+id/toggle_arrow"/>
+            </RelativeLayout>
 
-                </RelativeLayout>
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/filter_content_frame"
+                android:background="@color/lightGray"/>
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/filter_frame_content_height">
+        </LinearLayout>
 
-                    <FrameLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/filter_button_frame"
-                        android:layout_centerInParent="true"/>
 
-                </RelativeLayout>
-
-            </LinearLayout>
-
-        </RelativeLayout>
-
-    </FrameLayout>
+    </LinearLayout>
 
     <!-- Ad Frame -->
     <RelativeLayout

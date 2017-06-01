@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/reload_dismissed" android:title="@string/reload_dismissed"/>
+    <item android:id="@+id/filter_on_priority" android:title="@string/filter_on_priority"/>
+    <item android:id="@+id/filter_on_tags" android:title="@string/filter_on_tags"/>
+    <item android:id="@+id/reset_filter" android:title="@string/reset_filter"/>
 </menu>

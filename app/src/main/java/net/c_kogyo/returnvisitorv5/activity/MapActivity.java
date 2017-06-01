@@ -939,14 +939,19 @@ public class MapActivity extends AppCompatActivity
             = getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
         boolean isCounting = preferences.getBoolean(Constants.SharedPrefTags.IS_COUNTING_TIME, false);
         if (isCounting) {
-        String workId = preferences.getString(Constants.SharedPrefTags.COUNTING_WORK_ID, null);
 
-        if (workId == null) return;
+            if (TimeCountIntentService.isTimeCounting()) {
+                return;
+            }
 
-        Intent restartCountIntent = new Intent(this, TimeCountIntentService.class);
-        restartCountIntent.setAction(TimeCountIntentService.RESTART_COUNTING_ACTION_TO_SERVICE);
-        restartCountIntent.putExtra(TimeCountIntentService.COUNTING_WORK_ID, workId);
-        startService(restartCountIntent);
+            String workId = preferences.getString(Constants.SharedPrefTags.COUNTING_WORK_ID, null);
+
+            if (workId == null) return;
+
+            Intent restartCountIntent = new Intent(this, TimeCountIntentService.class);
+            restartCountIntent.setAction(TimeCountIntentService.RESTART_COUNTING_ACTION_TO_SERVICE);
+            restartCountIntent.putExtra(TimeCountIntentService.COUNTING_WORK_ID, workId);
+            startService(restartCountIntent);
         }
     }
 

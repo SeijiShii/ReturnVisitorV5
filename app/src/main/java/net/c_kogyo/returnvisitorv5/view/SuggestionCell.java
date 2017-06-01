@@ -18,14 +18,10 @@ import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.R;
-import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitSuggestion;
 import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
-import net.c_kogyo.returnvisitorv5.util.DateTimeText;
-import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 /**

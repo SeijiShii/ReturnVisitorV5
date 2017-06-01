@@ -94,6 +94,10 @@ public class ToggleColorButton extends RelativeLayout {
         return mChecked;
     }
 
+    public void setChecked(boolean checked) {
+        this.mChecked = checked;
+    }
+
     public interface CheckChangeListener {
         void onCheckChange(boolean checked);
     }

@@ -1,5 +1,6 @@
 package net.c_kogyo.returnvisitorv5.activity;
 
+import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,11 +19,10 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.MapView;
-
 import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.DismissedSuggestion;
+import net.c_kogyo.returnvisitorv5.data.Filter;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
@@ -31,8 +31,9 @@ import net.c_kogyo.returnvisitorv5.dialog.ShowInMapDialog;
 import net.c_kogyo.returnvisitorv5.util.AdMobHelper;
 import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
+import net.c_kogyo.returnvisitorv5.view.PriorityFilterPane;
 import net.c_kogyo.returnvisitorv5.view.SuggestionCell;
-import net.c_kogyo.returnvisitorv5.view.ToggleColorButton;
+import net.c_kogyo.returnvisitorv5.view.TagFilterPane;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -51,12 +52,13 @@ public class VisitSuggestionActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        filter = new Filter();
+
         setContentView(R.layout.visit_suggestion_activity);
 
         AdMobHelper.setAdView(this);
 
         initFilterFrame();
-        initFilterButtonFrame();
 
         initLogoButton();
         initMenuButton();
@@ -74,59 +76,23 @@ public class VisitSuggestionActivity extends AppCompatActivity {
     }
 
     private LinearLayout filterFrame;
-    private boolean mIsFilterOpen = false;
+    private FrameLayout filterContentFrame;
     private void initFilterFrame() {
         filterFrame = (LinearLayout) findViewById(R.id.filter_frame);
+        filterContentFrame = (FrameLayout) findViewById(R.id.filter_content_frame);
 
-        initFilterToggleBar();
+        initFilterBar();
     }
 
-    private RelativeLayout filterToggleBar;
-    private void initFilterToggleBar() {
-        filterToggleBar = (RelativeLayout) findViewById(R.id.filter_toggle_bar);
+    private void initFilterBar() {
+        RelativeLayout filterToggleBar = (RelativeLayout) findViewById(R.id.filter_toggle_bar);
 
         ViewUtil.setOnClickListener(filterToggleBar, new ViewUtil.OnViewClickListener() {
             @Override
             public void onViewClick(View v) {
-                openCloseFilter();
+                closeFilterPane(null);
             }
         });
-    }
-
-    private void openCloseFilter() {
-
-        ImageView toggleArrow = (ImageView) findViewById(R.id.toggle_arrow);
-
-        int closeHeight = getResources().getDimensionPixelSize(R.dimen.filter_frame_height_close);
-        int openHeight = getResources().getDimensionPixelSize(R.dimen.filter_frame_height_open);
-
-        int origin, target;
-
-        if (mIsFilterOpen) {
-            origin = openHeight;
-            target = closeHeight;
-
-            toggleArrow.setBackgroundResource(R.drawable.white_upper_arrow);
-
-        } else {
-            origin = closeHeight;
-            target = openHeight;
-
-            toggleArrow.setBackgroundResource(R.drawable.white_down_arrow);
-        }
-
-        ValueAnimator animator = ValueAnimator.ofInt(origin, target);
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                filterFrame.getLayoutParams().height = (int) animation.getAnimatedValue();
-                filterFrame.requestLayout();
-            }
-        });
-        animator.setDuration(200);
-        animator.start();
-
-        mIsFilterOpen = !mIsFilterOpen;
     }
 
     private void initLogoButton() {
@@ -160,17 +126,175 @@ public class VisitSuggestionActivity extends AppCompatActivity {
                     case R.id.reload_dismissed:
                         reloadDismissedSuggestions();
                         return true;
+                    case R.id.filter_on_priority:
+                        filterOnPriority();
+                        return true;
+                    case R.id.filter_on_tags:
+                        filterOnTag();
+                        return true;
+                    case R.id.reset_filter:
+                        resetFilter();
+                        return true;
                 }
                 return false;
             }
         });
+        if (isPriorityFilterOpen) {
+            popupMenu.getMenu().getItem(1).setEnabled(false);
+        }
         popupMenu.show();
     }
 
     private void reloadDismissedSuggestions() {
         dismissedSuggestions.clear();
         saveDismissedSuggestions();
-        refreshListByFilter(true);
+//        refreshListByFilter(true);
+    }
+
+    private Filter filter;
+    private PriorityFilterPane priorityFilterPane;
+    private boolean isPriorityFilterOpen;
+    private void filterOnPriority() {
+
+        priorityFilterPane
+                = new PriorityFilterPane(this,
+                new PriorityFilterPane.PriorityFilterListener() {
+                    @Override
+                    public void onSetFilter(ArrayList<Visit.Priority> priorities) {
+                        filter.setPriorities(priorities);
+                        refreshListByFilter(true);
+                    }
+                }, filter.getPriorities());
+        filterContentFrame.removeAllViews();
+        filterContentFrame.addView(priorityFilterPane);
+
+        final int paneHeight = getResources().getDimensionPixelSize(R.dimen.priority_filter_height);
+        isPriorityFilterOpen = true;
+
+        if (filterFrame.getHeight() <= 0) {
+            openFilterPane(paneHeight);
+        } else {
+            closeFilterPane(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    openFilterPane(paneHeight);
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation) {
+
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animation) {
+
+                }
+            });
+        }
+
+
+
+    }
+
+    private TagFilterPane tagFilterPane;
+    private boolean isTagFilterOpen;
+    private void filterOnTag() {
+
+        tagFilterPane =
+                new TagFilterPane(this,
+                        filter.getTagIds(),
+                        new TagFilterPane.TagFilterPaneListener() {
+                            @Override
+                            public void onTagSelectChanged(ArrayList<String> selectedTagIds) {
+
+                            }
+                        });
+        filterContentFrame.removeAllViews();
+        filterContentFrame.addView(tagFilterPane);
+
+        final int paneHeight = getResources().getDimensionPixelSize(R.dimen.tag_filter_height);
+        isTagFilterOpen = true;
+
+        if (filterFrame.getHeight() <= 0) {
+            openFilterPane(paneHeight);
+        } else {
+            closeFilterPane(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    openFilterPane(paneHeight);
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation) {
+
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animation) {
+
+                }
+            });
+        }
+    }
+
+    private void openFilterPane(int paneHeight) {
+
+        int barHeight = getResources().getDimensionPixelSize(R.dimen.filter_bar_height);
+        int targetHeight = paneHeight + barHeight;
+
+        ValueAnimator animator = ValueAnimator.ofInt(0, targetHeight);
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) animation.getAnimatedValue());
+                filterFrame.setLayoutParams(params);
+                filterFrame.requestLayout();
+            }
+        });
+
+        int duration =  (int) (targetHeight * getResources().getDisplayMetrics().density);
+        animator.setDuration(duration);
+        animator.start();
+
+    }
+
+    private void closeFilterPane(@Nullable Animator.AnimatorListener listener) {
+
+        if (filterFrame.getHeight() <= 0) return;
+
+        ValueAnimator animator = ValueAnimator.ofInt(filterFrame.getHeight(), 0);
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) animation.getAnimatedValue());
+                filterFrame.setLayoutParams(params);
+                filterFrame.requestLayout();
+            }
+        });
+
+        int duration =  (int) (filterFrame.getHeight() * getResources().getDisplayMetrics().density);
+        animator.setDuration(duration);
+
+        if (listener != null) {
+            animator.addListener(listener);
+        }
+
+        animator.start();
+
+        isPriorityFilterOpen = false;
+
     }
 
     private void returnToMapActivity() {
@@ -212,49 +336,14 @@ public class VisitSuggestionActivity extends AppCompatActivity {
         suggestionList = (ListView) findViewById(R.id.suggestion_list_view);
     }
 
-
-    private ToggleColorButton[] filterButtons;
-    private void initFilterButtonFrame() {
-
-        FrameLayout filterButtonFrame = (FrameLayout) findViewById(R.id.filter_button_frame);
-
-        LinearLayout filterButtonBase = new LinearLayout(this);
-        filterButtonBase.setOrientation(LinearLayout.HORIZONTAL);
-
-        filterButtons = new ToggleColorButton[5];
-        for (int i = 0 ; i < 5 ; i++ ) {
-            filterButtons[i] = new ToggleColorButton(this,
-                    Constants.buttonRes[i + 3],
-                    Constants.buttonRes[0],
-                    true);
-            filterButtons[i].setCheckChangeListener(mCheckChangeListener);
-            filterButtonBase.addView(filterButtons[i]);
-        }
-        filterButtonFrame.addView(filterButtonBase);
-
-    }
-
-    ToggleColorButton.CheckChangeListener mCheckChangeListener = new ToggleColorButton.CheckChangeListener() {
-        @Override
-        public void onCheckChange(boolean checked) {
-            refreshListByFilter(true);
-        }
-    };
-
     private void refreshListByFilter(boolean blink) {
-        final ArrayList<Visit.Priority> priorities = new ArrayList<>();
-        for ( int i = 0 ; i < 5 ; i++ ) {
-            if (filterButtons[i].isChecked()) {
-                priorities.add(Visit.Priority.getEnum(i + 3));
-            }
-        }
 
         if (blink) {
             ViewUtil.fadeView(suggestionList, false, null,
                     new ViewUtil.PostFadeViewListener() {
                         @Override
                         public void postFade(View view) {
-                            SuggestionListAdapter mAdapter = new SuggestionListAdapter(priorities);
+                            SuggestionListAdapter mAdapter = new SuggestionListAdapter(filter);
                             suggestionList.setAdapter(mAdapter);
 
                             ViewUtil.fadeView(suggestionList, true, null, null, 300);
@@ -262,16 +351,22 @@ public class VisitSuggestionActivity extends AppCompatActivity {
                     }, 300);
 
         } else {
-            SuggestionListAdapter mAdapter = new SuggestionListAdapter(priorities);
+            SuggestionListAdapter mAdapter = new SuggestionListAdapter(filter);
             suggestionList.setAdapter(mAdapter);
         }
+    }
+
+    private void resetFilter() {
+        filter = new Filter();
+        closeFilterPane(null);
+        refreshListByFilter(true);
     }
 
     private class SuggestionListAdapter extends BaseAdapter {
 
         ArrayList<VisitSuggestion> mSuggestions;
-        SuggestionListAdapter(ArrayList<Visit.Priority> priorities) {
-            mSuggestions = VisitSuggestion.getFilteredSuggestions(priorities, dismissedSuggestions);
+        SuggestionListAdapter(Filter filter) {
+            mSuggestions = VisitSuggestion.getFilteredSuggestions(filter, dismissedSuggestions, VisitSuggestionActivity.this);
         }
 
         @Override
