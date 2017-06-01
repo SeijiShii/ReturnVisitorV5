@@ -136,7 +136,9 @@ public class RecordVisitActivity extends AppCompatActivity {
 
                 try {
                     mVisit = (Visit) visit.clone();
-                    mPlace = (Place) place.clone();
+                    if (place != null) {
+                        mPlace = (Place) place.clone();
+                    }
                 } catch (CloneNotSupportedException e) {
                     e.printStackTrace();
                 }

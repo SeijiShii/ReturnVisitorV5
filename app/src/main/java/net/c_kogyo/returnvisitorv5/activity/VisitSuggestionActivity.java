@@ -142,6 +142,10 @@ public class VisitSuggestionActivity extends AppCompatActivity {
         if (isPriorityFilterOpen) {
             popupMenu.getMenu().getItem(1).setEnabled(false);
         }
+        if (isTagFilterOpen) {
+            popupMenu.getMenu().getItem(2).setEnabled(false);
+        }
+
         popupMenu.show();
     }
 
@@ -211,7 +215,8 @@ public class VisitSuggestionActivity extends AppCompatActivity {
                         new TagFilterPane.TagFilterPaneListener() {
                             @Override
                             public void onTagSelectChanged(ArrayList<String> selectedTagIds) {
-
+                                filter.setTagIds(selectedTagIds);
+                                refreshListByFilter(true);
                             }
                         });
         filterContentFrame.removeAllViews();
@@ -294,6 +299,7 @@ public class VisitSuggestionActivity extends AppCompatActivity {
         animator.start();
 
         isPriorityFilterOpen = false;
+        isTagFilterOpen = false;
 
     }
 

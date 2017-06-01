@@ -83,6 +83,7 @@ public class TagFilterPane extends FrameLayout {
             public void onTagSelectChanged(ArrayList<String> selectedTagIds) {
                 if (mListener != null) {
                     mListener.onTagSelectChanged(selectedTagIds);
+                    mSelectedTagIds = selectedTagIds;
                 }
             }
         });

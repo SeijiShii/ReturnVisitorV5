@@ -202,18 +202,20 @@ public class VisitSuggestion {
 
         for (VisitSuggestion suggestion : givenSuggestions) {
 
-            if (suggestion.latestSeenVisit != null) {
-                VisitDetail visitDetail = suggestion.latestSeenVisit.getVisitDetail(suggestion.person.getId());
-                if (visitDetail != null) {
-                    if (hasSame(tagIds, visitDetail.getTagIds())) {
-                        suggestions.add(suggestion);
+            if (suggestion.person != null) {
+                if (suggestion.latestSeenVisit != null) {
+                    VisitDetail visitDetail = suggestion.latestSeenVisit.getVisitDetail(suggestion.person.getId());
+                    if (visitDetail != null) {
+                        if (hasSame(tagIds, visitDetail.getTagIds())) {
+                            suggestions.add(suggestion);
+                        }
                     }
-                }
-            } else {
-                VisitDetail visitDetail = suggestion.latestVisit.getVisitDetail(suggestion.person.getId());
-                if (visitDetail != null) {
-                    if (hasSame(tagIds, visitDetail.getTagIds())) {
-                        suggestions.add(suggestion);
+                } else {
+                    VisitDetail visitDetail = suggestion.latestVisit.getVisitDetail(suggestion.person.getId());
+                    if (visitDetail != null) {
+                        if (hasSame(tagIds, visitDetail.getTagIds())) {
+                            suggestions.add(suggestion);
+                        }
                     }
                 }
             }
