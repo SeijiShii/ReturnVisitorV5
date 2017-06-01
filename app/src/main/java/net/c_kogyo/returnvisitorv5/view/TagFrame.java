@@ -20,48 +20,30 @@ import java.util.ArrayList;
  * Created by SeijiShii on 2017/02/21.
  */
 
-public class TagFrame extends LinearLayout{
+public class TagFrame extends TagLinesFrame{
 
-    private final static int LINE_HEIGHT = 35;
-    private final static int MARGIN = 5;
-
-    private int lineHeight, frameWidth, margin;
     private ArrayList<String> mTagIds;
     private ArrayList<Tag> mTags;
     private TagFrameCallback mCallback;
 
-    public TagFrame(Context context,
-                    ArrayList<String> tags,
-                    TagFrameCallback callback) {
+    public TagFrame(Context context) {
         super(context);
-
-        this.mTagIds = tags;
-        this.mCallback = callback;
-
-        initCommon();
-
     }
 
     public TagFrame(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
+    @Override
+    public void setLayoutParams(TagLinesFrame frame) {
+        frame.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+    }
+
+
     public void setTagIdsAndInitialize(ArrayList<String> tagIds, TagFrameCallback callback) {
         this.mTagIds = tagIds;
         this.mCallback = callback;
-
-        initCommon();
-    }
-
-    private void initCommon() {
-
-        this.removeAllViews();
-
-        lineHeight = (int) (getContext().getResources().getDisplayMetrics().density * LINE_HEIGHT);
-        margin = (int) (getContext().getResources().getDisplayMetrics().density * MARGIN);
-
-        this.setOrientation(VERTICAL);
-        this.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        removeAllViews();
 
         if (mTagIds.size() <= 0) {
             return;
@@ -72,65 +54,13 @@ public class TagFrame extends LinearLayout{
             return;
         }
 
-        waitAndSetWidth();
-    }
-
-    private LinearLayout generateNewLine() {
-
-        LinearLayout newLine = new LinearLayout(getContext());
-        newLine.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, lineHeight));
-        newLine.setOrientation(HORIZONTAL);
-
-        return newLine;
-    }
-
-    private void waitAndSetWidth() {
-
-        setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-
-        final Handler handler = new Handler();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (getWidth() <= 0) {
-                    try {
-                        Thread.sleep(50);
-                    } catch (InterruptedException e) {
-
-                    }
-                }
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        frameWidth = getWidth();
-                        putTagsInLine();
-                    }
-                });
-            }
-        }).start();
-
-    }
-
-    private void putTagsInLine() {
-
-        this.removeAllViews();
-        this.addView(generateNewLine());
-
-        int widthSum = 0;
-
-        for (Tag tag: mTags) {
-
+        ArrayList<View> tagViews = new ArrayList<>();
+        for (Tag tag : mTags) {
             SmallTagView tagView = new SmallTagView(getContext(), tag);
-            if (tagView.getViewWidth() + margin + widthSum > frameWidth) {
-
-                // これから追加するタグの幅とすでにセットされているタグの幅を足したとき、フレームの幅を超えるようなら行を追加する
-                this.addView(generateNewLine());
-                widthSum = 0;
-            }
-            // 最後の行にタグを追加する
-            ((LinearLayout)(this.getChildAt(this.getChildCount() - 1))).addView(tagView);
-            widthSum += (tagView.getViewWidth() + margin);
+            tagViews.add(tagView);
         }
+
+        super.setViewsAndInitialize(tagViews);
 
         if (mCallback != null) {
             mCallback.postDrawn();
