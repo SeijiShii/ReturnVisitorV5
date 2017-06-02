@@ -454,8 +454,12 @@ public class CalendarPagerActivity extends AppCompatActivity {
                     public void onOkClick(Work work) {
                         startWorkPagerActivityWithNewWork(work);
                     }
-                },
-                true,
+
+                  @Override
+                  public void onCloseDialog() {
+                        InputUtil.hideSoftKeyboard(CalendarPagerActivity.this);
+                  }
+              }, true,
                 Calendar.getInstance()).show(getFragmentManager(), null);
     }
 
