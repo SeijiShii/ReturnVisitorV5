@@ -14,6 +14,7 @@ import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -27,6 +28,7 @@ import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.DismissedSuggestion;
 import net.c_kogyo.returnvisitorv5.data.Filter;
+import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
@@ -177,7 +179,7 @@ public class VisitSuggestionActivity extends AppCompatActivity {
                 = new PriorityFilterPane(this,
                 new PriorityFilterPane.PriorityFilterListener() {
                     @Override
-                    public void onSetFilter(ArrayList<Visit.Priority> priorities) {
+                    public void onSetFilter(ArrayList<Person.Priority> priorities) {
                         filter.setPriorities(priorities);
                         refreshListByFilter(true);
                     }
@@ -407,6 +409,19 @@ public class VisitSuggestionActivity extends AppCompatActivity {
     private ListView suggestionList;
     private void initSuggestionList() {
         suggestionList = (ListView) findViewById(R.id.suggestion_list_view);
+        suggestionList.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+                if (scrollState == SCROLL_STATE_TOUCH_SCROLL) {
+                    InputUtil.hideSoftKeyboard(VisitSuggestionActivity.this);
+                }
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+
+            }
+        });
     }
 
     private void refreshListByFilter(boolean blink) {

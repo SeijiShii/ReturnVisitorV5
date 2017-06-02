@@ -11,6 +11,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
+import static net.c_kogyo.returnvisitorv5.data.Person.PRIORITY;
 import static net.c_kogyo.returnvisitorv5.data.Visit.PLACE_ID;
 
 /**
@@ -28,14 +29,13 @@ public class VisitDetail extends DataItem  implements Cloneable{
     public static final String SEEN = "seen";
     public static final String IS_STUDY = "is_study";
     public static final String IS_RV = "is_rv";
-    public static final String PRIORITY = "priority";
 
 
     private String personId, visitId, placeId;
     private boolean seen, isStudy, isRV;
     private ArrayList<Placement> placements;
     private ArrayList<String> tagIds;
-    private Visit.Priority priority;
+    private Person.Priority priority;
 
 
     public VisitDetail(String personId, String visitId, String placeId) {
@@ -60,7 +60,7 @@ public class VisitDetail extends DataItem  implements Cloneable{
 
         this.placements = new ArrayList<>();
         this.tagIds = new ArrayList<>();
-        this.priority = Visit.Priority.NONE;
+        this.priority = Person.Priority.NONE;
     }
 
     public VisitDetail(VisitDetail lastVisitDetail) {
@@ -96,7 +96,7 @@ public class VisitDetail extends DataItem  implements Cloneable{
                 this.isStudy = object.getBoolean(IS_STUDY);
 
             if (object.has(PRIORITY))
-                this.priority = Visit.Priority.valueOf(object.getString(PRIORITY));
+                this.priority = Person.Priority.valueOf(object.getString(PRIORITY));
 
             if (object.has(PLACEMENTS)) {
                 JSONArray pArray = object.getJSONArray(PLACEMENTS);
@@ -174,11 +174,11 @@ public class VisitDetail extends DataItem  implements Cloneable{
         this.seen = seen;
     }
 
-    public void setPriority(Visit.Priority priority) {
+    public void setPriority(Person.Priority priority) {
         this.priority = priority;
     }
 
-    public Visit.Priority getPriority() {
+    public Person.Priority getPriority() {
         return priority;
     }
 

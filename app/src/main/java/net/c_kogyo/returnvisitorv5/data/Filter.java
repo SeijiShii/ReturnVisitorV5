@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 public class Filter {
 
-    ArrayList<Visit.Priority> priorities;
+    ArrayList<Person.Priority> priorities;
     ArrayList<String> tagIds;
     ArrayList<String> searchWords;
 
@@ -18,14 +18,14 @@ public class Filter {
         priorities = new ArrayList<>();
 
         for (int i = 0 ; i < 5 ;i++ ) {
-            priorities.add(Visit.Priority.values()[i + 3]);
+            priorities.add(Person.Priority.values()[i + 3]);
         }
 
         tagIds = new ArrayList<>();
         searchWords = new ArrayList<>();
     }
 
-    public Filter(ArrayList<Visit.Priority> priorities,
+    public Filter(ArrayList<Person.Priority> priorities,
                   ArrayList<String> tagIds,
                   ArrayList<String> searchWords) {
 
@@ -36,11 +36,11 @@ public class Filter {
         this.searchWords = searchWords;
     }
 
-    public ArrayList<Visit.Priority> getPriorities() {
+    public ArrayList<Person.Priority> getPriorities() {
         return priorities;
     }
 
-    public void setPriorities(ArrayList<Visit.Priority> priorities) {
+    public void setPriorities(ArrayList<Person.Priority> priorities) {
         this.priorities = priorities;
     }
 

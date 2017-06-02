@@ -78,4 +78,11 @@ public class PersonList extends DataList<Person> {
         Log.d(TAG, "Invalid person count: " + deleteList.size());
 
     }
+
+    // for change
+    public void setPriorityToPersons() {
+        for (Person person : list) {
+            person.setPriorityFromLatestVisitDetail();
+        }
+    }
 }

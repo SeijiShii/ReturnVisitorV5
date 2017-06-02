@@ -187,7 +187,7 @@ public class VisitList extends DataList<Visit> {
     public ArrayList<Visit> getAllNotHomeVisitsInOneMonth() {
         ArrayList<Visit> nhVisits = new ArrayList<>();
         for (Visit visit : list) {
-            if (visit.getPriority() == Visit.Priority.NOT_HOME) {
+            if (visit.getPriority() == Person.Priority.NOT_HOME) {
                 if (CalendarUtil.daysPast(visit.getDatetime(), Calendar.getInstance()) < 32) {
                     nhVisits.add(visit);
                 }

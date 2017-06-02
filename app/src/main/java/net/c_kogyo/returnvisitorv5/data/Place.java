@@ -234,25 +234,25 @@ public class Place extends DataItem {
         return place;
     }
 
-    public Visit.Priority getPriority() {
+    public Person.Priority getPriority() {
 
         switch (category) {
             case HOUSE:
             case ROOM:
                 Visit visit = RVData.getInstance().visitList.getLatestVisitToPlace(this.id);
                 if (visit == null) {
-                    return Visit.Priority.NONE;
+                    return Person.Priority.NONE;
                 }
                 return visit.getPriority();
 
             case HOUSING_COMPLEX:
                 Place room = RVData.getInstance().placeList.getMostPriorRoom(this.id);
                 if (room == null) {
-                    return Visit.Priority.NONE;
+                    return Person.Priority.NONE;
                 }
                 return room.getPriority();
             default:
-                return Visit.Priority.NONE;
+                return Person.Priority.NONE;
         }
         // DONE: 2017/03/05 実際のpriority処理を記述
     }

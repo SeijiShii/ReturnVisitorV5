@@ -9,6 +9,7 @@ import android.widget.RelativeLayout;
 
 import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.R;
+import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 
 import java.util.ArrayList;
@@ -20,11 +21,11 @@ import java.util.ArrayList;
 public class PriorityFilterPane extends RelativeLayout {
 
     private PriorityFilterListener mListener;
-    private ArrayList<Visit.Priority> mInitPriorities;
+    private ArrayList<Person.Priority> mInitPriorities;
 
     public PriorityFilterPane(Context context,
                               PriorityFilterListener listener,
-                              ArrayList<Visit.Priority> initPriorities) {
+                              ArrayList<Person.Priority> initPriorities) {
 
         // TODO: 2017/06/01 Priority反映
         super(context);
@@ -65,13 +66,13 @@ public class PriorityFilterPane extends RelativeLayout {
             buttons[i] = new ToggleColorButton(getContext(),
                     Constants.buttonRes[i + 3],
                     Constants.buttonRes[0],
-                    mInitPriorities.contains(Visit.Priority.values()[i + 3]));
+                    mInitPriorities.contains(Person.Priority.values()[i + 3]));
             buttonFrame.addView(buttons[i]);
 
             buttons[i].setCheckChangeListener(checkChangeListener);
         }
 
-        for (Visit.Priority priority : mInitPriorities) {
+        for (Person.Priority priority : mInitPriorities) {
             buttons[priority.num() - 3].setChecked(true);
         }
 
@@ -81,10 +82,10 @@ public class PriorityFilterPane extends RelativeLayout {
             = new ToggleColorButton.CheckChangeListener() {
         @Override
         public void onCheckChange(boolean checked) {
-            ArrayList<Visit.Priority> priorities = new ArrayList<>();
+            ArrayList<Person.Priority> priorities = new ArrayList<>();
             for ( int i = 0 ; i < 5 ; i++ ) {
                 if (buttons[i].isChecked()) {
-                    priorities.add(Visit.Priority.getEnum(i + 3));
+                    priorities.add(Person.Priority.getEnum(i + 3));
                 }
             }
             if (mListener != null) {
@@ -94,6 +95,6 @@ public class PriorityFilterPane extends RelativeLayout {
     };
 
     public interface PriorityFilterListener {
-        void onSetFilter(ArrayList<Visit.Priority> priorities);
+        void onSetFilter(ArrayList<Person.Priority> priorities);
     }
 }

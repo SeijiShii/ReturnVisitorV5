@@ -41,7 +41,7 @@ public class VisitSuggestion {
         return latestSeenVisit;
     }
 
-    public Visit.Priority getPriority() {
+    public Person.Priority getPriority() {
 
         for (VisitDetail visitDetail : latestVisit.getVisitDetails()) {
             if (visitDetail.getPersonId().equals(person.getId())) {
@@ -118,11 +118,11 @@ public class VisitSuggestion {
         return suggestions;
     }
 
-    private static ArrayList<VisitSuggestion> getSuggestionsByPriority(Visit.Priority priority) {
+    private static ArrayList<VisitSuggestion> getSuggestionsByPriority(Person.Priority priority) {
 
         ArrayList<VisitSuggestion> suggestions = new ArrayList<>();
 
-        if (priority != Visit.Priority.NOT_HOME) {
+        if (priority != Person.Priority.NOT_HOME) {
             for (Person person : RVData.getInstance().personList) {
 
                 if (person.getPriority() == priority) {
@@ -189,16 +189,16 @@ public class VisitSuggestion {
         return suggestions;
     }
 
-    private static ArrayList<VisitSuggestion> getSuggestionsByPriorities(ArrayList<Visit.Priority> priorities) {
-        ArrayList<Visit.Priority> noDoubledPriorities = new ArrayList<>();
-        for (Visit.Priority priority : priorities) {
+    private static ArrayList<VisitSuggestion> getSuggestionsByPriorities(ArrayList<Person.Priority> priorities) {
+        ArrayList<Person.Priority> noDoubledPriorities = new ArrayList<>();
+        for (Person.Priority priority : priorities) {
             if (!noDoubledPriorities.contains(priority)) {
                 noDoubledPriorities.add(priority);
             }
         }
 
         ArrayList<VisitSuggestion> suggestions = new ArrayList<>();
-        for (Visit.Priority priority : noDoubledPriorities) {
+        for (Person.Priority priority : noDoubledPriorities) {
             suggestions.addAll(getSuggestionsByPriority(priority));
         }
 

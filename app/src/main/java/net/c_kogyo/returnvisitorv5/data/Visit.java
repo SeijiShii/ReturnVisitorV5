@@ -31,39 +31,6 @@ public class Visit extends DataItem implements Cloneable{
     private ArrayList<Placement> placements;
     private ArrayList<VisitDetail> visitDetails;
 
-    public enum Priority {
-
-        NONE(0),
-        NEGATIVE(1),
-        FOR_NEXT(2),
-        NOT_HOME(3),
-        BUSY(4),
-        LOW(5),
-        MIDDLE(6),
-        HIGH(7);
-
-        private final int num;
-
-        Priority(int num) {
-            this.num = num;
-        }
-
-        public static Priority getEnum (int num) {
-
-            Priority[] enumArray = Priority.values();
-
-            for (Priority priority : enumArray) {
-
-                if (priority.num() == num) return priority;
-
-            }
-            return null;
-        }
-        public int num(){
-            return num;
-        }
-
-    }
 
     public Visit() {
         super(VISIT);
@@ -229,9 +196,9 @@ public class Visit extends DataItem implements Cloneable{
         return datetime;
     }
     
-    public Priority getPriority() {
+    public Person.Priority getPriority() {
 
-        if (visitDetails.size() <= 0) return Priority.NOT_HOME;
+        if (visitDetails.size() <= 0) return Person.Priority.NOT_HOME;
 
         return getPriorVisitDetail().getPriority();
     }

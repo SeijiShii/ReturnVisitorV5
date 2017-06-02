@@ -256,8 +256,9 @@ public class VisitDetailView extends BaseAnimateView {
         priorityRater.setPriority(mVisitDetail.getPriority());
         priorityRater.setOnPrioritySetListener(new PriorityRater.OnPrioritySetListener() {
             @Override
-            public void onPrioritySet(Visit.Priority priority) {
+            public void onPriorityChanged(Person.Priority priority) {
                 mVisitDetail.setPriority(priority);
+                mPerson.setPriority(priority);
                 if (mListener != null) {
                     mListener.onPrioritySet(priority);
                 }
@@ -463,7 +464,7 @@ public class VisitDetailView extends BaseAnimateView {
 
         void onPlacementButtonClick(VisitDetail visitDetail);
 
-        void onPrioritySet(Visit.Priority priority);
+        void onPrioritySet(Person.Priority priority);
 
         void postInitialExtract(VisitDetailView visitDetailView);
 

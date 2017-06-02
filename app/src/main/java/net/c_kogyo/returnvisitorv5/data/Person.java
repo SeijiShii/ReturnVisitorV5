@@ -20,6 +20,8 @@ public class Person extends DataItem implements Cloneable{
     public static final String SEX      = "sex";
     public static final String AGE      = "age";
     public static final String PLACE_IDS  = "place_ids";
+    public static final String PRIORITY = "priority";
+
 
     public enum Sex {
         SEX_UNKNOWN(0),
@@ -86,6 +88,40 @@ public class Person extends DataItem implements Cloneable{
 
     }
 
+    public enum Priority {
+
+        NONE(0),
+        NEGATIVE(1),
+        FOR_NEXT(2),
+        NOT_HOME(3),
+        BUSY(4),
+        LOW(5),
+        MIDDLE(6),
+        HIGH(7);
+
+        private final int num;
+
+        Priority(int num) {
+            this.num = num;
+        }
+
+        public static Priority getEnum (int num) {
+
+            Priority[] enumArray = Priority.values();
+
+            for (Priority priority : enumArray) {
+
+                if (priority.num() == num) return priority;
+
+            }
+            return null;
+        }
+        public int num(){
+            return num;
+        }
+
+    }
+
 //    public enum Interest {
 //
 //        NONE(0),
@@ -121,6 +157,7 @@ public class Person extends DataItem implements Cloneable{
 
     private Sex sex;
     private Age age;
+    private Priority priority;
 
     private ArrayList<String> placeIds;
 
@@ -134,9 +171,8 @@ public class Person extends DataItem implements Cloneable{
     private void initCommon(String placeId) {
         this.sex = Sex.SEX_UNKNOWN;
         this.age = Age.AGE_UNKNOWN;
-//        this.interest = Interest.NONE;
-//        this.tagIds = new ArrayList<>();
         this.placeIds = new ArrayList<>();
+        this.priority = Priority.NONE;
 
         if (placeId == null) return;
         this.placeIds.add(placeId);
@@ -184,28 +220,39 @@ public class Person extends DataItem implements Cloneable{
         this.age = age;
     }
 
-    public String getSexString(Context context) {
+    private String getSexString(Context context) {
 
         String[] sexStringArray = context.getResources().getStringArray(R.array.sex_array);
         return sexStringArray[sex.num()];
 
     }
 
-    public String getAgeString(Context context) {
+    private String getAgeString(Context context) {
 
         String[] ageStringArray = context.getResources().getStringArray(R.array.age_array);
         return ageStringArray[age.num()];
 
     }
 
+    private String getPriorityString(Context context) {
+
+        String[] priorityStringArray = context.getResources().getStringArray(R.array.priority_array);
+        return priorityStringArray[priority.num()];
+    }
+
+    public void setPriority(Priority priority) {
+        this.priority = priority;
+    }
+
     @Override
-    protected Object clone() throws CloneNotSupportedException {
+    public Object clone() throws CloneNotSupportedException {
 
         Person person = (Person) super.clone();
 
         person.sex  = this.sex;
         person.age  = this.age;
         person.placeIds = new ArrayList<>(this.placeIds);
+        person.priority = this.priority;
 
         return person;
     }
@@ -225,6 +272,8 @@ public class Person extends DataItem implements Cloneable{
             }
             object.put(PLACE_IDS, array);
 
+            object.put(PRIORITY, priority.toString());
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -236,8 +285,9 @@ public class Person extends DataItem implements Cloneable{
     public String toStringForSearch(Context context) {
 
         StringBuilder builder = new StringBuilder(super.toStringForSearch(context));
-        builder.append(context.getResources().getStringArray(R.array.sex_array)[this.sex.num()]).append(" ");
-        builder.append(context.getResources().getStringArray(R.array.age_array)[this.age.num()]).append(" ");
+        builder.append(getSexString(context)).append(" ");
+        builder.append(getAgeString(context)).append(" ");
+        builder.append(getPriorityString(context)).append(" ");
 
         // DONE: 2017/05/26 タグも対象とするか
         Visit visit = RVData.getInstance().visitList.getLatestVisitToPerson(id);
@@ -262,13 +312,11 @@ public class Person extends DataItem implements Cloneable{
             builder.append(name).append(" ");
         }
 
-        String[] sexArray = context.getResources().getStringArray(R.array.sex_array);
         if (sex != Sex.SEX_UNKNOWN) {
-            builder.append(sexArray[sex.num()]).append(" ");
+            builder.append(getSexString(context)).append(" ");
         }
 
-        String[] ageArray = context.getResources().getStringArray(R.array.age_array);
-        builder.append(ageArray[age.num()]).append(" ");
+        builder.append(getAgeString(context)).append(" ");
         builder.append(note);
 
         return builder.toString();
@@ -282,10 +330,11 @@ public class Person extends DataItem implements Cloneable{
         this.placeIds = placeIds;
     }
 
-    public static Person setJSON(Person person, JSONObject object) {
+    private static Person setJSON(Person person, JSONObject object) {
         try {
             if (object.has(SEX))            person.sex         = Sex.valueOf(object.get(SEX).toString());
             if (object.has(AGE))            person.age         = Age.valueOf(object.get(AGE).toString());
+            if (object.has(PRIORITY))       person.priority     = Priority.valueOf(object.get(PRIORITY).toString());
 
             if (object.has(PLACE_IDS)) {
                 person.placeIds = new ArrayList<>();
@@ -301,9 +350,15 @@ public class Person extends DataItem implements Cloneable{
         return person;
     }
 
-    public Visit.Priority getPriority() {
+    public Priority getPriority() {
 
-        Visit.Priority priority = Visit.Priority.NONE;
+        return priority;
+
+
+    }
+
+    public void setPriorityFromLatestVisitDetail() {
+
         Visit visit = RVData.getInstance().visitList.getLatestVisitToPerson(id);
 
         if (visit != null) {
@@ -313,7 +368,6 @@ public class Person extends DataItem implements Cloneable{
                 priority = visitDetail.getPriority();
             }
         }
-        return priority;
     }
 
     // TODO: 2017/06/02 Priorityを人に属するようにする
