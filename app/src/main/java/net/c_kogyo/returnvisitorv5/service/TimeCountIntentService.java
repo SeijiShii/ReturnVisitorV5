@@ -102,6 +102,7 @@ public class TimeCountIntentService extends IntentService {
                 mWork = RVData.getInstance().workList.getById(workId);
                 if (mWork == null) {
                     stopTimeCount();
+                    return;
                 }
             }
         }

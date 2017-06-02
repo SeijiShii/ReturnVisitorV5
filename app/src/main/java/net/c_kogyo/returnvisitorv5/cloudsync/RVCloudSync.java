@@ -182,6 +182,8 @@ public class RVCloudSync {
                                 });
                                 break;
                         }
+                        socketClient.close();
+
                     } catch (JSONException e) {
                         Log.e(TAG, e.getMessage());
                     }
