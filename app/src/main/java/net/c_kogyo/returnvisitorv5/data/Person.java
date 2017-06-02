@@ -214,10 +214,12 @@ public class Person extends DataItem implements Cloneable{
 
     public void setSex(Sex sex) {
         this.sex = sex;
+        onUpdate();
     }
 
     public void setAge(Age age) {
         this.age = age;
+        onUpdate();
     }
 
     private String getSexString(Context context) {
@@ -242,6 +244,7 @@ public class Person extends DataItem implements Cloneable{
 
     public void setPriority(Priority priority) {
         this.priority = priority;
+        onUpdate();
     }
 
     @Override
@@ -328,6 +331,7 @@ public class Person extends DataItem implements Cloneable{
 
     public void setPlaceIds(ArrayList<String> placeIds) {
         this.placeIds = placeIds;
+        onUpdate();
     }
 
     private static Person setJSON(Person person, JSONObject object) {

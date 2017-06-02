@@ -164,18 +164,22 @@ public class VisitDetail extends DataItem  implements Cloneable{
 
     public void setIsRv(boolean isRv) {
         this.isRV = isRv;
+        onUpdate();
     }
 
     public void setIsStudy(boolean isStudy) {
         this.isStudy = isStudy;
+        onUpdate();
     }
 
     public void setSeen(boolean seen) {
         this.seen = seen;
+        onUpdate();
     }
 
     public void setPriority(Person.Priority priority) {
         this.priority = priority;
+        onUpdate();
     }
 
     public Person.Priority getPriority() {
@@ -212,6 +216,7 @@ public class VisitDetail extends DataItem  implements Cloneable{
 
     public void setPlaceId(String placeId) {
         this.placeId = placeId;
+        onUpdate();
     }
 
     public String toString(Context context, int indents, boolean withTags) {

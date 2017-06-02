@@ -515,12 +515,15 @@ public class RecordVisitActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
+                mVisit.onUpdate();
+
                 RVData.getInstance().visitList.setOrAdd(mVisit);
                 RVData.getInstance().personList.addList(mAddedPersons);
                 RVData.getInstance().personList.removeList(mRemovedPersons);
 
                 if (mPlace != null) {
                     mPlace.setName(placeNameText.getText());
+                    mPlace.onUpdate();
                     RVData.getInstance().placeList.setOrAdd(mPlace);
                 }
 

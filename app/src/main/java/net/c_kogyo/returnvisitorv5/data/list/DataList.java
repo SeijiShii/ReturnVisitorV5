@@ -30,6 +30,7 @@ public class DataList<T extends DataItem> implements Iterable<T>{
 
     synchronized public void setOrAdd(T data) {
 
+        data.onUpdate();
         if (contains(data)) {
             list.set(indexOf(data), data);
         } else {

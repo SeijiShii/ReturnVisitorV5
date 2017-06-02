@@ -564,6 +564,8 @@ public class MapActivity extends AppCompatActivity
         place.setLatLng(marker.getPosition());
         place.setAddress(null);
 
+        place.onUpdate();
+
         RVData.getInstance().saveData(this);
 
         RVCloudSync.syncDataIfLoggedIn(this);
@@ -731,6 +733,7 @@ public class MapActivity extends AppCompatActivity
                     public void onOkClick(Place housingComplex) {
 
                         placeMarkers.refreshMarker(housingComplex);
+                        housingComplex.onUpdate();
                     }
 
                     @Override

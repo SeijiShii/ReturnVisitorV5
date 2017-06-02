@@ -92,15 +92,18 @@ public class Visit extends DataItem implements Cloneable{
 
     public void setPlaceId(String placeId) {
         this.placeId = placeId;
+        onUpdate();
     }
 
     public ArrayList<Placement> getPlacements() {
+        onUpdate();
         return placements;
     }
 
-    public void setPlacements(ArrayList<Placement> placements) {
-        this.placements = placements;
-    }
+//    public void setPlacements(ArrayList<Placement> placements) {
+//        this.placements = placements;
+//        onUpdate();
+//    }
 
     public void addVisitDetail(VisitDetail visitDetail) {
         this.visitDetails.add(visitDetail);
@@ -136,6 +139,7 @@ public class Visit extends DataItem implements Cloneable{
     // そう考えると場所無き訪問もあるよね
 
     public ArrayList<Placement> getAllPlacements() {
+        onUpdate();
         ArrayList<Placement> placements = new ArrayList<>(this.placements);
 
         for (VisitDetail visitDetail : visitDetails) {
@@ -146,6 +150,7 @@ public class Visit extends DataItem implements Cloneable{
 
     public int getPlacementCount() {
 
+        onUpdate();
         int count = 0;
 
         for (Placement plc : getAllPlacements()) {
@@ -160,6 +165,7 @@ public class Visit extends DataItem implements Cloneable{
 
     public int getShowVideoCount() {
 
+        onUpdate();
         int count = 0;
         for (Placement plc : getAllPlacements()) {
             if (plc.getCategory() == Publication.Category.SHOW_VIDEO) {
@@ -225,6 +231,7 @@ public class Visit extends DataItem implements Cloneable{
     }
 
     public ArrayList<VisitDetail> getVisitDetails() {
+        onUpdate();
         return visitDetails;
     }
 
@@ -305,6 +312,7 @@ public class Visit extends DataItem implements Cloneable{
 
     public void setDatetime(Calendar datetime) {
         this.datetime = datetime;
+        onUpdate();
     }
 
     public boolean hasPerson(String personId) {

@@ -125,6 +125,9 @@ public class DataItem implements Cloneable{
         return updatedAt;
     }
 
+    // TODO: 2017/06/02 すべてのデータに反映
+    public void onUpdate() {updatedAt = Calendar.getInstance();};
+
     public void setUpdatedAt() {
         updatedAt = Calendar.getInstance();
     }

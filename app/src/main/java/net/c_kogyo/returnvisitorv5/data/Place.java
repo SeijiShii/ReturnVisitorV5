@@ -167,6 +167,7 @@ public class Place extends DataItem {
 
     public void setAddress(String address) {
         this.address = address;
+        onUpdate();
     }
 
     public boolean isAddressRequested() {
@@ -179,6 +180,7 @@ public class Place extends DataItem {
 
     public void setLatLng(LatLng latLng) {
         this.latLng = latLng;
+        onUpdate();
     }
 
     @Override
@@ -275,6 +277,7 @@ public class Place extends DataItem {
 
     public void setParentId(String parentId) {
         this.parentId = parentId;
+        onUpdate();
     }
 
     public Category getCategory() {
@@ -283,6 +286,7 @@ public class Place extends DataItem {
 
     public void setCategory(Category category) {
         this.category = category;
+        onUpdate();
     }
 
     public int getChildCount() {
