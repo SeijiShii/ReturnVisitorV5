@@ -316,4 +316,6 @@ public class Person extends DataItem implements Cloneable{
         return priority;
     }
 
+    // TODO: 2017/06/02 Priorityを人に属するようにする
+
 }

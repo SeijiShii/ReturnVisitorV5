@@ -1563,4 +1563,7 @@ public class MapActivity extends AppCompatActivity
         }
     }
 
+    // TODO: 2017/06/02 ダイアログを閉じるたびにキーボードも閉じるように
+    // TODO: Term of Use
+
 }
