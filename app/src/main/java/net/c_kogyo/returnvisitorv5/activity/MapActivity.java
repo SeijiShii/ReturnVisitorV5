@@ -63,6 +63,7 @@ import net.c_kogyo.returnvisitorv5.dialog.MapLongClickDialog;
 import net.c_kogyo.returnvisitorv5.dialog.PersonDialog;
 import net.c_kogyo.returnvisitorv5.dialog.PlaceDialog;
 import net.c_kogyo.returnvisitorv5.dialog.SearchDialog;
+import net.c_kogyo.returnvisitorv5.dialog.TermOfUseDialog;
 import net.c_kogyo.returnvisitorv5.service.TimeCountIntentService;
 import net.c_kogyo.returnvisitorv5.util.AdMobHelper;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
@@ -826,6 +827,7 @@ public class MapActivity extends AppCompatActivity
         initAddWorkButton();
         initAddVisitButton();
         initSuggestionButton();
+        initTermOfUseButton();
     }
 
     private void initDrawerLogoButton() {
@@ -1575,6 +1577,16 @@ public class MapActivity extends AppCompatActivity
                 InputUtil.hideSoftKeyboard(MapActivity.this);
             }
         }, true).show(getFragmentManager(), null);
+    }
+
+    private void initTermOfUseButton() {
+        Button termOfUseButton = (Button) findViewById(R.id.term_of_use_button);
+        termOfUseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TermOfUseDialog.getInstance().show(getFragmentManager(), null);
+            }
+        });
     }
 
     // TODO: 2017/06/02 ダイアログを閉じるたびにキーボードも閉じるように
