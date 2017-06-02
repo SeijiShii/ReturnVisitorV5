@@ -1,6 +1,5 @@
 package net.c_kogyo.returnvisitorv5.activity;
 
-import android.animation.Animator;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.BroadcastReceiver;
@@ -293,7 +292,7 @@ public class RecordVisitActivity extends AppCompatActivity {
 
         PersonDialog.getInstance(new Person(mPlace.getId()),
 
-                new PersonDialog.OnButtonsClickListener() {
+                new PersonDialog.PersonDialogListener() {
                     @Override
                     public void onOkClick(final Person person) {
                         InputUtil.hideSoftKeyboard(RecordVisitActivity.this);
@@ -311,6 +310,11 @@ public class RecordVisitActivity extends AppCompatActivity {
                     @Override
                     public void onDeleteClick(Person person) {
                         // Newの時は削除ボタンが表示されないので呼ばれることはない
+                    }
+
+                    @Override
+                    public void onCloseDialog() {
+                        InputUtil.hideSoftKeyboard(RecordVisitActivity.this);
                     }
                 }).show(getFragmentManager(), null);
 
@@ -445,7 +449,7 @@ public class RecordVisitActivity extends AppCompatActivity {
     private void showPersonDialogForEdit(Person person) {
 
         PersonDialog.getInstance(person,
-                new PersonDialog.OnButtonsClickListener() {
+                new PersonDialog.PersonDialogListener() {
                     @Override
                     public void onOkClick(Person person) {
                         VisitDetail visitDetail = mVisit.getVisitDetail(person.getId());
@@ -467,6 +471,12 @@ public class RecordVisitActivity extends AppCompatActivity {
                         mVisit.getVisitDetails().remove(visitDetail);
                         mRemovedPersons.add(person);
                     }
+
+                    @Override
+                    public void onCloseDialog() {
+                        InputUtil.hideSoftKeyboard(RecordVisitActivity.this);
+                    }
+
                 }).show(getFragmentManager(), null);
     }
 
@@ -588,6 +598,11 @@ public class RecordVisitActivity extends AppCompatActivity {
                 }
             }
 
+            @Override
+            public void onCloseDialog() {
+                InputUtil.hideSoftKeyboard(RecordVisitActivity.this);
+            }
+
         }).show(getFragmentManager(), null);
     }
 
@@ -598,8 +613,14 @@ public class RecordVisitActivity extends AppCompatActivity {
             public void onDecidePlacement(Placement placement, String parentId) {
                 addPlacement(placement, parentId);
                 addPlacementCell(placement, parentId, false);
-                }
-            }).show(getFragmentManager(), null);
+            }
+
+            @Override
+            public void onCloseDialog() {
+                InputUtil.hideSoftKeyboard(RecordVisitActivity.this);
+            }
+
+        }).show(getFragmentManager(), null);
 
     }
 
@@ -735,6 +756,11 @@ public class RecordVisitActivity extends AppCompatActivity {
                     public void onSetLatLng(LatLng latLng) {
                         setPlace(new Place(latLng, Place.Category.HOUSE));
                     }
+
+                    @Override
+                    public void onCloseDialog() {
+                        InputUtil.hideSoftKeyboard(RecordVisitActivity.this);
+                    }
                 }).show(getFragmentManager(), null);
     }
 
@@ -759,7 +785,12 @@ public class RecordVisitActivity extends AppCompatActivity {
                                 person,
                                 VisitDetailView.DrawCondition.EXTRACT_POST_DRAWN_FROM_0);
                     }
-                }).show(getFragmentManager(), null);
+
+            @Override
+            public void onCloseDialog() {
+                InputUtil.hideSoftKeyboard(RecordVisitActivity.this);
+            }
+        }).show(getFragmentManager(), null);
     }
 
     @Override
@@ -838,16 +869,17 @@ public class RecordVisitActivity extends AppCompatActivity {
                     @Override
                     public void onOkClick(Place housingComplex) {
 
+                        //この呼び出しではOKボタンは表示されない
                     }
 
                     @Override
                     public void onDeleteHousingComplex(Place housingComplex) {
-
+                       // この呼び出しでは削除ボタンはひょうじされない
                     }
 
                     @Override
-                    public void onCancelClick() {
-
+                    public void onCloseDialog() {
+                        InputUtil.hideSoftKeyboard(RecordVisitActivity.this);
                     }
                 }, false, false)
                             .show(getFragmentManager(), null);

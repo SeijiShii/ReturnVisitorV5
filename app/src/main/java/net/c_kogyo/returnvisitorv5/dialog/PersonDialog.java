@@ -2,14 +2,11 @@ package net.c_kogyo.returnvisitorv5.dialog;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.AttributeSet;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -18,7 +15,6 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -35,15 +31,15 @@ import net.c_kogyo.returnvisitorv5.util.ConfirmDialog;
 public class PersonDialog extends DialogFragment {
 
     private static Person mPerson;
-    private static OnButtonsClickListener mButtonsClickListener;
+    private static PersonDialogListener mListener;
     private static boolean isPersonEdited;
 
     private static PersonDialog instance;
 
     public static PersonDialog getInstance(Person person,
-                                           OnButtonsClickListener listener) {
+                                           PersonDialogListener listener) {
         mPerson = person;
-        mButtonsClickListener = listener;
+        mListener = listener;
         isPersonEdited = false;
 
         if (instance == null) {
@@ -224,8 +220,8 @@ public class PersonDialog extends DialogFragment {
                 mPerson.setName(nameText.getText().toString());
                 mPerson.setNote(noteText.getText().toString());
 
-                if (mButtonsClickListener != null) {
-                    mButtonsClickListener.onOkClick(mPerson);
+                if (mListener != null) {
+                    mListener.onOkClick(mPerson);
                 }
                 dismiss();
             }
@@ -252,6 +248,9 @@ public class PersonDialog extends DialogFragment {
             @Override
             public void onClick(View view) {
                 dismiss();
+                if (mListener != null) {
+                    mListener.onCloseDialog();
+                }
             }
         });
     }
@@ -269,8 +268,8 @@ public class PersonDialog extends DialogFragment {
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
-                                    if (mButtonsClickListener != null) {
-                                        mButtonsClickListener.onDeleteClick(mPerson);
+                                    if (mListener != null) {
+                                        mListener.onDeleteClick(mPerson);
                                     }
                                     PersonDialog.this.dismiss();
                                 }
@@ -313,11 +312,13 @@ public class PersonDialog extends DialogFragment {
         }
     }
 
-    public interface OnButtonsClickListener {
+    public interface PersonDialogListener {
 
         void onOkClick(Person person);
 
         void onDeleteClick(Person person);
+
+        void onCloseDialog();
     }
 
 }

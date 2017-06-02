@@ -34,6 +34,7 @@ import net.c_kogyo.returnvisitorv5.dialog.DayAggregationDialog;
 import net.c_kogyo.returnvisitorv5.fragment.WorkFragment;
 import net.c_kogyo.returnvisitorv5.util.AdMobHelper;
 import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
+import net.c_kogyo.returnvisitorv5.util.InputUtil;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 
 import java.text.DateFormat;
@@ -469,8 +470,11 @@ public class WorkPagerActivity extends AppCompatActivity {
                 onAddWork(work);
             }
 
-        },
-                false,
+              @Override
+              public void onCloseDialog() {
+                  InputUtil.hideSoftKeyboard(WorkPagerActivity.this);
+              }
+          }, false,
                 mDatePagerAdapter.getDayItem(mPager.getCurrentItem())).show(getFragmentManager(), null);
     }
 

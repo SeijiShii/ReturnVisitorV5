@@ -34,6 +34,7 @@ import net.c_kogyo.returnvisitorv5.data.VisitSuggestion;
 import net.c_kogyo.returnvisitorv5.dialog.ShowInMapDialog;
 import net.c_kogyo.returnvisitorv5.util.AdMobHelper;
 import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
+import net.c_kogyo.returnvisitorv5.util.InputUtil;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 import net.c_kogyo.returnvisitorv5.view.PriorityFilterPane;
 import net.c_kogyo.returnvisitorv5.view.SearchFilterPane;
@@ -393,6 +394,11 @@ public class VisitSuggestionActivity extends AppCompatActivity {
                     @Override
                     public void onMarkerClick(Place place) {
                         moveToMapWithPlace(place);
+                    }
+
+                    @Override
+                    public void onCloseDialog() {
+                        InputUtil.hideSoftKeyboard(VisitSuggestionActivity.this);
                     }
                 });
         mapDialog.show(getFragmentManager(), null);

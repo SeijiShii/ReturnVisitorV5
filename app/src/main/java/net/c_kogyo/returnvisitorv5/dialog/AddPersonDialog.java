@@ -369,6 +369,8 @@ public class AddPersonDialog extends DialogFragment
     public interface AddPersonDialogListener {
 
         void onSetPerson(Person person);
+
+        void onCloseDialog();
     }
 
     class PersonListAdapter extends BaseAdapter{

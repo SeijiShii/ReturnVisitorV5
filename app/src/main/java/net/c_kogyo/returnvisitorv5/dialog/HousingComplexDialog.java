@@ -100,7 +100,7 @@ public class HousingComplexDialog extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (mListener != null) {
-                    mListener.onCancelClick();
+                    mListener.onCloseDialog();
                 }
             }
         });
@@ -279,7 +279,7 @@ public class HousingComplexDialog extends DialogFragment {
 
         void onOkClick(Place housingComplex);
 
-        void onCancelClick();
+        void onCloseDialog();
     }
 
     private void initBroadcasting() {

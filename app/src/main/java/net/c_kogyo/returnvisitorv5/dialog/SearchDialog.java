@@ -60,7 +60,7 @@ public class SearchDialog extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (mListener != null) {
-                    mListener.onCancel();
+                    mListener.onCloseDialog();
                 }
                 dismiss();
             }
@@ -206,7 +206,7 @@ public class SearchDialog extends DialogFragment {
 
     public interface SearchDialogListener{
 
-        void onCancel();
+        void onCloseDialog();
 
         void onClickPerson(Person person);
 

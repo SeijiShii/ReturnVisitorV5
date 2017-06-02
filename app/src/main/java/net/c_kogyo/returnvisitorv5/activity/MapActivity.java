@@ -13,6 +13,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
+import android.os.PersistableBundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -672,6 +673,11 @@ public class MapActivity extends AppCompatActivity
                             public void onEditVisitClick(Visit visit) {
                                 startRecordVisitActivityToEditVisit(visit);
                             }
+
+                            @Override
+                            public void onCloseDialog() {
+                                InputUtil.hideSoftKeyboard(MapActivity.this);
+                            }
                         }).show(getFragmentManager(), null);
 
     }
@@ -735,13 +741,15 @@ public class MapActivity extends AppCompatActivity
                     }
 
                     @Override
-                    public void onCancelClick() {
+                    public void onCloseDialog() {
                         if (housingComplex.getChildCount() == 0) {
                             placeMarkers.removeByPlace(housingComplex);
                         } else {
                             placeMarkers.refreshMarker(housingComplex);
                         }
+                        InputUtil.hideSoftKeyboard(MapActivity.this);
                     }
+
                 }, true, true).show(getFragmentManager(), null);
 
     }
@@ -1094,6 +1102,11 @@ public class MapActivity extends AppCompatActivity
                         startWorkPagerActivityWithNewWork(work);
 
                     }
+
+                      @Override
+                      public void onCloseDialog() {
+                          InputUtil.hideSoftKeyboard(MapActivity.this);
+                      }
                 },
                 true,
                 Calendar.getInstance()).show(getFragmentManager(), null);
@@ -1222,6 +1235,11 @@ public class MapActivity extends AppCompatActivity
             public void onLogoutClick() {
                 // DONE: 2017/05/13 onLogoutClick
                 confirmLogout();
+            }
+
+            @Override
+            public void onCloseDialog() {
+                InputUtil.hideSoftKeyboard(MapActivity.this);
             }
         });
         loginDialog.show(getFragmentManager(), null);
@@ -1447,11 +1465,13 @@ public class MapActivity extends AppCompatActivity
     private void showSearchDialog(String initialSearchWord) {
 
         final SearchDialog searchDialog = SearchDialog.getInstance(new SearchDialog.SearchDialogListener() {
+
             @Override
-            public void onCancel() {
+            public void onCloseDialog() {
                 if (searchText.getText().length() > 0) {
                     searchText.setText("");
                 }
+                InputUtil.hideSoftKeyboard(MapActivity.this);
             }
 
             @Override

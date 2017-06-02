@@ -224,6 +224,9 @@ public class LoginDialog extends DialogFragment {
             @Override
             public void onClick(View v) {
                 dismiss();
+                if (mListener != null) {
+                    mListener.onCloseDialog();
+                }
             }
         });
     }
@@ -331,6 +334,8 @@ public class LoginDialog extends DialogFragment {
     public interface LoginDialogListener {
 
         void onLogoutClick();
+
+        void onCloseDialog();
 
     }
 

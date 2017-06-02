@@ -73,7 +73,14 @@ public class TagDialog extends DialogFragment {
                 }
             }
         });
-        builder.setNegativeButton(R.string.cancel, null);
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (mListener != null) {
+                    mListener.onCloseDialog();
+                }
+            }
+        });
         
         return builder.create();
     }
@@ -215,6 +222,8 @@ public class TagDialog extends DialogFragment {
     public interface TagDialogListener {
 
         void onOkClick(VisitDetail visitDetail);
+
+        void onCloseDialog();
 
     }
 

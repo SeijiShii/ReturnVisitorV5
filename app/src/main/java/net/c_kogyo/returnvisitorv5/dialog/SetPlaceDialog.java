@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -76,7 +77,14 @@ public class SetPlaceDialog extends DialogFragment
         builder.setView(view);
 
         builder.setTitle(R.string.set_place);
-        builder.setNegativeButton(R.string.close, null);
+        builder.setNegativeButton(R.string.close, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (mListener != null) {
+                    mListener.onCloseDialog();
+                }
+            }
+        });
         
         return builder.create();
         
@@ -221,6 +229,8 @@ public class SetPlaceDialog extends DialogFragment
         void onSetPlace(Place place);
 
         void onSetLatLng(LatLng latLng);
+
+        void onCloseDialog();
     }
 
     public static AtomicBoolean isShowing = new AtomicBoolean(false);

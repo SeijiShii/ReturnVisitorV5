@@ -79,7 +79,14 @@ public class AddWorkDialog extends DialogFragment {
             }
         });
 
-        builder.setNegativeButton(R.string.cancel, null);
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (mListener != null) {
+                    mListener.onCloseDialog();
+                }
+            }
+        });
 
         return builder.create();
         
@@ -223,6 +230,8 @@ public class AddWorkDialog extends DialogFragment {
     public interface AddWorkDialogListener {
 
         void onOkClick(Work work);
+
+        void onCloseDialog();
     }
 
     public static AtomicBoolean isShowing = new AtomicBoolean(false);

@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -36,14 +37,14 @@ public class ShowInMapDialog extends DialogFragment
         implements OnMapReadyCallback,
                     GoogleMap.OnMarkerClickListener {
 
-    private static MapDialogListener mListner;
+    private static MapDialogListener mListener;
 
     private static final String PLACE_ID = "place_id";
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
 
     public static ShowInMapDialog newInstance(String placeId, MapDialogListener listener) {
 
-        mListner = listener;
+        mListener = listener;
 
         Bundle arg = new Bundle();
         arg.putString(PLACE_ID, placeId);
@@ -83,7 +84,14 @@ public class ShowInMapDialog extends DialogFragment
         builder.setView(view);
 
         builder.setTitle(R.string.show_in_map);
-        builder.setNegativeButton(R.string.close, null);
+        builder.setNegativeButton(R.string.close, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (mListener != null) {
+                    mListener.onCloseDialog();
+                }
+            }
+        });
 
         return builder.create();
     }
@@ -153,8 +161,8 @@ public class ShowInMapDialog extends DialogFragment
     @Override
     public boolean onMarkerClick(Marker marker) {
 
-        if (mListner != null) {
-            mListner.onMarkerClick(mPlace);
+        if (mListener != null) {
+            mListener.onMarkerClick(mPlace);
             dismiss();
             return true;
         }
@@ -246,6 +254,8 @@ public class ShowInMapDialog extends DialogFragment
 
     public interface MapDialogListener {
         void onMarkerClick(Place place);
+
+        void onCloseDialog();
     }
 
     public static AtomicBoolean isShowing = new AtomicBoolean(false);

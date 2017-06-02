@@ -371,6 +371,9 @@ public  class  PlacementDialog extends DialogFragment {
             @Override
             public void onClick(View v) {
                 dismiss();
+                if (mListener != null) {
+                    mListener.onCloseDialog();
+                }
             }
         });
     }
@@ -378,6 +381,8 @@ public  class  PlacementDialog extends DialogFragment {
     public interface PlacementDialogListener {
 
         void onDecidePlacement(Placement placement, String parentId);
+
+        void onCloseDialog();
 
     }
 
