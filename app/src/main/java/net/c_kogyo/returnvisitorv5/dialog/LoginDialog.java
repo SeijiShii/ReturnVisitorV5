@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.activity.MapActivity;
+import net.c_kogyo.returnvisitorv5.cloudsync.LoginState;
 import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
 import net.c_kogyo.returnvisitorv5.util.InputUtil;
 import net.c_kogyo.returnvisitorv5.view.RightTextSwitch;
@@ -166,7 +167,7 @@ public class LoginDialog extends DialogFragment {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (MapActivity.isLoggedIn()) {
+                if (LoginState.loadLoginState(getActivity()).isLoggedIn()) {
                     onClickLogout();
                 } else {
                     onLogInClick();
@@ -176,7 +177,7 @@ public class LoginDialog extends DialogFragment {
     }
 
     private void refreshLoginButton() {
-        if (MapActivity.isLoggedIn()) {
+        if (LoginState.loadLoginState(getActivity()).isLoggedIn()) {
             loginButton.setText(R.string.logout_button_small);
         } else {
             loginButton.setText(R.string.login_button);
@@ -344,12 +345,10 @@ public class LoginDialog extends DialogFragment {
         String message = "";
         switch (result.statusCode) {
             case STATUS_202_AUTHENTICATED:
-                MapActivity.setIsLoggedIn(true);
                 message = getActivity().getString(R.string.login_success, result.userData.userName);
                 break;
 
             case STATUS_401_UNAUTHORIZED:
-                MapActivity.setIsLoggedIn(false);
                 message = getActivity().getString(R.string.login_failed) + "\n"
                         + getActivity().getString(R.string.wrong_password, result.userData.userName);
                 enableUserNameText(true);
@@ -357,7 +356,6 @@ public class LoginDialog extends DialogFragment {
                 break;
 
             case STATUS_404_NOT_FOUND:
-                MapActivity.setIsLoggedIn(false);
                 message = getActivity().getString(R.string.login_failed) + "\n"
                         + getActivity().getString(R.string.user_not_found, result.userData.userName);
                 enableAccountButton(true);
@@ -366,12 +364,10 @@ public class LoginDialog extends DialogFragment {
                 break;
 
             case STATUS_201_CREATED:
-                MapActivity.setIsLoggedIn(true);
                 message = getActivity().getString(R.string.create_user_success, result.userData.userName);
                 break;
 
             case STATUS_400_DUPLICATE_USER_NAME:
-                MapActivity.setIsLoggedIn(false);
                 message = getActivity().getString(R.string.create_user_failed) + "\n"
                         + getActivity().getString(R.string.duplicate_user, result.userData.userName);
                 enableAccountButton(true);
@@ -380,7 +376,6 @@ public class LoginDialog extends DialogFragment {
                 break;
 
             case STATUS_400_SHORT_PASSWORD:
-                MapActivity.setIsLoggedIn(false);
                 message = getActivity().getString(R.string.create_user_failed) + "\n"
                         + getActivity().getString(R.string.short_password);
                 enableAccountButton(true);
@@ -389,7 +384,6 @@ public class LoginDialog extends DialogFragment {
                 break;
 
             case STATUS_400_SHORT_USER_NAME:
-                MapActivity.setIsLoggedIn(false);
                 message = getActivity().getString(R.string.create_user_failed) + "\n"
                         + getActivity().getString(R.string.short_user_name, result.userData.userName);
                 enableAccountButton(true);
@@ -398,7 +392,6 @@ public class LoginDialog extends DialogFragment {
                 break;
 
             case REQUEST_TIME_OUT:
-                MapActivity.setIsLoggedIn(false);
                 message = getActivity().getString(R.string.login_failed) + "\n"
                         + getActivity().getString(R.string.request_time_out);
                 enableAccountButton(true);
@@ -407,7 +400,6 @@ public class LoginDialog extends DialogFragment {
                 break;
 
             case SERVER_NOT_AVAILABLE:
-                MapActivity.setIsLoggedIn(false);
                 message = getActivity().getString(R.string.login_failed) + "\n"
                         + getActivity().getString(R.string.server_not_available);
                 enableAccountButton(true);

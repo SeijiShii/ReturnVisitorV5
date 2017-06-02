@@ -22,10 +22,7 @@ import java.net.URISyntaxException;
 import static android.content.Context.MODE_PRIVATE;
 import static net.c_kogyo.returnvisitorv5.Constants.DATA_ARRAY_LATER_THAN_TIME;
 import static net.c_kogyo.returnvisitorv5.Constants.LOADED_DATA_ARRAY;
-import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.IS_LOGGED_IN;
 import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.LAST_DEVICE_SYNC_TIME;
-import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.PASSWORD;
-import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.USER_NAME;
 
 /**
  * Created by SeijiShii on 2017/05/10.
@@ -105,9 +102,7 @@ public class RVCloudSync {
 
         mCallback.onStartRequest(method);
 
-        if (socketClient == null) {
-            initSocketClient(context);
-        }
+        initSocketClient(context);
 
         if (socketClient == null)
             return;
@@ -142,7 +137,7 @@ public class RVCloudSync {
         }
     }
 
-    private void initSocketClient(Context context) {
+    private void initSocketClient(final Context context) {
         try {
             socketClient = new RVWebSocketClient(new URI(ROOT_URL), context) {
                 @Override
@@ -159,6 +154,14 @@ public class RVCloudSync {
                             loadedArray = object.getJSONArray(Constants.LOADED_DATA_ARRAY);
 
                         final RequestResult result = new RequestResult(userData, status);
+
+                        if (status == ResultStatus.STATUS_202_AUTHENTICATED
+                                || status == ResultStatus.STATUS_201_CREATED
+                                || status == ResultStatus.STATUS_200_SYNC_OK) {
+                            LoginState.onSuccessLogin(userData.userName, userData.password, context);
+                        } else {
+                            LoginState.onLoggedOut(context);
+                        }
 
                         switch (method) {
                             case LOGIN:
@@ -224,9 +227,7 @@ public class RVCloudSync {
 
         mCallback.onStartRequest(RVCloudSyncMethod.SYNC_DATA);
 
-        if (socketClient == null) {
-            initSocketClient(context);
-        }
+        initSocketClient(context);
 
         SharedPreferences prefs
                 = context.getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
@@ -356,15 +357,12 @@ public class RVCloudSync {
     }
 
     public static void syncDataIfLoggedIn(Context context) {
-        SharedPreferences prefs
-                = context.getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
-        boolean isLoggedIn = prefs.getBoolean(IS_LOGGED_IN, false);
-        String userName = prefs.getString(Constants.SharedPrefTags.USER_NAME, null);
-        String password = prefs.getString(Constants.SharedPrefTags.PASSWORD, null);
 
-        if (isLoggedIn) {
+        LoginState loginState = LoginState.loadLoginState(context);
+
+        if (loginState.isLoggedIn()) {
             try {
-                RVCloudSync.getInstance().startDataSync(userName, password, context);
+                RVCloudSync.getInstance().startDataSync(loginState.getUserName(), loginState.getPassword(), context);
             } catch (RVCloudSync.RVCloudSyncException e) {
                 Log.e(RVCloudSync.TAG, e.getMessage());
             }

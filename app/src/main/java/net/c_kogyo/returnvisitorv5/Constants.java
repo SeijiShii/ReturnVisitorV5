@@ -24,9 +24,7 @@ public class Constants {
 
         public static final String WEEK_START_DAY = "week_start_day";
 
-        public static final String IS_LOGGED_IN = "is_logged_in";
-        public static final String USER_NAME = "user_name";
-        public static final String PASSWORD = "password";
+
 
         public static final String LAST_DEVICE_SYNC_TIME = "last_device_sync_time";
     }

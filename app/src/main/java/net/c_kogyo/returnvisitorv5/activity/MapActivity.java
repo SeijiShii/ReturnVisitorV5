@@ -47,6 +47,7 @@ import com.google.android.gms.maps.model.Marker;
 
 import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.R;
+import net.c_kogyo.returnvisitorv5.cloudsync.LoginState;
 import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
 import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Place;
@@ -81,10 +82,7 @@ import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.NEW_VISIT
 import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.NEW_VISIT_REQUEST_CODE;
 import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.VISIT_ADDED_RESULT_CODE;
 import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.VISIT_EDITED_RESULT_CODE;
-import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.IS_LOGGED_IN;
-import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.PASSWORD;
 import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS;
-import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.USER_NAME;
 import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.ZOOM_LEVEL;
 import static net.c_kogyo.returnvisitorv5.data.Place.PLACE;
 import static net.c_kogyo.returnvisitorv5.data.Visit.VISIT;
@@ -100,9 +98,6 @@ public class MapActivity extends AppCompatActivity
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
 
     private static boolean isForeground;
-    private static boolean mIsLoggedIn;
-    private String userName;
-    private String password;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,7 +133,7 @@ public class MapActivity extends AppCompatActivity
 
         initDrawerOverlay();
 
-        loadLoginState();
+        RVCloudSync.syncDataIfLoggedIn(this);
 
 //        saveLastSyncTime();
 
@@ -309,7 +304,6 @@ public class MapActivity extends AppCompatActivity
         mapView.onPause();
 
         saveCameraPosition();
-        saveLoginState();
     }
 
     @Override
@@ -1192,7 +1186,7 @@ public class MapActivity extends AppCompatActivity
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mIsLoggedIn) {
+                if (LoginState.loadLoginState(MapActivity.this).isLoggedIn()) {
                     confirmLogout();
                 } else {
                     openCloseDrawer();
@@ -1203,8 +1197,11 @@ public class MapActivity extends AppCompatActivity
     }
 
     private void refreshLoginButton() {
-        if (mIsLoggedIn) {
-            String s = getString(R.string.logout_button, userName);
+
+        LoginState loginState = LoginState.loadLoginState(this);
+
+        if (loginState.isLoggedIn()) {
+            String s = getString(R.string.logout_button, loginState.getUserName());
             loginButton.setText(s);
         } else {
             loginButton.setText(R.string.login_button);
@@ -1245,21 +1242,13 @@ public class MapActivity extends AppCompatActivity
     }
 
     private void logout() {
-        mIsLoggedIn = false;
-        userName = null;
-        password = null;
+
+        LoginState.onLoggedOut(this);
+
         refreshLoginButton();
         if (loginDialog != null) {
             loginDialog.postLogout();
         }
-    }
-
-    public static boolean isLoggedIn() {
-        return mIsLoggedIn;
-    }
-
-    public static void setIsLoggedIn(boolean login) {
-        mIsLoggedIn = login;
     }
 
     // DONE: 2017/05/05 データがないときにWORKやカレンダーに遷移しないようにする(実装済み、要検証)
@@ -1270,35 +1259,9 @@ public class MapActivity extends AppCompatActivity
 
     // DONE: 2017/05/16 save login state
 
-    private void saveLoginState() {
 
-        SharedPreferences prefs
-                = getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putBoolean(IS_LOGGED_IN, mIsLoggedIn);
-        editor.putString(USER_NAME, userName);
-        editor.putString(PASSWORD, password);
 
-        editor.apply();
-    }
 
-    private void loadLoginState() {
-
-        SharedPreferences prefs
-                = getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
-        mIsLoggedIn = prefs.getBoolean(IS_LOGGED_IN, false);
-        userName = prefs.getString(USER_NAME, null);
-        password = prefs.getString(PASSWORD, null);
-
-        if (mIsLoggedIn){
-            try {
-                RVCloudSync.getInstance().startDataSync(userName, password, this);
-            } catch (RVCloudSync.RVCloudSyncException e){
-                Log.e(RVCloudSync.TAG, e.getMessage());
-            }
-            refreshLoginButton();
-        }
-    }
 
     // DONE: 2017/05/21 データロード中、同期中の表示
     // DONE: 2017/05/21 同期結果の表示
@@ -1373,11 +1336,11 @@ public class MapActivity extends AppCompatActivity
 
             case STATUS_202_AUTHENTICATED:
             case STATUS_201_CREATED:
-                mIsLoggedIn = true;
-                MapActivity.this.userName = result.userData.userName;
-                MapActivity.this.password = result.userData.password;
+
+                LoginState loginState = LoginState.loadLoginState(this);
+
                 try {
-                    RVCloudSync.getInstance().startDataSync(userName, password, MapActivity.this);
+                    RVCloudSync.getInstance().startDataSync(loginState.getUserName(), loginState.getPassword(), MapActivity.this);
                 } catch (RVCloudSync.RVCloudSyncException e) {
                     Log.e(RVCloudSync.TAG, e.getMessage());
                 }
@@ -1391,7 +1354,7 @@ public class MapActivity extends AppCompatActivity
 
             case REQUEST_TIME_OUT:
             case SERVER_NOT_AVAILABLE:
-                mIsLoggedIn = false;
+                LoginState.onLoggedOut(this);
                 refreshLoginButton();
                 break;
         }
