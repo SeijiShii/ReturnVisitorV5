@@ -82,6 +82,11 @@
 
         </RelativeLayout>
 
+        <net.c_kogyo.returnvisitorv5.view.PriorityRater
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/priority_rater"/>
+
         <!-- Note -->
         <AutoCompleteTextView
             android:layout_width="match_parent"

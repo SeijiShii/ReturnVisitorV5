@@ -11,16 +11,18 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
+import net.c_kogyo.returnvisitorv5.activity.VisitSuggestionActivity;
 import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.RVData;
+import net.c_kogyo.returnvisitorv5.util.InputUtil;
 import net.c_kogyo.returnvisitorv5.view.SearchCell;
 
 import java.util.ArrayList;
@@ -115,6 +117,19 @@ public class SearchDialog extends DialogFragment {
         searchListView = (ListView) view.findViewById(R.id.search_list_view);
         searchListAdapter = new SearchListAdapter(mInitWord, getActivity());
         searchListView.setAdapter(searchListAdapter);
+        searchListView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+                if (scrollState == SCROLL_STATE_TOUCH_SCROLL) {
+                    InputUtil.hideSoftKeyboard(getActivity());
+                }
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+
+            }
+        });
 
         refreshNoItemText();
     }
@@ -179,9 +194,18 @@ public class SearchDialog extends DialogFragment {
             if (convertView == null) {
                 convertView = new SearchCell(getActivity(), object,
                         new SearchCell.SearchCellListener() {
+
                             @Override
-                            public void onClick(Object data) {
-                                onClickSearchItem(object);
+                            public void onClickShowInMap(Object data) {
+                                SearchDialog.this.onClickShowInMap(object);
+                            }
+
+                            @Override
+                            public void onClickEditPerson(Person person) {
+                                if (mListener != null) {
+                                    mListener.onClickEditPerson(person);
+                                }
+                                dismiss();
                             }
                         });
             } else {
@@ -191,15 +215,15 @@ public class SearchDialog extends DialogFragment {
         }
     }
 
-    private void onClickSearchItem(Object object) {
+    private void onClickShowInMap(Object object) {
 
         if (mListener == null)
             return;
 
         if (object instanceof Place) {
-            mListener.onClickPlace((Place) object);
+            mListener.onClickShowPlaceInMap((Place) object);
         } else if (object instanceof Person) {
-            mListener.onClickPerson((Person) object);
+            mListener.onClickShowPersonInMap((Person) object);
         }
         dismiss();
     }
@@ -208,11 +232,13 @@ public class SearchDialog extends DialogFragment {
 
         void onCloseDialog();
 
-        void onClickPerson(Person person);
+        void onClickShowPersonInMap(Person person);
 
-        void onClickPlace(Place place);
+        void onClickShowPlaceInMap(Place place);
 
         void onTextChanged(String text);
+
+        void onClickEditPerson(Person person);
     }
 
     public static AtomicBoolean isShowing = new AtomicBoolean(false);

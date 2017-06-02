@@ -15,6 +15,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -23,6 +24,7 @@ import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.util.ConfirmDialog;
+import net.c_kogyo.returnvisitorv5.view.PriorityRater;
 
 /**
  * Created by SeijiShii on 2017/02/20.
@@ -33,14 +35,22 @@ public class PersonDialog extends DialogFragment {
     private static Person mPerson;
     private static PersonDialogListener mListener;
     private static boolean isPersonEdited;
+    private static boolean mShowPriorityRater;
 
     private static PersonDialog instance;
 
     public static PersonDialog getInstance(Person person,
-                                           PersonDialogListener listener) {
-        mPerson = person;
+                                           PersonDialogListener listener,
+                                           boolean showPriorityRater) {
+
+        try {
+            mPerson = (Person) person.clone();
+        } catch (CloneNotSupportedException e) {
+
+        }
         mListener = listener;
         isPersonEdited = false;
+        mShowPriorityRater = showPriorityRater;
 
         if (instance == null) {
             instance = new PersonDialog();
@@ -68,6 +78,7 @@ public class PersonDialog extends DialogFragment {
         initNameText();
         initSexRadioButtons();
         initAgeSpinner();
+        initPriorityRater();
         initNoteText();
         initOkButton();
         initCancelButton();
@@ -97,7 +108,7 @@ public class PersonDialog extends DialogFragment {
             @Override
             public void afterTextChanged(Editable editable) {
                 isPersonEdited = true;
-                renewOkButton();
+                refreshOkButton();
             }
         });
     }
@@ -126,7 +137,7 @@ public class PersonDialog extends DialogFragment {
                     mPerson.setSex(Person.Sex.MALE);
                     femaleButton.setChecked(false);
                     isPersonEdited = true;
-                    renewOkButton();
+                    refreshOkButton();
                 }
             }
         });
@@ -138,7 +149,7 @@ public class PersonDialog extends DialogFragment {
                     mPerson.setSex(Person.Sex.FEMALE);
                     maleButton.setChecked(false);
                     isPersonEdited = true;
-                    renewOkButton();
+                    refreshOkButton();
                 }
             }
         });
@@ -165,7 +176,7 @@ public class PersonDialog extends DialogFragment {
 
                 if (Person.Age.getEnum(i) != oldAge) {
                     isPersonEdited = true;
-                    renewOkButton();
+                    refreshOkButton();
                 }
             }
 
@@ -174,6 +185,26 @@ public class PersonDialog extends DialogFragment {
 
             }
         });
+
+    }
+
+    private void initPriorityRater() {
+
+        PriorityRater priorityRater = (PriorityRater) view.findViewById(R.id.priority_rater);
+        if (mShowPriorityRater) {
+            priorityRater.setPriority(mPerson.getPriority());
+            priorityRater.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            priorityRater.setOnPrioritySetListener(new PriorityRater.OnPrioritySetListener() {
+                @Override
+                public void onPriorityChanged(Person.Priority priority) {
+                    mPerson.setPriority(priority);
+                    isPersonEdited = true;
+                    refreshOkButton();
+                }
+            });
+        } else {
+            priorityRater.setLayoutParams(new LinearLayout.LayoutParams(0, 0));
+        }
 
     }
 
@@ -201,7 +232,7 @@ public class PersonDialog extends DialogFragment {
 
                 mPerson.setNote(editable.toString());
                 isPersonEdited = true;
-                renewOkButton();
+                refreshOkButton();
             }
         });
     }
@@ -211,7 +242,7 @@ public class PersonDialog extends DialogFragment {
 
         okButton = (Button) view.findViewById(R.id.ok_button);
 
-        renewOkButton();
+        refreshOkButton();
 
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -229,7 +260,7 @@ public class PersonDialog extends DialogFragment {
 
     }
 
-    private void renewOkButton() {
+    private void refreshOkButton() {
 
         okButton.setEnabled(isPersonEdited);
 

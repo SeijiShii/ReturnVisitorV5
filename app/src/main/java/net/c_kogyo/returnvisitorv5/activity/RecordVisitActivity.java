@@ -316,7 +316,7 @@ public class RecordVisitActivity extends AppCompatActivity {
                     public void onCloseDialog() {
                         InputUtil.hideSoftKeyboard(RecordVisitActivity.this);
                     }
-                }).show(getFragmentManager(), null);
+                }, false).show(getFragmentManager(), null);
 
     }
 
@@ -405,7 +405,7 @@ public class RecordVisitActivity extends AppCompatActivity {
                 condition,
                 new VisitDetailView.VisitDetailViewListener() {
                     @Override
-                    public void onPrioritySet(Visit.Priority priority) {
+                    public void onPrioritySet(Person.Priority priority) {
                         refreshPriorityMark();
                     }
 
@@ -452,6 +452,9 @@ public class RecordVisitActivity extends AppCompatActivity {
                 new PersonDialog.PersonDialogListener() {
                     @Override
                     public void onOkClick(Person person) {
+
+                        setEditedPerson(person);
+
                         VisitDetail visitDetail = mVisit.getVisitDetail(person.getId());
                         if (visitDetail != null) {
                             VisitDetailView visitDetailView = getVisitDetailView(visitDetail);
@@ -477,7 +480,7 @@ public class RecordVisitActivity extends AppCompatActivity {
                         InputUtil.hideSoftKeyboard(RecordVisitActivity.this);
                     }
 
-                }).show(getFragmentManager(), null);
+                }, false).show(getFragmentManager(), null);
     }
 
     @Nullable
@@ -784,6 +787,7 @@ public class RecordVisitActivity extends AppCompatActivity {
                         addVisitDetailView(visitDetail,
                                 person,
                                 VisitDetailView.DrawCondition.EXTRACT_POST_DRAWN_FROM_0);
+                        setEditedPerson(person);
                     }
 
             @Override
@@ -883,6 +887,21 @@ public class RecordVisitActivity extends AppCompatActivity {
                     }
                 }, false, false)
                             .show(getFragmentManager(), null);
+    }
+
+    private void setEditedPerson(Person person) {
+
+        for (Person person1 : mAddedPersons) {
+            if (person1.equals(person)) {
+                mAddedPersons.remove(person1);
+                mAddedPersons.add(person);
+                return;
+            }
+        }
+
+        RVData.getInstance().personList.setOrAdd(person);
+        RVData.getInstance().saveData(this);
+        RVCloudSync.syncDataIfLoggedIn(this);
     }
 
     // DONE: 2017/03/26 PriorityRaterの挙動がいまいち

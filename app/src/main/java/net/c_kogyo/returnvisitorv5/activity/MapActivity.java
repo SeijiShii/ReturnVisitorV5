@@ -60,6 +60,7 @@ import net.c_kogyo.returnvisitorv5.dialog.AddWorkDialog;
 import net.c_kogyo.returnvisitorv5.dialog.HousingComplexDialog;
 import net.c_kogyo.returnvisitorv5.dialog.LoginDialog;
 import net.c_kogyo.returnvisitorv5.dialog.MapLongClickDialog;
+import net.c_kogyo.returnvisitorv5.dialog.PersonDialog;
 import net.c_kogyo.returnvisitorv5.dialog.PlaceDialog;
 import net.c_kogyo.returnvisitorv5.dialog.SearchDialog;
 import net.c_kogyo.returnvisitorv5.service.TimeCountIntentService;
@@ -1475,7 +1476,7 @@ public class MapActivity extends AppCompatActivity
             }
 
             @Override
-            public void onClickPerson(final Person person) {
+            public void onClickShowPersonInMap(final Person person) {
 
                 ArrayList<Place> places = RVData.getInstance().placeList.getByPerson(person);
                 if (places.size() > 0) {
@@ -1491,7 +1492,7 @@ public class MapActivity extends AppCompatActivity
             }
 
             @Override
-            public void onClickPlace(final Place place) {
+            public void onClickShowPlaceInMap(final Place place) {
 
                 if (searchText.getText().length() > 0) {
                     searchText.setText("");
@@ -1504,6 +1505,11 @@ public class MapActivity extends AppCompatActivity
             @Override
             public void onTextChanged(String text) {
                 searchText.setText(text);
+            }
+
+            @Override
+            public void onClickEditPerson(Person person) {
+                showPersonDialogForEdit(person);
             }
         },initialSearchWord);
         searchDialog.show(getFragmentManager(), SEARCH_DIALOG);
@@ -1544,6 +1550,31 @@ public class MapActivity extends AppCompatActivity
                 showHousingComplexDialog(parent);
                 break;
         }
+    }
+
+    private void showPersonDialogForEdit(Person person) {
+        PersonDialog.getInstance(person, new PersonDialog.PersonDialogListener() {
+            @Override
+            public void onOkClick(Person person) {
+                RVData.getInstance().personList.setOrAdd(person);
+                RVData.getInstance().saveData(MapActivity.this);
+                RVCloudSync.syncDataIfLoggedIn(MapActivity.this);
+                InputUtil.hideSoftKeyboard(MapActivity.this);
+            }
+
+            @Override
+            public void onDeleteClick(Person person) {
+                RVData.getInstance().personList.deleteById(person.getId());
+                RVData.getInstance().saveData(MapActivity.this);
+                RVCloudSync.syncDataIfLoggedIn(MapActivity.this);
+                InputUtil.hideSoftKeyboard(MapActivity.this);
+            }
+
+            @Override
+            public void onCloseDialog() {
+                InputUtil.hideSoftKeyboard(MapActivity.this);
+            }
+        }, true).show(getFragmentManager(), null);
     }
 
     // TODO: 2017/06/02 ダイアログを閉じるたびにキーボードも閉じるように

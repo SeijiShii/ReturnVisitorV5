@@ -1,13 +1,13 @@
 package net.c_kogyo.returnvisitorv5.view;
 
 import android.content.Context;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -16,7 +16,7 @@ import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.Constants;
-import net.c_kogyo.returnvisitorv5.data.Visit;
+import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 
 import static net.c_kogyo.returnvisitorv5.Constants.buttonRes;
@@ -27,7 +27,7 @@ import static net.c_kogyo.returnvisitorv5.Constants.buttonRes;
 
 public class PriorityRater extends FrameLayout {
 
-    private Visit.Priority mPriority;
+    private Person.Priority mPriority;
     private OnPrioritySetListener mListener;
 
     public PriorityRater(@NonNull Context context) {
@@ -42,9 +42,9 @@ public class PriorityRater extends FrameLayout {
         initCommon();
     }
 
-    public void setPriority(Visit.Priority priority) {
+    public void setPriority(Person.Priority priority) {
         this.mPriority = priority;
-        refreshRater(mPriority);
+        waitAndUpdateUI(mPriority);
     }
 
     public void setOnPrioritySetListener(OnPrioritySetListener listener) {
@@ -53,12 +53,41 @@ public class PriorityRater extends FrameLayout {
 
 
     private View view;
+//    private int measuredWidth = 0;
     private void initCommon() {
 
         view = LayoutInflater.from(getContext()).inflate(R.layout.priority_rater, this);
 
-        initPriorityFrame();
-        initPriorityText();
+//        measure(0, 0);
+//        measuredWidth = getMeasuredWidth();
+
+//        initPriorityFrame();
+//        initPriorityText();
+
+        waitAndDraw();
+    }
+
+    private void waitAndDraw() {
+        final Handler handler = new Handler();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (getWidth() <= 0) {
+                    try {
+                        Thread.sleep(20);
+                    } catch (InterruptedException e) {
+
+                    }
+                }
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        initPriorityFrame();
+                        initPriorityText();
+                    }
+                });
+            }
+        }).start();
     }
 
     private LinearLayout priorityFrame;
@@ -73,10 +102,15 @@ public class PriorityRater extends FrameLayout {
         // 2017/02/27 Implement priorityFrame
         priorityFrame.removeAllViews();
 
-        raterButtons = new RaterButton[Visit.Priority.values().length];
-        for ( int i = 0 ; i < Visit.Priority.values().length ; i++ ) {
+//        int buttonWith = measuredWidth / 8;
+        int buttonWith = getWidth() / 8;
+
+
+        raterButtons = new RaterButton[Person.Priority.values().length];
+        for ( int i = 0 ; i < Person.Priority.values().length ; i++ ) {
             raterButtons[i] = new RaterButton(getContext(), buttonRes[0]);
             raterButtons[i].setTag(i);
+            raterButtons[i].setLayoutParams(new LinearLayout.LayoutParams(buttonWith, ViewGroup.LayoutParams.MATCH_PARENT));
 
             priorityFrame.addView(raterButtons[i]);
 
@@ -84,18 +118,48 @@ public class PriorityRater extends FrameLayout {
                 @Override
                 public void onViewClick(View v) {
                     int tag = Integer.parseInt(v.getTag().toString());
-                    Visit.Priority priority = Visit.Priority.getEnum(tag);
+                    Person.Priority priority = Person.Priority.getEnum(tag);
 
-                    if (mListener != null) {
-                        mListener.onPrioritySet(priority);
+                    if (priority != mPriority) {
+                        // 変化したか
+                        mPriority = priority;
+                        if (mListener != null) {
+                            mListener.onPriorityChanged(priority);
+                        }
+                        updateUI(priority);
                     }
-                    refreshRater(priority);
                 }
             });
         }
     }
 
-    private void refreshRater(Visit.Priority priority) {
+    private void waitAndUpdateUI(final Person.Priority priority) {
+
+        final Handler handler = new Handler();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (priorityText == null || raterButtons == null) {
+                    try {
+                        Thread.sleep(20);
+                    } catch (InterruptedException e) {
+
+                    }
+                }
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateUI(priority);
+                    }
+                });
+            }
+        }).start();
+
+
+
+    }
+
+    private void updateUI(Person.Priority priority) {
 
         int num = priority.num();
 
@@ -105,7 +169,7 @@ public class PriorityRater extends FrameLayout {
             raterButtons[i].setBackgroundResource(Constants.buttonRes[num]);
         }
 
-        for (int i = num + 1 ; i < Visit.Priority.values().length ; i++ ) {
+        for (int i = num + 1 ; i < Person.Priority.values().length ; i++ ) {
             raterButtons[i].setBackgroundResource(Constants.buttonRes[0]);
         }
     }
@@ -117,7 +181,7 @@ public class PriorityRater extends FrameLayout {
     }
 
     public interface OnPrioritySetListener {
-        void onPrioritySet(Visit.Priority priority);
+        void onPriorityChanged(Person.Priority priority);
     }
 
     private class RaterButton extends RelativeLayout{

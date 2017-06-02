@@ -5,6 +5,7 @@
     android:layout_height="@dimen/ui_height_small"
     android:background="@drawable/gray_fog_circle">
 
+    <!-- Marker -->
     <RelativeLayout
         android:layout_width="30dp"
         android:layout_height="match_parent">
@@ -26,5 +27,19 @@
         android:textSize="@dimen/text_size_small"
         android:gravity="left|center_vertical"
         android:layout_marginLeft="10dp"/>
+
+    <!-- Menu Button -->
+    <RelativeLayout
+        android:layout_width="40dp"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:id="@+id/menu_button"
+            android:layout_centerInParent="true"
+            android:background="@drawable/edit_button"/>
+
+    </RelativeLayout>
 
 </LinearLayout>
