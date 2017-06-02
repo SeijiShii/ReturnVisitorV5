@@ -287,7 +287,7 @@ public class WorkView extends BaseAnimateView {
 
             long duration = intent.getLongExtra(TimeCountIntentService.DURATION, 0);
             String durationString = DateTimeText.getDurationString(duration, true);
-
+            durationString = mContext.getString(R.string.duration_string, durationString);
             durationText.setText(durationString);
 
         } else {

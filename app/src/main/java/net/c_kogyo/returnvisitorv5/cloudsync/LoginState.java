@@ -21,6 +21,10 @@ public class LoginState {
 
     private LoginState(){}
 
+    public static LoginState getInstance() {
+        return instance;
+    }
+
     public static LoginState loadLoginState(Context context) {
 
         SharedPreferences preferences = context.getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, Context.MODE_PRIVATE);

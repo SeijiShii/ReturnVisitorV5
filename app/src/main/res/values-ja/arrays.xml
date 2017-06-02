@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="age_array">
+        <item>不明</item>
+        <item>～10</item>
+        <item>11～20</item>
+        <item>21～30</item>
+        <item>31～40</item>
+        <item>41～50</item>
+        <item>51～60</item>
+        <item>61～70</item>
+        <item>71～80</item>
+        <item>81～</item>
+    </array>
+
+    <array name="priority_array">
+        <item>なし</item>
+        <item>マイナス</item>
+        <item>次の網羅のとき</item>
+        <item>留守</item>
+        <item>忙しい (もう一度訪問する)</item>
+        <item>低い</item>
+        <item>中</item>
+        <item>高い</item>
+    </array>
+
+    <array name="sex_array">
+        <item>不明</item>
+        <item>男性</item>
+        <item>女性</item>
+    </array>
+
+    <array name="placement_array">
+        <item>聖書</item>
+        <item>本</item>
+        <item>パンフ、ブロシュア</item>
+        <item>雑誌</item>
+        <item>Web リンク</item>
+        <item>ビデオ再生</item>
+        <item>その他</item>
+    </array>
+
+    <array name="magazine_array">
+        <item>ものみの塔</item>
+        <item>研究用ものみの塔</item>
+        <item>目ざめよ!</item>
+    </array>
+
+    <array name="complete_array">
+        <item>New World Translation</item>
+        <item>Reference Bible</item>
+
+        <item>Bible Teach</item>
+        <item>God\'s Love</item>
+        <item>Bible Stories</item>
+        <item>Close to Jehovah</item>
+        <item>Sing to Jehovah</item>
+        <item>Young People Ask, Volume 1</item>
+        <item>Young People Ask, Volume 2</item>
+        <item>Teacher</item>
+
+        <item>新世界訳</item>
+        <item>参照資料付き聖書</item>
+        <item>聖書の教え</item>
+        <item>神の愛</item>
+        <item>聖書物語</item>
+        <item>エホバに近づきなさい</item>
+        <item>エホバに歌う</item>
+        <item>若い人が尋ねる，第1巻</item>
+        <item>若い人が尋ねる，第2巻</item>
+        <item>教え手</item>
+
+        <item>Kingdom News</item>
+        <item>Bible\’s Message</item>
+        <item>Does God Care</item>
+        <item>God\’s Friend</item>
+        <item>Good News</item>
+        <item>Happy Family</item>
+        <item>Happy Life</item>
+        <item>Jehovah\’s Will</item>
+        <item>Listen and Live</item>
+        <item>Listen to God</item>
+        <item>My Bible Lessons</item>
+        <item>Origin of Life</item>
+        <item>Pathway</item>
+        <item>Satisfying Life</item>
+        <item>Spirits of the Dead</item>
+        <item>Teach Your Children</item>
+        <item>Was Life Created?</item>
+        <item>When Someone Dies</item>
+        <item>Happy Family Life</item>
+        <item>Kingdom</item>
+        <item>Know the Truth</item>
+        <item>View the Bible</item>
+        <item>View the Future</item>
+        <item>Web site tract</item>
+        <item>Who Controls the World?</item>
+        <item>Will Suffering End?</item>
+
+        <item>愛する家族を亡くしたとき</item>
+        <item>エホバのご意志</item>
+        <item>お子さんを教えましょう</item>
+        <item>神の言われることを聞いてください</item>
+        <item>神の言葉の紹介</item>
+        <item>神の友</item>
+        <item>聞いて生きる</item>
+        <item>研究ガイド</item>
+        <item>幸せな家族</item>
+        <item>幸せへの道</item>
+        <item>死者の霊</item>
+        <item>せいしょのべんきょう</item>
+        <item>聖書のメッセージ</item>
+        <item>生命 ― どこから？</item>
+        <item>生命の起源</item>
+        <item>満足のいく生活</item>
+        <item>良い知らせ</item>
+        <item>王国ニュース</item>
+        <item>王国</item>
+        <item>家族の幸せ</item>
+        <item>苦しみ</item>
+        <item>この世界</item>
+        <item>将来</item>
+        <item>真理を知る</item>
+        <item>聖書はどんな本？</item>
+        <item>Biblia con referencias</item>
+        <item>Guía de estudio</item>
+        <item>La Atalaya</item>
+        <item>¡Despertad! </item>
+        <item>Anuario</item>
+        <item>Acerquémonos a Jehová</item>
+        <item>Adoremos a Dios</item>
+        <item> “Amor de Dios” </item>
+        <item>Aprendamos</item>
+        <item>Benefíciese </item>
+        <item>Cantemos a Jehová </item>
+        <item>Ejemplos de fe</item>
+        <item>El día de Jehová </item>
+        <item>Enseña </item>
+        <item>Historias bíblica</item>s
+        <item>Jeremías </item>
+        <item>Las profecías de Isaías I </item>
+        <item>Las profecías de Isaías II </item>
+        <item>Los jóvenes preguntan (vol. 1) </item>
+        <item>Los jóvenes preguntan (vol. 2) </item>
+        <item> “Mi seguidor” </item>
+        <item>Razonamiento </item>
+        <item>Reino de Dios </item>
+        <item> “Testimonio cabal” </item>
+        <item>10 preguntas</item>
+        <item>Alerta</item>
+        <item>Amigos de Dios</item>
+        <item>Buenas noticias</item>
+        <item> “Buena tierra” </item>
+        <item>Camino a la vida</item>
+        <item>Cómo ser feliz</item>
+        <item>Cuando muere un ser querido</item>
+        <item>De padres a hijos</item>
+        <item>El camino</item>
+        <item>El origen de la vida</item>
+        <item>Escuche</item>
+        <item>Escuche y vivirá</item>
+        <item>Espíritus de difuntos</item>
+        <item>Examinando</item>
+        <item>Fe verdadera</item>
+        <item>Guía</item>
+        <item>Introducción a la Palabra de Dios</item>
+        <item>Jehová desea que vuelva</item>
+        <item>La Biblia y su mensaje</item>
+        <item>La voluntad de Jehová</item>
+        <item>Los testigos de Jehová</item>
+        <item>Mis primeras lecciones de la Biblia</item>
+        <item>Obra de un Creador</item>
+        <item>Paz y felicidad duraderas</item>
+        <item>¿Se interesa Dios por nosotros? </item>
+        <item>Su familia</item>
+        <item>Vida llena</item>
+        <item>Noticias del Reino</item>
+        <item>¿Cómo ve el futuro? </item>
+        <item>¿Dejaremos de sufrir? </item>
+        <item>El sufrimiento</item>
+        <item>Espíritu inmortal</item>
+        <item>Familia feliz</item>
+        <item>Infierno</item>
+        <item>Invitación a jw.org</item>
+        <item>La Biblia tratado</item>
+        <item>¿Quién controla el mundo? </item>
+        <item>¿Quiénes son los testigos de Jehová? </item>
+        <item>Reino</item>
+        <item>¿Rige el destino nuestra vida? </item>
+        <item>Saber la verdad</item>
+        <item>Saber más de la Biblia</item>
+        <item>Tu vida</item>
+
+    </array>
+
+    <array name="tag_item_array">
+        <item>Bible Study</item>
+        <item>Return Visit</item>
+        <item>Magazine Route</item>
+    </array>
+
+    <array name="visit_frequency_array">
+        <item>None</item>
+        <item>3 Days</item>
+        <item>1 Week</item>
+        <item>2 Weeks</item>
+        <item>1 Month</item>
+        <item>2 Months</item>
+        <item>3 Months</item>
+        <item>6 Months</item>
+        <item>1 Year</item>
+    </array>
+
+
+</resources>

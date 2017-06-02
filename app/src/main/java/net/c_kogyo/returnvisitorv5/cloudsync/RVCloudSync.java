@@ -358,7 +358,7 @@ public class RVCloudSync {
 
     public static void syncDataIfLoggedIn(Context context) {
 
-        LoginState loginState = LoginState.loadLoginState(context);
+        LoginState loginState = LoginState.getInstance();
 
         if (loginState.isLoggedIn()) {
             try {

@@ -167,7 +167,7 @@ public class LoginDialog extends DialogFragment {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (LoginState.loadLoginState(getActivity()).isLoggedIn()) {
+                if (LoginState.getInstance().isLoggedIn()) {
                     onClickLogout();
                 } else {
                     onLogInClick();
@@ -177,7 +177,7 @@ public class LoginDialog extends DialogFragment {
     }
 
     private void refreshLoginButton() {
-        if (LoginState.loadLoginState(getActivity()).isLoggedIn()) {
+        if (LoginState.getInstance().isLoggedIn()) {
             loginButton.setText(R.string.logout_button_small);
         } else {
             loginButton.setText(R.string.login_button);

@@ -136,6 +136,7 @@ public class MapActivity extends AppCompatActivity
 
         initDrawerOverlay();
 
+        LoginState.loadLoginState(this);
         RVCloudSync.syncDataIfLoggedIn(this);
 
 //        saveLastSyncTime();
@@ -1202,7 +1203,7 @@ public class MapActivity extends AppCompatActivity
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (LoginState.loadLoginState(MapActivity.this).isLoggedIn()) {
+                if (LoginState.getInstance().isLoggedIn()) {
                     confirmLogout();
                 } else {
                     openCloseDrawer();
@@ -1214,7 +1215,7 @@ public class MapActivity extends AppCompatActivity
 
     private void refreshLoginButton() {
 
-        LoginState loginState = LoginState.loadLoginState(this);
+        LoginState loginState = LoginState.getInstance();
 
         if (loginState.isLoggedIn()) {
             String s = getString(R.string.logout_button, loginState.getUserName());
@@ -1358,7 +1359,7 @@ public class MapActivity extends AppCompatActivity
             case STATUS_202_AUTHENTICATED:
             case STATUS_201_CREATED:
 
-                LoginState loginState = LoginState.loadLoginState(this);
+                LoginState loginState = LoginState.getInstance();
 
                 try {
                     RVCloudSync.getInstance().startDataSync(loginState.getUserName(), loginState.getPassword(), MapActivity.this);
