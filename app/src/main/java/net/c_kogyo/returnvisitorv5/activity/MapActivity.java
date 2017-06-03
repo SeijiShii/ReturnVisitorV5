@@ -107,8 +107,8 @@ public class MapActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
 
         // log
-        Intent errorLogIntent = new Intent(this, ErrorLogIntentService.class);
-        startService(errorLogIntent);
+//        Intent errorLogIntent = new Intent(this, ErrorLogIntentService.class);
+//        startService(errorLogIntent);
 
 
         setContentView(R.layout.map_activity);
