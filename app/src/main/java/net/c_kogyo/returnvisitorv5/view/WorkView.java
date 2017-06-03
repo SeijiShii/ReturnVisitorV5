@@ -341,6 +341,7 @@ public class WorkView extends BaseAnimateView {
                         @Override
                         public void run() {
                             if(mListener != null) {
+                                // TODO: 2017/06/03 WorkViewの終わり時間を変更するとこのあたりでヌルポが出るよ。
                                 mListener.postAddVisitCell(cell);
                             }
                         }

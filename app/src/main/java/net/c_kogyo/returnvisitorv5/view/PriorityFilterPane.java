@@ -27,7 +27,7 @@ public class PriorityFilterPane extends RelativeLayout {
                               PriorityFilterListener listener,
                               ArrayList<Person.Priority> initPriorities) {
 
-        // TODO: 2017/06/01 Priority反映
+        // DONE: 2017/06/01 Priority反映
         super(context);
 
         mListener = listener;

@@ -109,4 +109,22 @@ public class PlaceList extends DataList<Place> {
         Log.d(TAG, "Valid place count: " + list.size());
         Log.d(TAG, "Invalid place count: " + deleteList.size());
     }
+
+    public void deleteRoomsWithoutParent() {
+
+        ArrayList<Place> deleteList = new ArrayList<>();
+        for (Place place : list) {
+            if (place.getCategory() == Place.Category.ROOM) {
+                Place parent = getById(place.getParentId());
+
+                if (parent == null) {
+                    deleteList.add(place);
+                }
+            }
+        }
+
+        for (Place place : deleteList) {
+            deleteById(place.getId());
+        }
+    }
 }

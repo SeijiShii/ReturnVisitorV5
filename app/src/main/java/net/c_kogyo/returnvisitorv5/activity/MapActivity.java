@@ -1489,6 +1489,8 @@ public class MapActivity extends AppCompatActivity
                     Place place = places.get(0);
                     showDialogFitToPlace(place);
                     mMap.animateCamera(CameraUpdateFactory.newLatLng(place.getLatLng()));
+                } else {
+                    Toast.makeText(MapActivity.this, R.string.place_not_found, Toast.LENGTH_SHORT).show();
                 }
 
                 if (searchText.getText().length() > 0) {
@@ -1553,7 +1555,11 @@ public class MapActivity extends AppCompatActivity
                 break;
             case ROOM:
                 Place parent = RVData.getInstance().placeList.getById(place.getParentId());
-                showHousingComplexDialog(parent);
+                if (parent != null) {
+                    showHousingComplexDialog(parent);
+                } else {
+                    Toast.makeText(this, R.string.place_not_found, Toast.LENGTH_SHORT).show();
+                }
                 break;
         }
     }

@@ -121,6 +121,8 @@ public class RVData {
 
             jsonToData(stringToJson(loadStringFromFile()));
 
+//            personList.setPriorityToPersons();
+//            placeList.deleteRoomsWithoutParent();
 
             if (mCallback != null) {
                 new Thread(new Runnable() {

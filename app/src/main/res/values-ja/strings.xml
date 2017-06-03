@@ -12,7 +12,7 @@
     <string name="age">年齢</string>
     <string name="aggregation_menu">集計</string>
     <string name="cancel">キャンセル</string>
-    <string name="carry_over">繰り越し</string>
+    <string name="carry_over">繰り越し: %s分</string>
     <string name="click_marker_or_long_click_map">マーカーをクリックするか、地図を長押ししてください</string>
     <string name="click_marker_to_jump">マーカーをクリックして表示</string>
     <string name="close">閉じる</string>
@@ -64,7 +64,7 @@
     <string name="male">男性</string>
     <string name="month">月</string>
     <string name="month_aggregation">月の集計</string>
-    <string name="month_format">yyyy年MMM月</string>
+    <string name="month_format">yyyy年MMM</string>
     <string name="name">名前</string>
     <string name="never_seen">会ったことがない。</string>
     <string name="no_item_to_show">表示アイテムはありません。</string>

@@ -1,0 +1,23 @@
+body {
+  color: #555;
+}
+
+h1 {
+  font-size: 30px;
+  line-height: 40px;
+  vertical-align: middle;
+}
+
+h2 {
+  font-size: 20px;
+  background: linear-gradient(transparent 70%, #006992 0%);
+}
+
+p {
+  font-size: 15px;
+  margin-left: 20px;
+}
+
+#logo {
+  margin-right: 10px;
+}
