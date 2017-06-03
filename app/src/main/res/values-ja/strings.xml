@@ -128,4 +128,5 @@
     <string name="visit_details">訪問の内容</string>
     <string name="work">活動</string>
     <string name="wrong_password">ユーザー名 %s のアカウントは存在しますが、パスワードが違います。</string>
+    <string name="suggestion">提案</string>
 </resources>

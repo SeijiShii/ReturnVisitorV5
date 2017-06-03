@@ -213,8 +213,9 @@ public class MapActivity extends AppCompatActivity
         }
 
         // xmlでの指定の方法が分からん
-        int topPadding = (int) (getResources().getDisplayMetrics().density * 50);
-        mMap.setPadding(0, topPadding, 0, 0);
+        int dp50 = (int) (getResources().getDisplayMetrics().density * 50);
+        int dp25 = (int) (getResources().getDisplayMetrics().density * 25);
+        mMap.setPadding(0, dp50, 0, dp25);
         mMap.getUiSettings().setMapToolbarEnabled(false);
 
         loadCameraPosition();
@@ -1599,7 +1600,7 @@ public class MapActivity extends AppCompatActivity
         });
     }
 
-    // TODO: 2017/06/02 ダイアログを閉じるたびにキーボードも閉じるように
-    // TODO: Term of Use
+    // DONE: 2017/06/02 ダイアログを閉じるたびにキーボードも閉じるように
+    // DONE: Term of Use
 
 }

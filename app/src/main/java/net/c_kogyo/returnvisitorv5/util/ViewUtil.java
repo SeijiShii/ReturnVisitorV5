@@ -59,6 +59,11 @@ public class ViewUtil {
     public static void scrollToView(final ScrollView scrollViewParent, final View view) {
         // Get deepChild Offset
         Point childOffset = new Point();
+
+        ViewParent viewParent = view.getParent();
+        if (viewParent == null )
+            return;
+
         getDeepChildOffset(scrollViewParent, view.getParent(), view, childOffset);
         // Scroll to child.
         scrollViewParent.smoothScrollTo(0, childOffset.y);
