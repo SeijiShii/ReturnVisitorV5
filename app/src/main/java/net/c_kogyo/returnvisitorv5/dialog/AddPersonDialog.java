@@ -102,7 +102,7 @@ public class AddPersonDialog extends DialogFragment
     private View view;
     private void initCommon(Bundle savedInstanceState) {
         
-        view = View.inflate(getActivity(), R.layout.add_work_dialog, null);
+        view = View.inflate(getActivity(), R.layout.add_person_dialog, null);
 
         initDataFrame();
         initSearchText();
@@ -166,6 +166,7 @@ public class AddPersonDialog extends DialogFragment
                 if (mListener != null) {
                     mListener.onSetPerson((Person) personListAdapter.getItem(position));
                 }
+                dismiss();
             }
         });
 

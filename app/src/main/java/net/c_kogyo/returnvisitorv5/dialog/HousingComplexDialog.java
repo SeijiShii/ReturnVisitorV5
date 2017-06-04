@@ -230,17 +230,17 @@ public class HousingComplexDialog extends DialogFragment {
         roomListView = (ListView) view.findViewById(R.id.room_list_view);
         initRoomAdapter();
         refreshRoomListHeight();
-        roomListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Place room = (Place) roomAdapter.getItem(position);
-                if (mListener != null) {
-                    mListener.onClickRoomCell(room);
-                }
-
-                dismiss();
-            }
-        });
+//        roomListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                Place room = (Place) roomAdapter.getItem(position);
+//                if (mListener != null) {
+//                    mListener.onClickRoomCell(room);
+//                }
+//
+//                dismiss();
+//            }
+//        });
 
     }
 
@@ -439,6 +439,7 @@ public class HousingComplexDialog extends DialogFragment {
                             if (mListener != null) {
                                 mListener.onClickRoomCell(mRoom);
                             }
+                            dismiss();
                             return true;
                     }
                     return false;
