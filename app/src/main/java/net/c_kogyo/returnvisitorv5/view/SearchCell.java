@@ -46,7 +46,7 @@ public class SearchCell extends FrameLayout {
     private void initCommon() {
         view = View.inflate(getContext(), R.layout.search_cell, this);
 
-        marker = (ImageView) view.findViewById(R.id.marker);
+        marker = (ImageView) view.findViewById(R.id.visit_marker);
         textView = (TextView) view.findViewById(R.id.text_view);
 
         initMenuButton();

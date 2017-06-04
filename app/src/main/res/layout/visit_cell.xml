@@ -18,7 +18,7 @@
             <ImageView
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:id="@+id/marker"
+                android:id="@+id/visit_marker"
                 android:layout_centerInParent="true"/>
 
         </RelativeLayout>

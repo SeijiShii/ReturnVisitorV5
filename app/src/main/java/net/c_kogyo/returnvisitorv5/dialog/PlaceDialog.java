@@ -27,6 +27,7 @@ import android.widget.ListView;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
+import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
@@ -108,6 +109,15 @@ public class PlaceDialog extends DialogFragment {
                     mListener.onDeleteClick(mPlace);
                 }
                 dismiss();
+            }
+
+            @Override
+            public void onClickEditPerson(Person person) {
+                dismiss();
+                if (mListener != null) {
+                    mListener.onClickEditPerson(person);
+                }
+
             }
         });
         placeCell.setOnTouchListener(new View.OnTouchListener() {
@@ -233,6 +243,8 @@ public class PlaceDialog extends DialogFragment {
         void onEditVisitClick(Visit visit);
 
         void onCloseDialog();
+
+        void onClickEditPerson(Person person);
     }
 
     public static AtomicBoolean isShowing = new AtomicBoolean(false);

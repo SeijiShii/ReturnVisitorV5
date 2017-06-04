@@ -55,7 +55,7 @@ public class SuggestionCell extends FrameLayout {
     private void initCommon() {
         view = View.inflate(getContext(), R.layout.suggestion_cell, this);
 
-        marker = (ImageView) view.findViewById(R.id.marker);
+        marker = (ImageView) view.findViewById(R.id.visit_marker);
         dataText = (TextView) view.findViewById(R.id.data_text);
         lastVisitText = (TextView) view.findViewById(R.id.last_visit_date_text);
         lastSeenText = (TextView) view.findViewById(R.id.last_seen_text);

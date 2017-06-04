@@ -90,7 +90,7 @@ public abstract class VisitCell extends BaseAnimateView {
     }
 
     private LinearLayout headerRow;
-    private ImageView marker;
+    private ImageView visitMarker;
     private TextView headerText;
     private ImageView openCloseMark;
     private TextView visitDataText;
@@ -105,7 +105,7 @@ public abstract class VisitCell extends BaseAnimateView {
             }
         });
 
-        marker = (ImageView) getViewById(R.id.marker);
+        visitMarker = (ImageView) getViewById(R.id.visit_marker);
         headerText = (TextView) getViewById(R.id.header_text);
         openCloseMark = (ImageView) getViewById(R.id.open_close_mark);
         visitDetailContainer = (LinearLayout) getViewById(R.id.visit_detail_container);
@@ -236,7 +236,7 @@ public abstract class VisitCell extends BaseAnimateView {
             mVisit = visit;
         }
 
-        marker.setBackgroundResource(Constants.buttonRes[mVisit.getPriority().num()]);
+        visitMarker.setBackgroundResource(Constants.buttonRes[mVisit.getPriority().num()]);
         refreshHeaderText();
         visitDataText.setText(mVisit.getPlacementsString());
 

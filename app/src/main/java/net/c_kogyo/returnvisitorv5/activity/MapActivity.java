@@ -684,6 +684,11 @@ public class MapActivity extends AppCompatActivity
                             public void onCloseDialog() {
                                 InputUtil.hideSoftKeyboard(MapActivity.this);
                             }
+
+                            @Override
+                            public void onClickEditPerson(Person person) {
+                                showPersonDialogForEdit(person);
+                            }
                         }).show(getFragmentManager(), null);
 
     }

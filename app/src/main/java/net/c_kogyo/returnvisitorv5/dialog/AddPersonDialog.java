@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
@@ -34,12 +35,14 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
+import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.PlaceMarkers;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
+import net.c_kogyo.returnvisitorv5.view.BaseAnimateView;
 import net.c_kogyo.returnvisitorv5.view.PersonCell;
 import net.c_kogyo.returnvisitorv5.view.PlaceCell;
 
@@ -400,7 +403,13 @@ public class AddPersonDialog extends DialogFragment
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
-                convertView = new PersonCell(getActivity(), (Person) getItem(position), false, null);
+                convertView = new PersonCell(getActivity(), (Person) getItem(position), false, null){
+                    @Override
+                    public void setLayoutParams(BaseAnimateView view) {
+                        int dp40 = getActivity().getResources().getDimensionPixelSize(R.dimen.ui_height_small);
+                        view.setLayoutParams(new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp40));
+                    }
+                };
             } else {
                 ((PersonCell) convertView).refreshData((Person) getItem(position));
             }

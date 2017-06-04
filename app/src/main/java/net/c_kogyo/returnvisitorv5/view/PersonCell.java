@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -24,7 +23,7 @@ import net.c_kogyo.returnvisitorv5.util.ConfirmDialog;
  * Created by SeijiShii on 2017/05/25.
  */
 
-public class PersonCell extends FrameLayout {
+public abstract class PersonCell extends BaseAnimateView {
 
     private Person mPerson;
     private boolean mShowEditButton;
@@ -35,7 +34,7 @@ public class PersonCell extends FrameLayout {
                       Person person,
                       boolean showEditButton,
                       @Nullable PersonCellListener listener) {
-        super(context);
+        super(context, context.getResources().getDimensionPixelSize(R.dimen.ui_height_small), R.layout.person_cell);
 
         mPerson = person;
         mShowEditButton = showEditButton;
@@ -45,16 +44,14 @@ public class PersonCell extends FrameLayout {
     }
 
     public PersonCell(@NonNull Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
+        super(context, attrs, R.layout.person_cell);
     }
 
-    private View view;
-    private ImageView markerView;
+    private ImageView personMarker;
     private TextView personText;
     private void initCommon() {
-        view = LayoutInflater.from(getContext()).inflate(R.layout.person_cell, this);
-        markerView = (ImageView) view.findViewById(R.id.marker);
-        personText = (TextView) view.findViewById(R.id.person_text);
+        personMarker = (ImageView) getViewById(R.id.person_marker);
+        personText = (TextView) getViewById(R.id.person_text);
 
         initEditButton();
 
@@ -63,7 +60,7 @@ public class PersonCell extends FrameLayout {
 
     private Button editButton;
     private void initEditButton() {
-        editButton = (Button) view.findViewById(R.id.edit_button);
+        editButton = (Button) getViewById(R.id.person_edit_button);
         if (mShowEditButton) {
             editButton.setVisibility(VISIBLE);
             editButton.setOnClickListener(new OnClickListener() {
@@ -119,8 +116,12 @@ public class PersonCell extends FrameLayout {
             mPerson = person;
         }
 
-        markerView.setBackgroundResource(Constants.buttonRes[mPerson.getPriority().num()]);
+        personMarker.setBackgroundResource(Constants.buttonRes[mPerson.getPriority().num()]);
         personText.setText(mPerson.toString(getContext()));
+    }
+
+    public Person getPerson() {
+        return mPerson;
     }
 
 }
