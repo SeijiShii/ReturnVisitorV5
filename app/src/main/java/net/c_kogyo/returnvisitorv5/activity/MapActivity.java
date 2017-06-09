@@ -689,6 +689,13 @@ public class MapActivity extends AppCompatActivity
                             public void onClickEditPerson(Person person) {
                                 showPersonDialogForEdit(person);
                             }
+
+                            @Override
+                            public void onClickNotHomeButton(Place place) {
+                                // TODO: 2017/06/10 Not home action
+                                recordNotHome(place);
+                            }
+
                         }).show(getFragmentManager(), null);
 
     }
@@ -767,7 +774,17 @@ public class MapActivity extends AppCompatActivity
     }
 
     private void recordNotHome(Place place) {
-        Visit visit = new Visit(place);
+
+        Visit visit;
+
+        Visit lastVisit = RVData.getInstance().visitList.getLatestVisitToPlace(place.getId());
+
+        if (lastVisit == null) {
+            visit = new Visit(place);
+        } else {
+            visit = new Visit(lastVisit);
+        }
+
         RVData.getInstance().placeList.setOrAdd(place);
         RVData.getInstance().visitList.setOrAdd(visit);
         RVData.getInstance().saveData(this);

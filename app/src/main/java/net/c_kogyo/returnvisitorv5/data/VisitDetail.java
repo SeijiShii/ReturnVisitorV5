@@ -75,6 +75,8 @@ public class VisitDetail extends DataItem  implements Cloneable{
         this.priority = lastVisitDetail.priority;
 
         this.tagIds = new ArrayList<>(lastVisitDetail.tagIds);
+
+        this.seen = false;
     }
 
     public VisitDetail(JSONObject object) {

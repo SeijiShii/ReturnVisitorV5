@@ -19,4 +19,20 @@
         android:id="@+id/visit_list_view"
         android:layout_marginLeft="10dp"/>
 
+    <!-- Not home button -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_height_small">
+
+        <Button
+            android:layout_width="150dp"
+            android:layout_height="match_parent"
+            android:id="@+id/not_home_button"
+            android:text="@string/record_not_home"
+            android:textColor="@color/colorPrimaryDark"
+            android:background="@drawable/trans_gray_selector"
+            android:layout_alignParentRight="true"/>
+
+    </RelativeLayout>
+
 </LinearLayout>

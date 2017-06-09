@@ -97,6 +97,7 @@ public class PlaceDialog extends DialogFragment {
 
         initPlaceCell();
         initVisitListView();
+        initNotHomeButton();
     }
 
     private PlaceCell placeCell;
@@ -157,6 +158,19 @@ public class PlaceDialog extends DialogFragment {
             }
         }).start();
 
+    }
+
+    private void initNotHomeButton() {
+        Button notHomeButton = (Button) view.findViewById(R.id.not_home_button);
+        notHomeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mListener != null) {
+                    mListener.onClickNotHomeButton(mPlace);
+                }
+                dismiss();
+            }
+        });
     }
 
     private class VisitListAdapter extends BaseAdapter {
@@ -245,6 +259,8 @@ public class PlaceDialog extends DialogFragment {
         void onCloseDialog();
 
         void onClickEditPerson(Person person);
+
+        void onClickNotHomeButton(Place place);
     }
 
     public static AtomicBoolean isShowing = new AtomicBoolean(false);

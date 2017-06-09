@@ -83,7 +83,7 @@
     <string name="priority_for_person">次の訪問の優先度</string>
     <string name="record_as_complex_button">集合住宅として記録</string>
     <string name="record_new_visit_menu">訪問を記録</string>
-    <string name="record_not_home">留守宅を記録</string>
+    <string name="record_not_home">留守を記録</string>
     <string name="record_placement_button">配布物のみを記録</string>
     <string name="record_single_house_button">家を記録</string>
     <string name="record_visit">訪問を記録</string>
