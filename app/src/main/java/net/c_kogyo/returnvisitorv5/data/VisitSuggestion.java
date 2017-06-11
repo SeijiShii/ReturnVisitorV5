@@ -104,7 +104,6 @@ public class VisitSuggestion {
         suggestions = filterSuggestionsByTag(filter.tagIds, suggestions);
         suggestions = filterSuggestionsByWords(filter.searchWords, suggestions, context);
 
-
         ArrayList<VisitSuggestion> deleteList = new ArrayList<>();
         for (DismissedSuggestion dismissedSuggestion : dismissedSuggestions) {
             for (VisitSuggestion suggestion : suggestions) {

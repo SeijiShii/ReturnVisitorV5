@@ -58,12 +58,20 @@ public class DateTimeText {
         return android.text.format.DateFormat.format(fString, month).toString();
     }
 
-
-
     static public String getDateTimeText(Calendar calendar, Context context) {
         DateFormat format = android.text.format.DateFormat.getMediumDateFormat(context);
         String dateString = format.format(calendar.getTime());
 
         return dateString + " " + getTimeText(calendar, false);
+    }
+
+    static public String getDaysAgoText(int days, Context context) {
+        if (days <= 0) {
+            return context.getString(R.string.today);
+        } else if (days == 1) {
+            return context.getString(R.string.yesterday);
+        } else {
+            return context.getString(R.string.days_ago, days);
+        }
     }
 }

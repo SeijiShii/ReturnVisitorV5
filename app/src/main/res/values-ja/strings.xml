@@ -47,8 +47,8 @@
     <string name="filter_on_tags">タグで絞り込み</string>
     <string name="history_title">履歴</string>
     <string name="housing_complex">集合住宅</string>
-    <string name="last_seen">最後に会えた日: %1$s,  %2$d日前</string>
-    <string name="last_visit_date">最後の訪問: %1$s, %2$d日前</string>
+    <string name="last_seen">最後に会えた日: %s</string>
+    <string name="last_visit_date">最後の訪問: %s</string>
     <string name="loading">ロード中…</string>
     <string name="login_button">ログイン</string>
     <string name="login_failed">ログイン失敗。</string>
@@ -129,4 +129,10 @@
     <string name="work">活動</string>
     <string name="wrong_password">ユーザー名 %s のアカウントは存在しますが、パスワードが違います。</string>
     <string name="suggestion">提案</string>
+
+    <!-- Days ago -->
+    <string name="days_ago">%d日前</string>
+    <string name="yesterday">昨日</string>
+    <string name="today">今日</string>
+
 </resources>

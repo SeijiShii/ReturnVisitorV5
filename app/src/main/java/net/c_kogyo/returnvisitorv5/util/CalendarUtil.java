@@ -59,7 +59,7 @@ public class CalendarUtil {
     public static int daysPast(Calendar before, Calendar later) {
 
         long diff = later.getTimeInMillis() - before.getTimeInMillis();
-        return (int) (diff / ONE_DAY) + 1;
+        return (int) (diff / ONE_DAY);
 
     }
 }
