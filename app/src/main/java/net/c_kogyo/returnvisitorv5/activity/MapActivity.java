@@ -248,7 +248,11 @@ public class MapActivity extends AppCompatActivity
                         mMap.setOnMarkerDragListener(MapActivity.this);
 
                         // DONE: 2017/03/01 ここにマーカー描画処理を記述する
-                        placeMarkers = new PlaceMarkers(mMap);
+                        if (placeMarkers == null) {
+                            placeMarkers = new PlaceMarkers(mMap);
+                        } else {
+                            placeMarkers.drawAllMarkers();
+                        }
 
                         refreshLogoButton();
                         refreshWorkButton();

@@ -204,10 +204,10 @@ public class RecordVisitActivity extends AppCompatActivity {
     }
 
     private void refreshAddressText() {
-        if (mPlace.getAddress() != null && !mPlace.getAddress().equals("")) {
-            addressText.setText(mPlace.getAddress());
-        } else {
+        if (mPlace.needsAddressRequest()) {
             inquireAddress();
+        } else {
+            addressText.setText(mPlace.getAddress());
         }
     }
 
@@ -345,7 +345,7 @@ public class RecordVisitActivity extends AppCompatActivity {
 
     private void inquireAddress() {
 
-        if (mPlace.getAddress() != null) return;
+        if (!mPlace.needsAddressRequest()) return;
 
         double lat, lng;
 

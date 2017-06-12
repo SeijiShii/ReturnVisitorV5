@@ -97,7 +97,6 @@ public class Place extends DataItem {
     private void initCommon() {
         this.latLng = new LatLng(0, 0);
         this.address = null;
-//        this.markerId = null;
         this.parentId = null;
         this.category = Category.HOUSE;
     }
@@ -296,5 +295,9 @@ public class Place extends DataItem {
         }
 
         return -1;
+    }
+
+    public boolean needsAddressRequest() {
+        return address == null || address.trim().length() <= 0;
     }
 }
