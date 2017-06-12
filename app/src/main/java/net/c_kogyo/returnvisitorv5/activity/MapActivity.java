@@ -64,6 +64,7 @@ import net.c_kogyo.returnvisitorv5.dialog.PersonDialog;
 import net.c_kogyo.returnvisitorv5.dialog.PlaceDialog;
 import net.c_kogyo.returnvisitorv5.dialog.SearchDialog;
 import net.c_kogyo.returnvisitorv5.dialog.TermOfUseDialog;
+import net.c_kogyo.returnvisitorv5.service.FetchAddressIntentService;
 import net.c_kogyo.returnvisitorv5.service.TimeCountIntentService;
 import net.c_kogyo.returnvisitorv5.util.AdMobHelper;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
@@ -76,8 +77,6 @@ import net.c_kogyo.returnvisitorv5.view.CountTimeFrame;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import static net.c_kogyo.returnvisitorv5.Constants.LATITUDE;
-import static net.c_kogyo.returnvisitorv5.Constants.LONGITUDE;
 import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.EDIT_VISIT_ACTION;
 import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.EDIT_VISIT_REQUEST_CODE;
 import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.NEW_HOUSE_ACTION;
@@ -87,6 +86,8 @@ import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.VISIT_ADD
 import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.VISIT_EDITED_RESULT_CODE;
 import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS;
 import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.ZOOM_LEVEL;
+import static net.c_kogyo.returnvisitorv5.data.Place.LATITUDE;
+import static net.c_kogyo.returnvisitorv5.data.Place.LONGITUDE;
 import static net.c_kogyo.returnvisitorv5.data.Place.PLACE;
 import static net.c_kogyo.returnvisitorv5.data.Visit.VISIT;
 
@@ -796,7 +797,13 @@ public class MapActivity extends AppCompatActivity
         RVCloudSync.syncDataIfLoggedIn(this);
 
         placeMarkers.addMarker(place);
+
+        if (place.needsAddressRequest()) {
+            FetchAddressIntentService.inquireAddress(place, this);
+        }
     }
+
+
 
     // DONE: 2017/03/27 HousingComplexMarkerRes
     // PENDING: 2017/03/27 Mapを回転させる
@@ -1030,6 +1037,20 @@ public class MapActivity extends AppCompatActivity
                    editor.putString(Constants.SharedPrefTags.COUNTING_WORK_ID, countingWorkId);
                    editor.apply();
                }
+           } else if (intent.getAction().equals(FetchAddressIntentService.SEND_FETCED_ADDRESS_ACTION)) {
+               String placeId = intent.getStringExtra(PLACE);
+               if (placeId == null) return;
+
+               Place place = RVData.getInstance().placeList.getById(placeId);
+               if (place == null) return;
+
+               String address = intent.getStringExtra(FetchAddressIntentService.ADDRESS_FETCHED);
+               if (address == null) return;
+
+               place.setAddress(address);
+               RVData.getInstance().placeList.setOrAdd(place);
+               RVData.getInstance().saveData(MapActivity.this);
+               RVCloudSync.syncDataIfLoggedIn(MapActivity.this);
            }
         }
     };
@@ -1039,6 +1060,7 @@ public class MapActivity extends AppCompatActivity
 
         manager.registerReceiver(receiver, new IntentFilter(TimeCountIntentService.TIME_COUNTING_ACTION_TO_ACTIVITY));
         manager.registerReceiver(receiver, new IntentFilter(TimeCountIntentService.STOP_TIME_COUNT_ACTION_TO_ACTIVITY));
+        manager.registerReceiver(receiver, new IntentFilter(FetchAddressIntentService.SEND_FETCED_ADDRESS_ACTION));
     }
 
 //    private void restartTimeCountIfNeeded() {

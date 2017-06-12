@@ -1,6 +1,7 @@
 package net.c_kogyo.returnvisitorv5.service;
 
 import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
@@ -11,14 +12,16 @@ import android.util.Log;
 import com.google.android.gms.maps.model.LatLng;
 
 import net.c_kogyo.returnvisitorv5.R;
+import net.c_kogyo.returnvisitorv5.data.Place;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import static net.c_kogyo.returnvisitorv5.Constants.LATITUDE;
-import static net.c_kogyo.returnvisitorv5.Constants.LONGITUDE;
+import static net.c_kogyo.returnvisitorv5.data.Place.LATITUDE;
+import static net.c_kogyo.returnvisitorv5.data.Place.LONGITUDE;
+import static net.c_kogyo.returnvisitorv5.data.Place.PLACE;
 
 /**
  * Created by SeijiShii on 2017/02/23.
@@ -36,7 +39,8 @@ public class FetchAddressIntentService extends IntentService {
     private static final String TAG = "Reverse Geocoder Tag";
 
     private boolean mIsUsingMapLocale, doneSecondInquiry;
-    private LatLng latLng;
+    private LatLng mLatLng;
+    private String mPlaceId;
 
     public FetchAddressIntentService() {
         super(FETCH_ADDRESS_INTENT_SERVICE);
@@ -47,16 +51,18 @@ public class FetchAddressIntentService extends IntentService {
 
         double lat = intent.getDoubleExtra(LATITUDE, 1000);
         double lng = intent.getDoubleExtra(LONGITUDE, 1000);
-        latLng = new LatLng(lat, lng);
+        mLatLng = new LatLng(lat, lng);
+
+        mPlaceId = intent.getStringExtra(PLACE);
 
         mIsUsingMapLocale = intent.getBooleanExtra(IS_USING_MAP_LOCALE, false);
 
 
-        inquireAddress(Locale.getDefault());
+        requestAddress(Locale.getDefault());
     }
 
     // 再帰的に呼ばれるメソッド
-    private void inquireAddress(Locale locale) {
+    private void requestAddress(Locale locale) {
 
         Geocoder geocoder = new Geocoder(this, locale);
 
@@ -65,7 +71,7 @@ public class FetchAddressIntentService extends IntentService {
         List<Address> addresses = null;
 
         try {
-            addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
+            addresses = geocoder.getFromLocation(mLatLng.latitude, mLatLng.longitude, 1);
         } catch (IOException ioException) {
             // Catch network or other I/O problems.
             errorMessage = getString(R.string.service_not_available);
@@ -74,8 +80,8 @@ public class FetchAddressIntentService extends IntentService {
             // Catch invalid latitude or longitude values.
             errorMessage = getString(R.string.invalid_lat_long_used);
             Log.e(TAG, errorMessage + ". " +
-                    "Latitude = " + latLng.latitude +
-                    ", Longitude = " + latLng.longitude, illegalArgumentException);
+                    "Latitude = " + mLatLng.latitude +
+                    ", Longitude = " + mLatLng.longitude, illegalArgumentException);
         }
 
         // Handle case where no address was found.
@@ -115,7 +121,7 @@ public class FetchAddressIntentService extends IntentService {
                     }
 
                     doneSecondInquiry = true;
-                    inquireAddress(new Locale(langCode, countryCode));
+                    requestAddress(new Locale(langCode, countryCode));
 
                 } else {
                     String addressString = TextUtils.join(" ", addressFragments);
@@ -132,9 +138,24 @@ public class FetchAddressIntentService extends IntentService {
 
         Intent sendAddressIntent = new Intent(SEND_FETCED_ADDRESS_ACTION);
         sendAddressIntent.putExtra(ADDRESS_FETCHED, address);
+        sendAddressIntent.putExtra(PLACE, mPlaceId);
 
         manager.sendBroadcast(sendAddressIntent);
 
+    }
+
+    static public void inquireAddress(Place place, Context context) {
+
+        if (!place.needsAddressRequest()) return;
+
+        Intent addressServiceIntent = new Intent(context, FetchAddressIntentService.class);
+
+        addressServiceIntent.putExtra(LATITUDE, place.getLatLng().latitude);
+        addressServiceIntent.putExtra(LONGITUDE, place.getLatLng().longitude);
+        addressServiceIntent.putExtra(PLACE, place.getId());
+        addressServiceIntent.putExtra(FetchAddressIntentService.IS_USING_MAP_LOCALE, true);
+
+        context.startService(addressServiceIntent);
     }
 
 }

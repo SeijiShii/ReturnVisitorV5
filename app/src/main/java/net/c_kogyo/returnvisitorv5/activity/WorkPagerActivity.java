@@ -42,8 +42,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import static net.c_kogyo.returnvisitorv5.Constants.DATE_LONG;
-import static net.c_kogyo.returnvisitorv5.Constants.LATITUDE;
-import static net.c_kogyo.returnvisitorv5.Constants.LONGITUDE;
+import static net.c_kogyo.returnvisitorv5.data.Place.LATITUDE;
+import static net.c_kogyo.returnvisitorv5.data.Place.LONGITUDE;
 import static net.c_kogyo.returnvisitorv5.util.ViewUtil.setOnClickListener;
 
 /**

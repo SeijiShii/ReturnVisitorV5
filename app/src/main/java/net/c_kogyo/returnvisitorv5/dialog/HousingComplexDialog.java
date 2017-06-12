@@ -45,6 +45,9 @@ import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static net.c_kogyo.returnvisitorv5.data.Place.LATITUDE;
+import static net.c_kogyo.returnvisitorv5.data.Place.LONGITUDE;
+
 /**
  * Created by SeijiShii on 2017/03/18.
  */
@@ -124,7 +127,9 @@ public class HousingComplexDialog extends DialogFragment {
         initRoomListView();
 
         initBroadcasting();
-        inquireAddress();
+        if (mHousingComplex.needsAddressRequest()) {
+            FetchAddressIntentService.inquireAddress(mHousingComplex, getActivity());
+        }
     }
 
     private EditText nameText;
@@ -287,19 +292,6 @@ public class HousingComplexDialog extends DialogFragment {
         LocalBroadcastManager manager = LocalBroadcastManager.getInstance(getActivity());
         manager.registerReceiver(receiver, new IntentFilter(FetchAddressIntentService.SEND_FETCED_ADDRESS_ACTION));
 
-    }
-
-    private void inquireAddress() {
-        if (mHousingComplex.getAddress() == null || mHousingComplex.getAddress().equals("")) {
-
-            Intent addressServiceIntent = new Intent(getActivity(), FetchAddressIntentService.class);
-
-            addressServiceIntent.putExtra(Constants.LATITUDE, mHousingComplex.getLatLng().latitude);
-            addressServiceIntent.putExtra(Constants.LONGITUDE, mHousingComplex.getLatLng().longitude);
-            addressServiceIntent.putExtra(FetchAddressIntentService.IS_USING_MAP_LOCALE, true);
-
-            getActivity().startService(addressServiceIntent);
-        }
     }
 
     private BroadcastReceiver receiver = new BroadcastReceiver() {

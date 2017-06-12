@@ -57,6 +57,8 @@ import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.NEW_HOUSE
 import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.NEW_VISIT_ACTION_NO_PLACE;
 import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.NEW_VISIT_ACTION_NO_PLACE_WITH_DATE;
 import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.NEW_VISIT_ACTION_WITH_PLACE;
+import static net.c_kogyo.returnvisitorv5.data.Place.LATITUDE;
+import static net.c_kogyo.returnvisitorv5.data.Place.LONGITUDE;
 import static net.c_kogyo.returnvisitorv5.data.Place.PLACE;
 import static net.c_kogyo.returnvisitorv5.data.Visit.VISIT;
 
@@ -118,8 +120,8 @@ public class RecordVisitActivity extends AppCompatActivity {
         switch (intent.getAction()) {
             case NEW_HOUSE_ACTION:
 
-                double lat = intent.getDoubleExtra(Constants.LATITUDE, 0);
-                double lng = intent.getDoubleExtra(Constants.LONGITUDE, 0);
+                double lat = intent.getDoubleExtra(LATITUDE, 0);
+                double lng = intent.getDoubleExtra(LONGITUDE, 0);
 
                 mPlace = new Place(new LatLng(lat, lng), Place.Category.HOUSE);
                 mVisit = new Visit(mPlace);
@@ -204,8 +206,11 @@ public class RecordVisitActivity extends AppCompatActivity {
     }
 
     private void refreshAddressText() {
+
+        if (mPlace == null) return;
+
         if (mPlace.needsAddressRequest()) {
-            inquireAddress();
+            FetchAddressIntentService.inquireAddress(mPlace, this);
         } else {
             addressText.setText(mPlace.getAddress());
         }
@@ -329,6 +334,11 @@ public class RecordVisitActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             switch (intent.getAction()) {
                 case FetchAddressIntentService.SEND_FETCED_ADDRESS_ACTION:
+
+                    String placeId = intent.getStringExtra(PLACE);
+                    if (placeId == null) return;
+                    if (!mPlace.getId().equals(placeId)) return;
+
                     String address = intent.getStringExtra(FetchAddressIntentService.ADDRESS_FETCHED);
                     mPlace.setAddress(address);
                     addressText.setText(mPlace.getAddress());
@@ -343,30 +353,7 @@ public class RecordVisitActivity extends AppCompatActivity {
         manager.registerReceiver(receiver, new IntentFilter(FetchAddressIntentService.SEND_FETCED_ADDRESS_ACTION));
     }
 
-    private void inquireAddress() {
 
-        if (!mPlace.needsAddressRequest()) return;
-
-        double lat, lng;
-
-        if (mPlace.getLatLng() == null) {
-            lat = getIntent().getDoubleExtra(Constants.LATITUDE, 1000);
-            lng = getIntent().getDoubleExtra(Constants.LONGITUDE, 1000);
-            if (lat >= 1000 & lng >= 1000) return;
-
-        } else {
-            lat = mPlace.getLatLng().latitude;
-            lng = mPlace.getLatLng().longitude;
-        }
-
-        Intent addressServiceIntent = new Intent(this, FetchAddressIntentService.class);
-
-        addressServiceIntent.putExtra(Constants.LATITUDE, lat);
-        addressServiceIntent.putExtra(Constants.LONGITUDE, lng);
-        addressServiceIntent.putExtra(FetchAddressIntentService.IS_USING_MAP_LOCALE, true);
-
-        startService(addressServiceIntent);
-    }
 
     private ImageView priorityMark;
     private void initPriorityMark() {

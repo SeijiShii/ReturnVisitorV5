@@ -38,11 +38,11 @@ import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static android.content.Context.MODE_PRIVATE;
-import static net.c_kogyo.returnvisitorv5.Constants.LATITUDE;
-import static net.c_kogyo.returnvisitorv5.Constants.LONGITUDE;
 import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS;
 import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.ZOOM_LEVEL;
 import static net.c_kogyo.returnvisitorv5.activity.MapActivity.MY_LOCATION_TAG;
+import static net.c_kogyo.returnvisitorv5.data.Place.LATITUDE;
+import static net.c_kogyo.returnvisitorv5.data.Place.LONGITUDE;
 
 /**
  * Created by SeijiShii on 2017/05/09.

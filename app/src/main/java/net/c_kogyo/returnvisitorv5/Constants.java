@@ -33,11 +33,6 @@ public class Constants {
     public static final String LOADED_DATA_ARRAY = "loaded_data_array";
 //    public static final String FAILED_DATA_ARRAY = "failed_data_array";
 
-
-    public static final String LATITUDE = "latitude";
-    public static final String LONGITUDE = "longitude";
-
-
     public static final int[] buttonRes = {
             R.mipmap.button_marker_gray,
             R.mipmap.button_marker_red,
