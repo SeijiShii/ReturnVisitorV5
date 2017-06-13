@@ -58,7 +58,15 @@ public class CalendarUtil {
 
     public static int daysPast(Calendar before, Calendar later) {
 
-        long diff = later.getTimeInMillis() - before.getTimeInMillis();
+        Calendar clonedLater = (Calendar) later.clone();
+
+        clonedLater.add(Calendar.DAY_OF_MONTH, 1);
+        clonedLater.set(Calendar.HOUR_OF_DAY, 0);
+        clonedLater.set(Calendar.MINUTE, 0);
+        clonedLater.set(Calendar.SECOND, 0);
+        clonedLater.add(Calendar.SECOND, -1);
+
+        long diff = clonedLater.getTimeInMillis() - before.getTimeInMillis();
         return (int) (diff / ONE_DAY);
 
     }
