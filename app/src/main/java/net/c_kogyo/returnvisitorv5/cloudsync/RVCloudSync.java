@@ -92,44 +92,24 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback{
                            boolean passAlreadyEncrypted,
                            Context context) {
 
-        if (mCallback != null) {
-            mCallback.onStartLoginRequest();
-        }
-        initSocketClient(context);
-
-        if (socketClient == null)
-            return;
-
         final UserData userData = new UserData(userName, password, passAlreadyEncrypted);
-
-        if (socketClient.isOpen()) {
-            loginWithData(userData);
-        } else {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    int timeCounter = 0;
-                    while (!socketClient.isOpen()) {
-                        try {
-                            Thread.sleep(50);
-                            timeCounter += 50;
-                            if (timeCounter > 50000) {
-                                if (mCallback != null) {
-                                    RequestResult result = new RequestResult(userData, ResultStatus.REQUEST_TIME_OUT);
-                                    mCallback.onLoginResult(result);
-                                }
-                                return;
-                            }
-                        } catch (InterruptedException e ) {
-                            Log.e(TAG, e.getMessage());
+        startSendingUserData(userData, context, LOGIN,
+                new SendUserDataCallback() {
+                    @Override
+                    public void onStart() {
+                        if (mCallback != null) {
+                            mCallback.onStartLoginRequest();
                         }
                     }
-                    loginWithData(userData);
-                }
-            }).start();
-            socketClient.connect();
 
-        }
+                    @Override
+                    public void onTimedOut() {
+                        if (mCallback != null) {
+                            RequestResult result = new RequestResult(userData, ResultStatus.REQUEST_TIME_OUT);
+                            mCallback.onLoginResult(result);
+                        }
+                    }
+                });
     }
 
     public void createUser(String userName,
@@ -137,18 +117,39 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback{
                                 boolean passAlreadyEncrypted,
                                 Context context) {
 
-        if (mCallback != null) {
-            mCallback.onStartCreateUserRequest();
-        }
+        final UserData userData = new UserData(userName, password, passAlreadyEncrypted);
+        startSendingUserData(userData, context, CREATE_USER,
+                new SendUserDataCallback() {
+                    @Override
+                    public void onStart() {
+                        if (mCallback != null) {
+                            mCallback.onStartCreateUserRequest();
+                        }
+                    }
+
+                    @Override
+                    public void onTimedOut() {
+                        if (mCallback != null) {
+                            RequestResult result = new RequestResult(userData, ResultStatus.REQUEST_TIME_OUT);
+                            mCallback.onCreateUserResult(result);
+                        }
+                    }
+                });
+    }
+
+    private void startSendingUserData(final UserData userData,
+                                      Context context,
+                                      final RVCloudSyncMethod method,
+                                      final SendUserDataCallback callback) {
+        callback.onStart();
+
         initSocketClient(context);
 
         if (socketClient == null)
             return;
 
-        final UserData userData = new UserData(userName, password, passAlreadyEncrypted);
-
         if (socketClient.isOpen()) {
-            createUserWithData(userData);
+            sendUserData(userData, method);
         } else {
             new Thread(new Runnable() {
                 @Override
@@ -159,21 +160,37 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback{
                             Thread.sleep(50);
                             timeCounter += 50;
                             if (timeCounter > 50000) {
-                                if (mCallback != null) {
-                                    RequestResult result = new RequestResult(userData, ResultStatus.REQUEST_TIME_OUT);
-                                    mCallback.onCreateUserResult(result);
-                                }
+                                callback.onTimedOut();
                                 return;
                             }
                         } catch (InterruptedException e ) {
                             Log.e(TAG, e.getMessage());
                         }
                     }
-                    createUserWithData(userData);
+                    sendUserData(userData, method);
                 }
             }).start();
             socketClient.connect();
+
         }
+    }
+
+    private void sendUserData(UserData userData, RVCloudSyncMethod method) {
+        final JSONObject object = new JSONObject();
+        try {
+            object.put(METHOD, method);
+            object.put(USER_DATA, userData.jsonObject());
+        } catch (JSONException e) {
+            Log.e(TAG, e.getMessage());
+        }
+        socketClient.send(object.toString());
+    }
+
+    private interface SendUserDataCallback{
+
+        void onStart();
+
+        void onTimedOut();
     }
 
     public void syncDataIfLoggedIn (Context context) {
@@ -236,27 +253,27 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback{
         }
     }
 
-    private void loginWithData(UserData userData) {
-        final JSONObject object = new JSONObject();
-        try {
-            object.put(METHOD, LOGIN);
-            object.put(USER_DATA, userData.jsonObject());
-        } catch (JSONException e) {
-            Log.e(TAG, e.getMessage());
-        }
-        socketClient.send(object.toString());
-    }
-
-    private void createUserWithData(UserData userData) {
-        final JSONObject object = new JSONObject();
-        try {
-            object.put(METHOD, CREATE_USER);
-            object.put(USER_DATA, userData.jsonObject());
-        } catch (JSONException e) {
-            Log.e(TAG, e.getMessage());
-        }
-        socketClient.send(object.toString());
-    }
+//    private void loginWithData(UserData userData) {
+//        final JSONObject object = new JSONObject();
+//        try {
+//            object.put(METHOD, LOGIN);
+//            object.put(USER_DATA, userData.jsonObject());
+//        } catch (JSONException e) {
+//            Log.e(TAG, e.getMessage());
+//        }
+//        socketClient.send(object.toString());
+//    }
+//
+//    private void createUserWithData(UserData userData) {
+//        final JSONObject object = new JSONObject();
+//        try {
+//            object.put(METHOD, CREATE_USER);
+//            object.put(USER_DATA, userData.jsonObject());
+//        } catch (JSONException e) {
+//            Log.e(TAG, e.getMessage());
+//        }
+//        socketClient.send(object.toString());
+//    }
 
 
     public class UserData {

@@ -1424,7 +1424,7 @@ public class MapActivity extends AppCompatActivity
     public void onSyncDataResult(RVCloudSync.RequestResult result) {
         switch (result.statusCode) {
             case STATUS_200_SYNC_OK:
-                onDataSyncSuccess();
+                onDataSyncSuccess(result);
                 break;
             case REQUEST_TIME_OUT:
             case SERVER_NOT_AVAILABLE:
@@ -1454,7 +1454,7 @@ public class MapActivity extends AppCompatActivity
         });
     }
 
-    private void onDataSyncSuccess() {
+    private void onDataSyncSuccess(final RVCloudSync.RequestResult result) {
         cloudResultHandler.post(new Runnable() {
             @Override
             public void run() {
@@ -1468,16 +1468,23 @@ public class MapActivity extends AppCompatActivity
                 } else {
                     placeMarkers.drawAllMarkers();
                 }
+                postRequestResult(result);
             }
         });
     }
 
-    private void onSuccessLogin(RVCloudSync.RequestResult result) {
+    private void onSuccessLogin(final RVCloudSync.RequestResult result) {
 
         LoginState.onSuccessLogin(result.userData.userName, result.userData.password, this);
         RVCloudSync.getInstance().syncDataIfLoggedIn(this);
-        postRequestResult(result);
 
+        cloudResultHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                enableWaitScreen(false);
+                postRequestResult(result);
+            }
+        });
     }
 
     private void onFailRequest(RVCloudSync.RequestResult result) {
