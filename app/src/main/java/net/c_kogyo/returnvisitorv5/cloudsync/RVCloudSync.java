@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import net.c_kogyo.returnvisitorv5.Constants;
-import net.c_kogyo.returnvisitorv5.activity.MapActivity;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.util.EncryptUtil;
 
@@ -23,12 +22,14 @@ import static android.content.Context.MODE_PRIVATE;
 import static net.c_kogyo.returnvisitorv5.Constants.DATA_ARRAY_LATER_THAN_TIME;
 import static net.c_kogyo.returnvisitorv5.Constants.LOADED_DATA_ARRAY;
 import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.LAST_DEVICE_SYNC_TIME;
+import static net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync.RVCloudSyncMethod.CREATE_USER;
+import static net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync.RVCloudSyncMethod.LOGIN;
 
 /**
  * Created by SeijiShii on 2017/05/10.
  */
 
-public class RVCloudSync {
+public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback{
 
     public static final String TAG = "RVCloudSync";
 
@@ -71,7 +72,6 @@ public class RVCloudSync {
 
     private static RVCloudSync instance = new RVCloudSync();
     private RVCloudSyncCallback mCallback;
-    private Handler mHandler;
 
     private RVWebSocketClient socketClient;
 //    private UserData userData;
@@ -80,38 +80,30 @@ public class RVCloudSync {
         return instance;
     }
 
-    public void setCallback(@NonNull RVCloudSyncCallback callback, Handler handler) {
+    public void setCallback(@NonNull RVCloudSyncCallback callback) {
         mCallback = callback;
-        mHandler = handler;
     }
 
 //    private WebSocket webSocket;
     private RVCloudSync() {}
 
-    public void startSendingUserData(@Nullable String userName,
-                                     @Nullable String password,
-                                     final RVCloudSyncMethod method,
-                                     Context context,
-                                     boolean passAlreadyEncrypted)
-                                        throws RVCloudSyncException{
-        if (userName == null || password == null)
-            return;
+    public void login(String userName,
+                           String password,
+                           boolean passAlreadyEncrypted,
+                           Context context) {
 
-        if (mCallback == null)
-            throw new RVCloudSyncException();
-
-        mCallback.onStartRequest(method);
-
+        if (mCallback != null) {
+            mCallback.onStartLoginRequest();
+        }
         initSocketClient(context);
 
         if (socketClient == null)
             return;
 
-
         final UserData userData = new UserData(userName, password, passAlreadyEncrypted);
 
         if (socketClient.isOpen()) {
-            sendUserData(userData, method);
+            loginWithData(userData);
         } else {
             new Thread(new Runnable() {
                 @Override
@@ -122,14 +114,17 @@ public class RVCloudSync {
                             Thread.sleep(50);
                             timeCounter += 50;
                             if (timeCounter > 50000) {
-                                postErrorResult(ResultStatus.REQUEST_TIME_OUT);
+                                if (mCallback != null) {
+                                    RequestResult result = new RequestResult(userData, ResultStatus.REQUEST_TIME_OUT);
+                                    mCallback.onLoginResult(result);
+                                }
                                 return;
                             }
                         } catch (InterruptedException e ) {
                             Log.e(TAG, e.getMessage());
                         }
                     }
-                    sendUserData(userData, method);
+                    loginWithData(userData);
                 }
             }).start();
             socketClient.connect();
@@ -137,95 +132,58 @@ public class RVCloudSync {
         }
     }
 
-    private void initSocketClient(final Context context) {
-        try {
-            socketClient = new RVWebSocketClient(new URI(ROOT_URL), context) {
+    public void createUser(String userName,
+                                String password,
+                                boolean passAlreadyEncrypted,
+                                Context context) {
+
+        if (mCallback != null) {
+            mCallback.onStartCreateUserRequest();
+        }
+        initSocketClient(context);
+
+        if (socketClient == null)
+            return;
+
+        final UserData userData = new UserData(userName, password, passAlreadyEncrypted);
+
+        if (socketClient.isOpen()) {
+            createUserWithData(userData);
+        } else {
+            new Thread(new Runnable() {
                 @Override
-                public void onMessage(String s) {
-
-                    try {
-                        JSONObject object = new JSONObject(s);
-                        RVCloudSyncMethod method = RVCloudSyncMethod.valueOf(object.getString(METHOD));
-                        ResultStatus status = ResultStatus.valueOf(object.getString(STATE));
-                        UserData userData = new UserData(object.getJSONObject(USER_DATA));
-
-                        JSONArray loadedArray = new JSONArray();
-                        if (object.has(LOADED_DATA_ARRAY))
-                            loadedArray = object.getJSONArray(Constants.LOADED_DATA_ARRAY);
-
-                        final RequestResult result = new RequestResult(userData, status);
-
-                        if (status == ResultStatus.STATUS_202_AUTHENTICATED
-                                || status == ResultStatus.STATUS_201_CREATED
-                                || status == ResultStatus.STATUS_200_SYNC_OK) {
-                            LoginState.onSuccessLogin(userData.userName, userData.password, context);
-                        } else {
-                            LoginState.onLoggedOut(context);
+                public void run() {
+                    int timeCounter = 0;
+                    while (!socketClient.isOpen()) {
+                        try {
+                            Thread.sleep(50);
+                            timeCounter += 50;
+                            if (timeCounter > 50000) {
+                                if (mCallback != null) {
+                                    RequestResult result = new RequestResult(userData, ResultStatus.REQUEST_TIME_OUT);
+                                    mCallback.onCreateUserResult(result);
+                                }
+                                return;
+                            }
+                        } catch (InterruptedException e ) {
+                            Log.e(TAG, e.getMessage());
                         }
-
-                        switch (method) {
-                            case LOGIN:
-                            case CREATE_USER:
-                                mHandler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        mCallback.onRequestResult(result);
-                                    }
-                                });
-                                break;
-
-                            case SYNC_DATA:
-                                RVData.getInstance().setFromRecordArray(loadedArray, RVData.RecordArraySource.FROM_CLOUD);
-                                RVData.getInstance().removeDeletedData();
-                                mHandler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        mCallback.onRequestResult(result);
-                                    }
-                                });
-                                break;
-                        }
-                        socketClient.close();
-
-                    } catch (JSONException e) {
-                        Log.e(TAG, e.getMessage());
                     }
+                    createUserWithData(userData);
                 }
-            };
-        } catch (URISyntaxException e) {
-            Log.e(TAG, e.getMessage());
+            }).start();
+            socketClient.connect();
         }
     }
 
-    private void postErrorResult(final ResultStatus status) {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mCallback.onRequestResult(new RequestResult(new UserData(null, null, false), status));
-            }
-        });
-    }
+    public void syncDataIfLoggedIn (Context context) {
 
-    private void sendUserData(UserData userData, RVCloudSyncMethod method) { {
+        LoginState loginState = LoginState.getInstance();
+        if (!loginState.isLoggedIn()) return;
 
-        final JSONObject object = new JSONObject();
-        try {
-            object.put(METHOD, method.toString());
-            object.put(USER_DATA, userData.jsonObject());
-        } catch (JSONException e) {
-            Log.e(TAG, e.getMessage());
+        if (mCallback != null) {
+            mCallback.onStartSyncDataRequest();
         }
-            socketClient.send(object.toString());
-        }
-    }
-
-    public void startDataSync(@Nullable String userName, @Nullable String password, Context context) throws RVCloudSyncException{
-
-        if (mCallback == null) {
-            throw new RVCloudSyncException();
-        }
-
-        mCallback.onStartRequest(RVCloudSyncMethod.SYNC_DATA);
 
         initSocketClient(context);
 
@@ -233,10 +191,12 @@ public class RVCloudSync {
                 = context.getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
         long lastSyncTime = prefs.getLong(LAST_DEVICE_SYNC_TIME, 0);
 
+        final UserData userData = new UserData(loginState.getUserName(), loginState.getPassword(), true);
+
         final SyncData syncData
-                = new SyncData(new UserData(userName, password, true),
-                lastSyncTime,
-                RVData.getInstance().getJSONArrayLaterThanTime(lastSyncTime));
+                = new SyncData(userData,
+                                lastSyncTime,
+                                RVData.getInstance().getJSONArrayLaterThanTime(lastSyncTime));
 
         if (socketClient.isOpen()) {
             socketClient.send(syncData.jsonObject().toString());
@@ -250,7 +210,11 @@ public class RVCloudSync {
                             Thread.sleep(50);
                             timeCounter += 50;
                             if (timeCounter > 50000) {
-                                postErrorResult(ResultStatus.REQUEST_TIME_OUT);
+
+                                if (mCallback != null) {
+                                    RequestResult result = new RequestResult(userData, ResultStatus.REQUEST_TIME_OUT);
+                                    mCallback.onSyncDataResult(result);
+                                }
                                 return;
                             }
                         } catch (InterruptedException e ) {
@@ -264,19 +228,36 @@ public class RVCloudSync {
         }
     }
 
-    public interface RVCloudSyncCallback {
-
-        void onStartRequest(RVCloudSyncMethod method);
-
-        void onRequestResult(RequestResult result);
-
-    }
-
-    public class RVCloudSyncException extends Exception {
-        private RVCloudSyncException() {
-            super("RVCloudSyncCallback not set!");
+    private void initSocketClient(final Context context) {
+        try {
+            socketClient = new RVWebSocketClient(new URI(ROOT_URL), context, this);
+        } catch (URISyntaxException e) {
+            Log.e(TAG, e.getMessage());
         }
     }
+
+    private void loginWithData(UserData userData) {
+        final JSONObject object = new JSONObject();
+        try {
+            object.put(METHOD, LOGIN);
+            object.put(USER_DATA, userData.jsonObject());
+        } catch (JSONException e) {
+            Log.e(TAG, e.getMessage());
+        }
+        socketClient.send(object.toString());
+    }
+
+    private void createUserWithData(UserData userData) {
+        final JSONObject object = new JSONObject();
+        try {
+            object.put(METHOD, CREATE_USER);
+            object.put(USER_DATA, userData.jsonObject());
+        } catch (JSONException e) {
+            Log.e(TAG, e.getMessage());
+        }
+        socketClient.send(object.toString());
+    }
+
 
     public class UserData {
         public String userName, password;
@@ -356,20 +337,69 @@ public class RVCloudSync {
         }
     }
 
-    public static void syncDataIfLoggedIn(Context context) {
+    @Override
+    public void onWebSocketMessage(String s) {
+        try {
+            JSONObject object = new JSONObject(s);
+            RVCloudSyncMethod method = RVCloudSyncMethod.valueOf(object.getString(METHOD));
+            ResultStatus status = ResultStatus.valueOf(object.getString(STATE));
+            UserData userData = new UserData(object.getJSONObject(USER_DATA));
 
-        LoginState loginState = LoginState.getInstance();
+            JSONArray loadedArray = new JSONArray();
+            if (object.has(LOADED_DATA_ARRAY))
+                loadedArray = object.getJSONArray(Constants.LOADED_DATA_ARRAY);
 
-        if (loginState.isLoggedIn()) {
-            try {
-                RVCloudSync.getInstance().startDataSync(loginState.getUserName(), loginState.getPassword(), context);
-            } catch (RVCloudSync.RVCloudSyncException e) {
-                Log.e(RVCloudSync.TAG, e.getMessage());
+            final RequestResult result = new RequestResult(userData, status);
+
+//            if (status == ResultStatus.STATUS_202_AUTHENTICATED
+//                    || status == ResultStatus.STATUS_201_CREATED
+//                    || status == ResultStatus.STATUS_200_SYNC_OK) {
+//                LoginState.onSuccessLogin(userData.userName, userData.password, context);
+//            } else {
+//                LoginState.onLoggedOut(context);
+//            }
+
+            switch (method) {
+                case LOGIN:
+                    if (mCallback != null) {
+                        mCallback.onLoginResult(result);
+                    }
+                case CREATE_USER:
+                    if (mCallback != null) {
+                        mCallback.onCreateUserResult(result);
+                    }
+                    break;
+
+                case SYNC_DATA:
+                    RVData.getInstance().setFromRecordArray(loadedArray, RVData.RecordArraySource.FROM_CLOUD);
+                    RVData.getInstance().removeDeletedData();
+                    if (mCallback != null) {
+                        mCallback.onSyncDataResult(result);
+                    }
+                    break;
             }
+            socketClient.close();
+
+        } catch (JSONException e) {
+            Log.e(TAG, e.getMessage());
         }
     }
 
+    public interface RVCloudSyncCallback {
 
+        void onStartLoginRequest();
+
+        void onLoginResult(RequestResult result);
+
+        void onStartCreateUserRequest();
+
+        void onCreateUserResult(RequestResult result);
+
+        void onStartSyncDataRequest();
+
+        void onSyncDataResult(RequestResult result);
+
+    }
 
     // DONE: 2017/05/11 401 UNAUTHORIZED
     // DONE: 2017/05/11 ユーザの作成を提案

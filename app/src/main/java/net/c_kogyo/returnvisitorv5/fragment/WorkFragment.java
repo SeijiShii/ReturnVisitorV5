@@ -199,7 +199,7 @@ public class WorkFragment extends Fragment {
 
                 RVData.getInstance().visitList.deleteById(visitCell1.getVisit().getId());
                 RVData.getInstance().saveData(WorkFragment.this.getActivity());
-                RVCloudSync.syncDataIfLoggedIn(WorkFragment.this.getActivity());
+                RVCloudSync.getInstance().syncDataIfLoggedIn(WorkFragment.this.getActivity());
 
                 verifyItemRemains();
             }
@@ -272,7 +272,7 @@ public class WorkFragment extends Fragment {
 
                         RVData.getInstance().saveData(getActivity());
 
-                        RVCloudSync.syncDataIfLoggedIn(getActivity());
+                        RVCloudSync.getInstance().syncDataIfLoggedIn(getActivity());
 
                     }
 

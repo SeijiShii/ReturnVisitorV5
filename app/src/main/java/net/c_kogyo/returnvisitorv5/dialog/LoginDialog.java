@@ -7,6 +7,7 @@ import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -39,13 +40,15 @@ import static android.view.View.VISIBLE;
 public class LoginDialog extends DialogFragment {
 
     private static LoginDialogListener mListener;
+    private static Handler mHandler;
     private static final int TEXT_LENGTH = 8;
 
     private static LoginDialog instance;
     
-    public static LoginDialog getInstance(LoginDialogListener listener) {
+    public static LoginDialog getInstance(LoginDialogListener listener, Handler handler) {
         
         mListener = listener;
+        mHandler = handler;
         
         if (instance == null) {
             instance = new LoginDialog();
@@ -251,28 +254,22 @@ public class LoginDialog extends DialogFragment {
         String password = passwordTextView.getText().toString();
 
         if (validateTexts(userName, password)) {
-            try {
-                RVCloudSync.getInstance()
-                        .startSendingUserData(userName,
-                                                password,
-                                                RVCloudSync.RVCloudSyncMethod.LOGIN,
-                                                getActivity(),
-                                                false);
-                messageTextView.setText(R.string.start_login);
+            RVCloudSync.getInstance().login(userName,
+                    password,
+                    false,
+                    getActivity());
+            messageTextView.setText(R.string.start_login);
 
-                if (mListener != null) {
-                    progressBar.setVisibility(VISIBLE);
+            if (mListener != null) {
+                progressBar.setVisibility(VISIBLE);
 
-                    enableLoginButton(false);
-                    enableAccountButton(false);
-                    enableCloseButton(false);
+                enableLoginButton(false);
+                enableAccountButton(false);
+                enableCloseButton(false);
 
-                    enableUserNameText(false);
-                    enablePasswordText(false);
+                enableUserNameText(false);
+                enablePasswordText(false);
 
-                }
-            } catch (RVCloudSync.RVCloudSyncException e) {
-                e.printStackTrace();
             }
         }
     }
@@ -287,25 +284,19 @@ public class LoginDialog extends DialogFragment {
         String password = passwordTextView.getText().toString();
 
         if (validateTexts(userName, password)) {
-            try {
-                RVCloudSync.getInstance().
-                        startSendingUserData(userName,
-                                                password,
-                                                RVCloudSync.RVCloudSyncMethod.CREATE_USER,
-                                                getActivity(),
-                                                false);
-                messageTextView.setText(R.string.creating_user);
+            RVCloudSync.getInstance().createUser(userName,
+                    password,
+                    false,
+                    getActivity());
+            messageTextView.setText(R.string.creating_user);
 
-                if (mListener != null) {
+            if (mListener != null) {
 
-                    progressBar.setVisibility(VISIBLE);
+                progressBar.setVisibility(VISIBLE);
 
-                    enableLoginButton(false);
-                    enableAccountButton(false);
-                    enableCloseButton(false);
-                }
-            } catch (RVCloudSync.RVCloudSyncException e) {
-                e.printStackTrace();
+                enableLoginButton(false);
+                enableAccountButton(false);
+                enableCloseButton(false);
             }
         }
     }
@@ -340,7 +331,7 @@ public class LoginDialog extends DialogFragment {
     }
 
     public void onLoginResult(RVCloudSync.RequestResult result){
-        // DONE: 2017/05/11  onRequestResult(RVCloudSync.ResultStatus statusCode)
+        // DONE: 2017/05/11  postRequestResult(RVCloudSync.ResultStatus statusCode)
 
         setCancelable(true);
 

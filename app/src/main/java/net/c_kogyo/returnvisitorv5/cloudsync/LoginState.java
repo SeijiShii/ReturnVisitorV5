@@ -27,7 +27,8 @@ public class LoginState {
 
     public static LoginState loadLoginState(Context context) {
 
-        SharedPreferences preferences = context.getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences preferences
+                = context.getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, Context.MODE_PRIVATE);
         instance.isLoggedIn = preferences.getBoolean(IS_LOGGED_IN, false);
         if (instance.isLoggedIn) {
             instance.userName = preferences.getString(USER_NAME, null);
@@ -40,7 +41,8 @@ public class LoginState {
     }
 
     private static void saveLoginState(Context context) {
-        SharedPreferences preferences = context.getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences preferences
+                = context.getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
 
         editor.putBoolean(IS_LOGGED_IN, instance.isLoggedIn);

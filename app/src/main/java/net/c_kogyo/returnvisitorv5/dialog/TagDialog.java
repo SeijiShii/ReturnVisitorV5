@@ -190,7 +190,7 @@ public class TagDialog extends DialogFragment {
 
                 RVData.getInstance().saveData(getActivity());
 
-                RVCloudSync.syncDataIfLoggedIn(getActivity());
+                RVCloudSync.getInstance().syncDataIfLoggedIn(getActivity());
             }
         });
     }
@@ -298,7 +298,7 @@ public class TagDialog extends DialogFragment {
 
                     RVData.getInstance().saveData(getActivity());
 
-                    RVCloudSync.syncDataIfLoggedIn(getActivity());
+                    RVCloudSync.getInstance().syncDataIfLoggedIn(getActivity());
                 }
             });
             return view;

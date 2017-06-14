@@ -427,7 +427,7 @@ public class RecordVisitActivity extends AppCompatActivity {
                     public void postDeletePerson(Person person) {
                         RVData.getInstance().personList.deleteById(person.getId());
                         RVData.getInstance().saveData(RecordVisitActivity.this);
-                        RVCloudSync.syncDataIfLoggedIn(RecordVisitActivity.this);
+                        RVCloudSync.getInstance().syncDataIfLoggedIn(RecordVisitActivity.this);
                     }
                 });
         visitDetailFrame.addView(detailView);
@@ -550,7 +550,7 @@ public class RecordVisitActivity extends AppCompatActivity {
 
                 RVData.getInstance().saveData(getApplicationContext());
 
-                RVCloudSync.syncDataIfLoggedIn(RecordVisitActivity.this);
+                RVCloudSync.getInstance().syncDataIfLoggedIn(RecordVisitActivity.this);
 
                 finish();
 
@@ -897,7 +897,7 @@ public class RecordVisitActivity extends AppCompatActivity {
 
         RVData.getInstance().personList.setOrAdd(person);
         RVData.getInstance().saveData(this);
-        RVCloudSync.syncDataIfLoggedIn(this);
+        RVCloudSync.getInstance().syncDataIfLoggedIn(this);
     }
 
     // DONE: 2017/03/26 PriorityRaterの挙動がいまいち

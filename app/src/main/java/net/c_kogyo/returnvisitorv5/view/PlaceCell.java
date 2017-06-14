@@ -176,7 +176,7 @@ public class PlaceCell extends BaseAnimateView {
         // 変更になっていないとき保存が起動すると無駄なのでチェック
         if (prioritiesChanged) {
             RVData.getInstance().saveData(getContext());
-            RVCloudSync.syncDataIfLoggedIn(getContext());
+            RVCloudSync.getInstance().syncDataIfLoggedIn(getContext());
         }
     }
 
@@ -187,7 +187,7 @@ public class PlaceCell extends BaseAnimateView {
                 removePersonCell(person);
                 RVData.getInstance().personList.deleteById(person.getId());
                 RVData.getInstance().saveData(getContext());
-                RVCloudSync.syncDataIfLoggedIn(getContext());
+                RVCloudSync.getInstance().syncDataIfLoggedIn(getContext());
             }
 
             @Override

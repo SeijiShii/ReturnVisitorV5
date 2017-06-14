@@ -22,7 +22,7 @@
     <string name="count_time">時間を計る</string>
     <string name="create_user_button">ユーザー登録</string>
     <string name="create_user_failed">ユーザー登録できませんでした。</string>
-    <string name="create_user_success">ユーザー登録が完了しました。</string>
+    <string name="create_user_success">ユーザー登録が完了しました。%s</string>
     <string name="creating_user">登録中...</string>
     <string name="day_aggregation">日ごとの集計</string>
     <string name="default_title">一般</string>

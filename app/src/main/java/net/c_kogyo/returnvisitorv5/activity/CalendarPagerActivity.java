@@ -468,7 +468,7 @@ public class CalendarPagerActivity extends AppCompatActivity {
         RVData.getInstance().workList.setOrAdd(work);
         RVData.getInstance().saveData(this);
 
-        RVCloudSync.syncDataIfLoggedIn(this);
+        RVCloudSync.getInstance().syncDataIfLoggedIn(this);
 
         Intent withNewWorkIntent = new Intent(this, WorkPagerActivity.class);
         withNewWorkIntent.setAction(Constants.WorkPagerActivityActions.START_WITH_NEW_WORK);

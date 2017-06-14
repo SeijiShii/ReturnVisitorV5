@@ -91,7 +91,7 @@ public class HousingComplexDialog extends DialogFragment {
             public void onClick(DialogInterface dialog, int which) {
 
                 RVData.getInstance().placeList.setOrAdd(mHousingComplex);
-                RVCloudSync.syncDataIfLoggedIn(getActivity());
+                RVCloudSync.getInstance().syncDataIfLoggedIn(getActivity());
 
                 if (mListener != null) {
                     mListener.onOkClick(mHousingComplex);
@@ -195,7 +195,7 @@ public class HousingComplexDialog extends DialogFragment {
             public void onClick(View v) {
 
                 RVData.getInstance().placeList.setOrAdd(mHousingComplex);
-                RVCloudSync.syncDataIfLoggedIn(getActivity());
+                RVCloudSync.getInstance().syncDataIfLoggedIn(getActivity());
 
                 InputUtil.hideSoftKeyboard(getActivity());
 
@@ -333,7 +333,7 @@ public class HousingComplexDialog extends DialogFragment {
         RVData.getInstance().placeList.removeList(removedRooms);
         RVData.getInstance().saveData(getActivity());
 
-        RVCloudSync.syncDataIfLoggedIn(getActivity());
+        RVCloudSync.getInstance().syncDataIfLoggedIn(getActivity());
     }
 
     private class RoomListAdapter extends BaseAdapter{

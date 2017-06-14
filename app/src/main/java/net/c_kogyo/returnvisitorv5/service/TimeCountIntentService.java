@@ -74,7 +74,7 @@ public class TimeCountIntentService extends IntentService {
                     RVData.getInstance().workList.setOrAdd(mWork);
                     RVData.getInstance().saveData(TimeCountIntentService.this);
 
-                    RVCloudSync.syncDataIfLoggedIn(TimeCountIntentService.this);
+                    RVCloudSync.getInstance().syncDataIfLoggedIn(TimeCountIntentService.this);
                 }
             }
         };
@@ -96,7 +96,7 @@ public class TimeCountIntentService extends IntentService {
                 mWork = new Work(Calendar.getInstance());
                 RVData.getInstance().workList.setOrAdd(mWork);
                 RVData.getInstance().saveData(this);
-                RVCloudSync.syncDataIfLoggedIn(this);
+                RVCloudSync.getInstance().syncDataIfLoggedIn(this);
             } else if (intent.getAction().equals(RESTART_COUNTING_ACTION_TO_SERVICE)) {
                 String workId = intent.getStringExtra(COUNTING_WORK_ID);
                 mWork = RVData.getInstance().workList.getById(workId);
@@ -138,7 +138,7 @@ public class TimeCountIntentService extends IntentService {
 
                     RVData.getInstance().workList.setOrAdd(mWork);
                     RVData.getInstance().saveData(this);
-                    RVCloudSync.syncDataIfLoggedIn(this);
+                    RVCloudSync.getInstance().syncDataIfLoggedIn(this);
                     minCounter = 0;
                 }
             }

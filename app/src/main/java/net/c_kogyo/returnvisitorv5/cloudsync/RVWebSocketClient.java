@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -38,12 +39,15 @@ import javax.net.ssl.X509TrustManager;
  * Created by SeijiShii on 2017/05/20.
  */
 
-public abstract class RVWebSocketClient extends WebSocketClient{
+public class RVWebSocketClient extends WebSocketClient{
 
     private final String TAG = "RVWebSocketClient";
+    private RVWebSocketClientCallback mCallback;
 
-    public RVWebSocketClient(URI uri, final Context context) {
+    public RVWebSocketClient(URI uri, final Context context, RVWebSocketClientCallback callback) {
         super(uri);
+
+        mCallback = callback;
 
         try {
 
@@ -103,7 +107,16 @@ public abstract class RVWebSocketClient extends WebSocketClient{
 
     }
 
+    @Override
+    public void onMessage(String s) {
+        if (mCallback != null) {
+            mCallback.onWebSocketMessage(s);
+        }
+    }
 
+    public interface RVWebSocketClientCallback {
+        void onWebSocketMessage(String s);
+    }
 }
 
 

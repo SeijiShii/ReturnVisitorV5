@@ -132,7 +132,7 @@ public class WorkView extends BaseAnimateView {
                         mWork.onUpdate();
                         RVData.getInstance().workList.setOrAdd(mWork);
                         RVData.getInstance().saveData(getContext());
-                        RVCloudSync.syncDataIfLoggedIn(getContext());
+                        RVCloudSync.getInstance().syncDataIfLoggedIn(getContext());
 
                         updateStartTimeText();
                         updateEndTimeText();
@@ -167,7 +167,7 @@ public class WorkView extends BaseAnimateView {
                         mWork.onUpdate();
                         RVData.getInstance().workList.setOrAdd(mWork);
                         RVData.getInstance().saveData(getContext());
-                        RVCloudSync.syncDataIfLoggedIn(getContext());
+                        RVCloudSync.getInstance().syncDataIfLoggedIn(getContext());
 
                         updateStartTimeText();
                         updateEndTimeText();
@@ -411,7 +411,7 @@ public class WorkView extends BaseAnimateView {
                 RVData.getInstance().saveData(getContext());
                 visitCellContainer.removeView(visitCell);
 
-                RVCloudSync.syncDataIfLoggedIn(getContext());
+                RVCloudSync.getInstance().syncDataIfLoggedIn(getContext());
             }
 
             @Override

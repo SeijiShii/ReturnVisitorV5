@@ -493,7 +493,7 @@ public class WorkPagerActivity extends AppCompatActivity {
 
         RVData.getInstance().saveData(WorkPagerActivity.this);
 
-        RVCloudSync.syncDataIfLoggedIn(WorkPagerActivity.this);
+        RVCloudSync.getInstance().syncDataIfLoggedIn(WorkPagerActivity.this);
     }
 
     private void hideSoftKeyboard() {
@@ -574,7 +574,7 @@ public class WorkPagerActivity extends AppCompatActivity {
                             RVData.getInstance().saveData(WorkPagerActivity.this);
                             notifyDataSetChanged();
 
-                            RVCloudSync.syncDataIfLoggedIn(WorkPagerActivity.this);
+                            RVCloudSync.getInstance().syncDataIfLoggedIn(WorkPagerActivity.this);
                         }
 
                         @Override
