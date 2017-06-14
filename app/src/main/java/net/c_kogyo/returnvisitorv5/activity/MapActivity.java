@@ -537,6 +537,12 @@ public class MapActivity extends AppCompatActivity
             }
         }));
         popupWindow.showAtLocation(mapView, Gravity.CENTER, 0, 0);
+        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                placeMarkers.removeByPlace(tmpPlace);
+            }
+        });
     }
 
     @Override
