@@ -338,66 +338,70 @@ public class LoginDialog extends DialogFragment {
         progressBar.setVisibility(INVISIBLE);
         enableCloseButton(true);
 
+        Context context = getActivity();
+        if (context == null)
+            return;
+
         String message = "";
         switch (result.statusCode) {
             case STATUS_202_AUTHENTICATED:
-                message = getActivity().getString(R.string.login_success, result.userData.userName);
+                message = context.getString(R.string.login_success, result.userData.userName);
                 break;
 
             case STATUS_401_UNAUTHORIZED:
-                message = getActivity().getString(R.string.login_failed) + "\n"
-                        + getActivity().getString(R.string.wrong_password, result.userData.userName);
+                message = context.getString(R.string.login_failed) + "\n"
+                        + context.getString(R.string.wrong_password, result.userData.userName);
                 enableUserNameText(true);
                 enablePasswordText(true);
                 break;
 
             case STATUS_404_NOT_FOUND:
-                message = getActivity().getString(R.string.login_failed) + "\n"
-                        + getActivity().getString(R.string.user_not_found, result.userData.userName);
+                message = context.getString(R.string.login_failed) + "\n"
+                        + context.getString(R.string.user_not_found, result.userData.userName);
                 enableAccountButton(true);
                 enableUserNameText(true);
                 enablePasswordText(true);
                 break;
 
             case STATUS_201_CREATED:
-                message = getActivity().getString(R.string.create_user_success, result.userData.userName);
+                message = context.getString(R.string.create_user_success, result.userData.userName);
                 break;
 
             case STATUS_400_DUPLICATE_USER_NAME:
-                message = getActivity().getString(R.string.create_user_failed) + "\n"
-                        + getActivity().getString(R.string.duplicate_user, result.userData.userName);
+                message = context.getString(R.string.create_user_failed) + "\n"
+                        + context.getString(R.string.duplicate_user, result.userData.userName);
                 enableAccountButton(true);
                 enableUserNameText(true);
                 enablePasswordText(true);
                 break;
 
             case STATUS_400_SHORT_PASSWORD:
-                message = getActivity().getString(R.string.create_user_failed) + "\n"
-                        + getActivity().getString(R.string.short_password);
+                message = context.getString(R.string.create_user_failed) + "\n"
+                        + context.getString(R.string.short_password);
                 enableAccountButton(true);
                 enableUserNameText(true);
                 enablePasswordText(true);
                 break;
 
             case STATUS_400_SHORT_USER_NAME:
-                message = getActivity().getString(R.string.create_user_failed) + "\n"
-                        + getActivity().getString(R.string.short_user_name, result.userData.userName);
+                message = context.getString(R.string.create_user_failed) + "\n"
+                        + context.getString(R.string.short_user_name, result.userData.userName);
                 enableAccountButton(true);
                 enableUserNameText(true);
                 enablePasswordText(true);
                 break;
 
             case REQUEST_TIME_OUT:
-                message = getActivity().getString(R.string.login_failed) + "\n"
-                        + getActivity().getString(R.string.request_time_out);
+                message = context.getString(R.string.login_failed) + "\n"
+                        + context.getString(R.string.request_time_out);
                 enableAccountButton(true);
                 enableUserNameText(true);
                 enablePasswordText(true);
                 break;
 
             case SERVER_NOT_AVAILABLE:
-                message = getActivity().getString(R.string.login_failed) + "\n"
-                        + getActivity().getString(R.string.server_not_available);
+                message = context.getString(R.string.login_failed) + "\n"
+                        + context.getString(R.string.server_not_available);
                 enableAccountButton(true);
                 enableUserNameText(true);
                 enablePasswordText(true);

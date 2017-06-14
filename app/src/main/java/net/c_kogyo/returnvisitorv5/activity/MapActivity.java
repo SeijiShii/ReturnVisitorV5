@@ -140,7 +140,10 @@ public class MapActivity extends AppCompatActivity
 
         initDrawerOverlay();
 
-//        LoginState.loadLoginState(this);
+        LoginState.loadLoginState(this);
+        refreshLoginButton();
+        refreshWorkButton();
+        refreshCalendarButton();
         RVCloudSync.getInstance().syncDataIfLoggedIn(this);
 
 //        saveLastSyncTime();
@@ -1387,9 +1390,11 @@ public class MapActivity extends AppCompatActivity
                 break;
             case STATUS_401_UNAUTHORIZED:
             case STATUS_404_NOT_FOUND:
+                onFailRequest(result);
+                break;
             case REQUEST_TIME_OUT:
             case SERVER_NOT_AVAILABLE:
-                onFailRequest(result);
+                postRequestResult(result);
                 break;
         }
     }
@@ -1408,9 +1413,11 @@ public class MapActivity extends AppCompatActivity
             case STATUS_400_DUPLICATE_USER_NAME:
             case STATUS_400_SHORT_USER_NAME:
             case STATUS_400_SHORT_PASSWORD:
+                onFailRequest(result);
+                break;
             case REQUEST_TIME_OUT:
             case SERVER_NOT_AVAILABLE:
-                onFailRequest(result);
+                postRequestResult(result);
                 break;
         }
     }
@@ -1428,7 +1435,7 @@ public class MapActivity extends AppCompatActivity
                 break;
             case REQUEST_TIME_OUT:
             case SERVER_NOT_AVAILABLE:
-                onFailRequest(result);
+                postRequestResult(result);
                 break;
         }
     }
@@ -1454,12 +1461,19 @@ public class MapActivity extends AppCompatActivity
         });
     }
 
+    private void onSuccessLogin(final RVCloudSync.RequestResult result) {
+
+        LoginState.onSuccessLogin(result.userData.userName, result.userData.password, this);
+        RVCloudSync.getInstance().syncDataIfLoggedIn(this);
+
+        postRequestResult(result);
+
+    }
+
     private void onDataSyncSuccess(final RVCloudSync.RequestResult result) {
         cloudResultHandler.post(new Runnable() {
             @Override
             public void run() {
-                enableWaitScreen(false);
-                waitMessageText.setText("");
 
                 saveLastSyncTime();
                 RVData.getInstance().saveData(MapActivity.this);
@@ -1468,20 +1482,6 @@ public class MapActivity extends AppCompatActivity
                 } else {
                     placeMarkers.drawAllMarkers();
                 }
-                postRequestResult(result);
-            }
-        });
-    }
-
-    private void onSuccessLogin(final RVCloudSync.RequestResult result) {
-
-        LoginState.onSuccessLogin(result.userData.userName, result.userData.password, this);
-        RVCloudSync.getInstance().syncDataIfLoggedIn(this);
-
-        cloudResultHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                enableWaitScreen(false);
                 postRequestResult(result);
             }
         });
@@ -1500,6 +1500,9 @@ public class MapActivity extends AppCompatActivity
                 if (loginDialog != null) {
                     loginDialog.onLoginResult(result);
                 }
+
+                enableWaitScreen(false);
+                waitMessageText.setText("");
 
                 refreshLoginButton();
                 refreshWorkButton();

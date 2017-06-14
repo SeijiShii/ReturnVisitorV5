@@ -226,7 +226,7 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback{
                         try {
                             Thread.sleep(50);
                             timeCounter += 50;
-                            if (timeCounter > 50000) {
+                            if (timeCounter > 10000) {
 
                                 if (mCallback != null) {
                                     RequestResult result = new RequestResult(userData, ResultStatus.REQUEST_TIME_OUT);
@@ -239,6 +239,23 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback{
                         }
                     }
                     socketClient.send(syncData.jsonObject().toString());
+
+                    while (true) {
+                        try {
+                            Thread.sleep(50);
+                            timeCounter += 50;
+                            if (timeCounter > 10000) {
+
+                                if (mCallback != null) {
+                                    RequestResult result = new RequestResult(userData, ResultStatus.REQUEST_TIME_OUT);
+                                    mCallback.onSyncDataResult(result);
+                                }
+                                return;
+                            }
+                        } catch (InterruptedException e ) {
+                            Log.e(TAG, e.getMessage());
+                        }
+                    }
                 }
             }).start();
             socketClient.connect();
