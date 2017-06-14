@@ -35,14 +35,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class SearchDialog extends DialogFragment {
 
     private static SearchDialogListener mListener;
-    private static String mInitWord;
+//    private static String mInitWord;
     private static SearchDialog instance;
     
-    public static SearchDialog getInstance (SearchDialogListener listener,
-                                            String initialSearchWord) {
+    public static SearchDialog getInstance (SearchDialogListener listener) {
 
         mListener = listener;
-        mInitWord = initialSearchWord;
+//        mInitWord = initialSearchWord;
 
         if (instance == null) {
             instance = new SearchDialog();
@@ -82,7 +81,7 @@ public class SearchDialog extends DialogFragment {
 
     private void initSearchText() {
         EditText searchText = (EditText) view.findViewById(R.id.search_text);
-        searchText.setText(mInitWord);
+//        searchText.setText(mInitWord);
         searchText.requestFocus();
         searchText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -104,9 +103,9 @@ public class SearchDialog extends DialogFragment {
 
                 refreshNoItemText();
 
-                if (mListener != null) {
-                    mListener.onTextChanged(s.toString());
-                }
+//                if (mListener != null) {
+//                    mListener.onTextChanged(s.toString());
+//                }
             }
         });
     }
@@ -115,7 +114,7 @@ public class SearchDialog extends DialogFragment {
     private SearchListAdapter searchListAdapter;
     private void initSearchListView() {
         searchListView = (ListView) view.findViewById(R.id.search_list_view);
-        searchListAdapter = new SearchListAdapter(mInitWord, getActivity());
+        searchListAdapter = new SearchListAdapter("", getActivity());
         searchListView.setAdapter(searchListAdapter);
         searchListView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
@@ -236,7 +235,7 @@ public class SearchDialog extends DialogFragment {
 
         void onClickShowPlaceInMap(Place place);
 
-        void onTextChanged(String text);
+//        void onTextChanged(String text);
 
         void onClickEditPerson(Person person);
     }

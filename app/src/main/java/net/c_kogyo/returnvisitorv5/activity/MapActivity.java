@@ -1512,41 +1512,51 @@ public class MapActivity extends AppCompatActivity
     }
     // DONE: 2017/05/22 SAVEのたびにUIが停止するのはいただけない。
 
-    private EditText searchText;
+    private TextView searchText;
     private void initSearchText() {
-        searchText = (EditText) findViewById(R.id.search_text);
+        searchText = (TextView) findViewById(R.id.search_text);
         searchText.setAlpha(0.5f);
+        searchText.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
 
-//        searchText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        searchText.setAlpha(0.3f);
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        searchText.setAlpha(0.5f);
+                        showSearchDialog();
+                        return true;
+                    case MotionEvent.ACTION_CANCEL:
+                        searchText.setAlpha(0.5f);
+                        return true;
+                }
+
+                return false;
+            }
+        });
+
+//        searchText.addTextChangedListener(new TextWatcher() {
 //            @Override
-//            public void onFocusChange(View v, boolean hasFocus) {
-//                if (hasFocus) {
-//                    v.setAlpha(1f);
-//                } else {
-//                    v.setAlpha(0.5f);
+//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//
+//            }
+//
+//            @Override
+//            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//
+//            }
+//
+//            @Override
+//            public void afterTextChanged(Editable s) {
+//                if (s.length() > 0) {
+//                    if (getFragmentManager().findFragmentByTag(SEARCH_DIALOG) == null) {
+//                        showSearchDialog(s.toString());
+//                    }
 //                }
 //            }
 //        });
-        searchText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (s.length() > 0) {
-                    if (getFragmentManager().findFragmentByTag(SEARCH_DIALOG) == null) {
-                        showSearchDialog(s.toString());
-                    }
-                }
-            }
-        });
     }
 
     private View dummyFocusView;
@@ -1586,7 +1596,7 @@ public class MapActivity extends AppCompatActivity
     }
 
     private String SEARCH_DIALOG = "search_dialog";
-    private void showSearchDialog(String initialSearchWord) {
+    private void showSearchDialog() {
 
         final SearchDialog searchDialog = SearchDialog.getInstance(new SearchDialog.SearchDialogListener() {
 
@@ -1627,16 +1637,16 @@ public class MapActivity extends AppCompatActivity
                 mMap.animateCamera(CameraUpdateFactory.newLatLng(place.getLatLng()));
             }
 
-            @Override
-            public void onTextChanged(String text) {
-                searchText.setText(text);
-            }
+//            @Override
+//            public void onTextChanged(String text) {
+//                searchText.setText(text);
+//            }
 
             @Override
             public void onClickEditPerson(Person person) {
                 showPersonDialogForEdit(person);
             }
-        },initialSearchWord);
+        });
         searchDialog.show(getFragmentManager(), SEARCH_DIALOG);
 
         final Handler handler = new Handler();

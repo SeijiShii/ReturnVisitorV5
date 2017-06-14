@@ -40,7 +40,7 @@
                         android:layout_centerInParent="true"/>
                 </RelativeLayout>
 
-                <EditText
+                <TextView
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -49,8 +49,9 @@
                     android:background="@drawable/gray_white_circle"
                     android:layout_margin="5dp"
                     android:hint="@string/search"
-                    android:inputType="text"
-                    android:id="@+id/search_text"/>
+                    android:id="@+id/search_text"
+                    android:gravity="center_vertical|left"
+                    android:textSize="@dimen/text_size_middle"/>
 
                 <!-- Dummy Focus View -->
                 <View
