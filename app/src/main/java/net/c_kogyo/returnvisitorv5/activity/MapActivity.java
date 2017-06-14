@@ -113,7 +113,6 @@ public class MapActivity extends AppCompatActivity
         Intent errorLogIntent = new Intent(this, ErrorLogIntentService.class);
         startService(errorLogIntent);
 
-
         setContentView(R.layout.map_activity);
         initWaitScreen();
         initProgressFrame();
@@ -590,9 +589,9 @@ public class MapActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == NEW_VISIT_REQUEST_CODE
-                || requestCode == PLACE_ADDED_RESULT_CODE
-                || requestCode == EDIT_VISIT_REQUEST_CODE) {
+        if (resultCode == VISIT_ADDED_RESULT_CODE
+                || resultCode == PLACE_ADDED_RESULT_CODE
+                || resultCode == VISIT_EDITED_RESULT_CODE) {
             String visitId = data.getStringExtra(VISIT);
             if (visitId != null) {
                 Visit visit = RVData.getInstance().visitList.getById(visitId);
@@ -600,7 +599,7 @@ public class MapActivity extends AppCompatActivity
                     String placeId = visit.getPlaceId();
                     Place place = RVData.getInstance().placeList.getById(placeId);
                     if (place != null) {
-                        if (requestCode == PLACE_ADDED_RESULT_CODE) {
+                        if (resultCode == PLACE_ADDED_RESULT_CODE) {
                             // 新しい場所の追加である
                             if (place.getCategory() == Place.Category.HOUSE) {
                                 // 新しい家なのでマーカーを追加
