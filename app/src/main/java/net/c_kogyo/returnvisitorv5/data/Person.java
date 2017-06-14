@@ -357,11 +357,15 @@ public class Person extends DataItem implements Cloneable{
     public Priority getPriority() {
 
         return priority;
-
-
     }
 
-    public void setPriorityFromLatestVisitDetail() {
+    /**
+     *
+     * @return 結果的に優先度が変更になっていればTRUE
+     */
+    public boolean setPriorityFromLatestVisitDetail() {
+
+        Priority oldPriority = priority;
 
         Visit visit = RVData.getInstance().visitList.getLatestVisitToPerson(id);
 
@@ -372,6 +376,8 @@ public class Person extends DataItem implements Cloneable{
                 priority = visitDetail.getPriority();
             }
         }
+        // 変更になっていればTRUE
+        return priority != oldPriority;
     }
 
     // DONE: 2017/06/02 Priorityを人に属するようにする

@@ -1,28 +1,20 @@
 package net.c_kogyo.returnvisitorv5.dialog;
 
-import android.animation.Animator;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
-import android.util.AttributeSet;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import net.c_kogyo.returnvisitorv5.R;
@@ -31,7 +23,6 @@ import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
-import net.c_kogyo.returnvisitorv5.util.ConfirmDialog;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 import net.c_kogyo.returnvisitorv5.view.BaseAnimateView;
 import net.c_kogyo.returnvisitorv5.view.PlaceCell;
@@ -212,6 +203,14 @@ public class PlaceDialog extends DialogFragment {
                                 notifyDataSetChanged();
 
                                 RVCloudSync.syncDataIfLoggedIn(getActivity());
+                                // TODO: 2017/06/14 訪問削除時の処理
+                                // マーカーを更新するためにMapActivityに知らせる。
+                                if (mListener != null) {
+                                    mListener.onDeleteVisit(mPlace, visitCell.getVisit());
+                                }
+                                // PlaceCellのマーカーを最近の訪問に合わせて更新する
+                                placeCell.updatePriorityMarkers();
+                                // 人の優先度を最近の訪問に合わせて更新する
                             }
 
                             @Override
@@ -261,6 +260,8 @@ public class PlaceDialog extends DialogFragment {
         void onClickEditPerson(Person person);
 
         void onClickNotHomeButton(Place place);
+
+        void onDeleteVisit(Place place, Visit visit);
     }
 
     public static AtomicBoolean isShowing = new AtomicBoolean(false);

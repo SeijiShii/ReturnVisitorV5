@@ -1,20 +1,15 @@
 package net.c_kogyo.returnvisitorv5.view;
 
 import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.media.Image;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.PopupMenu;
 import android.util.AttributeSet;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -91,7 +86,7 @@ public class PlaceCell extends BaseAnimateView {
                 openCloseView();
             }
         });
-        initPlaceMarker();
+        initPriorityMarker();
         initPlaceText();
         initArrowMark();
     }
@@ -134,18 +129,22 @@ public class PlaceCell extends BaseAnimateView {
         mIsViewOpen = !mIsViewOpen;
     }
 
-    private void initPlaceMarker() {
-        ImageView placeMarker = (ImageView) getViewById(R.id.place_marker);
+    private ImageView marker;
+    private void initPriorityMarker() {
+        marker = (ImageView) getViewById(R.id.place_marker);
+        updateMarker();
+    }
 
+    private void updateMarker() {
         switch (mPlace.getCategory()) {
             case HOUSE:
-                placeMarker.setBackgroundResource(Constants.markerRes[mPlace.getPriority().num()]);
+                marker.setBackgroundResource(Constants.markerRes[mPlace.getPriority().num()]);
                 break;
             case ROOM:
-                placeMarker.setBackgroundResource(Constants.buttonRes[mPlace.getPriority().num()]);
+                marker.setBackgroundResource(Constants.buttonRes[mPlace.getPriority().num()]);
                 break;
             case HOUSING_COMPLEX:
-                placeMarker.setBackgroundResource(Constants.complexRes[mPlace.getPriority().num()]);
+                marker.setBackgroundResource(Constants.complexRes[mPlace.getPriority().num()]);
                 break;
         }
     }
@@ -158,31 +157,57 @@ public class PlaceCell extends BaseAnimateView {
     private LinearLayout personContainer;
     private void initPersonContainer() {
         personContainer = (LinearLayout) getViewById(R.id.person_container);
-        for (Person person : RVData.getInstance().personList.getPersonsInPlace(mPlace)) {
-            PersonCell cell = new PersonCell(getContext(), person, true, new PersonCell.PersonCellListener() {
-                @Override
-                public void onClickDelete(Person person) {
-                   removePersonCell(person);
-                    RVData.getInstance().personList.deleteById(person.getId());
-                    RVData.getInstance().saveData(getContext());
-                    RVCloudSync.syncDataIfLoggedIn(getContext());
-                }
+        updatePersonContainer();
+    }
 
-                @Override
-                public void onClickEdit(Person person) {
-                    if (mListener != null) {
-                        mListener.onClickEditPerson(person);
-                    }
-                }
-            }){
-                @Override
-                public void setLayoutParams(BaseAnimateView view) {
-                    int dp40 = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small);
-                    view.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp40));
-                }
-            };
-            personContainer.addView(cell);
+    private void updatePersonContainer() {
+        boolean prioritiesChanged = false;
+
+        personContainer.removeAllViews();
+        for (Person person : RVData.getInstance().personList.getPersonsInPlace(mPlace)) {
+            boolean changed = person.setPriorityFromLatestVisitDetail();
+            if (changed) {
+                RVData.getInstance().personList.setOrAdd(person);
+                prioritiesChanged = true;
+            }
+            personContainer.addView(generatePersonCell(person));
         }
+        // 訪問削除時に人優先度を変更したら保存しなくてはならない。
+        // 変更になっていないとき保存が起動すると無駄なのでチェック
+        if (prioritiesChanged) {
+            RVData.getInstance().saveData(getContext());
+            RVCloudSync.syncDataIfLoggedIn(getContext());
+        }
+    }
+
+    private PersonCell generatePersonCell(Person person) {
+        return new PersonCell(getContext(), person, true, new PersonCell.PersonCellListener() {
+            @Override
+            public void onClickDelete(Person person) {
+                removePersonCell(person);
+                RVData.getInstance().personList.deleteById(person.getId());
+                RVData.getInstance().saveData(getContext());
+                RVCloudSync.syncDataIfLoggedIn(getContext());
+            }
+
+            @Override
+            public void onClickEdit(Person person) {
+                if (mListener != null) {
+                    mListener.onClickEditPerson(person);
+                }
+            }
+        }){
+            @Override
+            public void setLayoutParams(BaseAnimateView view) {
+                int dp40 = getContext().getResources().getDimensionPixelSize(R.dimen.ui_height_small);
+                view.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp40));
+            }
+        };
+    }
+
+    public void updatePriorityMarkers() {
+        updateMarker();
+        updatePersonContainer();
     }
 
     private void removePersonCell(Person person) {

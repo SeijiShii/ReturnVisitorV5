@@ -80,8 +80,10 @@ import java.util.Calendar;
 import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.EDIT_VISIT_ACTION;
 import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.EDIT_VISIT_REQUEST_CODE;
 import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.NEW_HOUSE_ACTION;
+import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.NEW_PLACE_REQUEST_CODE;
 import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.NEW_VISIT_ACTION_WITH_PLACE;
 import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.NEW_VISIT_REQUEST_CODE;
+import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.PLACE_ADDED_RESULT_CODE;
 import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.VISIT_ADDED_RESULT_CODE;
 import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.VISIT_EDITED_RESULT_CODE;
 import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS;
@@ -108,8 +110,8 @@ public class MapActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
 
         // log
-//        Intent errorLogIntent = new Intent(this, ErrorLogIntentService.class);
-//        startService(errorLogIntent);
+        Intent errorLogIntent = new Intent(this, ErrorLogIntentService.class);
+        startService(errorLogIntent);
 
 
         setContentView(R.layout.map_activity);
@@ -582,43 +584,36 @@ public class MapActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        switch (requestCode) {
-            case Constants.RecordVisitActions.NEW_VISIT_REQUEST_CODE:
-                if (resultCode == VISIT_ADDED_RESULT_CODE) {
-                    String visitId = data.getStringExtra(VISIT);
-                    if (visitId != null) {
-                        Visit visit = RVData.getInstance().visitList.getById(visitId);
-                        if (visit != null) {
-                            String placeId = visit.getPlaceId();
-                            Place place = RVData.getInstance().placeList.getById(placeId);
-                            if (place != null) {
-
-                                if (place.getCategory() == Place.Category.HOUSE) {
-                                    placeMarkers.addMarker(place);
-                                } else if (place.getCategory() == Place.Category.ROOM) {
-                                    String parentId = place.getParentId();
-                                    Place parent = RVData.getInstance().placeList.getById(parentId);
+        if (requestCode == NEW_VISIT_REQUEST_CODE
+                || requestCode == PLACE_ADDED_RESULT_CODE
+                || requestCode == EDIT_VISIT_REQUEST_CODE) {
+            String visitId = data.getStringExtra(VISIT);
+            if (visitId != null) {
+                Visit visit = RVData.getInstance().visitList.getById(visitId);
+                if (visit != null) {
+                    String placeId = visit.getPlaceId();
+                    Place place = RVData.getInstance().placeList.getById(placeId);
+                    if (place != null) {
+                        if (requestCode == PLACE_ADDED_RESULT_CODE) {
+                            // 新しい場所の追加である
+                            if (place.getCategory() == Place.Category.HOUSE) {
+                                // 新しい家なのでマーカーを追加
+                                placeMarkers.addMarker(place);
+                            } else if (place.getCategory() == Place.Category.ROOM) {
+                                // 新しい場所だが、部屋なのでアパートを更新
+                                String parentId = place.getParentId();
+                                Place parent = RVData.getInstance().placeList.getById(parentId);
+                                if (parent != null) {
                                     placeMarkers.refreshMarker(parent);
                                 }
                             }
+                        } else {
+                            // 訪問の編集、または既にある場所に訪問を追加した
+                            placeMarkers.refreshMarker(place);
                         }
                     }
                 }
-                break;
-            case EDIT_VISIT_REQUEST_CODE:
-                if (resultCode == VISIT_EDITED_RESULT_CODE) {
-                    String visitId = data.getStringExtra(VISIT);
-                    if (visitId != null) {
-                        Visit visit = RVData.getInstance().visitList.getById(visitId);
-                        if (visit != null) {
-                            String placeId = visit.getPlaceId();
-                            Place place = RVData.getInstance().placeList.getById(placeId);
-                            if (place != null) {
-                                placeMarkers.refreshMarker(place);
-                            }
-                        }
-                    }
-                }
+            }
         }
     }
 
@@ -701,6 +696,10 @@ public class MapActivity extends AppCompatActivity
                                 recordNotHome(place);
                             }
 
+                            @Override
+                            public void onDeleteVisit(Place place, Visit visit) {
+                                placeMarkers.refreshMarker(place);
+                            }
                         }).show(getFragmentManager(), null);
 
     }
@@ -711,7 +710,7 @@ public class MapActivity extends AppCompatActivity
         recordVisitIntent.setAction(NEW_HOUSE_ACTION);
         recordVisitIntent.putExtra(LATITUDE, latLng.latitude);
         recordVisitIntent.putExtra(LONGITUDE, latLng.longitude);
-        startActivityForResult(recordVisitIntent, NEW_VISIT_REQUEST_CODE);
+        startActivityForResult(recordVisitIntent, NEW_PLACE_REQUEST_CODE);
     }
 
     private void startRecordVisitActivityToEditVisit(Visit visit) {
@@ -802,8 +801,6 @@ public class MapActivity extends AppCompatActivity
             FetchAddressIntentService.inquireAddress(place, this);
         }
     }
-
-
 
     // DONE: 2017/03/27 HousingComplexMarkerRes
     // PENDING: 2017/03/27 Mapを回転させる

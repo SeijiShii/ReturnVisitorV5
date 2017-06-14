@@ -522,13 +522,19 @@ public class RecordVisitActivity extends AppCompatActivity {
 
                 switch (getIntent().getAction()) {
                     case NEW_HOUSE_ACTION:
+                        Intent newPlaceReturnIntent = new Intent();
+                        newPlaceReturnIntent.putExtra(VISIT, mVisit.getId());
+                        setResult(Constants.RecordVisitActions.PLACE_ADDED_RESULT_CODE, newPlaceReturnIntent);
+
+                        break;
+
                     case NEW_VISIT_ACTION_WITH_PLACE:
                     case NEW_VISIT_ACTION_NO_PLACE:
                     case NEW_VISIT_ACTION_NO_PLACE_WITH_DATE:
 
-                        Intent newPlaceReturnIntent = new Intent();
-                        newPlaceReturnIntent.putExtra(VISIT, mVisit.getId());
-                        setResult(Constants.RecordVisitActions.VISIT_ADDED_RESULT_CODE, newPlaceReturnIntent);
+                        Intent newVisitReturnIntent = new Intent();
+                        newVisitReturnIntent.putExtra(VISIT, mVisit.getId());
+                        setResult(Constants.RecordVisitActions.VISIT_ADDED_RESULT_CODE, newVisitReturnIntent);
 
                         break;
 
