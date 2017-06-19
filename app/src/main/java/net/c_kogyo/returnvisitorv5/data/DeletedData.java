@@ -3,9 +3,6 @@ package net.c_kogyo.returnvisitorv5.data;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Calendar;
-import java.util.Iterator;
-
 /**
  * Created by SeijiShii on 2017/05/10.
  */
@@ -28,8 +25,8 @@ public class DeletedData extends DataItem {
         this.className = data.getClass().getSimpleName();
     }
 
-    public DeletedData(Record record) {
-        this(record.getDataJSON());
+    public DeletedData(RVRecord RVRecord) {
+        this(RVRecord.getDataJSON());
     }
 
     public DeletedData(JSONObject object) {

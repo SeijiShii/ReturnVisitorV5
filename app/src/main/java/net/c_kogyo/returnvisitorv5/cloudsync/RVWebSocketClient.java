@@ -109,10 +109,13 @@ public class RVWebSocketClient extends WebSocketClient{
 
     @Override
     public void onMessage(String s) {
+        Log.d(TAG, "onMessage called!");
+
         if (mCallback != null) {
             mCallback.onWebSocketMessage(s);
         }
     }
+
 
     public interface RVWebSocketClientCallback {
         void onWebSocketMessage(String s);

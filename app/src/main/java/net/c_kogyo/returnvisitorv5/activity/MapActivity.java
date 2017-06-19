@@ -669,7 +669,7 @@ public class MapActivity extends AppCompatActivity
                             @Override
                             public void onRecordVisitClick(Place place) {
 
-                                // DONE: 2017/03/16 Record Visitへの遷移
+                                // DONE: 2017/03/16 RVRecord Visitへの遷移
                                 startRecordVisitActivityForNewVisit(place);
 
                             }
@@ -713,7 +713,7 @@ public class MapActivity extends AppCompatActivity
 
     }
 
-    // Method for Record Visit Activity
+    // Method for RVRecord Visit Activity
     private void startRecordVisitActivityForNewPlace(LatLng latLng) {
         Intent recordVisitIntent = new Intent(this, RecordVisitActivity.class);
         recordVisitIntent.setAction(NEW_HOUSE_ACTION);

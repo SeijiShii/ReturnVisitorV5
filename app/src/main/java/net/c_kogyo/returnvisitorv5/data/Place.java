@@ -90,8 +90,8 @@ public class Place extends DataItem {
 //        }
     }
 
-    public Place(Record record) {
-        this(record.getDataJSON());
+    public Place(RVRecord RVRecord) {
+        this(RVRecord.getDataJSON());
     }
 
     private void initCommon() {

@@ -1,9 +1,5 @@
 package net.c_kogyo.returnvisitorv5.data;
 
-import org.json.JSONObject;
-
-import java.net.PortUnreachableException;
-
 /**
  * Created by SeijiShii on 2017/02/27.
  */
@@ -17,8 +13,8 @@ public class NoteCompItem extends DataItem {
         this.name = name;
     }
 
-    public NoteCompItem(Record record) {
-        super(record.getDataJSON());
+    public NoteCompItem(RVRecord RVRecord) {
+        super(RVRecord.getDataJSON());
     }
 
 //    public NoteCompItem(JSONObject object) {

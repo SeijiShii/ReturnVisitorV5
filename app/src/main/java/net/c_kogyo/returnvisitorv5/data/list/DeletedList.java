@@ -2,7 +2,7 @@ package net.c_kogyo.returnvisitorv5.data.list;
 
 import net.c_kogyo.returnvisitorv5.data.DataItem;
 import net.c_kogyo.returnvisitorv5.data.DeletedData;
-import net.c_kogyo.returnvisitorv5.data.Record;
+import net.c_kogyo.returnvisitorv5.data.RVRecord;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -24,8 +24,8 @@ public class DeletedList implements Iterable<DeletedData>{
         list.add(new DeletedData(data));
     }
 
-    synchronized public void add(Record record) {
-        list.add(new DeletedData(record));
+    synchronized public void add(RVRecord RVRecord) {
+        list.add(new DeletedData(RVRecord));
     }
 
     synchronized public void clear() {

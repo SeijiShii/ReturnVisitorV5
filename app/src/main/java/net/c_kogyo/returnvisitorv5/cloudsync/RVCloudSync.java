@@ -9,6 +9,7 @@ import android.util.Log;
 
 import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.data.RVData;
+import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 import net.c_kogyo.returnvisitorv5.util.EncryptUtil;
 
 import org.json.JSONArray;
@@ -17,6 +18,7 @@ import org.json.JSONObject;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Calendar;
 
 import static android.content.Context.MODE_PRIVATE;
 import static net.c_kogyo.returnvisitorv5.Constants.DATA_ARRAY_LATER_THAN_TIME;
@@ -207,6 +209,10 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback{
         SharedPreferences prefs
                 = context.getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
         long lastSyncTime = prefs.getLong(LAST_DEVICE_SYNC_TIME, 0);
+
+        Calendar date = Calendar.getInstance();
+        date.setTimeInMillis(lastSyncTime);
+        Log.d(TAG, "Last sync date: " + DateTimeText.getDateTimeText(date, context));
 
         final UserData userData = new UserData(loginState.getUserName(), loginState.getPassword(), true);
 

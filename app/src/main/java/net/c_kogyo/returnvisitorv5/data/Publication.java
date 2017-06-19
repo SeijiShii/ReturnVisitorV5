@@ -107,8 +107,8 @@ public class Publication extends DataItem implements Cloneable{
         this.category = category;
     }
 
-    public Publication(Record record) {
-        this(record.getDataJSON());
+    public Publication(RVRecord RVRecord) {
+        this(RVRecord.getDataJSON());
     }
 
     public Publication(JSONObject object) {

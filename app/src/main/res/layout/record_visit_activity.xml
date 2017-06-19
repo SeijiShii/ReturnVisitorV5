@@ -13,7 +13,7 @@
         android:background="#FFF"
         android:padding="@dimen/padding_normal">
 
-        <!-- Record Visit Title -->
+        <!-- RVRecord Visit Title -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="@dimen/ui_height_large"
@@ -161,7 +161,7 @@
             android:gravity="center"
             android:text="@string/person_from_other_place"/>
 
-        <!-- Record Publication -->
+        <!-- RVRecord Publication -->
         <Button
             android:layout_width="match_parent"
             android:layout_height="@dimen/ui_height_small"

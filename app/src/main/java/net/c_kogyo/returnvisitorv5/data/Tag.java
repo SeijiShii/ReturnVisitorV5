@@ -14,8 +14,8 @@ public class Tag extends DataItem {
         this.name = name;
     }
 
-    public Tag(Record record) {
-        super(record.getDataJSON());
+    public Tag(RVRecord RVRecord) {
+        super(RVRecord.getDataJSON());
     }
 
     public Tag(JSONObject object) {

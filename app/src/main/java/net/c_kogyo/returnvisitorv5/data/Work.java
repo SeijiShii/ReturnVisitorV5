@@ -1,10 +1,7 @@
 package net.c_kogyo.returnvisitorv5.data;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 
 /**
@@ -27,8 +24,8 @@ public class Work extends TimePeriodItem {
 //        this.intervals = new ArrayList<>();
     }
 
-    public Work(Record record) {
-        this(record.getDataJSON());
+    public Work(RVRecord RVRecord) {
+        this(RVRecord.getDataJSON());
     }
 
     public Work(JSONObject object) {

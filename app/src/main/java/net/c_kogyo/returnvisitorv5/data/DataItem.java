@@ -67,9 +67,9 @@ public class DataItem implements Cloneable{
 //        }
     }
 
-    public DataItem(Record record) {
+    public DataItem(RVRecord RVRecord) {
 
-        this(record.getDataJSON());
+        this(RVRecord.getDataJSON());
 
     }
 

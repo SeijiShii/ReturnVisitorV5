@@ -11,7 +11,7 @@ import java.util.Calendar;
  * デバイス上のsqlite3やバックエンドのサーバーに保存するときの形式となる
  */
 
-public class Record {
+public class RVRecord {
 
     public static final String DATA = "data";
     public static final String CLASS_NAME = "class_name";
@@ -22,14 +22,14 @@ public class Record {
     private String data;
     private String className;
 
-    public <T extends DataItem> Record(T item) {
+    public <T extends DataItem> RVRecord(T item) {
         this.dataId = item.id;
         this.updatedAt = (Calendar) item.getUpdatedAt().clone();
         this.data = item.jsonObject().toString().replace("\"", DOUBLE_QUOTES);
         this.className = item.getClass().getSimpleName();
     }
 
-    public Record(JSONObject object) {
+    public RVRecord(JSONObject object) {
 
         try {
             if (object.has(DataItem.ID))

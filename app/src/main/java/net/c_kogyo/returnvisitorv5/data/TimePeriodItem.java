@@ -29,8 +29,8 @@ public class TimePeriodItem extends DataItem{
         setJSON(this, object);
     }
 
-    public TimePeriodItem(Record record) {
-        this(record.getDataJSON());
+    public TimePeriodItem(RVRecord RVRecord) {
+        this(RVRecord.getDataJSON());
     }
 
     private void initCommon() {

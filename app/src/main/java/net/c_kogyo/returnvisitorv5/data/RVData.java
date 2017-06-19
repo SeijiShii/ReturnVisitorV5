@@ -6,7 +6,6 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import net.c_kogyo.returnvisitorv5.data.list.DataList;
 import net.c_kogyo.returnvisitorv5.data.list.DeletedList;
 import net.c_kogyo.returnvisitorv5.data.list.NoteCompList;
 import net.c_kogyo.returnvisitorv5.data.list.PersonList;
@@ -210,35 +209,35 @@ public class RVData {
 
             try {
                 JSONObject recordObject = jsonArray.getJSONObject(i);
-                Record record = new Record(recordObject);
+                RVRecord RVRecord = new RVRecord(recordObject);
 
-                switch (record.getClassName()) {
+                switch (RVRecord.getClassName()) {
                     case "Place":
-                        placeList.setOrAdd(new Place(record));
+                        placeList.setOrAdd(new Place(RVRecord));
                         break;
                     case "Person":
-                        personList.setOrAdd(new Person(record));
+                        personList.setOrAdd(new Person(RVRecord));
                         break;
                     case "Visit":
-                        visitList.setOrAdd(new Visit(record));
+                        visitList.setOrAdd(new Visit(RVRecord));
                         break;
                     case "Tag":
-                        tagList.setOrAdd(new Tag(record));
+                        tagList.setOrAdd(new Tag(RVRecord));
                         break;
                     case "NoteCompItem":
-                        noteCompList.setOrAdd(new NoteCompItem(record));
+                        noteCompList.setOrAdd(new NoteCompItem(RVRecord));
                         break;
                     case "Work":
-                        workList.setOrAdd(new Work(record));
+                        workList.setOrAdd(new Work(RVRecord));
                         break;
                     case "Publication":
-                        publicationList.setOrAdd(new Publication(record));
+                        publicationList.setOrAdd(new Publication(RVRecord));
                         break;
                     case "DeletedData":
                         if (source == RecordArraySource.FROM_CLOUD) {
-                            inCloudDeletedList.add(record);
+                            inCloudDeletedList.add(RVRecord);
                         } else if (source == RecordArraySource.FROM_DEVICE) {
-                            inDeviceDeletedList.add(record);
+                            inDeviceDeletedList.add(RVRecord);
                         }
                         break;
                 }
@@ -348,35 +347,35 @@ public class RVData {
             JSONArray array = new JSONArray();
 
             for (Place place : placeList) {
-                array.put(new Record(place).getFullJSON());
+                array.put(new RVRecord(place).getFullJSON());
             }
 
             for (Person person : personList) {
-                array.put(new Record(person).getFullJSON());
+                array.put(new RVRecord(person).getFullJSON());
             }
 
             for (Visit visit : visitList) {
-                array.put(new Record(visit).getFullJSON());
+                array.put(new RVRecord(visit).getFullJSON());
             }
 
             for (Tag tag : tagList) {
-                array.put(new Record(tag).getFullJSON());
+                array.put(new RVRecord(tag).getFullJSON());
             }
 
             for (NoteCompItem note : noteCompList) {
-                array.put(new Record(note).getFullJSON());
+                array.put(new RVRecord(note).getFullJSON());
             }
 
             for (Work work : workList) {
-                array.put(new Record(work).getFullJSON());
+                array.put(new RVRecord(work).getFullJSON());
             }
 
             for (Publication publication : publicationList) {
-                array.put(new Record(publication).getFullJSON());
+                array.put(new RVRecord(publication).getFullJSON());
             }
 
             for (DeletedData deletedData : inDeviceDeletedList) {
-                array.put(new Record(deletedData).getFullJSON());
+                array.put(new RVRecord(deletedData).getFullJSON());
             }
 
             try {
@@ -495,35 +494,35 @@ public class RVData {
         JSONArray array = new JSONArray();
 
         for (Place place : placeList.getListLaterThanTime(dateTimeInMills)) {
-            array.put(new Record(place).getFullJSON());
+            array.put(new RVRecord(place).getFullJSON());
         }
 
         for (Person person : personList.getListLaterThanTime(dateTimeInMills)) {
-            array.put(new Record(person).getFullJSON());
+            array.put(new RVRecord(person).getFullJSON());
         }
 
         for (Visit visit : visitList.getListLaterThanTime(dateTimeInMills)) {
-            array.put(new Record(visit).getFullJSON());
+            array.put(new RVRecord(visit).getFullJSON());
         }
 
         for (Tag tag : tagList.getListLaterThanTime(dateTimeInMills)) {
-            array.put(new Record(tag).getFullJSON());
+            array.put(new RVRecord(tag).getFullJSON());
         }
 
         for (Work work : workList.getListLaterThanTime(dateTimeInMills)) {
-            array.put(new Record(work).getFullJSON());
+            array.put(new RVRecord(work).getFullJSON());
         }
 
         for (Publication publication : publicationList.getListLaterThanTime(dateTimeInMills)) {
-            array.put(new Record(publication).getFullJSON());
+            array.put(new RVRecord(publication).getFullJSON());
         }
 
         for (DataItem item : noteCompList.getListLaterThanTime(dateTimeInMills)) {
-            array.put(new Record(item).getFullJSON());
+            array.put(new RVRecord(item).getFullJSON());
         }
 
         for (DeletedData deletedData : inDeviceDeletedList) {
-            array.put(new Record(deletedData).getFullJSON());
+            array.put(new RVRecord(deletedData).getFullJSON());
         }
         inDeviceDeletedList.clear();
 

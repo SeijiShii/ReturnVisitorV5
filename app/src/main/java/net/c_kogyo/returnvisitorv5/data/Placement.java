@@ -5,8 +5,6 @@ import android.content.Context;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Calendar;
-
 import static net.c_kogyo.returnvisitorv5.data.Publication.CATEGORY;
 
 /**
@@ -53,8 +51,8 @@ public class Placement extends DataItem{
         }
     }
 
-    public Placement(Record record) {
-        this(record.getDataJSON());
+    public Placement(RVRecord RVRecord) {
+        this(RVRecord.getDataJSON());
     }
 
     public JSONObject jsonObject() {

@@ -200,8 +200,8 @@ public class Person extends DataItem implements Cloneable{
 //        }
     }
 
-    public Person(Record record) {
-        this(record.getDataJSON());
+    public Person(RVRecord RVRecord) {
+        this(RVRecord.getDataJSON());
     }
 
     public Sex getSex() {

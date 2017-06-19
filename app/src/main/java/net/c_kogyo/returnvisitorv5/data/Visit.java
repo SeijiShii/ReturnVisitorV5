@@ -1,10 +1,6 @@
 package net.c_kogyo.returnvisitorv5.data;
 
-import android.content.Context;
 import android.support.annotation.Nullable;
-
-import net.c_kogyo.returnvisitorv5.R;
-import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -63,8 +59,8 @@ public class Visit extends DataItem implements Cloneable{
         setJSON(this, object);
     }
 
-    public Visit(Record record) {
-        this(record.getDataJSON());
+    public Visit(RVRecord RVRecord) {
+        this(RVRecord.getDataJSON());
     }
 
     private void initCommon(@Nullable Place place) {
