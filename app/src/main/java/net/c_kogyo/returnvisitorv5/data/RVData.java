@@ -268,6 +268,7 @@ public class RVData {
 
     }
 
+    // TODO: 2017/06/21 これの実装がペンディング
     public void removeDeletedData() {
 
         for (DeletedData deletedData : inCloudDeletedList) {
