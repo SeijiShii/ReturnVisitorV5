@@ -43,49 +43,10 @@ public class RVRecord {
     public RVRecord() {
     }
 
-//    public RVRecord(JSONObject object) {
-//
-//        try {
-//            if (object.has(ID))
-//                this.dataId = object.getString(ID);
-//            if (object.has(UPDATED_AT)){
-////                this.updatedAt = Calendar.getInstance();
-////                this.updatedAt.setTimeInMillis(object.getLong(UPDATED_AT));
-//                this.updatedAt = object.getLong(UPDATED_AT);
-//            }
-//            if (object.has(DATA))
-//                this.data = object.getString(DATA);
-//                this.data = this.data.replace(DOUBLE_QUOTES, "\"");
-//            if (object.has(CLASS_NAME))
-//                this.className = object.getString(CLASS_NAME);
-//
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//
-//    }
-
     public String getDataJSON() {
         data = data.replace("\\\"", "\"");
         return data;
     }
-
-//    public JSONObject getFullJSON() {
-//
-//        JSONObject object = new JSONObject();
-//
-//        try {
-//            object.put(DataItem.ID, dataId);
-////            object.put(DataItem.UPDATED_AT, updatedAt.getTimeInMillis());
-//            object.put(UPDATED_AT, updatedAt);
-//            object.put(DATA, data);
-//            object.put(CLASS_NAME, className);
-//
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//        return object;
-//    }
 
     public String getClassName() {
         return className;
@@ -94,15 +55,6 @@ public class RVRecord {
     public void setDataId(String dataId) {
         this.dataId = dataId;
     }
-
-//    public void setUpdatedAt(Calendar updatedAt) {
-//        this.updatedAt = updatedAt;
-//    }
-
-
-//    public void setUpdatedAt(long updatedAt) {
-//        this.updatedAt = updatedAt;
-//    }
 
     public void setData(String data) {
         this.data = data;
