@@ -25,6 +25,13 @@ public class DeletedData extends DataItem {
         this.className = data.getClass().getSimpleName();
     }
 
+    public DeletedData(RVRecord record) {
+        super(DELETED_DATA);
+
+        this.dataId = record.getDataId();
+        this.className = record.getClassName();
+    }
+
 //    public DeletedData(RVRecord RVRecord) {
 //        this(RVRecord.getDataJSON());
 //    }
@@ -46,18 +53,18 @@ public class DeletedData extends DataItem {
 //        return object;
 //    }
 
-    public static DeletedData setJSON(DeletedData deletedData, JSONObject object) {
-
-        try {
-            if (object.has(CLASS_NAME))
-                deletedData.className = object.getString(CLASS_NAME);
-            if (object.has(DATA_ID))
-                deletedData.dataId = object.getString(DATA_ID);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return deletedData;
-    }
+//    public static DeletedData setJSON(DeletedData deletedData, JSONObject object) {
+//
+//        try {
+//            if (object.has(CLASS_NAME))
+//                deletedData.className = object.getString(CLASS_NAME);
+//            if (object.has(DATA_ID))
+//                deletedData.dataId = object.getString(DATA_ID);
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//        return deletedData;
+//    }
 
     public String getClassName() {
         return className;

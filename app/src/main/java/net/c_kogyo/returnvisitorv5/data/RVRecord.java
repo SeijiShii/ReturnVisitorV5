@@ -29,6 +29,7 @@ public class RVRecord {
     private String data;
     private String className;
     private long updatedAt;
+    private boolean isDeleted;
 
     public <T extends DataItem> RVRecord(T item) {
 
@@ -38,6 +39,7 @@ public class RVRecord {
         this.updatedAt = item.updatedAt;
         this.data = StringUtil.replaceDoubleQuotes(gson.toJson(item));
         this.className = item.getClass().getSimpleName();
+        this.isDeleted = false;
     }
 
     public RVRecord() {
@@ -56,11 +58,32 @@ public class RVRecord {
         this.dataId = dataId;
     }
 
+    public String getDataId() {
+        return dataId;
+    }
+
     public void setData(String data) {
         this.data = data;
     }
 
     public void setClassName(String className) {
         this.className = className;
+    }
+
+    public long getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(long updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
+        updatedAt = Calendar.getInstance().getTimeInMillis();
     }
 }

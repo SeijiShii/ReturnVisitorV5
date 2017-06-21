@@ -205,25 +205,7 @@ public class RVData {
             return new JSONObject();
         }
 
-//       private void jsonToData(JSONObject object) {
-//
-//            if (object == null) return;
-//
-//            try {
-//                if (object.has(RV_DATA_LIST)) {
-//                    JSONArray array = object.getJSONArray(RV_DATA_LIST);
-//                    ArrayList<RVRecord> records = new ArrayList<>();
-//                    for ( int i = 0 ; i < array.length() ; i++ ) {
-//                        JSONObject object1 = array.getJSONObject(i);
-//                        RVRecord record = new RVRecord(object1);
-//                        records.add(record);
-//                    }
-//                    setFromRecordList(records, RecordArraySource.FROM_DEVICE);
-//                }
-//            }catch (JSONException e) {
-//                Log.e(TAG, e.getMessage());
-//            }
-//        }
+
     }
 
     public enum RecordArraySource{
