@@ -8,6 +8,7 @@ import android.net.Uri;
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.data.AggregationOfMonth;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 
 import java.util.Calendar;
 
@@ -21,6 +22,8 @@ public class MailReport {
 
     public static void exportToMail(Context context, Calendar month) {
 
+        RVDBHelper helper = new RVDBHelper(context);
+
         SharedPreferences prefs = context.getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
         String name = prefs.getString(Constants.SharedPrefTags.PUBLISHER_NAME, "");
 
@@ -28,11 +31,11 @@ public class MailReport {
 
         String message = name + "\n"
                 + context.getString(R.string.month)             + ": " + DateTimeText.getMonthText(month, context) + "\n"
-                + context.getString(R.string.placement)         + ": " + AggregationOfMonth.placementCount(month) + "\n"
-                + context.getString(R.string.show_video_count)  + ": " + AggregationOfMonth.showVideoCount(month) + "\n"
-                + context.getString(R.string.time)              + ": " + AggregationOfMonth.hour(month) + "\n"
-                + context.getString(R.string.return_visit)      + ": " + AggregationOfMonth.rvCount(month) + "\n"
-                + context.getString(R.string.study_count)       + ": " + AggregationOfMonth.bsCount(month) + "\n"
+                + context.getString(R.string.placement)         + ": " + AggregationOfMonth.placementCount(month, helper) + "\n"
+                + context.getString(R.string.show_video_count)  + ": " + AggregationOfMonth.showVideoCount(month, helper) + "\n"
+                + context.getString(R.string.time)              + ": " + AggregationOfMonth.hour(month, helper) + "\n"
+                + context.getString(R.string.return_visit)      + ": " + AggregationOfMonth.rvCount(month, helper) + "\n"
+                + context.getString(R.string.study_count)       + ": " + AggregationOfMonth.bsCount(month, helper) + "\n"
                 + context.getString(R.string.comment)           + ": " ;
 
         Intent mailIntent = new Intent(Intent.ACTION_SENDTO);

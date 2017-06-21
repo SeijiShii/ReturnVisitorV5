@@ -34,11 +34,7 @@ public class VisitList {
     }
 
     public static ArrayList<Visit> loadList(RVDBHelper helper) {
-        ArrayList<Visit> visitList = new ArrayList<>();
-        for (RVRecord record : helper.loadRecords(Visit.class)) {
-            visitList.add(new Gson().fromJson(record.getDataJSON(), Visit.class));
-        }
-        return visitList;
+        return helper.loadList(Visit.class, false);
     }
 
     public static ArrayList<Visit> getVisitsForPlace(String placeId, RVDBHelper helper) {

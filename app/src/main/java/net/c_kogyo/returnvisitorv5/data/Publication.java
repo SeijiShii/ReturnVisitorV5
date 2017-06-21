@@ -185,7 +185,6 @@ public class Publication extends DataItem implements Cloneable{
 
     public void setCategory(Category category) {
         this.category = category;
-        onUpdate();
     }
 
     public MagazineCategory getMagCategory() {
@@ -194,7 +193,6 @@ public class Publication extends DataItem implements Cloneable{
 
     public void setMagCategory(MagazineCategory magCategory) {
         this.magCategory = magCategory;
-        onUpdate();
     }
 
     public Calendar getNumber() {
@@ -205,7 +203,6 @@ public class Publication extends DataItem implements Cloneable{
 
     public void setNumber(Calendar number) {
         this.number = number;
-        onUpdate();
     }
 
     public static String getNumberString(Calendar number, MagazineCategory magCategory, Context context) {
@@ -292,24 +289,7 @@ public class Publication extends DataItem implements Cloneable{
 
     public void setWeight(int weight) {
         this.weight = weight;
-        onUpdate();
     }
 
-    //    public Publication clone (boolean withPlacedDate)  throws CloneNotSupportedException{
-//
-//        Publication clonedPlc = (Publication) super.clone();
-//
-//        clonedPlc.category = this.category;
-//        clonedPlc.magCategory = this.magCategory;
-//        clonedPlc.number = (Calendar) this.number.clone();
-//
-//        if (withPlacedDate) {
-//            clonedPlc.placedDate = (Calendar) this.placedDate.clone();
-//        }else {
-//            clonedPlc.placedDate = Calendar.getInstance();
-//        }
-//
-//        return clonedPlc;
-//    }
 
 }

@@ -12,7 +12,8 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 
 import net.c_kogyo.returnvisitorv5.R;
-import net.c_kogyo.returnvisitorv5.data.RVData;
+import net.c_kogyo.returnvisitorv5.data.list.TagList;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 
 import java.util.ArrayList;
 
@@ -32,7 +33,7 @@ public class TagFilterPane extends FrameLayout {
                          TagFilterPaneListener listener) {
         super(context);
 
-        mVisibleTagIds = new ArrayList<>(RVData.getInstance().tagList.getAllIds());
+        mVisibleTagIds = TagList.getAllIds(new RVDBHelper(context));
         mSelectedTagIds = new ArrayList<>(selectedTagIds);
 
         mListener = listener;
@@ -69,7 +70,7 @@ public class TagFilterPane extends FrameLayout {
 
             @Override
             public void afterTextChanged(Editable s) {
-                mVisibleTagIds = RVData.getInstance().tagList.getSearchedTagIds(s.toString(), getContext());
+                mVisibleTagIds = TagList.getSearchedTagIds(s.toString(), getContext(), new RVDBHelper(getContext()));
                 initTagFrame();
             }
         });

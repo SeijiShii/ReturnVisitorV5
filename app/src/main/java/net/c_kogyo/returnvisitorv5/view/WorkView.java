@@ -20,10 +20,12 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import net.c_kogyo.returnvisitorv5.R;
+import net.c_kogyo.returnvisitorv5.activity.MapActivity;
 import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
-import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.Work;
+import net.c_kogyo.returnvisitorv5.data.list.VisitList;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.service.TimeCountIntentService;
 import net.c_kogyo.returnvisitorv5.util.ConfirmDialog;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
@@ -46,6 +48,7 @@ public class WorkView extends BaseAnimateView {
     private Work mWork;
     private WorkViewListener mListener;
     private LocalBroadcastManager broadcastManager;
+    private RVDBHelper mDBHelper;
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -74,6 +77,7 @@ public class WorkView extends BaseAnimateView {
         mContext = context;
         mWork = work;
         mListener = listener;
+        mDBHelper = new RVDBHelper(context);
 
         broadcastManager = LocalBroadcastManager.getInstance(mContext);
 
@@ -128,10 +132,9 @@ public class WorkView extends BaseAnimateView {
                         start.set(Calendar.HOUR_OF_DAY, hourOfDay);
                         start.set(Calendar.MINUTE, minute);
 
-                        mWork.onUpdate();
-                        RVData.getInstance().workList.setOrAdd(mWork);
-                        RVData.getInstance().saveData(getContext());
-                        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getContext());
+                        mDBHelper.save(mWork);
+                        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getContext(),
+                                mDBHelper.loadRecordLaterThanTime(MapActivity.loadLastSyncTime(getContext())));
 
                         updateStartTimeText();
                         updateEndTimeText();
@@ -163,10 +166,9 @@ public class WorkView extends BaseAnimateView {
                         end.set(Calendar.HOUR_OF_DAY, hourOfDay);
                         end.set(Calendar.MINUTE, minute);
 
-                        mWork.onUpdate();
-                        RVData.getInstance().workList.setOrAdd(mWork);
-                        RVData.getInstance().saveData(getContext());
-                        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getContext());
+                        mDBHelper.save(mWork);
+                        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getContext(),
+                                mDBHelper.loadRecordLaterThanTime(MapActivity.loadLastSyncTime(getContext())));
 
                         updateStartTimeText();
                         updateEndTimeText();
@@ -313,7 +315,7 @@ public class WorkView extends BaseAnimateView {
 
         visitCellContainer = (LinearLayout) getViewById(R.id.visit_cell_container);
 
-        for (Visit visit : RVData.getInstance().visitList.getVisitsInWork(mWork)) {
+        for (Visit visit : VisitList.getVisitsInWork(mWork, mDBHelper)) {
             visitCellContainer.addView(generateVisitCell(visit, visitCellInitHeight));
         }
     }
@@ -340,7 +342,7 @@ public class WorkView extends BaseAnimateView {
                         @Override
                         public void run() {
                             if(mListener != null) {
-                                // TODO: 2017/06/03 WorkViewの終わり時間を変更するとこのあたりでヌルポが出るよ。
+                                // DONE: 2017/06/03 WorkViewの終わり時間を変更するとこのあたりでヌルポが出るよ。
                                 mListener.postAddVisitCell(cell);
                             }
                         }
@@ -353,7 +355,7 @@ public class WorkView extends BaseAnimateView {
 
     private int getProperPositionOfVisit(Visit visit) {
 
-        ArrayList<Visit> visitsInWork = RVData.getInstance().visitList.getVisitsInWork(mWork);
+        ArrayList<Visit> visitsInWork = VisitList.getVisitsInWork(mWork, mDBHelper);
 
         Collections.sort(visitsInWork, new Comparator<Visit>() {
             @Override
@@ -406,11 +408,11 @@ public class WorkView extends BaseAnimateView {
         return new VisitCell(getContext(), visit, initHeight, new VisitCell.VisitCellListener() {
             @Override
             public void postCompressVisitCell(VisitCell visitCell) {
-                RVData.getInstance().visitList.deleteById(visitCell.getVisit().getId());
-                RVData.getInstance().saveData(getContext());
+                mDBHelper.saveAsDeletedRecord(visitCell.getVisit());
                 visitCellContainer.removeView(visitCell);
 
-                RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getContext());
+                RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getContext(),
+                        mDBHelper.loadRecordLaterThanTime(MapActivity.loadLastSyncTime(getContext())));
             }
 
             @Override
@@ -481,7 +483,7 @@ public class WorkView extends BaseAnimateView {
 
     private void postChangeWorkTime() {
 
-        ArrayList<Visit> renewedVisits = RVData.getInstance().visitList.getVisitsInWork(mWork);
+        ArrayList<Visit> renewedVisits = VisitList.getVisitsInWork(mWork, mDBHelper);
 
         ArrayList<Visit> oldVisits = getVisitsInContainer();
 

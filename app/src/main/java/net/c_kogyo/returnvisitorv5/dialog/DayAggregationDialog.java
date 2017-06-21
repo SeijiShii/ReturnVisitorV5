@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.AggregationOfDay;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 
 import java.text.DateFormat;
@@ -42,8 +43,13 @@ public class DayAggregationDialog extends DialogFragment {
         return instance;
     }
 
+    private RVDBHelper mDBHelper;
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+        mDBHelper = new RVDBHelper(getActivity());
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         
         initCommon();
@@ -78,31 +84,31 @@ public class DayAggregationDialog extends DialogFragment {
 
     private void initPlacementCountText() {
         TextView placementCountText = (TextView) view.findViewById(R.id.placement_count_text);
-        int plcCount = AggregationOfDay.placementCount(mDate);
+        int plcCount = AggregationOfDay.placementCount(mDate, mDBHelper);
         placementCountText.setText(String.valueOf(plcCount));
     }
 
     private void initVideoCountText() {
         TextView videoCountText = (TextView) view.findViewById(R.id.video_count_text);
-        int videoCount = AggregationOfDay.showVideoCount(mDate);
+        int videoCount = AggregationOfDay.showVideoCount(mDate, mDBHelper);
         videoCountText.setText(String.valueOf(videoCount));
     }
 
     private void initTimeText() {
         TextView timeText = (TextView) view.findViewById(R.id.time_text);
-        long time = AggregationOfDay.time(mDate);
+        long time = AggregationOfDay.time(mDate, mDBHelper);
         timeText.setText(DateTimeText.getDurationString(time, false));
     }
 
     private void initRVCountText() {
         TextView rvCountText = (TextView) view.findViewById(R.id.rv_count_text);
-        int rvCount = AggregationOfDay.rvCount(mDate);
+        int rvCount = AggregationOfDay.rvCount(mDate, mDBHelper);
         rvCountText.setText(String.valueOf(rvCount));
     }
 
     private void initStudyCountText() {
         TextView studyCountText = (TextView) view.findViewById(R.id.study_count_text);
-        int studyCount = AggregationOfDay.bsVisitCount(mDate);
+        int studyCount = AggregationOfDay.bsVisitCount(mDate, mDBHelper);
         studyCountText.setText(String.valueOf(studyCount));
     }
 

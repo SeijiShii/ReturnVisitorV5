@@ -25,6 +25,9 @@ import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.Work;
+import net.c_kogyo.returnvisitorv5.data.list.PlaceList;
+import net.c_kogyo.returnvisitorv5.data.list.VisitList;
+import net.c_kogyo.returnvisitorv5.data.list.WorkList;
 import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.dialog.AddWorkDialog;
 import net.c_kogyo.returnvisitorv5.dialog.DayAggregationDialog;
@@ -452,7 +455,7 @@ public class WorkPagerActivity extends AppCompatActivity {
 
     private void moveToMapWithPosition(Visit visit) {
         String placeId = visit.getPlaceId();
-        Place place = mDBHelper.loadPlace(placeId);
+        Place place = PlaceList.loadPlace(placeId, mDBHelper);
         if (place == null) return;
 
         Intent intent = new Intent(WorkPagerActivity.this, MapActivity.class);
@@ -480,8 +483,8 @@ public class WorkPagerActivity extends AppCompatActivity {
 
     private void onAddWork(Work work) {
         mDBHelper.save(work);
-        ArrayList<Work> worksRemoved = mDBHelper.onChangeWorkTime(work);
-        ArrayList<Visit> visitsSwallowed = mDBHelper.getVisitsInWork(work);
+        ArrayList<Work> worksRemoved = WorkList.onChangeTime(work, mDBHelper);
+        ArrayList<Visit> visitsSwallowed = VisitList.getVisitsInWork(work, mDBHelper);
 
         int pos = mDatePagerAdapter.getPosition(work.getStart());
         mPager.setCurrentItem(pos);
@@ -518,7 +521,7 @@ public class WorkPagerActivity extends AppCompatActivity {
         if (workId == null)
             return;
 
-        addedWork = mDBHelper.loadWork(workId);
+        addedWork = WorkList.loadWork(workId, mDBHelper);
     }
 
     @Override
@@ -529,7 +532,7 @@ public class WorkPagerActivity extends AppCompatActivity {
             if (resultCode == Constants.RecordVisitActions.VISIT_ADDED_RESULT_CODE) {
                 String visitId = data.getStringExtra(Visit.VISIT);
                 if (visitId != null) {
-                    Visit visit = mDBHelper.loadVisit(visitId);
+                    Visit visit = VisitList.loadVisit(visitId, mDBHelper);
                     if (visit != null) {
                         getCurrentFragment().insertVisitCell(visit);
                     }

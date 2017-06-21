@@ -1,12 +1,12 @@
 package net.c_kogyo.returnvisitorv5.data.list;
 
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.gson.Gson;
 
 import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Place;
-import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.RVRecord;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
@@ -21,28 +21,31 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class PersonList {
 
-    public static ArrayList<Person> loadPersonList(RVDBHelper helper) {
+    public static ArrayList<Person> loadList(RVDBHelper helper) {
 
-        ArrayList<Person> personList = new ArrayList<>();
-        for (RVRecord record : helper.loadRecords(Person.class)) {
-            personList.add(new Gson().fromJson(record.getDataJSON(), Person.class));
-        }
-        return personList;
+        return helper.loadList(Person.class, false);
     }
 
+    @Nullable
+    public static Person loadPerson(String personId, RVDBHelper helper) {
+        RVRecord record = helper.loadRecord(personId, false);
+        if (record == null) return null;
+
+        return new Gson().fromJson(record.getDataJSON(), Person.class);
+    }
 
     public static ArrayList<Person> getPersonsInPlace(Place place, RVDBHelper helper) {
 
         ArrayList<Place> places = new ArrayList<>();
         if (place.getCategory() == Place.Category.HOUSING_COMPLEX) {
-            places = new ArrayList<>(RVData.getInstance().placeList.getRoomList(place.getId()));
+            places = new ArrayList<>(PlaceList.getRoomList(place.getId(), helper));
         } else {
             places.add(place);
         }
 
         ArrayList<String> ids = new ArrayList<>();
         for (Place place1 : places) {
-            ArrayList<Visit> visits = RVData.getInstance().visitList.getVisitsForPlace(place1.getId());
+            ArrayList<Visit> visits = VisitList.getVisitsForPlace(place1.getId(), helper);
             for (Visit visit : visits) {
                 for (VisitDetail visitDetail : visit.getVisitDetails()) {
                     if (!ids.contains(visitDetail.getPersonId())) {
@@ -51,50 +54,7 @@ public class PersonList {
                 }
             }
         }
-        return getList(ids);
+        return helper.loadListByIds(Person.class, ids);
     }
 
-    // for maintenance
-    public void removeItemsWithoutVisitDetail() {
-
-        ArrayList<String> validIds = new ArrayList<>();
-
-        for (Visit visit : RVData.getInstance().visitList) {
-            for (VisitDetail visitDetail : visit.getVisitDetails()) {
-               if (!validIds.contains(visitDetail.getPersonId())) {
-                   validIds.add(visitDetail.getPersonId());
-               }
-            }
-        }
-
-        ArrayList<Person> validPersons = new ArrayList<>();
-        for (String validId : validIds) {
-            Person person = getById(validId);
-            if (person != null) {
-                validPersons.add(person);
-            }
-        }
-
-        ArrayList<Person> deleteList = new ArrayList<>();
-        for (Person person : list) {
-            if (!validPersons.contains(person)) {
-                deleteList.add(person);
-            }
-        }
-
-        for (Person deletedPerson : deleteList) {
-            deleteById(deletedPerson.getId());
-        }
-
-        Log.d(TAG, "Valid person count: " + validIds.size());
-        Log.d(TAG, "Invalid person count: " + deleteList.size());
-
-    }
-
-    // for change
-    public void setPriorityToPersons() {
-        for (Person person : list) {
-            person.setPriorityFromLatestVisitDetail();
-        }
-    }
 }

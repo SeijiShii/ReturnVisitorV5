@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.Person;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.util.ConfirmDialog;
 import net.c_kogyo.returnvisitorv5.view.PriorityRater;
 
@@ -287,8 +288,10 @@ public class PersonDialog extends DialogFragment {
 
     private void initDeleteButton() {
 
+        RVDBHelper helper = new RVDBHelper(getActivity());
+
         Button deleteButton = (Button) view.findViewById(R.id.delete_button);
-        if (RVData.getInstance().personList.contains(mPerson)) {
+        if (helper.containsRecordWithId(mPerson.getId())) {
             deleteButton.setVisibility(View.VISIBLE);
             deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override

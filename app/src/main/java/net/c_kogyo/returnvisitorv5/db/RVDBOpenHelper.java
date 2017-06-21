@@ -35,10 +35,7 @@ public class RVDBOpenHelper extends SQLiteOpenHelper {
 
         Log.d(TAG, "onCreate version : " + db.getVersion());
 
-        String createTableQuery = "CREATE TABLE IF NOT EXISTS "
-                + TABLE_NAME
-                + "(id integer, data_id text, class_name text, updated_at integer, data text):";
-        db.execSQL(createTableQuery);
+        db.execSQL(CREATE_TABLE_QUERY);
 
     }
 

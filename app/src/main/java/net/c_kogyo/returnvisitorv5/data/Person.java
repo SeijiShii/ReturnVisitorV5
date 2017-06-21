@@ -3,6 +3,7 @@ package net.c_kogyo.returnvisitorv5.data;
 import android.content.Context;
 
 import net.c_kogyo.returnvisitorv5.R;
+import net.c_kogyo.returnvisitorv5.data.list.VisitList;
 import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 
 import org.json.JSONArray;
@@ -269,11 +270,11 @@ public class Person extends DataItem implements Cloneable{
         builder.append(getPriorityString(context)).append(" ");
 
         // DONE: 2017/05/26 タグも対象とするか
-        Visit visit = helper.getLatestVisitToPerson(id);
+        Visit visit = VisitList.getLatestVisitToPerson(id, helper);
         if (visit != null) {
             VisitDetail visitDetail = visit.getVisitDetail(id);
             if (visitDetail != null) {
-                ArrayList<Tag> tags = helper.la.getList(visitDetail.getTagIds());
+                ArrayList<Tag> tags = helper.loadListByIds(Tag.class, visitDetail.getTagIds());
                 for (Tag tag : tags) {
                     builder.append(" ").append(tag.getName());
                 }
@@ -307,28 +308,7 @@ public class Person extends DataItem implements Cloneable{
 
     public void setPlaceIds(ArrayList<String> placeIds) {
         this.placeIds = placeIds;
-        onUpdate();
     }
-
-//    private static Person setJSON(Person person, JSONObject object) {
-//        try {
-//            if (object.has(SEX))            person.sex         = Sex.valueOf(object.get(SEX).toString());
-//            if (object.has(AGE))            person.age         = Age.valueOf(object.get(AGE).toString());
-//            if (object.has(PRIORITY))       person.priority     = Priority.valueOf(object.get(PRIORITY).toString());
-//
-//            if (object.has(PLACE_IDS)) {
-//                person.placeIds = new ArrayList<>();
-//                JSONArray array = object.getJSONArray(PLACE_IDS);
-//                for ( int i = 0 ; i < array.length() ; i++ ) {
-//                    person.placeIds.add(array.getString(i));
-//                }
-//            }
-//
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//        return person;
-//    }
 
     public Priority getPriority() {
 
@@ -339,11 +319,11 @@ public class Person extends DataItem implements Cloneable{
      *
      * @return 結果的に優先度が変更になっていればTRUE
      */
-    public boolean setPriorityFromLatestVisitDetail() {
+    public boolean setPriorityFromLatestVisitDetail(RVDBHelper helper) {
 
         Priority oldPriority = priority;
 
-        Visit visit = RVData.getInstance().visitList.getLatestVisitToPerson(id);
+        Visit visit = VisitList.getLatestVisitToPerson(id, helper);
 
         if (visit != null) {
 

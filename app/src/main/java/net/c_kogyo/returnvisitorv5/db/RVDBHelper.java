@@ -18,6 +18,8 @@ import net.c_kogyo.returnvisitorv5.data.Tag;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
 import net.c_kogyo.returnvisitorv5.data.Work;
+import net.c_kogyo.returnvisitorv5.data.list.VisitList;
+import net.c_kogyo.returnvisitorv5.data.list.WorkList;
 import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
 
 import java.util.ArrayList;
@@ -282,14 +284,31 @@ public class RVDBHelper {
         return loadRecords(className, false);
     }
 
-    public ArrayList<RVRecord> loadRecordsByIds(ArrayList<String> ids) {
+    public  <T extends DataItem> ArrayList<T> loadList(Class<T> className, boolean loadDeleted) {
+
+        ArrayList<T> list = new ArrayList<>();
+        for (RVRecord record : loadRecords(className, loadDeleted)) {
+            list.add(mGson.fromJson(record.getDataJSON(), className));
+        }
+        return list;
+    }
+
+    public ArrayList<RVRecord> loadRecordsByIds(ArrayList<String> ids, boolean deleted) {
         ArrayList<RVRecord> records = new ArrayList<>();
+
+        String whereClause;
+        if (deleted) {
+            whereClause = DATA_ID + " = ?";
+        } else {
+            whereClause = DATA_ID + " = ?" + AND + IS_DELETED + " = 0";
+        }
+
         for (String id : ids) {
 
             Cursor cursor = mDB.query(false,
                     TABLE_NAME,
                     null,
-                    DATA_ID + " = ?",
+                    whereClause,
                     new String[]{id},
                     null, null, null, null);
             boolean isEOf = cursor.moveToFirst();
@@ -304,6 +323,18 @@ public class RVDBHelper {
             }
         }
         return records;
+    }
+
+    private ArrayList<RVRecord> loadRecordsByIds(ArrayList<String> ids) {
+        return loadRecordsByIds(ids, false);
+    }
+
+    public <T extends DataItem> ArrayList<T> loadListByIds(Class<T> className, ArrayList<String> ids) {
+        ArrayList<T> list = new ArrayList<>();
+        for (RVRecord record : loadRecordsByIds(ids)) {
+            list.add(mGson.fromJson(record.getDataJSON(), className));
+        }
+        return list;
     }
 
     public <T extends DataItem> void save(T item) {
@@ -332,32 +363,6 @@ public class RVDBHelper {
         }
     }
 
-
-    // Person
-    @Nullable
-    public Person loadPerson(String personId) {
-        RVRecord record = loadRecord(personId, false);
-        if (record == null) {
-            return null;
-        }
-        return mGson.fromJson(record.getDataJSON(), Person.class);
-    }
-
-    // Work
-
-
-
-    // Tag
-    @Nullable
-    private Tag loadTag(String tagId) {
-
-        RVRecord record = loadRecord(tagId, false);
-        if (record == null) {
-            return null;
-        }
-        return mGson.fromJson(record.getDataJSON(), Tag.class);
-    }
-
     public <T extends DataItem> ArrayList<T> getSearchedItems(Class<T> className, String searchWord, Context context) {
 
         String[] words = searchWord.split(" ");
@@ -380,5 +385,76 @@ public class RVDBHelper {
         return searchResultItems;
     }
 
+    public <T extends DataItem> boolean containsDataWithName(Class<T> tClass, String name) {
+        for (T item : loadList(tClass, false)) {
+            if (item.getName().equals(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
+    public <T extends DataItem >boolean addIfNoSameName(Class<T> tClass, String name) {
+
+        for (T item : loadList(tClass, false)) {
+            if (item.getName().equals(name)) return true;
+        }
+        return false;
+    }
+
+    public ArrayList<Calendar> getDatesWithData() {
+
+        ArrayList<Calendar> datesOfVisit = VisitList.getDates(this);
+        ArrayList<Calendar> datesOfWork = WorkList.getDates(this);
+        ArrayList<Calendar> datesDoubled = new ArrayList<>();
+
+        for (Calendar date0 : datesOfVisit) {
+            for (Calendar date1 : datesOfWork) {
+
+                if (CalendarUtil.isSameDay(date0, date1)) {
+                    datesDoubled.add(date1);
+                }
+            }
+        }
+
+        datesOfWork.removeAll(datesDoubled);
+        datesOfVisit.addAll(datesOfWork);
+
+        Collections.sort(datesOfVisit, new Comparator<Calendar>() {
+            @Override
+            public int compare(Calendar calendar, Calendar t1) {
+                return calendar.compareTo(t1);
+            }
+        });
+
+        return new ArrayList<>(datesOfVisit);
+    }
+
+    public ArrayList<Calendar> getMonthsWithData() {
+
+        ArrayList<Calendar> monthWithData = new ArrayList<>();
+        ArrayList<Calendar> datesWithData = getDatesWithData();
+
+        if (datesWithData.size() <= 0)
+            return monthWithData;
+
+        monthWithData.add(datesWithData.get(0));
+
+        int dateIndex = 0;
+        int monthIndex = 0;
+
+        while (dateIndex < datesWithData.size() - 1) {
+            dateIndex++;
+            if (!CalendarUtil.isSameMonth(datesWithData.get(dateIndex), monthWithData.get(monthIndex))) {
+                monthWithData.add(datesWithData.get(dateIndex));
+                monthIndex++;
+            }
+        }
+
+        return monthWithData;
+    }
+
+    public boolean hasWorkOrVisit() {
+        return VisitList.loadList(this).size() + WorkList.loadList(this).size() > 0;
+    }
 }

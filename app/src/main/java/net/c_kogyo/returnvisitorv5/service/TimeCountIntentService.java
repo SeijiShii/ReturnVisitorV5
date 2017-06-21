@@ -12,8 +12,11 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 
 import net.c_kogyo.returnvisitorv5.R;
+import net.c_kogyo.returnvisitorv5.activity.MapActivity;
 import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
 import net.c_kogyo.returnvisitorv5.data.Work;
+import net.c_kogyo.returnvisitorv5.data.list.WorkList;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 
 import java.util.Calendar;
@@ -51,9 +54,12 @@ public class TimeCountIntentService extends IntentService {
     public static final String CHANGE_START_ACTION_TO_SERVICE
             = TimeCountIntentService.class.getName() + "_change_start_action_to_service";
 
+    private RVDBHelper mDBHelper;
+
     public TimeCountIntentService() {
         super("TimeCountIntentService");
 
+        mDBHelper = new RVDBHelper(this);
         initBroadcasting();
 
     }
@@ -68,10 +74,10 @@ public class TimeCountIntentService extends IntentService {
                     long startTime = intent.getLongExtra(START_TIME, mWork.getStart().getTimeInMillis());
                     mWork.getStart().setTimeInMillis(startTime);
 
-                    RVData.getInstance().workList.setOrAdd(mWork);
-                    RVData.getInstance().saveData(TimeCountIntentService.this);
+                    mDBHelper.save(mWork);
 
-                    RVCloudSync.getInstance().requestDataSyncIfLoggedIn(TimeCountIntentService.this);
+                    RVCloudSync.getInstance().requestDataSyncIfLoggedIn(TimeCountIntentService.this,
+                            mDBHelper.loadRecordLaterThanTime(MapActivity.loadLastSyncTime(TimeCountIntentService.this)));
                 }
             }
         };
@@ -91,12 +97,12 @@ public class TimeCountIntentService extends IntentService {
 
             if (intent.getAction().equals(START_COUNTING_ACTION_TO_SERVICE)) {
                 mWork = new Work(Calendar.getInstance());
-                RVData.getInstance().workList.setOrAdd(mWork);
-                RVData.getInstance().saveData(this);
-                RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this);
+                mDBHelper.save(mWork);
+                RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this,
+                        mDBHelper.loadRecordLaterThanTime(MapActivity.loadLastSyncTime(this)));
             } else if (intent.getAction().equals(RESTART_COUNTING_ACTION_TO_SERVICE)) {
                 String workId = intent.getStringExtra(COUNTING_WORK_ID);
-                mWork = RVData.getInstance().workList.getById(workId);
+                mWork = WorkList.loadWork(workId, mDBHelper);
                 if (mWork == null) {
                     stopTimeCount();
                     return;
@@ -133,9 +139,9 @@ public class TimeCountIntentService extends IntentService {
 
                     mWork.setEnd(Calendar.getInstance());
 
-                    RVData.getInstance().workList.setOrAdd(mWork);
-                    RVData.getInstance().saveData(this);
-                    RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this);
+                    mDBHelper.save(mWork);
+                    RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this,
+                            mDBHelper.loadRecordLaterThanTime(MapActivity.loadLastSyncTime(this)));
                     minCounter = 0;
                 }
             }

@@ -135,7 +135,7 @@ public class SetPlaceDialog extends DialogFragment
         mMap.setPadding(0, padding, 0, padding);
         mMap.getUiSettings().setMapToolbarEnabled(false);
 
-        placeMarkers = new PlaceMarkers(googleMap);
+        placeMarkers = new PlaceMarkers(googleMap, getActivity());
 
         googleMap.setOnMarkerClickListener(this);
         googleMap.setOnMapLongClickListener(this);

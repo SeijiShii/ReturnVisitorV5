@@ -23,6 +23,8 @@ import com.google.android.gms.maps.model.Marker;
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.PlaceMarkers;
+import net.c_kogyo.returnvisitorv5.data.list.PlaceList;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -100,7 +102,7 @@ public class ShowInMapDialog extends DialogFragment
         Bundle arg = getArguments();
 
         String placeId = arg.getString(PLACE_ID);
-        mPlace = RVData.getInstance().placeList.getById(placeId);
+        mPlace = PlaceList.loadPlace(placeId, new RVDBHelper(getActivity()));
 
     }
 
@@ -151,7 +153,7 @@ public class ShowInMapDialog extends DialogFragment
 
         mMap.setOnMarkerClickListener(this);
 
-        PlaceMarkers.addSingleMarker(mPlace, mMap);
+        PlaceMarkers.addSingleMarker(mPlace, mMap, getActivity());
 
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mPlace.getLatLng(), 19));
 

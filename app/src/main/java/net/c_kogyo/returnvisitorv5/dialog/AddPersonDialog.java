@@ -40,6 +40,9 @@ import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.PlaceMarkers;
+import net.c_kogyo.returnvisitorv5.data.list.PersonList;
+import net.c_kogyo.returnvisitorv5.data.list.PlaceList;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 import net.c_kogyo.returnvisitorv5.view.BaseAnimateView;
 import net.c_kogyo.returnvisitorv5.view.PersonCell;
@@ -79,8 +82,12 @@ public class AddPersonDialog extends DialogFragment
         return instance;
     }
 
+    private RVDBHelper mDBHelper;
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+        mDBHelper = new RVDBHelper(getActivity());
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 
@@ -210,7 +217,7 @@ public class AddPersonDialog extends DialogFragment
 //        mMap.setPadding(0, padding, 0, padding);
         mMap.getUiSettings().setMapToolbarEnabled(false);
 
-        placeMarkers = new PlaceMarkers(googleMap);
+        placeMarkers = new PlaceMarkers(googleMap, getActivity());
 
         googleMap.setOnMarkerClickListener(this);
 
@@ -291,7 +298,7 @@ public class AddPersonDialog extends DialogFragment
 
     private PersonListAdapter personListAdapter;
     private void fadeInListFrameByPlace(Place place) {
-        ArrayList<Person> persons = RVData.getInstance().personList.getPersonsInPlace(place);
+        ArrayList<Person> persons = PersonList.getPersonsInPlace(place, mDBHelper);
         fadeInPersonList(persons);
         fadeInPlaceCell(place);
     }
@@ -336,7 +343,7 @@ public class AddPersonDialog extends DialogFragment
     }
 
     private void fadeInListFrameBySearchWord(String searchWord) {
-        ArrayList<Person> persons = new ArrayList<>(RVData.getInstance().personList.getSearchedItems(searchWord, getActivity()));
+        ArrayList<Person> persons = mDBHelper.getSearchedItems(Person.class, searchWord, getActivity());
         fadeInPersonList(persons);
     }
 

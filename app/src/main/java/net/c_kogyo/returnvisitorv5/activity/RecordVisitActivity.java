@@ -26,12 +26,16 @@ import com.google.android.gms.maps.model.LatLng;
 import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
+import net.c_kogyo.returnvisitorv5.data.NoteCompItem;
 import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.Placement;
 import net.c_kogyo.returnvisitorv5.data.Publication;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
+import net.c_kogyo.returnvisitorv5.data.list.PersonList;
+import net.c_kogyo.returnvisitorv5.data.list.PlaceList;
+import net.c_kogyo.returnvisitorv5.data.list.VisitList;
 import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.dialog.AddPersonDialog;
 import net.c_kogyo.returnvisitorv5.dialog.HousingComplexDialog;
@@ -133,10 +137,10 @@ public class RecordVisitActivity extends AppCompatActivity {
             case EDIT_VISIT_ACTION:
                 String visitId = intent.getStringExtra(VISIT);
 
-                Visit visit = mDBHelper.loadVisit(visitId);
+                Visit visit = VisitList.loadVisit(visitId, mDBHelper);
                 Place place = null;
                 if (visit != null) {
-                    place = mDBHelper.loadPlace(visit.getPlaceId());
+                    place = PlaceList.loadPlace(visit.getPlaceId(), mDBHelper);
                 }
 
                 try {
@@ -153,7 +157,7 @@ public class RecordVisitActivity extends AppCompatActivity {
                 break;
             case NEW_VISIT_ACTION_WITH_PLACE:
                 String placeId = intent.getStringExtra(PLACE);
-                Place place1 = mDBHelper.loadPlace(placeId);
+                Place place1 = PlaceList.loadPlace(placeId, mDBHelper);
 
                 try {
                     mPlace = (Place) place1.clone();
@@ -161,7 +165,7 @@ public class RecordVisitActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-                Visit lastVisit = mDBHelper.getLatestVisitToPlace(placeId);
+                Visit lastVisit = VisitList.getLatestVisitToPlace(placeId, mDBHelper);
                 if (lastVisit != null) {
                     mVisit = new Visit(lastVisit);
                 } else {
@@ -374,7 +378,7 @@ public class RecordVisitActivity extends AppCompatActivity {
     private void initVisitDetailFrame() {
         visitDetailFrame = (LinearLayout) findViewById(R.id.visit_detail_frame);
         for (VisitDetail visitDetail : mVisit.getVisitDetails()) {
-            Person person = mDBHelper.loadPerson(visitDetail.getPersonId());
+            Person person = PersonList.loadPerson(visitDetail.getPersonId(), mDBHelper);
             if (person != null) {
                 addVisitDetailView(visitDetail,
                         person,
@@ -519,7 +523,8 @@ public class RecordVisitActivity extends AppCompatActivity {
                 // PENDING: 2017/03/08 要動作検証 noteがAutoCompListについかされたかどうか
 
                 for (VisitDetail visitDetail : mVisit.getVisitDetails()) {
-                    mDBHelper.addIfNoSameName(visitDetail.getNote());
+
+                    mDBHelper.addIfNoSameName(NoteCompItem.class, visitDetail.getNote());
                 }
 
                 switch (getIntent().getAction()) {
@@ -829,12 +834,12 @@ public class RecordVisitActivity extends AppCompatActivity {
 
         Calendar oldDateTime = (Calendar) mVisit.getDatetime().clone();
 
-        Visit lastVisit = mDBHelper.getLatestVisitToPlace(place.getId());
+        Visit lastVisit = VisitList.getLatestVisitToPlace(place.getId(), mDBHelper);
         if (lastVisit != null) {
             mVisit = new Visit(lastVisit);
 
             for (VisitDetail visitDetail : mVisit.getVisitDetails()) {
-                Person person = mDBHelper.loadPerson(visitDetail.getPersonId());
+                Person person = PersonList.loadPerson(visitDetail.getPersonId(), mDBHelper);
                 if (person != null) {
                     addVisitDetailView(visitDetail,
                             person,

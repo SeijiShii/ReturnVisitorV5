@@ -23,6 +23,8 @@ import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Placement;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
+import net.c_kogyo.returnvisitorv5.data.list.NoteCompList;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.util.ConfirmDialog;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 
@@ -274,7 +276,7 @@ public class VisitDetailView extends BaseAnimateView {
         // PENDING: 2017/03/08 要動作検証
 
         ArrayList<String> noteCompList = new ArrayList<>();
-        for (NoteCompItem compItem : RVData.getInstance().noteCompList){
+        for (NoteCompItem compItem : NoteCompList.loadList(new RVDBHelper(getContext()))){
             noteCompList.add(compItem.getName());
         }
         String[] compArray = noteCompList.toArray(new String[0]);
@@ -449,7 +451,7 @@ public class VisitDetailView extends BaseAnimateView {
                 return false;
             }
         });
-        if (!mVisitDetail.belongsToMultiplePlace()) {
+        if (!mVisitDetail.belongsToMultiplePlace(new RVDBHelper(getContext()))) {
             popupMenu.getMenu().removeItem(R.id.remove_person);
         }
         popupMenu.show();

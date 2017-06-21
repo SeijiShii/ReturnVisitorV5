@@ -4,6 +4,8 @@ import android.content.Context;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import net.c_kogyo.returnvisitorv5.data.list.PlaceList;
+import net.c_kogyo.returnvisitorv5.data.list.VisitList;
 import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 
 import org.json.JSONException;
@@ -190,14 +192,14 @@ public class Place extends DataItem {
         switch (category) {
             case HOUSE:
             case ROOM:
-                Visit visit = helper.getLatestVisitToPlace(this.id);
+                Visit visit = VisitList.getLatestVisitToPlace(this.id, helper);
                 if (visit == null) {
                     return Person.Priority.NONE;
                 }
                 return visit.getPriority();
 
             case HOUSING_COMPLEX:
-                Place room = helper.getMostPriorRoom(this.id, context);
+                Place room = PlaceList.getMostPriorRoom(this.id, helper, context);
                 if (room == null) {
                     return Person.Priority.NONE;
                 }
@@ -240,7 +242,7 @@ public class Place extends DataItem {
 
         RVDBHelper helper = new RVDBHelper(context);
         if (category == Category.HOUSING_COMPLEX) {
-            return helper.getRoomList(id).size();
+            return PlaceList.getRoomList(id, helper).size();
         }
 
         return -1;

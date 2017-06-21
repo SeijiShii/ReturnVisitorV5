@@ -21,6 +21,7 @@ import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.activity.VisitSuggestionActivity;
 import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Place;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.util.InputUtil;
 import net.c_kogyo.returnvisitorv5.view.SearchCell;
 
@@ -158,10 +159,12 @@ public class SearchDialog extends DialogFragment {
 
         ArrayList<Place> places;
         ArrayList<Person> persons;
+        RVDBHelper helper;
 
         public SearchListAdapter(String searchWord, Context context) {
-            places = new ArrayList<>(RVData.getInstance().placeList.getSearchedItems(searchWord, context));
-            persons = new ArrayList<>(RVData.getInstance().personList.getSearchedItems(searchWord, context));
+            helper = new RVDBHelper(context);
+            places = helper.getSearchedItems(Place.class, searchWord, context);
+            persons = helper.getSearchedItems(Person.class, searchWord, context);
         }
 
         @Override

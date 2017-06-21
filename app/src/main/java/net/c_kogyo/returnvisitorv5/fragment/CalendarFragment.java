@@ -22,6 +22,7 @@ import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.activity.CalendarPagerActivity;
 import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.data.AggregationOfDay;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
@@ -84,10 +85,13 @@ public class CalendarFragment extends Fragment {
     }
 
     private View view;
+    private RVDBHelper mDBHelper;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+
+        mDBHelper = new RVDBHelper(getActivity());
 
         view = inflater.inflate(R.layout.calendar_fragment, container, false);
 
@@ -204,7 +208,7 @@ public class CalendarFragment extends Fragment {
 
             RelativeLayout timeBar = (RelativeLayout) view.findViewById(R.id.time_bar);
 
-            long timeLong = AggregationOfDay.time(mDate);
+            long timeLong = AggregationOfDay.time(mDate, mDBHelper);
             if (timeLong < 60000) {
                 timeBar.setVisibility(INVISIBLE);
             } else {
@@ -214,7 +218,7 @@ public class CalendarFragment extends Fragment {
 
         private void initTimeTextView() {
             TextView timeTextView = (TextView) view.findViewById(R.id.time_text_view);
-            long timeLong = AggregationOfDay.time(mDate);
+            long timeLong = AggregationOfDay.time(mDate, mDBHelper);
             String timeText = DateTimeText.getDurationString(timeLong, false);
             timeTextView.setText(timeText);
         }
@@ -223,19 +227,19 @@ public class CalendarFragment extends Fragment {
 
             LinearLayout barContainer = (LinearLayout) view.findViewById(R.id.bar_container);
 
-            if (AggregationOfDay.placementCount(mDate) > 0) {
+            if (AggregationOfDay.placementCount(mDate, mDBHelper) > 0) {
                 barContainer.addView(generateBar(R.color.placement_blue));
             }
 
-            if (AggregationOfDay.showVideoCount(mDate) > 0) {
+            if (AggregationOfDay.showVideoCount(mDate, mDBHelper) > 0) {
                 barContainer.addView(generateBar(R.color.video_green));
             }
 
-            if (AggregationOfDay.rvCount(mDate) > 0) {
+            if (AggregationOfDay.rvCount(mDate, mDBHelper) > 0) {
                 barContainer.addView(generateBar(R.color.rv_pink));
             }
 
-            if (AggregationOfDay.bsVisitCount(mDate) > 0) {
+            if (AggregationOfDay.bsVisitCount(mDate, mDBHelper) > 0) {
                 barContainer.addView(generateBar(R.color.study_purple));
             }
 
@@ -261,7 +265,7 @@ public class CalendarFragment extends Fragment {
 
         // DONE: 2017/05/05 タッチリスナの実装
         private void setTouchListenerIfNeeded() {
-            if (AggregationOfDay.hasWorkOrVisit(mDate)) {
+            if (AggregationOfDay.hasWorkOrVisit(mDate, mDBHelper)) {
                 ViewUtil.setOnClickListener(this, new ViewUtil.OnViewClickListener() {
                     @Override
                     public void onViewClick(View v) {

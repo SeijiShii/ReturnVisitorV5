@@ -27,9 +27,12 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
+import net.c_kogyo.returnvisitorv5.activity.MapActivity;
 import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
 import net.c_kogyo.returnvisitorv5.data.Tag;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
+import net.c_kogyo.returnvisitorv5.data.list.TagList;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.util.InputUtil;
 
 import java.util.ArrayList;
@@ -57,9 +60,13 @@ public class TagDialog extends DialogFragment {
         return instance;
     }
 
+    private RVDBHelper mDBHelper;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+        mDBHelper = new RVDBHelper(getActivity());
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         
         builder.setTitle(R.string.tag);
@@ -116,9 +123,9 @@ public class TagDialog extends DialogFragment {
                 s = trimWhitespace(s);
 
                 if (s.length() <= 0) {
-                    mAdapter = new TagListAdapter(RVData.getInstance().tagList.getSortedList());
+                    mAdapter = new TagListAdapter(TagList.getSortedList(mDBHelper));
                 } else {
-                    mAdapter = new TagListAdapter(RVData.getInstance().tagList.getSearchedItems(s, getActivity()));
+                    mAdapter = new TagListAdapter(mDBHelper.getSearchedItems(Tag.class, s, getActivity()));
                 }
                 tagListView.setAdapter(mAdapter);
                 mAdapter.notifyDataSetChanged();
@@ -173,23 +180,22 @@ public class TagDialog extends DialogFragment {
                     return;
                 }
 
-                if (RVData.getInstance().tagList.containsDataWithName(data)){
+                if (mDBHelper.containsDataWithName(Tag.class, data)){
                     return;
                 }
 
                 Tag newTag = new Tag(data);
-                RVData.getInstance().tagList.setOrAdd(newTag);
+                mDBHelper.save(newTag);
 
                 mVisitDetail.getTagIds().add(newTag.getId());
 
-                mAdapter = new TagListAdapter(RVData.getInstance().tagList.getSortedList());
+                mAdapter = new TagListAdapter(TagList.getSortedList(mDBHelper));
                 tagListView.setAdapter(mAdapter);
                 mAdapter.notifyDataSetChanged();
                 setListViewHeight();
 
-                RVData.getInstance().saveData(getActivity());
-
-                RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getActivity());
+                RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getActivity(),
+                        mDBHelper.loadRecordLaterThanTime(MapActivity.loadLastSyncTime(getActivity())));
             }
         });
     }
@@ -200,7 +206,7 @@ public class TagDialog extends DialogFragment {
 
         tagListView = (ListViewCompat) view.findViewById(R.id.tag_list_view);
         // DONE: 2017/03/06 tag list adapter
-        mAdapter = new TagListAdapter(RVData.getInstance().tagList.getSortedList());
+        mAdapter = new TagListAdapter(TagList.getSortedList(mDBHelper));
         tagListView.setAdapter(mAdapter);
 
         tagListView.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -286,18 +292,17 @@ public class TagDialog extends DialogFragment {
 
                 @Override
                 public void onDeleteTag(Tag tag) {
-                    RVData.getInstance().tagList.deleteById(tag.getId());
+                    mDBHelper.saveAsDeletedRecord(tag);
                     mVisitDetail.getTagIds().remove(tag.getId());
 
-                    mAdapter = new TagListAdapter(RVData.getInstance().tagList.getSortedList());
+                    mAdapter = new TagListAdapter(TagList.getSortedList(mDBHelper));
                     tagListView.setAdapter(mAdapter);
                     mAdapter.notifyDataSetChanged();
 
                     setListViewHeight();
 
-                    RVData.getInstance().saveData(getActivity());
-
-                    RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getActivity());
+                    RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getActivity(),
+                            mDBHelper.loadRecordLaterThanTime(MapActivity.loadLastSyncTime(getActivity())));
                 }
             });
             return view;

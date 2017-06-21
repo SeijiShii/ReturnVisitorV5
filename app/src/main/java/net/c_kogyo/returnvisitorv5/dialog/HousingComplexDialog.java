@@ -31,8 +31,11 @@ import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.Constants;
+import net.c_kogyo.returnvisitorv5.activity.MapActivity;
 import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
 import net.c_kogyo.returnvisitorv5.data.Place;
+import net.c_kogyo.returnvisitorv5.data.list.PlaceList;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.service.FetchAddressIntentService;
 import net.c_kogyo.returnvisitorv5.util.ConfirmDialog;
 import net.c_kogyo.returnvisitorv5.util.InputUtil;
@@ -71,8 +74,13 @@ public class HousingComplexDialog extends DialogFragment {
         
     }
 
+    private RVDBHelper mDBHelper;
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+        mDBHelper = new RVDBHelper(getActivity());
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         initCommon();
@@ -82,8 +90,9 @@ public class HousingComplexDialog extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                RVData.getInstance().placeList.setOrAdd(mHousingComplex);
-                RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getActivity());
+                mDBHelper.save(mHousingComplex);
+                RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getActivity(),
+                        mDBHelper.loadRecordLaterThanTime(MapActivity.loadLastSyncTime(getActivity())));
 
                 if (mListener != null) {
                     mListener.onOkClick(mHousingComplex);
@@ -186,8 +195,9 @@ public class HousingComplexDialog extends DialogFragment {
             @Override
             public void onClick(View v) {
 
-                RVData.getInstance().placeList.setOrAdd(mHousingComplex);
-                RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getActivity());
+                mDBHelper.save(mHousingComplex);
+                RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getActivity(),
+                        mDBHelper.loadRecordLaterThanTime(MapActivity.loadLastSyncTime(getActivity())));
 
                 InputUtil.hideSoftKeyboard(getActivity());
 
@@ -244,7 +254,7 @@ public class HousingComplexDialog extends DialogFragment {
     private RoomListAdapter roomAdapter;
     private void initRoomAdapter() {
 
-        ArrayList<Place> roomList = RVData.getInstance().placeList.getRoomList(mHousingComplex.getId());
+        ArrayList<Place> roomList = PlaceList.getRoomList(mHousingComplex.getId(), mDBHelper);
         roomList.addAll(addedRooms);
         roomList.removeAll(removedRooms);
         roomAdapter = new RoomListAdapter(roomList);
@@ -313,19 +323,19 @@ public class HousingComplexDialog extends DialogFragment {
     private void confirmEdit() {
 
         mHousingComplex.setName(nameText.getText().toString());
-        ArrayList<Place> rooms = RVData.getInstance().placeList.getRoomList(mHousingComplex.getId());
+        ArrayList<Place> rooms = PlaceList.getRoomList(mHousingComplex.getId(), mDBHelper);
         for (Place room : rooms) {
             room.setAddress(mHousingComplex.getName());
         }
         for (Place room : addedRooms) {
             room.setAddress(mHousingComplex.getName());
         }
-        RVData.getInstance().placeList.setOrAdd(mHousingComplex);
-        RVData.getInstance().placeList.addList(addedRooms);
-        RVData.getInstance().placeList.removeList(removedRooms);
-        RVData.getInstance().saveData(getActivity());
 
-        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getActivity());
+        mDBHelper.save(mHousingComplex);
+        mDBHelper.saveList(addedRooms);
+        mDBHelper.saveAsDeletedRecords(removedRooms);
+        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getActivity(),
+                mDBHelper.loadRecordLaterThanTime(MapActivity.loadLastSyncTime(getActivity())));
     }
 
     private class RoomListAdapter extends BaseAdapter{
@@ -469,7 +479,7 @@ public class HousingComplexDialog extends DialogFragment {
             if (room != null) {
                 mRoom = room;
             }
-            marker.setBackgroundResource(Constants.buttonRes[mRoom.getPriority().num()]);
+            marker.setBackgroundResource(Constants.buttonRes[mRoom.getPriority(getActivity()).num()]);
             nameText.setText(mRoom.getName());
         }
     }

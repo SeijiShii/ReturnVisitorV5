@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 public class NoteCompList {
 
-    private static ArrayList<NoteCompItem> loadList(RVDBHelper helper) {
+    public static ArrayList<NoteCompItem> loadList(RVDBHelper helper) {
         ArrayList<NoteCompItem> itemList = new ArrayList<>();
         for (RVRecord record : helper.loadRecords(NoteCompItem.class)) {
             itemList.add(new Gson().fromJson(record.getDataJSON(), NoteCompItem.class));
@@ -22,13 +22,4 @@ public class NoteCompList {
         return itemList;
     }
 
-    static public void addIfNoSameName(String name, RVDBHelper helper) {
-
-        for (NoteCompItem item : loadList(helper)) {
-            if (item.getName().equals(name)) {
-                return;
-            }
-        }
-        helper.save(new NoteCompItem(name));
-    }
 }

@@ -1,12 +1,11 @@
 package net.c_kogyo.returnvisitorv5.data.list;
 
 import android.content.Context;
-import android.view.ViewDebug;
 
 import net.c_kogyo.returnvisitorv5.data.Placement;
 import net.c_kogyo.returnvisitorv5.data.Publication;
-import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -18,27 +17,29 @@ import java.util.Comparator;
  * Created by SeijiShii on 2017/05/23.
  */
 
-public class PublicationList extends DataList<Publication> {
-
-
-
+public class PublicationList {
 
     /**
      *
      * @return Weighted list
      */
-    private final long ONE_DAY = 1000 * 60 * 60 * 24;
-    private final long ONE_WEEK = ONE_DAY * 7;          // weight: 16
-    private final long ONE_MONTH = ONE_DAY * 30;        // weight: 8
-    private final long THREE_MONTH = ONE_MONTH * 3;     // weight: 4
-    private final long SIX_MONTH = ONE_MONTH * 6;       // weight: 2
-    private final long ONE_YEAR = ONE_MONTH * 12;       // weight: 1
-    private ArrayList<Publication> getRankedList(Calendar today) {
+    private static final long ONE_DAY = 1000 * 60 * 60 * 24;
+    private static final long ONE_WEEK = ONE_DAY * 7;          // weight: 16
+    private static final long ONE_MONTH = ONE_DAY * 30;        // weight: 8
+    private static final long THREE_MONTH = ONE_MONTH * 3;     // weight: 4
+    private static final long SIX_MONTH = ONE_MONTH * 6;       // weight: 2
+    private static final long ONE_YEAR = ONE_MONTH * 12;       // weight: 1
 
-        ArrayList<Publication> weightedList = new ArrayList<>(list);
+    private static ArrayList<Publication> loadList(RVDBHelper helper) {
+        return helper.loadList(Publication.class, false);
+    }
+
+    private static ArrayList<Publication> getRankedList(Calendar today, RVDBHelper helper) {
+
+        ArrayList<Publication> weightedList = new ArrayList<>(loadList(helper));
 
         // 重みづけをする
-        for (Visit visit : RVData.getInstance().visitList) {
+        for (Visit visit : VisitList.loadList(helper)) {
             long diff = today.getTimeInMillis() - visit.getDatetime().getTimeInMillis();
 
             for (Placement placement : visit.getAllPlacements()) {
@@ -75,13 +76,16 @@ public class PublicationList extends DataList<Publication> {
 
 
     // DONE: 2017/05/23 getSearchedAndRankedList
-    public ArrayList<Publication> getSearchedAndRankedList(Calendar today, String searchWord, Context context) {
+    public static ArrayList<Publication> getSearchedAndRankedList(Calendar today,
+                                                                  String searchWord,
+                                                                  Context context,
+                                                                  RVDBHelper helper) {
 
         if (searchWord.length() <= 0)
-            return getRankedList(today);
+            return getRankedList(today, helper);
 
         String[] searchedWords = searchWord.split(" ");
-        ArrayList<Publication> rankedList = new ArrayList<>(getRankedList(today));
+        ArrayList<Publication> rankedList = new ArrayList<>(getRankedList(today, helper));
         ArrayList<Publication> listToRemove = new ArrayList<>();
 
         for (Publication publication : rankedList) {
@@ -97,33 +101,29 @@ public class PublicationList extends DataList<Publication> {
         return rankedList;
     }
 
-    public Publication getCorrespondingData(Publication publication) {
-        if (indexOf(publication) < 0) {
+    public static  Publication getCorrespondingData(Publication publication, RVDBHelper helper) {
+        if (indexOf(publication, helper) < 0) {
             return publication;
         } else {
-            return get(indexOf(publication));
+            return loadList(helper).get(indexOf(publication, helper));
         }
     }
 
-    @Override
-    synchronized public void setOrAdd(Publication data) {
+    public static void addIfNotExits(Publication data, RVDBHelper helper) {
 
-        if (contains(data)) {
-//            list.set(indexOf(data), data);
-        } else {
-            list.add(data);
+        if (!contains(data, helper)) {
+            helper.save(data);
         }
     }
 
-    @Override
-    synchronized public boolean contains(Publication data) {
-        return indexOf(data) >= 0;
+    public static boolean contains(Publication data, RVDBHelper helper) {
+        return indexOf(data, helper) >= 0;
     }
 
 
-    @Override
-    public synchronized int indexOf(Publication data) {
+    public static int indexOf(Publication data, RVDBHelper helper) {
 
+        ArrayList<Publication> list = helper.loadList(Publication.class, false);
         for (int i = 0; i < list.size() ; i++ ) {
 
             Publication data1 = list.get(i);

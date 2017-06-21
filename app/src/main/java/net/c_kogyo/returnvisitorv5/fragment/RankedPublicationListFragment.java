@@ -18,6 +18,8 @@ import android.widget.TextView;
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.Placement;
 import net.c_kogyo.returnvisitorv5.data.Publication;
+import net.c_kogyo.returnvisitorv5.data.list.PublicationList;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -83,7 +85,10 @@ public class RankedPublicationListFragment extends Fragment {
 
     public void refreshList(String searchWord) {
         final ArrayList<Publication> rankedList
-                = RVData.getInstance().publicationList.getSearchedAndRankedList(Calendar.getInstance(), searchWord, getActivity());
+                = PublicationList.getSearchedAndRankedList(Calendar.getInstance(),
+                                                            searchWord,
+                                                            getActivity(),
+                                                            new RVDBHelper(getActivity()));
 
         ArrayAdapter<String> rankedListAdapter;
         ArrayList<String> rankedDataList = new ArrayList<>();

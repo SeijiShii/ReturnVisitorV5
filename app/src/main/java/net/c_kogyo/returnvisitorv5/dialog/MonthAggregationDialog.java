@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.AggregationOfMonth;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 
 import java.util.Calendar;
@@ -43,8 +44,13 @@ public class MonthAggregationDialog extends DialogFragment {
         return instance;
     }
 
+    private RVDBHelper mDBHelper;
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+        mDBHelper = new RVDBHelper(getActivity());
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         
         builder.setTitle(R.string.month_aggregation);
@@ -89,37 +95,37 @@ public class MonthAggregationDialog extends DialogFragment {
 
     private void initPlacementCountText() {
         TextView placementCountText = (TextView) view.findViewById(R.id.placement_count_text);
-        int plcCount = AggregationOfMonth.placementCount(mMonth);
+        int plcCount = AggregationOfMonth.placementCount(mMonth, mDBHelper);
         placementCountText.setText(String.valueOf(plcCount));
     }
 
     private void initVideoCountText() {
         TextView videoCountText = (TextView) view.findViewById(R.id.video_count_text);
-        int videoCount = AggregationOfMonth.showVideoCount(mMonth);
+        int videoCount = AggregationOfMonth.showVideoCount(mMonth, mDBHelper);
         videoCountText.setText(String.valueOf(videoCount));
     }
 
     private void initTimeText() {
         TextView timeText = (TextView) view.findViewById(R.id.time_text);
-        int time = AggregationOfMonth.hour(mMonth);
+        int time = AggregationOfMonth.hour(mMonth, mDBHelper);
         timeText.setText(String.valueOf(time));
     }
 
     private void initRVCountText() {
         TextView rvCountText = (TextView) view.findViewById(R.id.rv_count_text);
-        int rvCount = AggregationOfMonth.rvCount(mMonth);
+        int rvCount = AggregationOfMonth.rvCount(mMonth, mDBHelper);
         rvCountText.setText(String.valueOf(rvCount));
     }
 
     private void initStudyCountText() {
         TextView studyCountText = (TextView) view.findViewById(R.id.study_count_text);
-        int studyCount = AggregationOfMonth.bsCount(mMonth);
+        int studyCount = AggregationOfMonth.bsCount(mMonth, mDBHelper);
         studyCountText.setText(String.valueOf(studyCount));
     }
 
     private void initCarryOverText() {
         TextView carryOverTextView = (TextView) view.findViewById(R.id.carry_over_text);
-        long carryOver = AggregationOfMonth.getCarryOver(AggregationOfMonth.time(mMonth));
+        long carryOver = AggregationOfMonth.getCarryOver(AggregationOfMonth.time(mMonth, mDBHelper));
         int minute = (int)(carryOver / (60 * 1000));
 
         String carryOverText = getActivity().getString(R.string.carry_over, String.valueOf(minute));

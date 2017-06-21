@@ -3,6 +3,9 @@ package net.c_kogyo.returnvisitorv5.data;
 import android.content.Context;
 import android.support.annotation.Nullable;
 
+import net.c_kogyo.returnvisitorv5.data.list.PersonList;
+import net.c_kogyo.returnvisitorv5.data.list.VisitList;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
 
 import java.util.ArrayList;
@@ -99,7 +102,7 @@ public class VisitSuggestion {
                                                                     ArrayList<DismissedSuggestion> dismissedSuggestions,
                                                                     Context context) {
 
-        ArrayList<VisitSuggestion> suggestions = getSuggestionsByPriorities(filter.priorities);
+        ArrayList<VisitSuggestion> suggestions = getSuggestionsByPriorities(filter.priorities, new RVDBHelper(context));
 
         suggestions = filterSuggestionsByTag(filter.tagIds, suggestions);
         suggestions = filterSuggestionsByWords(filter.searchWords, suggestions, context);
@@ -117,16 +120,16 @@ public class VisitSuggestion {
         return suggestions;
     }
 
-    private static ArrayList<VisitSuggestion> getSuggestionsByPriority(Person.Priority priority) {
+    private static ArrayList<VisitSuggestion> getSuggestionsByPriority(Person.Priority priority, RVDBHelper helper) {
 
         ArrayList<VisitSuggestion> suggestions = new ArrayList<>();
 
         if (priority != Person.Priority.NOT_HOME) {
-            for (Person person : RVData.getInstance().personList) {
+            for (Person person : PersonList.loadList(helper)) {
 
                 if (person.getPriority() == priority) {
-                    Visit latestVisit = RVData.getInstance().visitList.getLatestVisitToPerson(person.getId());
-                    Visit latestSeenVisit = RVData.getInstance().visitList.getLatestVisitSeenToPerson(person.getId());
+                    Visit latestVisit = VisitList.getLatestVisitToPerson(person.getId(), helper);
+                    Visit latestSeenVisit = VisitList.getLatestVisitSeenToPerson(person.getId(), helper);
                     if (latestVisit != null) {
                         switch (priority) {
                             case HIGH:
@@ -180,7 +183,7 @@ public class VisitSuggestion {
                 }
             }
         } else {
-            for (Visit visit : RVData.getInstance().visitList.getAllNotHomeVisitsInOneMonth()) {
+            for (Visit visit : VisitList.getAllNotHomeVisitsInOneMonth(helper)) {
                 suggestions.add(new VisitSuggestion(null, visit, null));
             }
         }
@@ -188,7 +191,7 @@ public class VisitSuggestion {
         return suggestions;
     }
 
-    private static ArrayList<VisitSuggestion> getSuggestionsByPriorities(ArrayList<Person.Priority> priorities) {
+    private static ArrayList<VisitSuggestion> getSuggestionsByPriorities(ArrayList<Person.Priority> priorities, RVDBHelper helper) {
         ArrayList<Person.Priority> noDoubledPriorities = new ArrayList<>();
         for (Person.Priority priority : priorities) {
             if (!noDoubledPriorities.contains(priority)) {
@@ -198,7 +201,7 @@ public class VisitSuggestion {
 
         ArrayList<VisitSuggestion> suggestions = new ArrayList<>();
         for (Person.Priority priority : noDoubledPriorities) {
-            suggestions.addAll(getSuggestionsByPriority(priority));
+            suggestions.addAll(getSuggestionsByPriority(priority, helper));
         }
 
         Collections.sort(suggestions, new Comparator<VisitSuggestion>() {

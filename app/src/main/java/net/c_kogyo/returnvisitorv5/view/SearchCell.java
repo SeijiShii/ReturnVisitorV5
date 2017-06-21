@@ -73,13 +73,13 @@ public class SearchCell extends FrameLayout {
 
             switch (place.getCategory()) {
                 case HOUSE:
-                    marker.setBackgroundResource(Constants.markerRes[place.getPriority().num()]);
+                    marker.setBackgroundResource(Constants.markerRes[place.getPriority(getContext()).num()]);
                     break;
                 case ROOM:
-                    marker.setBackgroundResource(Constants.buttonRes[place.getPriority().num()]);
+                    marker.setBackgroundResource(Constants.buttonRes[place.getPriority(getContext()).num()]);
                     break;
                 case HOUSING_COMPLEX:
-                    marker.setBackgroundResource(Constants.complexRes[place.getPriority().num()]);
+                    marker.setBackgroundResource(Constants.complexRes[place.getPriority(getContext()).num()]);
                     break;
             }
 

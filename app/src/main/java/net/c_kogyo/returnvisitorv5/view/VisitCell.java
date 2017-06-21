@@ -18,9 +18,10 @@ import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.activity.MapActivity;
 import net.c_kogyo.returnvisitorv5.data.Place;
-import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
+import net.c_kogyo.returnvisitorv5.data.list.PlaceList;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.util.ConfirmDialog;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
@@ -117,7 +118,7 @@ public abstract class VisitCell extends BaseAnimateView {
     private void refreshHeaderText() {
 
         String text = "";
-        Place place = RVData.getInstance().placeList.getById(mVisit.getPlaceId());
+        Place place = PlaceList.loadPlace(mVisit.getPlaceId(), new RVDBHelper(getContext()));
 
         switch (mHeaderContent) {
             case PLACE_DATA:

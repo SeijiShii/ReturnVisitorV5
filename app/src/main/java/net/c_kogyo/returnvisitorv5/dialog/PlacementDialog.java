@@ -24,6 +24,8 @@ import android.widget.TextView;
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.Placement;
 import net.c_kogyo.returnvisitorv5.data.Publication;
+import net.c_kogyo.returnvisitorv5.data.list.PublicationList;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.fragment.DefaultPublicationListFragment;
 import net.c_kogyo.returnvisitorv5.fragment.RankedPublicationListFragment;
 import net.c_kogyo.returnvisitorv5.data.FragmentTitlePair;
@@ -75,9 +77,11 @@ public  class  PlacementDialog extends DialogFragment {
 //        return builder.create();
 //    }
 
+    private RVDBHelper mDBHelper;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        mDBHelper = new RVDBHelper(getActivity());
         return new Dialog(getActivity(), R.style.DialogNoTitle);
     }
 
@@ -192,9 +196,8 @@ public  class  PlacementDialog extends DialogFragment {
             public void onClick(View view) {
                 mPublication.setName(generalNameText.getText().toString());
 
-
-                RVData.getInstance().publicationList.setOrAdd(mPublication);
-                Publication publication = RVData.getInstance().publicationList.getCorrespondingData(mPublication);
+                PublicationList.addIfNotExits(mPublication, mDBHelper);
+                Publication publication = PublicationList.getCorrespondingData(mPublication, mDBHelper);
                 Placement placement = new Placement(publication, getActivity());
 
                 if (mListener != null) {
@@ -353,8 +356,8 @@ public  class  PlacementDialog extends DialogFragment {
                 mPublication.setNumber(numbers.get(numberSpinner.getSelectedItemPosition()).first);
                 mPublication.setName(magazineNameText.getText().toString());
 
-                RVData.getInstance().publicationList.setOrAdd(mPublication);
-                Publication publication = RVData.getInstance().publicationList.getCorrespondingData(mPublication);
+                PublicationList.addIfNotExits(mPublication, mDBHelper);
+                Publication publication = PublicationList.getCorrespondingData(mPublication, mDBHelper);
                 Placement placement = new Placement(publication, getActivity());
 
                 if (mListener != null) {

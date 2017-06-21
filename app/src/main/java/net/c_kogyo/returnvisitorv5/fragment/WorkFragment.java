@@ -16,11 +16,14 @@ import android.widget.ScrollView;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.Constants;
+import net.c_kogyo.returnvisitorv5.activity.MapActivity;
 import net.c_kogyo.returnvisitorv5.activity.RecordVisitActivity;
 import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
-import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.Work;
+import net.c_kogyo.returnvisitorv5.data.list.VisitList;
+import net.c_kogyo.returnvisitorv5.data.list.WorkList;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
@@ -46,6 +49,7 @@ public class WorkFragment extends Fragment {
     private static WorkFragmentListener mWorkFragmentListener;
     private int mVisitCellHeight;
     private Work mNewAddedWork;
+    private RVDBHelper mDBHelper;
 
     public static WorkFragment newInstance(Calendar date,
                                            @Nullable Work newAddedWork,
@@ -80,6 +84,7 @@ public class WorkFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
+        mDBHelper = new RVDBHelper(getActivity());
         setParcelableData();
 
         Log.d(TAG, "WorkFragment, onCreateView, mDate: " + DateTimeText.getDateTimeText(mDate, getContext()));
@@ -115,7 +120,7 @@ public class WorkFragment extends Fragment {
 
         String workId = intent.getStringExtra(Constants.WorkFragmentConstants.ADDED_WORK_ID);
         if (workId != null) {
-            Work work = RVData.getInstance().workList.getById(workId);
+            Work work = WorkList.loadWork(workId, mDBHelper);
             if (work != null) {
                 if (CalendarUtil.isSameDay(work.getStart(), mDate)) {
                     mNewAddedWork = work;
@@ -130,11 +135,11 @@ public class WorkFragment extends Fragment {
     private void initContainer() {
 
         container = (LinearLayout) view.findViewById(R.id.container);
-        ArrayList<Work> worksInDay = RVData.getInstance().workList.getWorksInDay(mDate);
+        ArrayList<Work> worksInDay =WorkList.getWorksInDay(mDate, mDBHelper);
 
         int visitCounter = 0;
         int workCounter = 0;
-        ArrayList<Visit> visitsInDayNotInWork = RVData.getInstance().visitList.getVisitsInDayNotInWork(mDate);
+        ArrayList<Visit> visitsInDayNotInWork = VisitList.getVisitsInDayNotInWork(mDate, mDBHelper);
 
         while (visitCounter < visitsInDayNotInWork.size() && workCounter < worksInDay.size()) {
 
@@ -195,9 +200,9 @@ public class WorkFragment extends Fragment {
 
                 container.removeView(visitCell1);
 
-                RVData.getInstance().visitList.deleteById(visitCell1.getVisit().getId());
-                RVData.getInstance().saveData(WorkFragment.this.getActivity());
-                RVCloudSync.getInstance().requestDataSyncIfLoggedIn(WorkFragment.this.getActivity());
+                mDBHelper.saveAsDeletedRecord(visitCell1.getVisit());
+                RVCloudSync.getInstance().requestDataSyncIfLoggedIn(WorkFragment.this.getActivity(),
+                        mDBHelper.loadRecordLaterThanTime(MapActivity.loadLastSyncTime(WorkFragment.this.getActivity())));
 
                 verifyItemRemains();
             }
@@ -260,17 +265,16 @@ public class WorkFragment extends Fragment {
                     @Override
                     public void onChangeTime(Work work, ArrayList<Visit> visitsAdded, ArrayList<Visit> visitsRemoved) {
                         // DONE: 2017/04/09 Adjust works action
-                        RVData.getInstance().workList.setOrAdd(work);
-                        ArrayList<Work> worksRemoved = RVData.getInstance().workList.onChangeTime(work);
+                        mDBHelper.save(work);
+                        ArrayList<Work> worksRemoved = WorkList.onChangeTime(work, mDBHelper);
                         removeWorkViews(worksRemoved);
-                        RVData.getInstance().workList.removeList(worksRemoved);
+                        mDBHelper.saveAsDeletedRecords(worksRemoved);
                         // DONE: 2017/04/08 Add or Remove visitCells action
                         removeVisitCells(visitsAdded);
                         addVisitCells(visitsRemoved);
 
-                        RVData.getInstance().saveData(getActivity());
-
-                        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getActivity());
+                        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getActivity(),
+                                mDBHelper.loadRecordLaterThanTime(MapActivity.loadLastSyncTime(getActivity())));
 
                     }
 
@@ -350,7 +354,7 @@ public class WorkFragment extends Fragment {
         VisitCell visitCell = generateVisitCell(visit, true);
         //WorkViewまたはcontainerの適切なほうに挿入する
 
-        Work work = RVData.getInstance().workList.getByVisit(visit);
+        Work work = WorkList.getByVisit(visit, mDBHelper);
         if (work != null) {
             WorkView workView = getWorkView(work.getId());
             if (workView != null) {
@@ -382,7 +386,7 @@ public class WorkFragment extends Fragment {
 
     @Nullable
     private Visit getVisit(String visitId) {
-        for (Visit visit : RVData.getInstance().visitList.getVisitsInDayNotInWork(mDate)) {
+        for (Visit visit : VisitList.getVisitsInDayNotInWork(mDate, mDBHelper)) {
             if (visit.getId().equals(visitId)) {
                 return visit;
             }
@@ -415,7 +419,7 @@ public class WorkFragment extends Fragment {
                 String visitId = data.getStringExtra(Visit.VISIT);
                 if (visitId == null) return;
 
-                Visit visit = RVData.getInstance().visitList.getById(visitId);
+                Visit visit = VisitList.loadVisit(visitId, mDBHelper);
                 if (visit == null) return;
 
                 // VisitCellの時間を変化させたときに適正なポジションにあるかどうかをVerifyする必要あり
@@ -435,7 +439,7 @@ public class WorkFragment extends Fragment {
                 // 追加されたのはWorkかVisitか
                 String workId = data.getStringExtra(Work.WORK);
                 if (workId != null) {
-                    Work work = RVData.getInstance().workList.getById(workId);
+                    Work work = WorkList.loadWork(workId, mDBHelper);
                     if (work != null) {
                         addWorkViewAndExtract(work);
                     }
@@ -443,7 +447,7 @@ public class WorkFragment extends Fragment {
 
                 String visitId = data.getStringExtra(Visit.VISIT);
                 if (visitId != null) {
-                    Visit visit = RVData.getInstance().visitList.getById(visitId);
+                    Visit visit = VisitList.loadVisit(visitId, mDBHelper);
                     if (visit != null) {
                         insertVisitCellAndExtract(visit);
                     }
@@ -598,7 +602,7 @@ public class WorkFragment extends Fragment {
     private void moveVisitCellsInRemoveWorkView(Work work) {
         // DONE: 2017/04/15  削除したWork内のVisitを付け替える
 
-        addVisitCells(RVData.getInstance().visitList.getVisitsInWork(work));
+        addVisitCells(VisitList.getVisitsInWork(work, mDBHelper));
     }
 
     public void removeWorkViews(ArrayList<Work> works) {
@@ -653,7 +657,7 @@ public class WorkFragment extends Fragment {
 
     public void insertVisitCell(Visit visit) {
         // DONE: 2017/05/09  insertVisitCell
-        Work work = RVData.getInstance().workList.getByVisit(visit);
+        Work work = WorkList.getByVisit(visit, mDBHelper);
         if (work != null) {
             WorkView workView = getWorkView(work.getId());
             if (workView != null) {

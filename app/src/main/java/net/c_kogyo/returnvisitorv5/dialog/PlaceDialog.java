@@ -18,15 +18,19 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import net.c_kogyo.returnvisitorv5.R;
+import net.c_kogyo.returnvisitorv5.activity.MapActivity;
 import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
 import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.Visit;
+import net.c_kogyo.returnvisitorv5.data.list.VisitList;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 import net.c_kogyo.returnvisitorv5.view.BaseAnimateView;
 import net.c_kogyo.returnvisitorv5.view.PlaceCell;
 import net.c_kogyo.returnvisitorv5.view.VisitCell;
 
+import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -50,8 +54,12 @@ public class PlaceDialog extends DialogFragment {
         return instance;
     }
 
+    private RVDBHelper mDBHelper;
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+        mDBHelper = new RVDBHelper(getActivity());
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         
@@ -77,8 +85,6 @@ public class PlaceDialog extends DialogFragment {
         });
 
         return builder.create();
-        
-        
     }
 
     private View view;
@@ -166,19 +172,21 @@ public class PlaceDialog extends DialogFragment {
     private class VisitListAdapter extends BaseAdapter {
 
         int initialHeight;
+        ArrayList<Visit> visits;
         VisitListAdapter() {
+            visits = VisitList.getVisitsForPlace(mPlace.getId(), mDBHelper);
             initialHeight = getActivity().getResources().getDimensionPixelSize(R.dimen.ui_height_small)
                     + (int)(getActivity().getResources().getDisplayMetrics().density * 5);
         }
 
         @Override
         public int getCount() {
-            return RVData.getInstance().visitList.getVisitsForPlace(mPlace.getId()).size();
+            return visits.size();
         }
 
         @Override
         public Object getItem(int i) {
-            return RVData.getInstance().visitList.getVisitsForPlace(mPlace.getId()).get(i);
+            return visits.get(i);
         }
 
         @Override
@@ -197,12 +205,12 @@ public class PlaceDialog extends DialogFragment {
                             @Override
                             public void postCompressVisitCell(VisitCell visitCell) {
 
-                                RVData.getInstance().visitList.deleteById(visitCell.getVisit().getId());
-                                RVData.getInstance().saveData(getActivity());
+                                mDBHelper.saveAsDeletedRecord(visitCell.getVisit());
                                 notifyDataSetChanged();
 
-                                RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getActivity());
-                                // TODO: 2017/06/14 訪問削除時の処理
+                                RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getActivity(),
+                                        mDBHelper.loadRecordLaterThanTime(MapActivity.loadLastSyncTime(getActivity())));
+                                // DONE: 2017/06/14 訪問削除時の処理
                                 // マーカーを更新するためにMapActivityに知らせる。
                                 if (mListener != null) {
                                     mListener.onDeleteVisit(mPlace, visitCell.getVisit());

@@ -54,6 +54,8 @@ import net.c_kogyo.returnvisitorv5.data.PlaceMarkers;
 import net.c_kogyo.returnvisitorv5.data.RVRecord;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.Work;
+import net.c_kogyo.returnvisitorv5.data.list.PlaceList;
+import net.c_kogyo.returnvisitorv5.data.list.VisitList;
 import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.dialog.AddWorkDialog;
 import net.c_kogyo.returnvisitorv5.dialog.HousingComplexDialog;
@@ -167,7 +169,7 @@ public class MapActivity extends AppCompatActivity
         return prefs.getLong(LAST_DEVICE_SYNC_TIME, 0);
     }
 
-    private boolean isDataLoaded = false;
+//    private boolean isDataLoaded = false;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -200,6 +202,8 @@ public class MapActivity extends AppCompatActivity
 
     public static final String MY_LOCATION_TAG = "my_location";
     private GoogleMap mMap;
+    private PlaceMarkers placeMarkers;
+
     @Override
     public void onMapReady(GoogleMap map) {
 
@@ -232,51 +236,52 @@ public class MapActivity extends AppCompatActivity
 
         loadCameraPosition();
 
-        waitForDataLoadedAndRefreshUI();
+//        waitForDataLoadedAndRefreshUI();
+
+        mMap.setOnMapLongClickListener(MapActivity.this);
+        mMap.setOnMarkerClickListener(MapActivity.this);
+        mMap.setOnMarkerDragListener(MapActivity.this);
+
+        // DONE: 2017/03/01 ここにマーカー描画処理を記述する
+        if (placeMarkers == null) {
+            placeMarkers = new PlaceMarkers(mMap, MapActivity.this);
+        } else {
+            placeMarkers.drawAllMarkers(MapActivity.this);
+        }
+
+//        refreshLogoButton();
+        refreshWorkButton();
+        refreshCalendarButton();
+        enableWaitScreen(false);
     }
 
-    private PlaceMarkers placeMarkers;
-    private void waitForDataLoadedAndRefreshUI() {
-        
-        final Handler handler = new Handler();
-        
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                
-                while (!isDataLoaded) {
-                    try {
-                        Thread.sleep(50);
-                    } catch (InterruptedException e) {
-                        //
-                    }
-                }
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        mMap.setOnMapLongClickListener(MapActivity.this);
-                        mMap.setOnMarkerClickListener(MapActivity.this);
-                        mMap.setOnMarkerDragListener(MapActivity.this);
-
-                        // DONE: 2017/03/01 ここにマーカー描画処理を記述する
-                        if (placeMarkers == null) {
-                            placeMarkers = new PlaceMarkers(mMap);
-                        } else {
-                            placeMarkers.drawAllMarkers();
-                        }
-
-                        refreshLogoButton();
-                        refreshWorkButton();
-                        refreshCalendarButton();
-                        enableWaitScreen(false);
-                    }
-                });
-                
-            }
-        }).start();
-        
-    }
+//    private void waitForDataLoadedAndRefreshUI() {
+//
+//        final Handler handler = new Handler();
+//
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//
+//                while (!isDataLoaded) {
+//                    try {
+//                        Thread.sleep(50);
+//                    } catch (InterruptedException e) {
+//                        //
+//                    }
+//                }
+//                handler.post(new Runnable() {
+//                    @Override
+//                    public void run() {
+//
+//
+//                    }
+//                });
+//
+//            }
+//        }).start();
+//
+//    }
 
     @Override
     protected void onStart() {
@@ -401,7 +406,7 @@ public class MapActivity extends AppCompatActivity
 
         if (placeId == null) return;
 
-        final Place place = mDBHelper.loadPlace(placeId);
+        final Place place = PlaceList.loadPlace(placeId, mDBHelper);
 
         if (place == null) return;
 
@@ -492,7 +497,7 @@ public class MapActivity extends AppCompatActivity
     private void showMapLongClickPopup(final LatLng latLng) {
 
         final Place tmpPlace = new Place(latLng, Place.Category.HOUSE);
-        placeMarkers.addMarker(tmpPlace);
+        placeMarkers.addMarker(tmpPlace, this);
 
         final PopupWindow popupWindow = new PopupWindow(this);
 
@@ -602,27 +607,27 @@ public class MapActivity extends AppCompatActivity
                 || resultCode == VISIT_EDITED_RESULT_CODE) {
             String visitId = data.getStringExtra(VISIT);
             if (visitId != null) {
-                Visit visit = mDBHelper.loadVisit(visitId);
+                Visit visit = VisitList.loadVisit(visitId, mDBHelper);
                 if (visit != null) {
                     String placeId = visit.getPlaceId();
-                    Place place = mDBHelper.loadPlace(placeId);
+                    Place place = PlaceList.loadPlace(placeId, mDBHelper);
                     if (place != null) {
                         if (resultCode == PLACE_ADDED_RESULT_CODE) {
                             // 新しい場所の追加である
                             if (place.getCategory() == Place.Category.HOUSE) {
                                 // 新しい家なのでマーカーを追加
-                                placeMarkers.addMarker(place);
+                                placeMarkers.addMarker(place, this);
                             } else if (place.getCategory() == Place.Category.ROOM) {
                                 // 新しい場所だが、部屋なのでアパートを更新
                                 String parentId = place.getParentId();
-                                Place parent = mDBHelper.loadPlace(parentId);
+                                Place parent = PlaceList.loadPlace(parentId, mDBHelper);
                                 if (parent != null) {
-                                    placeMarkers.refreshMarker(parent);
+                                    placeMarkers.refreshMarker(parent, this);
                                 }
                             }
                         } else {
                             // 訪問の編集、または既にある場所に訪問を追加した
-                            placeMarkers.refreshMarker(place);
+                            placeMarkers.refreshMarker(place, this);
                         }
                     }
                 }
@@ -633,38 +638,38 @@ public class MapActivity extends AppCompatActivity
     private ImageView logoButton;
     private void initLogoButton() {
         logoButton = (ImageView) findViewById(R.id.logo_button);
-        refreshLogoButton();
+//        refreshLogoButton();
     }
 
     // DONE: 2017/05/06 データ読み込み前は半透明に
-    private void refreshLogoButton() {
-
-        float originAlpha, targetAlpha;
-
-        if (!isDataLoaded) {
-            originAlpha = 1f;
-            targetAlpha = 0.5f;
-            ViewUtil.setOnClickListener(logoButton, null);
-        } else {
-            originAlpha = 0.5f;
-            targetAlpha = 1f;
-            ViewUtil.setOnClickListener(logoButton, new ViewUtil.OnViewClickListener() {
-                @Override
-                public void onViewClick(View v) {
-                    openCloseDrawer();
-                }
-            });
-        }
-        ValueAnimator animator = ValueAnimator.ofFloat(originAlpha, targetAlpha);
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                logoButton.setAlpha((float) animation.getAnimatedValue());
-            }
-        });
-        animator.setDuration(300);
-        animator.start();
-    }
+//    private void refreshLogoButton() {
+//
+//        float originAlpha, targetAlpha;
+//
+//        if (!isDataLoaded) {
+//            originAlpha = 1f;
+//            targetAlpha = 0.5f;
+//            ViewUtil.setOnClickListener(logoButton, null);
+//        } else {
+//            originAlpha = 0.5f;
+//            targetAlpha = 1f;
+//            ViewUtil.setOnClickListener(logoButton, new ViewUtil.OnViewClickListener() {
+//                @Override
+//                public void onViewClick(View v) {
+//                    openCloseDrawer();
+//                }
+//            });
+//        }
+//        ValueAnimator animator = ValueAnimator.ofFloat(originAlpha, targetAlpha);
+//        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+//            @Override
+//            public void onAnimationUpdate(ValueAnimator animation) {
+//                logoButton.setAlpha((float) animation.getAnimatedValue());
+//            }
+//        });
+//        animator.setDuration(300);
+//        animator.start();
+//    }
 
     private void showPlaceDialog(Place place) {
 
@@ -711,7 +716,7 @@ public class MapActivity extends AppCompatActivity
 
                             @Override
                             public void onDeleteVisit(Place place, Visit visit) {
-                                placeMarkers.refreshMarker(place);
+                                placeMarkers.refreshMarker(place, MapActivity.this);
                             }
                         }).show(getFragmentManager(), null);
 
@@ -762,7 +767,7 @@ public class MapActivity extends AppCompatActivity
                     @Override
                     public void onOkClick(Place housingComplex) {
 
-                        placeMarkers.refreshMarker(housingComplex);
+                        placeMarkers.refreshMarker(housingComplex, MapActivity.this);
                     }
 
                     @Override
@@ -780,7 +785,7 @@ public class MapActivity extends AppCompatActivity
                         if (housingComplex.getChildCount(MapActivity.this) == 0) {
                             placeMarkers.removeByPlace(housingComplex);
                         } else {
-                            placeMarkers.refreshMarker(housingComplex);
+                            placeMarkers.refreshMarker(housingComplex, MapActivity.this);
                         }
                         InputUtil.hideSoftKeyboard(MapActivity.this);
                     }
@@ -793,7 +798,7 @@ public class MapActivity extends AppCompatActivity
 
         Visit visit;
 
-        Visit lastVisit = mDBHelper.getLatestVisitToPlace(place.getId());
+        Visit lastVisit = VisitList.getLatestVisitToPlace(place.getId(), mDBHelper);
 
         if (lastVisit == null) {
             visit = new Visit(place);
@@ -807,7 +812,7 @@ public class MapActivity extends AppCompatActivity
         RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this,
                 mDBHelper.loadRecordLaterThanTime(loadLastSyncTime(this)));
 
-        placeMarkers.addMarker(place);
+        placeMarkers.addMarker(place, this);
 
         if (place.needsAddressRequest()) {
             FetchAddressIntentService.inquireAddress(place, this);
@@ -1050,7 +1055,7 @@ public class MapActivity extends AppCompatActivity
                String placeId = intent.getStringExtra(PLACE);
                if (placeId == null) return;
 
-               Place place = mDBHelper.loadPlace(placeId);
+               Place place = PlaceList.loadPlace(placeId, mDBHelper);
 
                if (place == null) return;
 
@@ -1468,9 +1473,9 @@ public class MapActivity extends AppCompatActivity
 
                 saveLastSyncTime();
                 if (placeMarkers == null) {
-                    placeMarkers = new PlaceMarkers(mMap);
+                    placeMarkers = new PlaceMarkers(mMap, MapActivity.this);
                 } else {
-                    placeMarkers.drawAllMarkers();
+                    placeMarkers.drawAllMarkers(MapActivity.this);
                 }
                 postRequestResult(responseBody);
             }
@@ -1581,7 +1586,7 @@ public class MapActivity extends AppCompatActivity
             @Override
             public void onClickShowPersonInMap(final Person person) {
 
-                ArrayList<Place> places = mDBHelper.getPlaceListByPerson(person);
+                ArrayList<Place> places = PlaceList.getListByPerson(person, mDBHelper);
                 if (places.size() > 0) {
                     Place place = places.get(0);
                     showDialogFitToPlace(place);
@@ -1651,7 +1656,7 @@ public class MapActivity extends AppCompatActivity
                 showHousingComplexDialog(place);
                 break;
             case ROOM:
-                Place parent = mDBHelper.loadPlace(place.getParentId());
+                Place parent = PlaceList.loadPlace(place.getParentId(), mDBHelper);
                 if (parent != null) {
                     showHousingComplexDialog(parent);
                 } else {

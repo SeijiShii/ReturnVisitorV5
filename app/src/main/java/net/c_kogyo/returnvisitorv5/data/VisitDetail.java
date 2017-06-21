@@ -3,6 +3,10 @@ package net.c_kogyo.returnvisitorv5.data;
 import android.content.Context;
 
 import net.c_kogyo.returnvisitorv5.R;
+import net.c_kogyo.returnvisitorv5.data.list.PersonList;
+import net.c_kogyo.returnvisitorv5.data.list.TagList;
+import net.c_kogyo.returnvisitorv5.data.list.VisitList;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -153,9 +157,9 @@ public class VisitDetail extends DataItem  implements Cloneable{
 //        return object;
 //    }
 
-    public String getPersonData(Context context) {
+    public String getPersonData(Context context, RVDBHelper helper) {
 
-        Person person = RVData.getInstance().personList.getById(personId);
+        Person person = PersonList.loadPerson(personId, helper);
 
         if (person == null) {
             return null;
@@ -165,23 +169,18 @@ public class VisitDetail extends DataItem  implements Cloneable{
     }
 
     public void setIsRv(boolean isRv) {
-        this.isRV = isRv;
-        onUpdate();
-    }
+        this.isRV = isRv;    }
 
     public void setIsStudy(boolean isStudy) {
         this.isStudy = isStudy;
-        onUpdate();
     }
 
     public void setSeen(boolean seen) {
         this.seen = seen;
-        onUpdate();
     }
 
     public void setPriority(Person.Priority priority) {
         this.priority = priority;
-        onUpdate();
     }
 
     public Person.Priority getPriority() {
@@ -218,10 +217,11 @@ public class VisitDetail extends DataItem  implements Cloneable{
 
     public void setPlaceId(String placeId) {
         this.placeId = placeId;
-        onUpdate();
     }
 
     public String toString(Context context, int indents, boolean withTags) {
+
+        RVDBHelper helper = new RVDBHelper(context);
 
         StringBuilder builder0 = new StringBuilder();
         for (int i = 0 ; i < indents ; i++) {
@@ -231,7 +231,7 @@ public class VisitDetail extends DataItem  implements Cloneable{
 
         StringBuilder builder = new StringBuilder();
 
-        Person person = RVData.getInstance().personList.getById(personId);
+        Person person = PersonList.loadPerson(personId, helper);
         if (person != null) {
             builder.append(spaces).append(person.toString(context));
             builder.append("\n").append(spaces).append(context.getResources().getStringArray(R.array.priority_array)[getPriority().num()]);
@@ -257,7 +257,7 @@ public class VisitDetail extends DataItem  implements Cloneable{
             if (tagIds.size() > 0 ) {
                 builder.append("\n").append(context.getString(R.string.tag)).append(":");
                 for (String id : tagIds) {
-                    Tag tag = RVData.getInstance().tagList.getById(id);
+                    Tag tag = TagList.loadTag(id, helper);
                     if (tag != null) {
                         builder.append(" ").append(tag.getName());
                     }
@@ -330,11 +330,11 @@ public class VisitDetail extends DataItem  implements Cloneable{
         return count;
     }
 
-    public boolean belongsToMultiplePlace() {
+    public boolean belongsToMultiplePlace(RVDBHelper helper) {
 
         ArrayList<String> placeIds = new ArrayList<>();
 
-        for (Visit visit : RVData.getInstance().visitList.getList()) {
+        for (Visit visit : VisitList.loadList(helper)) {
             for (VisitDetail visitDetail : visit.getVisitDetails()) {
                 if (visitDetail.personId.equals(this.personId)) {
                     if (!placeIds.contains(visit.getPlaceId()) && !visit.getPlaceId().equals("")) {

@@ -17,9 +17,12 @@ import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.Constants;
+import net.c_kogyo.returnvisitorv5.activity.MapActivity;
 import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
 import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Place;
+import net.c_kogyo.returnvisitorv5.data.list.PersonList;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.util.ConfirmDialog;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 
@@ -32,6 +35,7 @@ public class PlaceCell extends BaseAnimateView {
     private Place mPlace;
     private PlaceCellListener mListener;
     private boolean mTransparent;
+    private RVDBHelper mDBHelper;
 
     @Override
     public void setLayoutParams(BaseAnimateView view) {
@@ -49,6 +53,7 @@ public class PlaceCell extends BaseAnimateView {
         mTransparent = transParent;
         mPlace = place;
         mListener = listener;
+        mDBHelper = new RVDBHelper(context);
 
         initCommon();
     }
@@ -137,13 +142,13 @@ public class PlaceCell extends BaseAnimateView {
     private void updateMarker() {
         switch (mPlace.getCategory()) {
             case HOUSE:
-                marker.setBackgroundResource(Constants.markerRes[mPlace.getPriority().num()]);
+                marker.setBackgroundResource(Constants.markerRes[mPlace.getPriority(getContext()).num()]);
                 break;
             case ROOM:
-                marker.setBackgroundResource(Constants.buttonRes[mPlace.getPriority().num()]);
+                marker.setBackgroundResource(Constants.buttonRes[mPlace.getPriority(getContext()).num()]);
                 break;
             case HOUSING_COMPLEX:
-                marker.setBackgroundResource(Constants.complexRes[mPlace.getPriority().num()]);
+                marker.setBackgroundResource(Constants.complexRes[mPlace.getPriority(getContext()).num()]);
                 break;
         }
     }
@@ -163,10 +168,10 @@ public class PlaceCell extends BaseAnimateView {
         boolean prioritiesChanged = false;
 
         personContainer.removeAllViews();
-        for (Person person : RVData.getInstance().personList.getPersonsInPlace(mPlace)) {
-            boolean changed = person.setPriorityFromLatestVisitDetail();
+        for (Person person : PersonList.getPersonsInPlace(mPlace, mDBHelper)) {
+            boolean changed = person.setPriorityFromLatestVisitDetail(mDBHelper);
             if (changed) {
-                RVData.getInstance().personList.setOrAdd(person);
+                mDBHelper.save(person);
                 prioritiesChanged = true;
             }
             personContainer.addView(generatePersonCell(person));
@@ -174,8 +179,8 @@ public class PlaceCell extends BaseAnimateView {
         // 訪問削除時に人優先度を変更したら保存しなくてはならない。
         // 変更になっていないとき保存が起動すると無駄なのでチェック
         if (prioritiesChanged) {
-            RVData.getInstance().saveData(getContext());
-            RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getContext());
+            RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getContext(),
+                    mDBHelper.loadRecordLaterThanTime(MapActivity.loadLastSyncTime(getContext())));
         }
     }
 
@@ -184,9 +189,9 @@ public class PlaceCell extends BaseAnimateView {
             @Override
             public void onClickDelete(Person person) {
                 removePersonCell(person);
-                RVData.getInstance().personList.deleteById(person.getId());
-                RVData.getInstance().saveData(getContext());
-                RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getContext());
+                mDBHelper.saveAsDeletedRecord(person);
+                RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getContext(),
+                        mDBHelper.loadRecordLaterThanTime(MapActivity.loadLastSyncTime(getContext())));
             }
 
             @Override

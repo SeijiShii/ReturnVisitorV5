@@ -1,5 +1,6 @@
 package net.c_kogyo.returnvisitorv5.data;
 
+import android.content.Context;
 import android.support.annotation.Nullable;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -8,6 +9,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import net.c_kogyo.returnvisitorv5.Constants;
+import net.c_kogyo.returnvisitorv5.data.list.PlaceList;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 
 import java.util.ArrayList;
 
@@ -31,15 +34,17 @@ public class PlaceMarkers {
 
     private ArrayList<PlaceMarker> markers;
     private GoogleMap mMap;
+    private RVDBHelper mDBHelper;
 
-    public PlaceMarkers(GoogleMap map) {
+    public PlaceMarkers(GoogleMap map, Context context) {
 
         this.mMap = map;
+        this.mDBHelper = new RVDBHelper(context);
 
-        drawAllMarkers();
+        drawAllMarkers(context);
     }
 
-    synchronized public void drawAllMarkers() {
+    synchronized public void drawAllMarkers(Context context) {
 
         if (this.markers != null) {
             for (PlaceMarker marker : this.markers) {
@@ -49,15 +54,15 @@ public class PlaceMarkers {
 
         this.markers = new ArrayList<>();
 
-        for (Place place : RVData.getInstance().placeList) {
+        for (Place place : PlaceList.loadList(mDBHelper)) {
 
             if (place.getCategory() != Place.Category.ROOM) {
-                addMarker(place);
+                addMarker(place, context);
             }
         }
     }
 
-    synchronized public void addMarker(Place place) {
+    synchronized public void addMarker(Place place, Context context) {
 
         if (place.getCategory() == Place.Category.ROOM)
             return;
@@ -66,25 +71,25 @@ public class PlaceMarkers {
                 .position(place.getLatLng())
                 .draggable(true);
         if (place.getCategory() == Place.Category.HOUSE) {
-            options.icon(BitmapDescriptorFactory.fromResource(Constants.markerRes[place.getPriority().num()]));
+            options.icon(BitmapDescriptorFactory.fromResource(Constants.markerRes[place.getPriority(context).num()]));
         } else if (place.getCategory() == Place.Category.HOUSING_COMPLEX) {
-            options.icon(BitmapDescriptorFactory.fromResource(Constants.complexRes[place.getPriority().num()]));
+            options.icon(BitmapDescriptorFactory.fromResource(Constants.complexRes[place.getPriority(context).num()]));
         }
 
         Marker marker = mMap.addMarker(options);
         markers.add(new PlaceMarker(place.getId(), marker));
     }
 
-    synchronized public void refreshMarker(Place place) {
+    synchronized public void refreshMarker(Place place, Context context) {
         PlaceMarker marker = getPlaceMarkerByPlace(place);
         if (marker != null) {
             if (place.getCategory() == Place.Category.HOUSE) {
-                marker.marker.setIcon(BitmapDescriptorFactory.fromResource(Constants.markerRes[place.getPriority().num()]));
+                marker.marker.setIcon(BitmapDescriptorFactory.fromResource(Constants.markerRes[place.getPriority(context).num()]));
             } else if (place.getCategory() == Place.Category.HOUSING_COMPLEX) {
-                marker.marker.setIcon(BitmapDescriptorFactory.fromResource(Constants.complexRes[place.getPriority().num()]));
+                marker.marker.setIcon(BitmapDescriptorFactory.fromResource(Constants.complexRes[place.getPriority(context).num()]));
             }
         } else {
-            addMarker(place);
+            addMarker(place, context);
         }
     }
 
@@ -102,7 +107,7 @@ public class PlaceMarkers {
 
         for (PlaceMarker placeMarker : markers) {
             if (placeMarker.marker.equals(marker)) {
-                return  RVData.getInstance().placeList.getById(placeMarker.placeId);
+                return  PlaceList.loadPlace(placeMarker.placeId, mDBHelper);
             }
         }
         return null;
@@ -116,17 +121,17 @@ public class PlaceMarkers {
         markers.remove(marker);
     }
 
-    public static Marker addSingleMarker(Place place, GoogleMap map) {
+    public static Marker addSingleMarker(Place place, GoogleMap map, Context context) {
 
         MarkerOptions options = new MarkerOptions()
                 .position(place.getLatLng())
                 .draggable(false);
         if (place.getCategory() == Place.Category.HOUSE) {
-            options.icon(BitmapDescriptorFactory.fromResource(Constants.markerRes[place.getPriority().num()]));
+            options.icon(BitmapDescriptorFactory.fromResource(Constants.markerRes[place.getPriority(context).num()]));
         } else if (place.getCategory() == Place.Category.HOUSING_COMPLEX) {
-            options.icon(BitmapDescriptorFactory.fromResource(Constants.complexRes[place.getPriority().num()]));
+            options.icon(BitmapDescriptorFactory.fromResource(Constants.complexRes[place.getPriority(context).num()]));
         } else if (place.getCategory() == Place.Category.ROOM) {
-            options.icon(BitmapDescriptorFactory.fromResource(Constants.buttonRes[place.getPriority().num()]));
+            options.icon(BitmapDescriptorFactory.fromResource(Constants.buttonRes[place.getPriority(context).num()]));
         }
 
         return map.addMarker(options);
