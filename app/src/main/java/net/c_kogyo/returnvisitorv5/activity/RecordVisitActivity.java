@@ -30,9 +30,9 @@ import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.Placement;
 import net.c_kogyo.returnvisitorv5.data.Publication;
-import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.dialog.AddPersonDialog;
 import net.c_kogyo.returnvisitorv5.dialog.HousingComplexDialog;
 import net.c_kogyo.returnvisitorv5.dialog.PersonDialog;
@@ -76,11 +76,13 @@ public class RecordVisitActivity extends AppCompatActivity {
     private ArrayList<Person> mAddedPersons;
     private ArrayList<Person> mRemovedPersons;
 
-    private ArrayList<Publication> mAddedPublications;
+    private RVDBHelper mDBHelper;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mDBHelper = new RVDBHelper(this);
 
         initData();
         initBroadcastManager();
@@ -114,7 +116,6 @@ public class RecordVisitActivity extends AppCompatActivity {
 
         mAddedPersons = new ArrayList<>();
         mRemovedPersons = new ArrayList<>();
-        mAddedPublications = new ArrayList<>();
 
         Intent intent = getIntent();
         switch (intent.getAction()) {
@@ -132,8 +133,11 @@ public class RecordVisitActivity extends AppCompatActivity {
             case EDIT_VISIT_ACTION:
                 String visitId = intent.getStringExtra(VISIT);
 
-                Visit visit = RVData.getInstance().visitList.getById(visitId);
-                Place place = RVData.getInstance().placeList.getById(visit.getPlaceId());
+                Visit visit = mDBHelper.loadVisit(visitId);
+                Place place = null;
+                if (visit != null) {
+                    place = mDBHelper.loadPlace(visit.getPlaceId());
+                }
 
                 try {
                     mVisit = (Visit) visit.clone();
@@ -149,14 +153,15 @@ public class RecordVisitActivity extends AppCompatActivity {
                 break;
             case NEW_VISIT_ACTION_WITH_PLACE:
                 String placeId = intent.getStringExtra(PLACE);
-                Place place1 = RVData.getInstance().placeList.getById(placeId);
+                Place place1 = mDBHelper.loadPlace(placeId);
+
                 try {
                     mPlace = (Place) place1.clone();
                 } catch (CloneNotSupportedException e) {
                     e.printStackTrace();
                 }
 
-                Visit lastVisit = RVData.getInstance().visitList.getLatestVisitToPlace(placeId);
+                Visit lastVisit = mDBHelper.getLatestVisitToPlace(placeId);
                 if (lastVisit != null) {
                     mVisit = new Visit(lastVisit);
                 } else {
@@ -369,7 +374,7 @@ public class RecordVisitActivity extends AppCompatActivity {
     private void initVisitDetailFrame() {
         visitDetailFrame = (LinearLayout) findViewById(R.id.visit_detail_frame);
         for (VisitDetail visitDetail : mVisit.getVisitDetails()) {
-            Person person = RVData.getInstance().personList.getById(visitDetail.getPersonId());
+            Person person = mDBHelper.loadPerson(visitDetail.getPersonId());
             if (person != null) {
                 addVisitDetailView(visitDetail,
                         person,
@@ -425,9 +430,9 @@ public class RecordVisitActivity extends AppCompatActivity {
 
                     @Override
                     public void postDeletePerson(Person person) {
-                        RVData.getInstance().personList.deleteById(person.getId());
-                        RVData.getInstance().saveData(RecordVisitActivity.this);
-                        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(RecordVisitActivity.this);
+                        mDBHelper.saveAsDeletedRecord(person);
+                        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(RecordVisitActivity.this,
+                                mDBHelper.loadRecordLaterThanTime(MapActivity.loadLastSyncTime(RecordVisitActivity.this)));
                     }
                 });
         visitDetailFrame.addView(detailView);
@@ -502,22 +507,19 @@ public class RecordVisitActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                mVisit.onUpdate();
-
-                RVData.getInstance().visitList.setOrAdd(mVisit);
-                RVData.getInstance().personList.addList(mAddedPersons);
-                RVData.getInstance().personList.removeList(mRemovedPersons);
+                mDBHelper.save(mVisit);
+                mDBHelper.saveList(mAddedPersons);
+                mDBHelper.saveAsDeletedRecords(mRemovedPersons);
 
                 if (mPlace != null) {
                     mPlace.setName(placeNameText.getText());
-                    mPlace.onUpdate();
-                    RVData.getInstance().placeList.setOrAdd(mPlace);
+                    mDBHelper.save(mPlace);
                 }
 
                 // PENDING: 2017/03/08 要動作検証 noteがAutoCompListについかされたかどうか
 
                 for (VisitDetail visitDetail : mVisit.getVisitDetails()) {
-                    RVData.getInstance().noteCompList.addIfNoSameName(visitDetail.getNote());
+                    mDBHelper.addIfNoSameName(visitDetail.getNote());
                 }
 
                 switch (getIntent().getAction()) {
@@ -548,9 +550,8 @@ public class RecordVisitActivity extends AppCompatActivity {
                         break;
                 }
 
-                RVData.getInstance().saveData(getApplicationContext());
-
-                RVCloudSync.getInstance().requestDataSyncIfLoggedIn(RecordVisitActivity.this);
+                RVCloudSync.getInstance().requestDataSyncIfLoggedIn(RecordVisitActivity.this,
+                        mDBHelper.loadRecordLaterThanTime(MapActivity.loadLastSyncTime(RecordVisitActivity.this)));
 
                 finish();
 
@@ -558,10 +559,9 @@ public class RecordVisitActivity extends AppCompatActivity {
         });
     }
 
-    private Button cancelButton;
     private void initCancelButton(){
         // DONE: 2017/03/24 キャンセル時も本データが変更されてしまうのはクローンして編集していないから
-        cancelButton = (Button) findViewById(R.id.cancel_button);
+        Button cancelButton = (Button) findViewById(R.id.cancel_button);
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -570,10 +570,9 @@ public class RecordVisitActivity extends AppCompatActivity {
         });
     }
 
-    private Button deleteButton;
     private void initDeleteButton() {
-        deleteButton = (Button) findViewById(R.id.delete_button);
-        if (RVData.getInstance().visitList.contains(mVisit)) {
+        Button deleteButton = (Button) findViewById(R.id.delete_button);
+        if (mDBHelper.containsRecordWithId(mVisit.getId())) {
             deleteButton.setVisibility(View.VISIBLE);
             deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -830,12 +829,12 @@ public class RecordVisitActivity extends AppCompatActivity {
 
         Calendar oldDateTime = (Calendar) mVisit.getDatetime().clone();
 
-        Visit lastVisit = RVData.getInstance().visitList.getLatestVisitToPlace(place.getId());
+        Visit lastVisit = mDBHelper.getLatestVisitToPlace(place.getId());
         if (lastVisit != null) {
             mVisit = new Visit(lastVisit);
 
             for (VisitDetail visitDetail : mVisit.getVisitDetails()) {
-                Person person = RVData.getInstance().personList.getById(visitDetail.getPersonId());
+                Person person = mDBHelper.loadPerson(visitDetail.getPersonId());
                 if (person != null) {
                     addVisitDetailView(visitDetail,
                             person,
@@ -895,9 +894,9 @@ public class RecordVisitActivity extends AppCompatActivity {
             }
         }
 
-        RVData.getInstance().personList.setOrAdd(person);
-        RVData.getInstance().saveData(this);
-        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this);
+        mDBHelper.save(person);
+        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this,
+                mDBHelper.loadRecordLaterThanTime(MapActivity.loadLastSyncTime(this)));
     }
 
     // DONE: 2017/03/26 PriorityRaterの挙動がいまいち

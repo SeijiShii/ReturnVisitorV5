@@ -51,9 +51,10 @@ import net.c_kogyo.returnvisitorv5.cloudsync.RVResponseBody;
 import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.PlaceMarkers;
-import net.c_kogyo.returnvisitorv5.data.RVData;
+import net.c_kogyo.returnvisitorv5.data.RVRecord;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.Work;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.dialog.AddWorkDialog;
 import net.c_kogyo.returnvisitorv5.dialog.HousingComplexDialog;
 import net.c_kogyo.returnvisitorv5.dialog.LoginDialog;
@@ -74,6 +75,7 @@ import net.c_kogyo.returnvisitorv5.view.CountTimeFrame;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Map;
 
 import static net.c_kogyo.returnvisitorv5.Constants.LATITUDE;
 import static net.c_kogyo.returnvisitorv5.Constants.LONGITUDE;
@@ -86,6 +88,7 @@ import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.NEW_VISIT
 import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.PLACE_ADDED_RESULT_CODE;
 import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.VISIT_ADDED_RESULT_CODE;
 import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.VISIT_EDITED_RESULT_CODE;
+import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.LAST_DEVICE_SYNC_TIME;
 import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS;
 import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.ZOOM_LEVEL;
 import static net.c_kogyo.returnvisitorv5.data.Place.PLACE;
@@ -96,7 +99,6 @@ public class MapActivity extends AppCompatActivity
                                         GoogleMap.OnMapLongClickListener,
                                         GoogleMap.OnMarkerClickListener,
                                         GoogleMap.OnMarkerDragListener,
-                                        RVData.RVDataCallback,
                                         RVCloudSync.RVCloudSyncCallback {
 
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
@@ -104,6 +106,8 @@ public class MapActivity extends AppCompatActivity
     private static boolean isForeground;
 
     private Handler cloudResultHandler;
+    private RVDBHelper mDBHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,6 +117,7 @@ public class MapActivity extends AppCompatActivity
         startService(errorLogIntent);
 
         cloudResultHandler = new Handler();
+        mDBHelper = new RVDBHelper(this);
 
         setContentView(R.layout.map_activity);
         initWaitScreen();
@@ -127,10 +132,6 @@ public class MapActivity extends AppCompatActivity
 //        loginDialogHandler = new Handler();
         RVCloudSync.getInstance().setCallback(this);
 
-        // 初期化のために一回ゲットする
-        RVData.getInstance().setRVDataCallback(this, new Handler());
-        RVData.getInstance().loadData(this);
-
         initLocalBroadcast();
 
         AdMobHelper.setAdView(this);
@@ -143,7 +144,8 @@ public class MapActivity extends AppCompatActivity
         refreshLoginButton();
         refreshWorkButton();
         refreshCalendarButton();
-        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this);
+        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this,
+                mDBHelper.loadRecordLaterThanTime(loadLastSyncTime(this)));
 
     }
 
@@ -157,6 +159,12 @@ public class MapActivity extends AppCompatActivity
         // editor.putLong(Constants.SharedPrefTags.LAST_DEVICE_SYNC_TIME, 0);
 
         editor.apply();
+    }
+
+    public static long loadLastSyncTime(Context context) {
+        SharedPreferences prefs
+                = context.getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
+        return prefs.getLong(LAST_DEVICE_SYNC_TIME, 0);
     }
 
     private boolean isDataLoaded = false;
@@ -393,7 +401,7 @@ public class MapActivity extends AppCompatActivity
 
         if (placeId == null) return;
 
-        final Place place = RVData.getInstance().placeList.getById(placeId);
+        final Place place = mDBHelper.loadPlace(placeId);
 
         if (place == null) return;
 
@@ -579,10 +587,9 @@ public class MapActivity extends AppCompatActivity
         place.setLatLng(marker.getPosition());
         place.setAddress(null);
 
-        place.onUpdate();
-
-        RVData.getInstance().saveData(this);
-        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this);
+        mDBHelper.save(place);
+        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this,
+                mDBHelper.loadRecordLaterThanTime(loadLastSyncTime(this)));
 
     }
 
@@ -595,10 +602,10 @@ public class MapActivity extends AppCompatActivity
                 || resultCode == VISIT_EDITED_RESULT_CODE) {
             String visitId = data.getStringExtra(VISIT);
             if (visitId != null) {
-                Visit visit = RVData.getInstance().visitList.getById(visitId);
+                Visit visit = mDBHelper.loadVisit(visitId);
                 if (visit != null) {
                     String placeId = visit.getPlaceId();
-                    Place place = RVData.getInstance().placeList.getById(placeId);
+                    Place place = mDBHelper.loadPlace(placeId);
                     if (place != null) {
                         if (resultCode == PLACE_ADDED_RESULT_CODE) {
                             // 新しい場所の追加である
@@ -608,7 +615,7 @@ public class MapActivity extends AppCompatActivity
                             } else if (place.getCategory() == Place.Category.ROOM) {
                                 // 新しい場所だが、部屋なのでアパートを更新
                                 String parentId = place.getParentId();
-                                Place parent = RVData.getInstance().placeList.getById(parentId);
+                                Place parent = mDBHelper.loadPlace(parentId);
                                 if (parent != null) {
                                     placeMarkers.refreshMarker(parent);
                                 }
@@ -675,10 +682,10 @@ public class MapActivity extends AppCompatActivity
                             public void onDeleteClick(Place place) {
 
                                 placeMarkers.removeByPlace(place);
-                                RVData.getInstance().placeList.deleteById(place.getId());
-                                RVData.getInstance().saveData(MapActivity.this);
+                                mDBHelper.saveAsDeletedRecord(place);
 
-                                RVCloudSync.getInstance().requestDataSyncIfLoggedIn(MapActivity.this);
+                                RVCloudSync.getInstance().requestDataSyncIfLoggedIn(MapActivity.this,
+                                        mDBHelper.loadRecordLaterThanTime(loadLastSyncTime(MapActivity.this)));
                             }
 
                             @Override
@@ -756,22 +763,21 @@ public class MapActivity extends AppCompatActivity
                     public void onOkClick(Place housingComplex) {
 
                         placeMarkers.refreshMarker(housingComplex);
-                        housingComplex.onUpdate();
                     }
 
                     @Override
                     public void onDeleteHousingComplex(Place housingComplex) {
 
                         placeMarkers.removeByPlace(housingComplex);
-                        RVData.getInstance().placeList.deleteById(housingComplex.getId());
-                        RVData.getInstance().saveData(MapActivity.this);
+                        mDBHelper.saveAsDeletedRecord(housingComplex);
 
-                        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(MapActivity.this);
+                        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(MapActivity.this,
+                                mDBHelper.loadRecordLaterThanTime(loadLastSyncTime(MapActivity.this)));
                     }
 
                     @Override
                     public void onCloseDialog() {
-                        if (housingComplex.getChildCount() == 0) {
+                        if (housingComplex.getChildCount(MapActivity.this) == 0) {
                             placeMarkers.removeByPlace(housingComplex);
                         } else {
                             placeMarkers.refreshMarker(housingComplex);
@@ -787,7 +793,7 @@ public class MapActivity extends AppCompatActivity
 
         Visit visit;
 
-        Visit lastVisit = RVData.getInstance().visitList.getLatestVisitToPlace(place.getId());
+        Visit lastVisit = mDBHelper.getLatestVisitToPlace(place.getId());
 
         if (lastVisit == null) {
             visit = new Visit(place);
@@ -795,11 +801,11 @@ public class MapActivity extends AppCompatActivity
             visit = new Visit(lastVisit);
         }
 
-        RVData.getInstance().placeList.setOrAdd(place);
-        RVData.getInstance().visitList.setOrAdd(visit);
-        RVData.getInstance().saveData(this);
+        mDBHelper.save(place);
+        mDBHelper.save(visit);
 
-        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this);
+        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this,
+                mDBHelper.loadRecordLaterThanTime(loadLastSyncTime(this)));
 
         placeMarkers.addMarker(place);
 
@@ -1044,16 +1050,17 @@ public class MapActivity extends AppCompatActivity
                String placeId = intent.getStringExtra(PLACE);
                if (placeId == null) return;
 
-               Place place = RVData.getInstance().placeList.getById(placeId);
+               Place place = mDBHelper.loadPlace(placeId);
+
                if (place == null) return;
 
                String address = intent.getStringExtra(FetchAddressIntentService.ADDRESS_FETCHED);
                if (address == null) return;
 
                place.setAddress(address);
-               RVData.getInstance().placeList.setOrAdd(place);
-               RVData.getInstance().saveData(MapActivity.this);
-               RVCloudSync.getInstance().requestDataSyncIfLoggedIn(MapActivity.this);
+               mDBHelper.save(place);
+               RVCloudSync.getInstance().requestDataSyncIfLoggedIn(MapActivity.this,
+                       mDBHelper.loadRecordLaterThanTime(loadLastSyncTime(MapActivity.this)));
            }
         }
     };
@@ -1066,30 +1073,13 @@ public class MapActivity extends AppCompatActivity
         manager.registerReceiver(receiver, new IntentFilter(FetchAddressIntentService.SEND_FETCED_ADDRESS_ACTION));
     }
 
-//    private void restartTimeCountIfNeeded() {
-//        SharedPreferences preferences
-//                = getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
-//        boolean isCounting = preferences.getBoolean(Constants.SharedPrefTags.IS_COUNTING_TIME, false);
-//        if (isCounting) {
-//            String workId = preferences.getString(Constants.SharedPrefTags.COUNTING_WORK_ID, null);
-//
-//            if (workId == null) return;
-//
-//            Intent restartCountIntent = new Intent(this, TimeCountService.class);
-//            restartCountIntent.setAction(TimeCountService.RESTART_COUNTING_ACTION_TO_SERVICE);
-//            restartCountIntent.putExtra(TimeCountService.COUNTING_WORK_ID, workId);
-//            startService(restartCountIntent);
-//        }
-//
-//    }
-
     private Button workButton;
     private void initWorkButton() {
         workButton = (Button) findViewById(R.id.work_button);
     }
 
     private void refreshWorkButton() {
-        if (RVData.getInstance().hasWorkOrVisit()) {
+        if (mDBHelper.hasWorkOrVisit()) {
             workButton.setAlpha(1f);
             workButton.setClickable(true);
             workButton.setOnClickListener(new View.OnClickListener() {
@@ -1119,7 +1109,7 @@ public class MapActivity extends AppCompatActivity
 
     private void refreshCalendarButton() {
 
-        if (RVData.getInstance().hasWorkOrVisit()) {
+        if (mDBHelper.hasWorkOrVisit()) {
             calendarButton.setAlpha(1f);
             calendarButton.setClickable(true);
             calendarButton.setOnClickListener(new View.OnClickListener() {
@@ -1185,10 +1175,10 @@ public class MapActivity extends AppCompatActivity
 
     private void startWorkPagerActivityWithNewWork(Work work) {
 
-        RVData.getInstance().workList.setOrAdd(work);
-        RVData.getInstance().saveData(this);
+        mDBHelper.save(work);
 
-        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this);
+        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this,
+                mDBHelper.loadRecordLaterThanTime(loadLastSyncTime(this)));
 
         Intent withNewWorkIntent = new Intent(this, WorkPagerActivity.class);
         withNewWorkIntent.setAction(Constants.WorkPagerActivityActions.START_WITH_NEW_WORK);
@@ -1336,41 +1326,37 @@ public class MapActivity extends AppCompatActivity
 
     // DONE: 2017/05/16 save login state
 
-
-
-
-
     // DONE: 2017/05/21 データロード中、同期中の表示
     // DONE: 2017/05/21 同期結果の表示
 
     // RVDataCallback implementation
-    @Override
-    public void onStartSavingData() {
-        fadeProgressFrame(true);
-        waitMessageText.setText(R.string.saving);
-    }
-
-    @Override
-    public void onFinishSavingData() {
-        fadeProgressFrame(false);
-        waitMessageText.setText("");
-    }
-
-    @Override
-    public void onStartLoadingData() {
-        enableWaitScreen(true);
-        fadeProgressFrame(true);
-        waitMessageText.setText(R.string.loading);
-    }
-
-    @Override
-    public void onFinishLoadingData() {
-        refreshLogoButton();
-        isDataLoaded = true;
-        fadeProgressFrame(false);
-        enableWaitScreen(false);
-        waitMessageText.setText("");
-    }
+//    @Override
+//    public void onStartSavingData() {
+//        fadeProgressFrame(true);
+//        waitMessageText.setText(R.string.saving);
+//    }
+//
+//    @Override
+//    public void onFinishSavingData() {
+//        fadeProgressFrame(false);
+//        waitMessageText.setText("");
+//    }
+//
+//    @Override
+//    public void onStartLoadingData() {
+//        enableWaitScreen(true);
+//        fadeProgressFrame(true);
+//        waitMessageText.setText(R.string.loading);
+//    }
+//
+//    @Override
+//    public void onFinishLoadingData() {
+//        refreshLogoButton();
+//        isDataLoaded = true;
+//        fadeProgressFrame(false);
+//        enableWaitScreen(false);
+//        waitMessageText.setText("");
+//    }
 
     // RVCloudSync Implementation
 
@@ -1427,6 +1413,11 @@ public class MapActivity extends AppCompatActivity
     }
 
     @Override
+    public void onRecordsLoadedFromCloud(ArrayList<RVRecord> records) {
+        mDBHelper.saveRecords(records);
+    }
+
+    @Override
     public void onSyncDataResult(RVResponseBody responseBody) {
         switch (responseBody.getStatusCode()) {
             case STATUS_200_SYNC_END_OK:
@@ -1463,7 +1454,8 @@ public class MapActivity extends AppCompatActivity
     private void onSuccessLogin(RVResponseBody responseBody) {
 
         LoginState.onSuccessLogin(responseBody.getUserName(), responseBody.getPassword(), this);
-        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this);
+        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this,
+                mDBHelper.loadRecordLaterThanTime(loadLastSyncTime(this)));
 
         postRequestResult(responseBody);
 
@@ -1475,7 +1467,6 @@ public class MapActivity extends AppCompatActivity
             public void run() {
 
                 saveLastSyncTime();
-                RVData.getInstance().saveData(MapActivity.this);
                 if (placeMarkers == null) {
                     placeMarkers = new PlaceMarkers(mMap);
                 } else {
@@ -1536,26 +1527,6 @@ public class MapActivity extends AppCompatActivity
             }
         });
 
-//        searchText.addTextChangedListener(new TextWatcher() {
-//            @Override
-//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-//
-//            }
-//
-//            @Override
-//            public void onTextChanged(CharSequence s, int start, int before, int count) {
-//
-//            }
-//
-//            @Override
-//            public void afterTextChanged(Editable s) {
-//                if (s.length() > 0) {
-//                    if (getFragmentManager().findFragmentByTag(SEARCH_DIALOG) == null) {
-//                        showSearchDialog(s.toString());
-//                    }
-//                }
-//            }
-//        });
     }
 
     private View dummyFocusView;
@@ -1610,7 +1581,7 @@ public class MapActivity extends AppCompatActivity
             @Override
             public void onClickShowPersonInMap(final Person person) {
 
-                ArrayList<Place> places = RVData.getInstance().placeList.getByPerson(person);
+                ArrayList<Place> places = mDBHelper.getPlaceListByPerson(person);
                 if (places.size() > 0) {
                     Place place = places.get(0);
                     showDialogFitToPlace(place);
@@ -1680,7 +1651,7 @@ public class MapActivity extends AppCompatActivity
                 showHousingComplexDialog(place);
                 break;
             case ROOM:
-                Place parent = RVData.getInstance().placeList.getById(place.getParentId());
+                Place parent = mDBHelper.loadPlace(place.getParentId());
                 if (parent != null) {
                     showHousingComplexDialog(parent);
                 } else {
@@ -1694,17 +1665,17 @@ public class MapActivity extends AppCompatActivity
         PersonDialog.getInstance(person, new PersonDialog.PersonDialogListener() {
             @Override
             public void onOkClick(Person person) {
-                RVData.getInstance().personList.setOrAdd(person);
-                RVData.getInstance().saveData(MapActivity.this);
-                RVCloudSync.getInstance().requestDataSyncIfLoggedIn(MapActivity.this);
+                mDBHelper.save(person);
+                RVCloudSync.getInstance().requestDataSyncIfLoggedIn(MapActivity.this,
+                        mDBHelper.loadRecordLaterThanTime(loadLastSyncTime(MapActivity.this)));
                 InputUtil.hideSoftKeyboard(MapActivity.this);
             }
 
             @Override
             public void onDeleteClick(Person person) {
-                RVData.getInstance().personList.deleteById(person.getId());
-                RVData.getInstance().saveData(MapActivity.this);
-                RVCloudSync.getInstance().requestDataSyncIfLoggedIn(MapActivity.this);
+                mDBHelper.saveAsDeletedRecord(person);
+                RVCloudSync.getInstance().requestDataSyncIfLoggedIn(MapActivity.this,
+                        mDBHelper.loadRecordLaterThanTime(loadLastSyncTime(MapActivity.this)));
                 InputUtil.hideSoftKeyboard(MapActivity.this);
             }
 

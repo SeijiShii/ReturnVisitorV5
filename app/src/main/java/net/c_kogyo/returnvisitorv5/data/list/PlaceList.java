@@ -1,14 +1,18 @@
 package net.c_kogyo.returnvisitorv5.data.list;
 
+import android.content.Context;
 import android.support.annotation.Nullable;
 import android.util.Log;
+
+import com.google.gson.Gson;
 
 import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.RVData;
-import net.c_kogyo.returnvisitorv5.data.Tag;
+import net.c_kogyo.returnvisitorv5.data.RVRecord;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,15 +22,33 @@ import java.util.Comparator;
  * Created by SeijiShii on 2017/03/14.
  */
 
-public class PlaceList extends DataList<Place> {
+public class PlaceList{
 
-    private final String TAG = "PlaceList";
+    @Nullable
+    public static Place loadPlace(String placeId, RVDBHelper helper) {
 
-    public synchronized ArrayList<Place> getListByIds(ArrayList<String> ids) {
+        RVRecord record = helper.loadRecord(placeId, false);
+        if (record == null) {
+            return null;
+        }
+        return new Gson().fromJson(record.getDataJSON(), Place.class);
+    }
+
+    public static ArrayList<Place> loadList(RVDBHelper helper) {
+        ArrayList<Place> placeList = new ArrayList<>();
+        for (RVRecord record : helper.loadRecords(Place.class)) {
+            placeList.add(new Gson().fromJson(record.getDataJSON(), Place.class));
+        }
+        return placeList;
+    }
+
+
+    public static ArrayList<Place> getListByIds(ArrayList<String> ids, RVDBHelper helper) {
+
         ArrayList<Place> list = new ArrayList<>();
         for (String id : ids) {
 
-            Place place = getById(id);
+            Place place = loadPlace(id, helper);
             if (place != null) {
                 list.add(place);
             }
@@ -34,9 +56,9 @@ public class PlaceList extends DataList<Place> {
         return list;
     }
 
-    public synchronized ArrayList<Place> getRoomList(String parentId) {
+    public static ArrayList<Place> getRoomList(String parentId, RVDBHelper helper) {
         ArrayList<Place> roomList = new ArrayList<>();
-        for (Place place : this) {
+        for (Place place : loadList(helper)) {
             if (place.getParentId() != null && place.getParentId().equals(parentId)) {
                 roomList.add(place);
             }
@@ -54,8 +76,8 @@ public class PlaceList extends DataList<Place> {
     }
 
     @Nullable
-    synchronized public Place getMostPriorRoom(String parentId) {
-        ArrayList<Place> roomList = getRoomList(parentId);
+    public static Place getMostPriorRoom(String parentId, RVDBHelper helper, final Context context) {
+        ArrayList<Place> roomList = getRoomList(parentId, helper);
 
         if (roomList.size() <= 0) return null;
 
@@ -64,7 +86,7 @@ public class PlaceList extends DataList<Place> {
         return Collections.max(roomList, new Comparator<Place>() {
             @Override
             public int compare(Place lhs, Place rhs) {
-                return lhs.getPriority().num() - rhs.getPriority().num();
+                return lhs.getPriority(context).num() - rhs.getPriority(context).num();
             }
         });
     }

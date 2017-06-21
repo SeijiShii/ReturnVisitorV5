@@ -23,9 +23,9 @@ import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
 import net.c_kogyo.returnvisitorv5.data.Place;
-import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.Work;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.dialog.AddWorkDialog;
 import net.c_kogyo.returnvisitorv5.dialog.DayAggregationDialog;
 import net.c_kogyo.returnvisitorv5.fragment.WorkFragment;
@@ -61,6 +61,7 @@ public class WorkPagerActivity extends AppCompatActivity {
     }
 
     private PagerState mPagerState, mOldState;
+    private RVDBHelper mDBHelper;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -69,6 +70,8 @@ public class WorkPagerActivity extends AppCompatActivity {
         setContentView(R.layout.work_pager_activity);
 
         AdMobHelper.setAdView(this);
+
+        mDBHelper = new RVDBHelper(this);
 
         setAddedWork();
 
@@ -449,7 +452,7 @@ public class WorkPagerActivity extends AppCompatActivity {
 
     private void moveToMapWithPosition(Visit visit) {
         String placeId = visit.getPlaceId();
-        Place place = RVData.getInstance().placeList.getById(placeId);
+        Place place = mDBHelper.loadPlace(placeId);
         if (place == null) return;
 
         Intent intent = new Intent(WorkPagerActivity.this, MapActivity.class);
@@ -476,9 +479,9 @@ public class WorkPagerActivity extends AppCompatActivity {
     }
 
     private void onAddWork(Work work) {
-        RVData.getInstance().workList.setOrAdd(work);
-        ArrayList<Work> worksRemoved = RVData.getInstance().workList.onChangeTime(work);
-        ArrayList<Visit> visitsSwallowed = RVData.getInstance().visitList.getVisitsInWork(work);
+        mDBHelper.save(work);
+        ArrayList<Work> worksRemoved = mDBHelper.onChangeWorkTime(work);
+        ArrayList<Visit> visitsSwallowed = mDBHelper.getVisitsInWork(work);
 
         int pos = mDatePagerAdapter.getPosition(work.getStart());
         mPager.setCurrentItem(pos);
@@ -488,9 +491,8 @@ public class WorkPagerActivity extends AppCompatActivity {
         fragment.removeVisitCells(visitsSwallowed);
         fragment.addWorkViewAndExtract(work);
 
-        RVData.getInstance().saveData(WorkPagerActivity.this);
-
-        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(WorkPagerActivity.this);
+        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(WorkPagerActivity.this,
+                mDBHelper.loadRecordLaterThanTime(MapActivity.loadLastSyncTime(WorkPagerActivity.this)));
     }
 
     private void hideSoftKeyboard() {
@@ -516,7 +518,7 @@ public class WorkPagerActivity extends AppCompatActivity {
         if (workId == null)
             return;
 
-        addedWork = RVData.getInstance().workList.getById(workId);
+        addedWork = mDBHelper.loadWork(workId);
     }
 
     @Override
@@ -527,7 +529,7 @@ public class WorkPagerActivity extends AppCompatActivity {
             if (resultCode == Constants.RecordVisitActions.VISIT_ADDED_RESULT_CODE) {
                 String visitId = data.getStringExtra(Visit.VISIT);
                 if (visitId != null) {
-                    Visit visit = RVData.getInstance().visitList.getById(visitId);
+                    Visit visit = mDBHelper.loadVisit(visitId);
                     if (visit != null) {
                         getCurrentFragment().insertVisitCell(visit);
                     }
@@ -555,7 +557,7 @@ public class WorkPagerActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
 
 //            Log.d(TAG, "Get Work Fragment, position: " + position);
-            return WorkFragment.newInstance(RVData.getInstance().getDatesWithData().get(position),
+            return WorkFragment.newInstance(mDBHelper.getDatesWithData().get(position),
                     addedWork,
                     toExtractAddedWorkView,
                     new WorkFragment.WorkFragmentListener() {
@@ -567,11 +569,11 @@ public class WorkPagerActivity extends AppCompatActivity {
 
                         @Override
                         public void postRemoveWorkView(Work work) {
-                            RVData.getInstance().workList.deleteById(work.getId());
-                            RVData.getInstance().saveData(WorkPagerActivity.this);
+                            mDBHelper.saveAsDeletedRecord(work);
                             notifyDataSetChanged();
 
-                            RVCloudSync.getInstance().requestDataSyncIfLoggedIn(WorkPagerActivity.this);
+                            RVCloudSync.getInstance().requestDataSyncIfLoggedIn(WorkPagerActivity.this,
+                                    mDBHelper.loadRecordLaterThanTime(MapActivity.loadLastSyncTime(WorkPagerActivity.this)));
                         }
 
                         @Override
@@ -589,14 +591,14 @@ public class WorkPagerActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return RVData.getInstance().getDatesWithData().size();
+            return mDBHelper.getDatesWithData().size();
         }
 
         public int getPosition(Calendar date) {
 
             for ( int i = 0 ; i < getCount() ; i++ ) {
 
-                Calendar dateWithData = RVData.getInstance().getDatesWithData().get(i);
+                Calendar dateWithData = mDBHelper.getDatesWithData().get(i);
 
                 if (CalendarUtil.isSameDay(date, dateWithData)) {
                     return i;
@@ -607,7 +609,7 @@ public class WorkPagerActivity extends AppCompatActivity {
         }
 
         public Calendar getDayItem(int pos) {
-            return RVData.getInstance().getDatesWithData().get(pos);
+            return mDBHelper.getDatesWithData().get(pos);
         }
 
 

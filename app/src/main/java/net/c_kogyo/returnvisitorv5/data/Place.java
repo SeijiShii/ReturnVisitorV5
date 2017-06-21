@@ -4,6 +4,8 @@ import android.content.Context;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -70,29 +72,6 @@ public class Place extends DataItem {
         this.latLng = latLng;
         this.category = category;
     }
-
-//    public Place(JSONObject object) {
-//        super(object);
-//        initCommon();
-//        setJSON(this, object);
-//
-////        try {
-////            if (object.has(LATITUDE) && object.has(LONGITUDE)) {
-////                double lat = object.getDouble(LATITUDE);
-////                double lng = object.getDouble(LONGITUDE);
-////                this.latLng = new LatLng(lat, lng);
-////            }
-////
-////            if (object.has(ADDRESS)) this.address = object.getString(ADDRESS);
-////
-////        } catch (JSONException e) {
-////            e.printStackTrace();
-////        }
-//    }
-
-//    public Place(RVRecord RVRecord) {
-//        this(RVRecord.getDataJSON());
-//    }
 
     private void initCommon() {
         this.latLng = new LatLng(0, 0);
@@ -166,7 +145,6 @@ public class Place extends DataItem {
 
     public void setAddress(String address) {
         this.address = address;
-        onUpdate();
     }
 
     public boolean isAddressRequested() {
@@ -179,7 +157,6 @@ public class Place extends DataItem {
 
     public void setLatLng(LatLng latLng) {
         this.latLng = latLng;
-        onUpdate();
     }
 
     @Override
@@ -206,52 +183,25 @@ public class Place extends DataItem {
         }
     }
 
-//    public static Place setJSON(Place place, JSONObject object) {
-//
-//        try {
-//            if (object.has(LATITUDE) && object.has(LONGITUDE)) {
-//                double lat = object.getDouble(LATITUDE);
-//                double lng = object.getDouble(LONGITUDE);
-//                place.latLng = new LatLng(lat, lng);
-//            }
-//
-//            if (object.has(ADDRESS))
-//                place.address = object.getString(ADDRESS);
-//
-//            if (object.has(CATEGORY)) {
-//                place.category = Category.valueOf(object.getString(CATEGORY));
-//                if (place.category == Category.UNDEFINED) {
-//                    place.category = Category.HOUSE;
-//                }
-//            }
-//
-//
-//            if (object.has(PARENT_ID))
-//                place.parentId = object.getString(PARENT_ID);
-//
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//        return place;
-//    }
+    public Person.Priority getPriority(Context context) {
 
-    public Person.Priority getPriority() {
+        RVDBHelper helper = new RVDBHelper(context);
 
         switch (category) {
             case HOUSE:
             case ROOM:
-                Visit visit = RVData.getInstance().visitList.getLatestVisitToPlace(this.id);
+                Visit visit = helper.getLatestVisitToPlace(this.id);
                 if (visit == null) {
                     return Person.Priority.NONE;
                 }
                 return visit.getPriority();
 
             case HOUSING_COMPLEX:
-                Place room = RVData.getInstance().placeList.getMostPriorRoom(this.id);
+                Place room = helper.getMostPriorRoom(this.id, context);
                 if (room == null) {
                     return Person.Priority.NONE;
                 }
-                return room.getPriority();
+                return room.getPriority(context);
             default:
                 return Person.Priority.NONE;
         }
@@ -276,7 +226,6 @@ public class Place extends DataItem {
 
     public void setParentId(String parentId) {
         this.parentId = parentId;
-        onUpdate();
     }
 
     public Category getCategory() {
@@ -285,13 +234,13 @@ public class Place extends DataItem {
 
     public void setCategory(Category category) {
         this.category = category;
-        onUpdate();
     }
 
-    public int getChildCount() {
+    public int getChildCount(Context context) {
 
+        RVDBHelper helper = new RVDBHelper(context);
         if (category == Category.HOUSING_COMPLEX) {
-            return RVData.getInstance().placeList.getRoomList(id).size();
+            return helper.getRoomList(id).size();
         }
 
         return -1;

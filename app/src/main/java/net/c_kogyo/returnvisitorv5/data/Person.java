@@ -3,6 +3,7 @@ package net.c_kogyo.returnvisitorv5.data;
 import android.content.Context;
 
 import net.c_kogyo.returnvisitorv5.R;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -214,12 +215,10 @@ public class Person extends DataItem implements Cloneable{
 
     public void setSex(Sex sex) {
         this.sex = sex;
-        onUpdate();
     }
 
     public void setAge(Age age) {
         this.age = age;
-        onUpdate();
     }
 
     private String getSexString(Context context) {
@@ -244,7 +243,6 @@ public class Person extends DataItem implements Cloneable{
 
     public void setPriority(Priority priority) {
         this.priority = priority;
-        onUpdate();
     }
 
     @Override
@@ -260,32 +258,10 @@ public class Person extends DataItem implements Cloneable{
         return person;
     }
 
-//    @Override
-//    public JSONObject jsonObject() {
-//
-//        JSONObject object = super.jsonObject();
-//
-//        try {
-//            object.put(SEX, sex);
-//            object.put(AGE, age);
-//
-//            JSONArray array = new JSONArray();
-//            for ( int i = 0 ; i < this.placeIds.size() ; i++ ) {
-//                array.put(this.placeIds.get(i));
-//            }
-//            object.put(PLACE_IDS, array);
-//
-//            object.put(PRIORITY, priority.toString());
-//
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//
-//        return object;
-//    }
-
     @Override
     public String toStringForSearch(Context context) {
+
+        RVDBHelper helper = new RVDBHelper(context);
 
         StringBuilder builder = new StringBuilder(super.toStringForSearch(context));
         builder.append(getSexString(context)).append(" ");
@@ -293,11 +269,11 @@ public class Person extends DataItem implements Cloneable{
         builder.append(getPriorityString(context)).append(" ");
 
         // DONE: 2017/05/26 タグも対象とするか
-        Visit visit = RVData.getInstance().visitList.getLatestVisitToPerson(id);
+        Visit visit = helper.getLatestVisitToPerson(id);
         if (visit != null) {
             VisitDetail visitDetail = visit.getVisitDetail(id);
             if (visitDetail != null) {
-                ArrayList<Tag> tags = RVData.getInstance().tagList.getList(visitDetail.getTagIds());
+                ArrayList<Tag> tags = helper.la.getList(visitDetail.getTagIds());
                 for (Tag tag : tags) {
                     builder.append(" ").append(tag.getName());
                 }

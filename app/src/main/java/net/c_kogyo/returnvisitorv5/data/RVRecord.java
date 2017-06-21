@@ -36,10 +36,15 @@ public class RVRecord {
         Gson gson = new Gson();
 
         this.dataId = item.id;
-        this.updatedAt = item.updatedAt;
+        this.updatedAt = Calendar.getInstance().getTimeInMillis();
         this.data = StringUtil.replaceDoubleQuotes(gson.toJson(item));
         this.className = item.getClass().getSimpleName();
         this.isDeleted = false;
+    }
+
+    public <T extends DataItem> RVRecord (T item, boolean isDeleted) {
+        this(item);
+        this.isDeleted = isDeleted;
     }
 
     public RVRecord() {

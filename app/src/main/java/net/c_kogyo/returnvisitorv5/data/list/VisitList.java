@@ -2,11 +2,14 @@ package net.c_kogyo.returnvisitorv5.data.list;
 
 import android.support.annotation.Nullable;
 
+import com.google.gson.Gson;
+
 import net.c_kogyo.returnvisitorv5.data.Person;
-import net.c_kogyo.returnvisitorv5.data.RVData;
+import net.c_kogyo.returnvisitorv5.data.RVRecord;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
 import net.c_kogyo.returnvisitorv5.data.Work;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
 
 import java.util.ArrayList;
@@ -18,12 +21,30 @@ import java.util.Comparator;
  * Created by SeijiShii on 2017/03/05.
  */
 
-public class VisitList extends DataList<Visit> {
+public class VisitList {
 
-    public synchronized ArrayList<Visit> getVisitsForPlace(String placeId) {
+    @Nullable
+    public static Visit loadVisit(String visitId, RVDBHelper helper) {
+
+        RVRecord record = helper.loadRecord(visitId, false);
+        if (record == null) {
+            return null;
+        }
+        return new Gson().fromJson(record.getDataJSON(), Visit.class);
+    }
+
+    public static ArrayList<Visit> loadList(RVDBHelper helper) {
+        ArrayList<Visit> visitList = new ArrayList<>();
+        for (RVRecord record : helper.loadRecords(Visit.class)) {
+            visitList.add(new Gson().fromJson(record.getDataJSON(), Visit.class));
+        }
+        return visitList;
+    }
+
+    public static ArrayList<Visit> getVisitsForPlace(String placeId, RVDBHelper helper) {
 
         ArrayList<Visit> visits = new ArrayList<>();
-        for (Visit visit : this) {
+        for (Visit visit : loadList(helper)) {
             if (visit.getPlaceId() != null) {
                 if (visit.getPlaceId().equals(placeId)) {
                     visits.add(visit);
@@ -34,9 +55,9 @@ public class VisitList extends DataList<Visit> {
     }
 
     @Nullable
-    synchronized public Visit getLatestVisitToPlace(String placeId) {
+    public static Visit getLatestVisitToPlace(String placeId, RVDBHelper helper) {
 
-        ArrayList<Visit> visits = getVisitsForPlace(placeId);
+        ArrayList<Visit> visits = getVisitsForPlace(placeId, helper);
 
         if (visits.size() <= 0) {
             return null;
@@ -51,9 +72,9 @@ public class VisitList extends DataList<Visit> {
         return visit;
     }
 
-    synchronized private ArrayList<Visit> getVisitsInMonth(Calendar month) {
+    private static ArrayList<Visit> getVisitsInMonth(Calendar month, RVDBHelper helper) {
         ArrayList<Visit> visitsInMonth = new ArrayList<>();
-        for (Visit visit : list) {
+        for (Visit visit : loadList(helper)) {
             if (CalendarUtil.isSameMonth(month, visit.getDatetime())) {
                 visitsInMonth.add(visit);
             }
@@ -61,9 +82,9 @@ public class VisitList extends DataList<Visit> {
         return visitsInMonth;
     }
 
-    synchronized public ArrayList<Visit> getVisitsInDay(Calendar date) {
+    public static ArrayList<Visit> getVisitsInDay(Calendar date, RVDBHelper helper) {
         ArrayList<Visit> visits = new ArrayList<>();
-        for (Visit visit : list) {
+        for (Visit visit : loadList(helper)) {
             if (CalendarUtil.isSameDay(visit.getDatetime(), date)) {
                 visits.add(visit);
             }
@@ -71,9 +92,9 @@ public class VisitList extends DataList<Visit> {
         return visits;
     }
 
-    synchronized public ArrayList<Visit> getVisitsInWork(Work work) {
+    public static ArrayList<Visit> getVisitsInWork(Work work, RVDBHelper helper) {
         ArrayList<Visit> visits = new ArrayList<>();
-        for (Visit visit : list) {
+        for (Visit visit : loadList(helper)) {
             if (visit.getDatetime().after(work.getStart())
                     && visit.getDatetime().before(work.getEnd())) {
                 visits.add(visit);
@@ -82,27 +103,27 @@ public class VisitList extends DataList<Visit> {
         return visits;
     }
 
-    synchronized public ArrayList<Visit> getVisitsInWorkInDay(Calendar date) {
+    public static ArrayList<Visit> getVisitsInWorkInDay(Calendar date, RVDBHelper helper) {
 
-        ArrayList<Work> worksInDay = RVData.getInstance().workList.getWorksInDay(date);
+        ArrayList<Work> worksInDay = WorkList.getWorksInDay(date, helper);
         ArrayList<Visit> visitsInWorkInDay = new ArrayList<>();
         for (Work work : worksInDay) {
-            visitsInWorkInDay.addAll(getVisitsInWork(work));
+            visitsInWorkInDay.addAll(getVisitsInWork(work, helper));
         }
         return visitsInWorkInDay;
     }
 
-    synchronized public ArrayList<Visit> getVisitsInDayNotInWork(Calendar date) {
-        ArrayList<Visit> visits = getVisitsInDay(date);
-        visits.removeAll(getVisitsInWorkInDay(date));
+    public static ArrayList<Visit> getVisitsInDayNotInWork(Calendar date, RVDBHelper helper) {
+        ArrayList<Visit> visits = getVisitsInDay(date, helper);
+        visits.removeAll(getVisitsInWorkInDay(date, helper));
         return visits;
     }
 
-    synchronized public ArrayList<Calendar> getDates() {
+    public static ArrayList<Calendar> getDates(RVDBHelper helper) {
 
         ArrayList<Calendar> dates = new ArrayList<>();
 
-        for (Visit visit : list) {
+        for (Visit visit : loadList(helper)) {
             dates.add(visit.getDatetime());
         }
 
@@ -127,19 +148,19 @@ public class VisitList extends DataList<Visit> {
         return dates;
     }
 
-    synchronized public ArrayList<VisitDetail> getBSVisitDetailsInMonth(Calendar month) {
+    public static ArrayList<VisitDetail> getBSVisitDetailsInMonth(Calendar month, RVDBHelper helper) {
         ArrayList<VisitDetail> bsVisitDetails = new ArrayList<>();
-        for (Visit visit : getVisitsInMonth(month)) {
+        for (Visit visit : getVisitsInMonth(month, helper)) {
             bsVisitDetails.addAll(visit.getBSVisitDetails());
         }
         return bsVisitDetails;
     }
 
-    public ArrayList<Visit> getVisitsToPerson(String personId) {
+    public static ArrayList<Visit> getVisitsToPerson(String personId, RVDBHelper helper) {
 
         ArrayList<Visit> visits = new ArrayList<>();
 
-        for (Visit visit : list) {
+        for (Visit visit : loadList(helper)) {
 
             if (visit.hasPerson(personId)) {
                 visits.add(visit);
@@ -157,18 +178,19 @@ public class VisitList extends DataList<Visit> {
     }
 
     @Nullable
-    public Visit getLatestVisitToPerson(String personId) {
+    public static Visit getLatestVisitToPerson(String personId, RVDBHelper helper) {
 
-        ArrayList<Visit> visits = getVisitsToPerson(personId);
+        ArrayList<Visit> visits = getVisitsToPerson(personId, helper);
 
         if (visits.size() <= 0) return null;
 
         return visits.get(visits.size() - 1);
     }
 
-    @Nullable public Visit getLatestVisitSeenToPerson(String personId) {
+    @Nullable
+    public static Visit getLatestVisitSeenToPerson(String personId, RVDBHelper helper) {
 
-        ArrayList<Visit> visits = getVisitsToPerson(personId);
+        ArrayList<Visit> visits = getVisitsToPerson(personId, helper);
 
         if (visits.size() <= 0) return null;
 
@@ -184,9 +206,9 @@ public class VisitList extends DataList<Visit> {
         return null;
     }
 
-    public ArrayList<Visit> getAllNotHomeVisitsInOneMonth() {
+    public static ArrayList<Visit> getAllNotHomeVisitsInOneMonth(RVDBHelper helper) {
         ArrayList<Visit> nhVisits = new ArrayList<>();
-        for (Visit visit : list) {
+        for (Visit visit : loadList(helper)) {
             if (visit.getPriority() == Person.Priority.NOT_HOME) {
                 if (CalendarUtil.daysPast(visit.getDatetime(), Calendar.getInstance()) < 32) {
                     nhVisits.add(visit);
@@ -196,9 +218,9 @@ public class VisitList extends DataList<Visit> {
         return nhVisits;
     }
 
-    public void setPlaceIdToVisitDetails() {
+    public static void setPlaceIdToVisitDetails(RVDBHelper helper) {
 
-        for (Visit visit : list) {
+        for (Visit visit : loadList(helper)) {
             for (VisitDetail visitDetail : visit.getVisitDetails()) {
                 if (visitDetail.getPlaceId().equals("")) {
                     visitDetail.setPlaceId(visit.getPlaceId());

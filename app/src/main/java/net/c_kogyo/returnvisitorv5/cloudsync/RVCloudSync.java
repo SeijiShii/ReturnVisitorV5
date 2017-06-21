@@ -8,8 +8,8 @@ import android.util.Log;
 import com.google.gson.Gson;
 
 import net.c_kogyo.returnvisitorv5.Constants;
-import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.RVRecord;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 import net.c_kogyo.returnvisitorv5.util.EncryptUtil;
 
@@ -43,7 +43,6 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback{
     private Gson mGson;
 
     private RVWebSocketClient socketClient;
-//    private UserData userData;
 
     public static RVCloudSync getInstance() {
         return instance;
@@ -53,7 +52,6 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback{
         mCallback = callback;
     }
 
-//    private WebSocket webSocket;
     private RVCloudSync() {
         mGson = new Gson();
     }
@@ -176,9 +174,11 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback{
     }
 
     private ArrayList<RVRecord> cloudDataList;
-    private long lastSyncTime;
     private int cloudDataCount = 0;
-    public void requestDataSyncIfLoggedIn(Context context) {
+    private ArrayList<RVRecord> mRecordsInDevice;
+    public void requestDataSyncIfLoggedIn(Context context, ArrayList<RVRecord> recordsInDevice) {
+
+        mRecordsInDevice = new ArrayList<>(recordsInDevice);
 
         final LoginState loginState = LoginState.getInstance();
         if (!loginState.isLoggedIn()) return;
@@ -193,7 +193,7 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback{
 
         SharedPreferences prefs
                 = context.getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
-        lastSyncTime = prefs.getLong(LAST_DEVICE_SYNC_TIME, 0);
+        long lastSyncTime = prefs.getLong(LAST_DEVICE_SYNC_TIME, 0);
 
         Calendar date = Calendar.getInstance();
         date.setTimeInMillis(lastSyncTime);
@@ -280,7 +280,7 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback{
     }
 
     private void sendDeviceData(String token) {
-        for (RVRecord record : RVData.getInstance().getRecordsLaterThanTime(lastSyncTime)) {
+        for (RVRecord record : mRecordsInDevice) {
             RVCloudSyncDataFrame dataFrame =
                     new RVCloudSyncDataFrame(RVCloudSyncDataFrame.FrameCategory.DEVICE_DATA_FRAME, mGson.toJson(record), token);
             socketClient.send(mGson.toJson(dataFrame));
@@ -300,7 +300,9 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback{
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    RVData.getInstance().setFromRecordList(bufferedList, RVData.RecordArraySource.FROM_CLOUD);
+                    if (mCallback != null) {
+                        mCallback.onRecordsLoadedFromCloud(bufferedList);
+                    }
                 }
             }).start();
             cloudDataList = new ArrayList<>();
@@ -308,8 +310,9 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback{
     }
 
     private void onCloudDataEndFrame(RVCloudSyncDataFrame dataFrame) {
-        RVData.getInstance().setFromRecordList(cloudDataList, RVData.RecordArraySource.FROM_CLOUD);
+
         if (mCallback != null) {
+            mCallback.onRecordsLoadedFromCloud(cloudDataList);
             mCallback.onSyncDataResult(mGson.fromJson(dataFrame.getDataBody(), RVResponseBody.class));
         }
         socketClient.close();
@@ -328,6 +331,8 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback{
         void onStartSyncDataRequest();
 
         void onSyncDataResult(RVResponseBody responseBody);
+
+        void onRecordsLoadedFromCloud(ArrayList<RVRecord> records);
 
     }
 

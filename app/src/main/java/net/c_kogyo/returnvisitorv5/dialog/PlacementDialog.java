@@ -24,7 +24,6 @@ import android.widget.TextView;
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.Placement;
 import net.c_kogyo.returnvisitorv5.data.Publication;
-import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.fragment.DefaultPublicationListFragment;
 import net.c_kogyo.returnvisitorv5.fragment.RankedPublicationListFragment;
 import net.c_kogyo.returnvisitorv5.data.FragmentTitlePair;
@@ -192,6 +191,7 @@ public  class  PlacementDialog extends DialogFragment {
             @Override
             public void onClick(View view) {
                 mPublication.setName(generalNameText.getText().toString());
+
 
                 RVData.getInstance().publicationList.setOrAdd(mPublication);
                 Publication publication = RVData.getInstance().publicationList.getCorrespondingData(mPublication);

@@ -2,9 +2,14 @@ package net.c_kogyo.returnvisitorv5.data.list;
 
 import android.support.annotation.Nullable;
 
+import com.google.gson.Gson;
+
+import net.c_kogyo.returnvisitorv5.data.RVRecord;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.Work;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
+import net.c_kogyo.returnvisitorv5.util.WriteLogThread;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -15,12 +20,29 @@ import java.util.Comparator;
  * Created by SeijiShii on 2017/03/30.
  */
 
-public class WorkList extends DataList<Work> {
+public class WorkList{
 
-    synchronized public ArrayList<Work> getWorksInDay(Calendar date) {
+    @Nullable
+    public static Work loadWork(String workId, RVDBHelper helper) {
+        RVRecord record = helper.loadRecord(workId, false);
+        if(record == null) {
+            return null;
+        }
+        return new Gson().fromJson(record.getDataJSON(), Work.class);
+    }
+
+    public static ArrayList<Work> loadList(RVDBHelper helper) {
+        ArrayList<Work> workList = new ArrayList<>();
+        for (RVRecord record : helper.loadRecords(Visit.class)) {
+            workList.add(new Gson().fromJson(record.getDataJSON(), Work.class));
+        }
+        return workList;
+    }
+
+    public static ArrayList<Work> getWorksInDay(Calendar date, RVDBHelper helper) {
 
         ArrayList<Work> works = new ArrayList<>();
-        for (Work work : list) {
+        for (Work work : loadList(helper)) {
             if (CalendarUtil.isSameDay(work.getStart(), date)) {
                 works.add(work);
             }
@@ -28,11 +50,11 @@ public class WorkList extends DataList<Work> {
         return works;
     }
 
-    synchronized public ArrayList<Calendar> getDates() {
+    public static ArrayList<Calendar> getDates(RVDBHelper helper) {
 
         ArrayList<Calendar> dates = new ArrayList<>();
 
-        for (Work work : list) {
+        for (Work work : loadList(helper)) {
             dates.add(work.getStart());
         }
 
@@ -63,15 +85,15 @@ public class WorkList extends DataList<Work> {
      * @param workChanged 時間の変更された
      * @return 調整の結果削除されたWorkのリスト
      */
-    synchronized public ArrayList<Work> onChangeTime(Work workChanged) {
+    public static ArrayList<Work> onChangeTime(Work workChanged, RVDBHelper helper) {
 
         ArrayList<Work> worksRemoved = new ArrayList<>();
 
         // 念のため存在チェック
-        if (!list.contains(workChanged)) return worksRemoved;
+        if (!helper.containsRecordWithId(workChanged.getId())) return worksRemoved;
 
         // すべてのリストを開始時間で整列
-        ArrayList<Work> sortedList = new ArrayList<>(list);
+        ArrayList<Work> sortedList = loadList(helper);
         Collections.sort(sortedList, new Comparator<Work>() {
             @Override
             public int compare(Work work, Work t1) {
@@ -118,14 +140,14 @@ public class WorkList extends DataList<Work> {
             }
         }
 
-        deleteAll(worksRemoved);
+        helper.saveAsDeletedRecords(worksRemoved);
 
         return worksRemoved;
     }
 
     @Nullable
-    synchronized public Work getByVisit(Visit visit) {
-        for (Work work : list) {
+    static public Work getByVisit(Visit visit, RVDBHelper helper) {
+        for (Work work : loadList(helper)) {
             if (visit.getDatetime().after(work.getStart()) && visit.getDatetime().before(work.getEnd())) {
                 return work;
             }
@@ -133,9 +155,9 @@ public class WorkList extends DataList<Work> {
         return null;
     }
 
-    synchronized public ArrayList<Work> getWorksInMonth(Calendar month) {
+    public static ArrayList<Work> getWorksInMonth(Calendar month, RVDBHelper helper) {
         ArrayList<Work> works = new ArrayList<>();
-        for (Work work : list) {
+        for (Work work : loadList(helper)) {
             if (CalendarUtil.isSameMonth(work.getStart(), month)) {
                 works.add(work);
             }

@@ -15,17 +15,9 @@ import java.util.Locale;
  */
 public class DataItem implements Cloneable{
 
-//    public static final String ID           = "id";
-//    public static final String NAME         = "name";
-//    public static final String NOTE         = "note";
-//    public static final String UPDATED_AT   = "updated_at";
-//    public static final String UPDATED_AT_STRING = "updated_at_string";
-
     protected String id;
     protected String name;
     protected String note;
-
-    protected long updatedAt;
 
     protected String idHeader;
 
@@ -38,67 +30,11 @@ public class DataItem implements Cloneable{
 
     }
 
-//    public DataItem(JSONObject object) {
-//
-//        initCommon();
-//
-//        setJSON(this, object);
-//
-////        try {
-////            if (object.has(ID)) {
-////                this.id = object.getString(ID);
-////            }
-////
-////            if (object.has(UPDATED_AT)) {
-////                this.updatedAt = Calendar.getInstance();
-////                this.updatedAt.setTimeInMillis(object.getLong(UPDATED_AT));
-////            }
-////
-////            if (object.has(NAME)) {
-////                this.name = object.getString(NAME);
-////            }
-////
-////            if (object.has(NOTE)) {
-////                this.note = object.getString(NOTE);
-////            }
-////
-////        } catch (JSONException e) {
-////            e.printStackTrace();
-////        }
-//    }
-
-//    public DataItem(RVRecord RVRecord) {
-//
-//        this(RVRecord.getDataJSON());
-//
-//    }
-
     private void initCommon() {
-        this.updatedAt = Calendar.getInstance().getTimeInMillis();
         this.id = generateNewId();
         this.name = "";
         this.note = "";
     }
-
-//    public JSONObject jsonObject() {
-//
-//        JSONObject object = new JSONObject();
-//
-//        try {
-//            object.put(ID, this.id);
-//            object.put(UPDATED_AT, this.updatedAt.getTimeInMillis());
-//
-//            SimpleDateFormat sdf = new SimpleDateFormat("yyyy,MM,dd, E, HH:mm:ss", Locale.JAPAN);
-//            object.put(UPDATED_AT_STRING, sdf.format(this.updatedAt.getTime()));
-//
-//            object.put(NAME, this.name);
-//            object.put(NOTE, this.note);
-//
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//        return object;
-//    }
 
     /**
      * カレンダーのミリ秒を文字列にした末尾に1000までの乱数を加えて初期値を生成する
@@ -119,17 +55,6 @@ public class DataItem implements Cloneable{
 
     public String getId() {
         return id;
-    }
-
-    public long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    // DONE: 2017/06/02 すべてのデータに反映
-    public void onUpdate() {updatedAt = Calendar.getInstance().getTimeInMillis();};
-
-    public void setUpdatedAt() {
-        updatedAt = Calendar.getInstance().getTimeInMillis();
     }
 
     public String getName() {
@@ -156,7 +81,6 @@ public class DataItem implements Cloneable{
         item.id = this.id;
         item.name = this.name;
         item.note = this.note;
-        item.updatedAt = this.updatedAt;
 
         return item;
     }
@@ -171,38 +95,9 @@ public class DataItem implements Cloneable{
         this.id = id;
     }
 
-    public void setUpdatedAt(long updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
     public <T extends DataItem> boolean equals(T o) {
         return this.getId().equals(o.getId());
     }
 
-//    public static DataItem setJSON(DataItem item, JSONObject object) {
-//
-//        try {
-//            if (object.has(ID)) {
-//                item.id = object.getString(ID);
-//            }
-//
-//            if (object.has(UPDATED_AT)) {
-//                item.updatedAt = Calendar.getInstance();
-//                item.updatedAt.setTimeInMillis(object.getLong(UPDATED_AT));
-//            }
-//
-//            if (object.has(NAME)) {
-//                item.name = object.getString(NAME);
-//            }
-//
-//            if (object.has(NOTE)) {
-//                item.note = object.getString(NOTE);
-//            }
-//
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//        return item;
-//    }
 
 }

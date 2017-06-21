@@ -23,7 +23,6 @@ import com.google.android.gms.maps.model.Marker;
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.PlaceMarkers;
-import net.c_kogyo.returnvisitorv5.data.RVData;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 

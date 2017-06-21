@@ -19,8 +19,8 @@ import android.widget.TextView;
 import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
-import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Work;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.dialog.AddWorkDialog;
 import net.c_kogyo.returnvisitorv5.dialog.MonthAggregationDialog;
 import net.c_kogyo.returnvisitorv5.fragment.CalendarFragment;
@@ -56,11 +56,14 @@ public class CalendarPagerActivity extends AppCompatActivity {
 
     private PagerState mPagerState, mOldState;
     private StartDay mStartDay;
+    private RVDBHelper mDBHelper;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.calendar_pager_activity);
+
+        mDBHelper = new RVDBHelper(this);
 
         AdMobHelper.setAdView(this);
 
@@ -461,10 +464,10 @@ public class CalendarPagerActivity extends AppCompatActivity {
 
     private void startWorkPagerActivityWithNewWork(Work work) {
 
-        RVData.getInstance().workList.setOrAdd(work);
-        RVData.getInstance().saveData(this);
+        mDBHelper.save(work);
 
-        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this);
+        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this,
+                mDBHelper.loadRecordLaterThanTime(MapActivity.loadLastSyncTime(this)));
 
         Intent withNewWorkIntent = new Intent(this, WorkPagerActivity.class);
         withNewWorkIntent.setAction(Constants.WorkPagerActivityActions.START_WITH_NEW_WORK);
@@ -494,11 +497,11 @@ public class CalendarPagerActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return RVData.getInstance().getMonthsWithData().size();
+            return mDBHelper.getMonthsWithData().size();
         }
 
         private Calendar getMonth(int position) {
-            return RVData.getInstance().getMonthsWithData().get(position);
+            return mDBHelper.getMonthsWithData().get(position);
         }
 
         private int getClosestPositionByMonth(Calendar month) {
@@ -536,7 +539,7 @@ public class CalendarPagerActivity extends AppCompatActivity {
         }
 
         private int getPositionByMonth(Calendar month) {
-            ArrayList<Calendar> monthsWithData = RVData.getInstance().getMonthsWithData();
+            ArrayList<Calendar> monthsWithData = mDBHelper.getMonthsWithData();
 
             for ( int i = 0 ; i < monthsWithData.size() ; i++ ) {
                 if (CalendarUtil.isSameMonth(month, monthsWithData.get(i))) {

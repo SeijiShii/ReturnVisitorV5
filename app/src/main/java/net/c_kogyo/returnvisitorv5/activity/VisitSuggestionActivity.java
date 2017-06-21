@@ -30,9 +30,9 @@ import net.c_kogyo.returnvisitorv5.data.DismissedSuggestion;
 import net.c_kogyo.returnvisitorv5.data.Filter;
 import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Place;
-import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitSuggestion;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.dialog.ShowInMapDialog;
 import net.c_kogyo.returnvisitorv5.util.AdMobHelper;
 import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
@@ -386,7 +386,7 @@ public class VisitSuggestionActivity extends AppCompatActivity {
 
     private void showMapDialog(Visit visit) {
 
-        if (!RVData.getInstance().placeList.hasItem(visit.getPlaceId())) {
+        if (!new RVDBHelper(this).containsRecordWithId(visit.getPlaceId())) {
             Toast.makeText(this, R.string.place_not_found, Toast.LENGTH_SHORT).show();
             return;
         }

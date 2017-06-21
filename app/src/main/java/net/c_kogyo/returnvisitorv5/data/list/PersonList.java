@@ -2,11 +2,15 @@ package net.c_kogyo.returnvisitorv5.data.list;
 
 import android.util.Log;
 
+import com.google.gson.Gson;
+
 import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.RVData;
+import net.c_kogyo.returnvisitorv5.data.RVRecord;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 
 import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -15,11 +19,19 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Created by SeijiShii on 2017/05/25.
  */
 
-public class PersonList extends DataList<Person> {
+public class PersonList {
 
-    private static final String TAG = "PersonList";
+    public static ArrayList<Person> loadPersonList(RVDBHelper helper) {
 
-    public ArrayList<Person> getPersonsInPlace(Place place) {
+        ArrayList<Person> personList = new ArrayList<>();
+        for (RVRecord record : helper.loadRecords(Person.class)) {
+            personList.add(new Gson().fromJson(record.getDataJSON(), Person.class));
+        }
+        return personList;
+    }
+
+
+    public static ArrayList<Person> getPersonsInPlace(Place place, RVDBHelper helper) {
 
         ArrayList<Place> places = new ArrayList<>();
         if (place.getCategory() == Place.Category.HOUSING_COMPLEX) {
