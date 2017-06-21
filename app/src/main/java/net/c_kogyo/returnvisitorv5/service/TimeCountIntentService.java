@@ -7,11 +7,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
-import android.widget.Toast;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
@@ -74,7 +72,7 @@ public class TimeCountIntentService extends IntentService {
                     RVData.getInstance().workList.setOrAdd(mWork);
                     RVData.getInstance().saveData(TimeCountIntentService.this);
 
-                    RVCloudSync.getInstance().syncDataIfLoggedIn(TimeCountIntentService.this);
+                    RVCloudSync.getInstance().requestDataSyncIfLoggedIn(TimeCountIntentService.this);
                 }
             }
         };
@@ -96,7 +94,7 @@ public class TimeCountIntentService extends IntentService {
                 mWork = new Work(Calendar.getInstance());
                 RVData.getInstance().workList.setOrAdd(mWork);
                 RVData.getInstance().saveData(this);
-                RVCloudSync.getInstance().syncDataIfLoggedIn(this);
+                RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this);
             } else if (intent.getAction().equals(RESTART_COUNTING_ACTION_TO_SERVICE)) {
                 String workId = intent.getStringExtra(COUNTING_WORK_ID);
                 mWork = RVData.getInstance().workList.getById(workId);
@@ -138,7 +136,7 @@ public class TimeCountIntentService extends IntentService {
 
                     RVData.getInstance().workList.setOrAdd(mWork);
                     RVData.getInstance().saveData(this);
-                    RVCloudSync.getInstance().syncDataIfLoggedIn(this);
+                    RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this);
                     minCounter = 0;
                 }
             }

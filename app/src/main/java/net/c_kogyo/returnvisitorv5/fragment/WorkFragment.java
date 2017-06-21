@@ -1,7 +1,5 @@
 package net.c_kogyo.returnvisitorv5.fragment;
 
-import android.animation.Animator;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
 import android.os.Bundle;
@@ -199,7 +197,7 @@ public class WorkFragment extends Fragment {
 
                 RVData.getInstance().visitList.deleteById(visitCell1.getVisit().getId());
                 RVData.getInstance().saveData(WorkFragment.this.getActivity());
-                RVCloudSync.getInstance().syncDataIfLoggedIn(WorkFragment.this.getActivity());
+                RVCloudSync.getInstance().requestDataSyncIfLoggedIn(WorkFragment.this.getActivity());
 
                 verifyItemRemains();
             }
@@ -272,7 +270,7 @@ public class WorkFragment extends Fragment {
 
                         RVData.getInstance().saveData(getActivity());
 
-                        RVCloudSync.getInstance().syncDataIfLoggedIn(getActivity());
+                        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getActivity());
 
                     }
 

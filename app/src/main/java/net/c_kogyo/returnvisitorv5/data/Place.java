@@ -15,11 +15,11 @@ public class Place extends DataItem {
 
     public static final String PLACE = "place";
 
-    public static final String LATITUDE = "latitude";
-    public static final String LONGITUDE = "longitude";
-    public static final String ADDRESS = "address";
-    public static final String CATEGORY = "category";
-    public static final String PARENT_ID = "parent_id";
+//    public static final String LATITUDE = "latitude";
+//    public static final String LONGITUDE = "longitude";
+//    public static final String ADDRESS = "address";
+//    public static final String CATEGORY = "category";
+//    public static final String PARENT_ID = "parent_id";
 
 
     public enum Category {
@@ -71,28 +71,28 @@ public class Place extends DataItem {
         this.category = category;
     }
 
-    public Place(JSONObject object) {
-        super(object);
-        initCommon();
-        setJSON(this, object);
-
-//        try {
-//            if (object.has(LATITUDE) && object.has(LONGITUDE)) {
-//                double lat = object.getDouble(LATITUDE);
-//                double lng = object.getDouble(LONGITUDE);
-//                this.latLng = new LatLng(lat, lng);
-//            }
+//    public Place(JSONObject object) {
+//        super(object);
+//        initCommon();
+//        setJSON(this, object);
 //
-//            if (object.has(ADDRESS)) this.address = object.getString(ADDRESS);
-//
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-    }
+////        try {
+////            if (object.has(LATITUDE) && object.has(LONGITUDE)) {
+////                double lat = object.getDouble(LATITUDE);
+////                double lng = object.getDouble(LONGITUDE);
+////                this.latLng = new LatLng(lat, lng);
+////            }
+////
+////            if (object.has(ADDRESS)) this.address = object.getString(ADDRESS);
+////
+////        } catch (JSONException e) {
+////            e.printStackTrace();
+////        }
+//    }
 
-    public Place(RVRecord RVRecord) {
-        this(RVRecord.getDataJSON());
-    }
+//    public Place(RVRecord RVRecord) {
+//        this(RVRecord.getDataJSON());
+//    }
 
     private void initCommon() {
         this.latLng = new LatLng(0, 0);
@@ -114,25 +114,25 @@ public class Place extends DataItem {
 //        this.markerId = markerId;
 //    }
 
-    @Override
-    public JSONObject jsonObject() {
-
-        JSONObject object = super.jsonObject();
-
-        try {
-            object.put(LATITUDE, latLng.latitude);
-            object.put(LONGITUDE, latLng.longitude);
-            object.put(ADDRESS, address);
-            object.put(CATEGORY, category.toString());
-            if (parentId != null) {
-                object.put(PARENT_ID, parentId);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return object;
-    }
+//    @Override
+//    public JSONObject jsonObject() {
+//
+//        JSONObject object = super.jsonObject();
+//
+//        try {
+//            object.put(LATITUDE, latLng.latitude);
+//            object.put(LONGITUDE, latLng.longitude);
+//            object.put(ADDRESS, address);
+//            object.put(CATEGORY, category.toString());
+//            if (parentId != null) {
+//                object.put(PARENT_ID, parentId);
+//            }
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//
+//        return object;
+//    }
 
 //    @Override
 //    public HashMap<String, Object> toMap() {
@@ -206,34 +206,34 @@ public class Place extends DataItem {
         }
     }
 
-    public static Place setJSON(Place place, JSONObject object) {
-
-        try {
-            if (object.has(LATITUDE) && object.has(LONGITUDE)) {
-                double lat = object.getDouble(LATITUDE);
-                double lng = object.getDouble(LONGITUDE);
-                place.latLng = new LatLng(lat, lng);
-            }
-
-            if (object.has(ADDRESS))
-                place.address = object.getString(ADDRESS);
-
-            if (object.has(CATEGORY)) {
-                place.category = Category.valueOf(object.getString(CATEGORY));
-                if (place.category == Category.UNDEFINED) {
-                    place.category = Category.HOUSE;
-                }
-            }
-
-
-            if (object.has(PARENT_ID))
-                place.parentId = object.getString(PARENT_ID);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return place;
-    }
+//    public static Place setJSON(Place place, JSONObject object) {
+//
+//        try {
+//            if (object.has(LATITUDE) && object.has(LONGITUDE)) {
+//                double lat = object.getDouble(LATITUDE);
+//                double lng = object.getDouble(LONGITUDE);
+//                place.latLng = new LatLng(lat, lng);
+//            }
+//
+//            if (object.has(ADDRESS))
+//                place.address = object.getString(ADDRESS);
+//
+//            if (object.has(CATEGORY)) {
+//                place.category = Category.valueOf(object.getString(CATEGORY));
+//                if (place.category == Category.UNDEFINED) {
+//                    place.category = Category.HOUSE;
+//                }
+//            }
+//
+//
+//            if (object.has(PARENT_ID))
+//                place.parentId = object.getString(PARENT_ID);
+//
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//        return place;
+//    }
 
     public Person.Priority getPriority() {
 

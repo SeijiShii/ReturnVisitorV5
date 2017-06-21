@@ -1,6 +1,5 @@
 package net.c_kogyo.returnvisitorv5.activity;
 
-import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Intent;
@@ -16,10 +15,8 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.Constants;
@@ -42,8 +39,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import static net.c_kogyo.returnvisitorv5.Constants.DATE_LONG;
-import static net.c_kogyo.returnvisitorv5.data.Place.LATITUDE;
-import static net.c_kogyo.returnvisitorv5.data.Place.LONGITUDE;
+import static net.c_kogyo.returnvisitorv5.Constants.LATITUDE;
+import static net.c_kogyo.returnvisitorv5.Constants.LONGITUDE;
 import static net.c_kogyo.returnvisitorv5.util.ViewUtil.setOnClickListener;
 
 /**
@@ -493,7 +490,7 @@ public class WorkPagerActivity extends AppCompatActivity {
 
         RVData.getInstance().saveData(WorkPagerActivity.this);
 
-        RVCloudSync.getInstance().syncDataIfLoggedIn(WorkPagerActivity.this);
+        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(WorkPagerActivity.this);
     }
 
     private void hideSoftKeyboard() {
@@ -574,7 +571,7 @@ public class WorkPagerActivity extends AppCompatActivity {
                             RVData.getInstance().saveData(WorkPagerActivity.this);
                             notifyDataSetChanged();
 
-                            RVCloudSync.getInstance().syncDataIfLoggedIn(WorkPagerActivity.this);
+                            RVCloudSync.getInstance().requestDataSyncIfLoggedIn(WorkPagerActivity.this);
                         }
 
                         @Override

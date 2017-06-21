@@ -25,6 +25,7 @@ import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.activity.MapActivity;
 import net.c_kogyo.returnvisitorv5.cloudsync.LoginState;
 import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
+import net.c_kogyo.returnvisitorv5.cloudsync.RVResponseBody;
 import net.c_kogyo.returnvisitorv5.util.InputUtil;
 import net.c_kogyo.returnvisitorv5.view.RightTextSwitch;
 
@@ -330,7 +331,7 @@ public class LoginDialog extends DialogFragment {
 
     }
 
-    public void onLoginResult(RVCloudSync.RequestResult result){
+    public void onLoginResult(RVResponseBody responseBody){
         // DONE: 2017/05/11  postRequestResult(RVCloudSync.ResultStatus statusCode)
 
         setCancelable(true);
@@ -343,33 +344,33 @@ public class LoginDialog extends DialogFragment {
             return;
 
         String message = "";
-        switch (result.statusCode) {
+        switch (responseBody.getStatusCode()) {
             case STATUS_202_AUTHENTICATED:
-                message = context.getString(R.string.login_success, result.userData.userName);
+                message = context.getString(R.string.login_success, responseBody.getUserName());
                 break;
 
             case STATUS_401_UNAUTHORIZED:
                 message = context.getString(R.string.login_failed) + "\n"
-                        + context.getString(R.string.wrong_password, result.userData.userName);
+                        + context.getString(R.string.wrong_password, responseBody.getUserName());
                 enableUserNameText(true);
                 enablePasswordText(true);
                 break;
 
             case STATUS_404_NOT_FOUND:
                 message = context.getString(R.string.login_failed) + "\n"
-                        + context.getString(R.string.user_not_found, result.userData.userName);
+                        + context.getString(R.string.user_not_found, responseBody.getUserName());
                 enableAccountButton(true);
                 enableUserNameText(true);
                 enablePasswordText(true);
                 break;
 
-            case STATUS_201_CREATED:
-                message = context.getString(R.string.create_user_success, result.userData.userName);
+            case STATUS_201_CREATED_USER:
+                message = context.getString(R.string.create_user_success, responseBody.getUserName());
                 break;
 
             case STATUS_400_DUPLICATE_USER_NAME:
                 message = context.getString(R.string.create_user_failed) + "\n"
-                        + context.getString(R.string.duplicate_user, result.userData.userName);
+                        + context.getString(R.string.duplicate_user, responseBody.getUserName());
                 enableAccountButton(true);
                 enableUserNameText(true);
                 enablePasswordText(true);
@@ -385,13 +386,13 @@ public class LoginDialog extends DialogFragment {
 
             case STATUS_400_SHORT_USER_NAME:
                 message = context.getString(R.string.create_user_failed) + "\n"
-                        + context.getString(R.string.short_user_name, result.userData.userName);
+                        + context.getString(R.string.short_user_name, responseBody.getUserName());
                 enableAccountButton(true);
                 enableUserNameText(true);
                 enablePasswordText(true);
                 break;
 
-            case REQUEST_TIME_OUT:
+            case STATUS_TIMED_OUT:
                 message = context.getString(R.string.login_failed) + "\n"
                         + context.getString(R.string.request_time_out);
                 enableAccountButton(true);
@@ -399,7 +400,7 @@ public class LoginDialog extends DialogFragment {
                 enablePasswordText(true);
                 break;
 
-            case SERVER_NOT_AVAILABLE:
+            case STATUS_SERVER_NOT_AVAILABLE:
                 message = context.getString(R.string.login_failed) + "\n"
                         + context.getString(R.string.server_not_available);
                 enableAccountButton(true);

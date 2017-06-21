@@ -52,13 +52,13 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import static net.c_kogyo.returnvisitorv5.Constants.LATITUDE;
+import static net.c_kogyo.returnvisitorv5.Constants.LONGITUDE;
 import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.EDIT_VISIT_ACTION;
 import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.NEW_HOUSE_ACTION;
 import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.NEW_VISIT_ACTION_NO_PLACE;
 import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.NEW_VISIT_ACTION_NO_PLACE_WITH_DATE;
 import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.NEW_VISIT_ACTION_WITH_PLACE;
-import static net.c_kogyo.returnvisitorv5.data.Place.LATITUDE;
-import static net.c_kogyo.returnvisitorv5.data.Place.LONGITUDE;
 import static net.c_kogyo.returnvisitorv5.data.Place.PLACE;
 import static net.c_kogyo.returnvisitorv5.data.Visit.VISIT;
 
@@ -427,7 +427,7 @@ public class RecordVisitActivity extends AppCompatActivity {
                     public void postDeletePerson(Person person) {
                         RVData.getInstance().personList.deleteById(person.getId());
                         RVData.getInstance().saveData(RecordVisitActivity.this);
-                        RVCloudSync.getInstance().syncDataIfLoggedIn(RecordVisitActivity.this);
+                        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(RecordVisitActivity.this);
                     }
                 });
         visitDetailFrame.addView(detailView);
@@ -550,7 +550,7 @@ public class RecordVisitActivity extends AppCompatActivity {
 
                 RVData.getInstance().saveData(getApplicationContext());
 
-                RVCloudSync.getInstance().syncDataIfLoggedIn(RecordVisitActivity.this);
+                RVCloudSync.getInstance().requestDataSyncIfLoggedIn(RecordVisitActivity.this);
 
                 finish();
 
@@ -897,7 +897,7 @@ public class RecordVisitActivity extends AppCompatActivity {
 
         RVData.getInstance().personList.setOrAdd(person);
         RVData.getInstance().saveData(this);
-        RVCloudSync.getInstance().syncDataIfLoggedIn(this);
+        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this);
     }
 
     // DONE: 2017/03/26 PriorityRaterの挙動がいまいち

@@ -1,6 +1,5 @@
 package net.c_kogyo.returnvisitorv5.view;
 
-import android.animation.Animator;
 import android.app.TimePickerDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -132,7 +131,7 @@ public class WorkView extends BaseAnimateView {
                         mWork.onUpdate();
                         RVData.getInstance().workList.setOrAdd(mWork);
                         RVData.getInstance().saveData(getContext());
-                        RVCloudSync.getInstance().syncDataIfLoggedIn(getContext());
+                        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getContext());
 
                         updateStartTimeText();
                         updateEndTimeText();
@@ -167,7 +166,7 @@ public class WorkView extends BaseAnimateView {
                         mWork.onUpdate();
                         RVData.getInstance().workList.setOrAdd(mWork);
                         RVData.getInstance().saveData(getContext());
-                        RVCloudSync.getInstance().syncDataIfLoggedIn(getContext());
+                        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getContext());
 
                         updateStartTimeText();
                         updateEndTimeText();
@@ -411,7 +410,7 @@ public class WorkView extends BaseAnimateView {
                 RVData.getInstance().saveData(getContext());
                 visitCellContainer.removeView(visitCell);
 
-                RVCloudSync.getInstance().syncDataIfLoggedIn(getContext());
+                RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getContext());
             }
 
             @Override

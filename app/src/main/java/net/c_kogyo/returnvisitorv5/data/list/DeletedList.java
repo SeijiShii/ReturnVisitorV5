@@ -1,5 +1,7 @@
 package net.c_kogyo.returnvisitorv5.data.list;
 
+import com.google.gson.Gson;
+
 import net.c_kogyo.returnvisitorv5.data.DataItem;
 import net.c_kogyo.returnvisitorv5.data.DeletedData;
 import net.c_kogyo.returnvisitorv5.data.RVRecord;
@@ -24,8 +26,8 @@ public class DeletedList implements Iterable<DeletedData>{
         list.add(new DeletedData(data));
     }
 
-    synchronized public void add(RVRecord RVRecord) {
-        list.add(new DeletedData(RVRecord));
+    synchronized public void add(RVRecord record) {
+        list.add(new Gson().fromJson(record.getDataJSON(), DeletedData.class));
     }
 
     synchronized public void clear() {

@@ -24,52 +24,52 @@ public class Work extends TimePeriodItem {
 //        this.intervals = new ArrayList<>();
     }
 
-    public Work(RVRecord RVRecord) {
-        this(RVRecord.getDataJSON());
-    }
-
-    public Work(JSONObject object) {
-        super(object);
-//        this.intervals = new ArrayList<>();
-        setJSON(this, object);
-    }
-
-    @Override
-    public JSONObject jsonObject() {
-
-        return super.jsonObject();
-
-//        JSONArray intervalArray = new JSONArray();
-//        for (TimePeriodItem item : intervals) {
-//            intervalArray.put(item.jsonObject());
-//        }
-
-//        try {
-//            object.put(INTERVALS, intervalArray);
-//        } catch (JSONException  e) {
-//            e.printStackTrace();
-//        }
-
-//        return object;
-    }
-
-    public static void setJSON(Work work, JSONObject object) {
-
-        TimePeriodItem.setJSON(work, object);
-
-//        try {
-//            if (object.has(INTERVALS)) {
-//                JSONArray array = object.getJSONArray(INTERVALS);
-//                work.intervals = new ArrayList<>();
-//                for ( int i = 0 ; i < array.length() ; i++ ) {
-//                    work.intervals.add(new TimePeriodItem(array.getJSONObject(i)));
-//                }
-//             }
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-
-    }
+//    public Work(RVRecord RVRecord) {
+//        this(RVRecord.getDataJSON());
+//    }
+//
+//    public Work(JSONObject object) {
+//        super(object);
+////        this.intervals = new ArrayList<>();
+//        setJSON(this, object);
+//    }
+//
+//    @Override
+//    public JSONObject jsonObject() {
+//
+//        return super.jsonObject();
+//
+////        JSONArray intervalArray = new JSONArray();
+////        for (TimePeriodItem item : intervals) {
+////            intervalArray.put(item.jsonObject());
+////        }
+//
+////        try {
+////            object.put(INTERVALS, intervalArray);
+////        } catch (JSONException  e) {
+////            e.printStackTrace();
+////        }
+//
+////        return object;
+//    }
+//
+//    public static void setJSON(Work work, JSONObject object) {
+//
+//        TimePeriodItem.setJSON(work, object);
+//
+////        try {
+////            if (object.has(INTERVALS)) {
+////                JSONArray array = object.getJSONArray(INTERVALS);
+////                work.intervals = new ArrayList<>();
+////                for ( int i = 0 ; i < array.length() ; i++ ) {
+////                    work.intervals.add(new TimePeriodItem(array.getJSONObject(i)));
+////                }
+////             }
+////        } catch (JSONException e) {
+////            e.printStackTrace();
+////        }
+//
+//    }
 
     //    public boolean isTimeCounting() {
 //

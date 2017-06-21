@@ -14,16 +14,16 @@ public class Tag extends DataItem {
         this.name = name;
     }
 
-    public Tag(RVRecord RVRecord) {
-        super(RVRecord.getDataJSON());
-    }
-
-    public Tag(JSONObject object) {
-
-        setJSON(this, object);
-    }
-
-    public static Tag setJSON(Tag tag, JSONObject object) {
-        return (Tag) DataItem.setJSON(tag, object);
-    }
+//    public Tag(RVRecord RVRecord) {
+//        super(RVRecord.getDataJSON());
+//    }
+//
+//    public Tag(JSONObject object) {
+//
+//        setJSON(this, object);
+//    }
+//
+//    public static Tag setJSON(Tag tag, JSONObject object) {
+//        return (Tag) DataItem.setJSON(tag, object);
+//    }
 }

@@ -99,17 +99,17 @@ public class RVWebSocketClient extends WebSocketClient{
 
     @Override
     public void onClose(int i, String s, boolean b) {
-
+        Log.d(TAG, s);
     }
 
     @Override
     public void onError(Exception e) {
-
+        Log.d(TAG, e.getMessage());
     }
 
     @Override
     public void onMessage(String s) {
-        Log.d(TAG, "onMessage called!");
+//        Log.d(TAG, "onMessage called!");
 
         if (mCallback != null) {
             mCallback.onWebSocketMessage(s);

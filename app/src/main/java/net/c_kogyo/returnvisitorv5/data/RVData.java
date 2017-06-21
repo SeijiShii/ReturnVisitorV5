@@ -1,10 +1,15 @@
 package net.c_kogyo.returnvisitorv5.data;
 
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.util.Log;
+
+import com.google.gson.Gson;
+import com.google.gson.internal.LinkedTreeMap;
+import com.google.gson.reflect.TypeToken;
 
 import net.c_kogyo.returnvisitorv5.data.list.DeletedList;
 import net.c_kogyo.returnvisitorv5.data.list.NoteCompList;
@@ -30,6 +35,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by SeijiShii on 2017/02/27.
@@ -62,7 +70,10 @@ public class RVData {
     private Handler mHandler;
 
     private static RVData instance = new RVData();
+    private Gson mGson;
     private RVData() {
+
+        mGson = new Gson();
 
         placeList = new PlaceList();
         personList = new PersonList();
@@ -118,7 +129,7 @@ public class RVData {
                 }).start();
             }
 
-            jsonToData(stringToJson(loadStringFromFile()));
+            stringToRecordList();
 
 //            personList.setPriorityToPersons();
 //            placeList.deleteRoomsWithoutParent();
@@ -171,6 +182,16 @@ public class RVData {
             return s;
         }
 
+        private void stringToRecordList() {
+
+            ArrayList<RVRecord> records = new ArrayList<>();
+            String dataString = loadStringFromFile();
+            if (dataString != null && dataString.length() > 0) {
+                records  = mGson.fromJson(loadStringFromFile(), new TypeToken<ArrayList<RVRecord>>(){}.getType());
+            }
+            setFromRecordList(records, RecordArraySource.FROM_DEVICE);
+        }
+
         private JSONObject stringToJson(String string) {
 
             if (string.equals("") || string.length() <= 0)
@@ -184,19 +205,25 @@ public class RVData {
             return new JSONObject();
         }
 
-        private void jsonToData(JSONObject object) {
-
-            if (object == null) return;
-
-            try {
-                if (object.has(RV_DATA_LIST)) {
-                    JSONArray array = object.getJSONArray(RV_DATA_LIST);
-                    setFromRecordArray(array, RecordArraySource.FROM_DEVICE);
-                }
-            }catch (JSONException e) {
-                Log.e(TAG, e.getMessage());
-            }
-        }
+//       private void jsonToData(JSONObject object) {
+//
+//            if (object == null) return;
+//
+//            try {
+//                if (object.has(RV_DATA_LIST)) {
+//                    JSONArray array = object.getJSONArray(RV_DATA_LIST);
+//                    ArrayList<RVRecord> records = new ArrayList<>();
+//                    for ( int i = 0 ; i < array.length() ; i++ ) {
+//                        JSONObject object1 = array.getJSONObject(i);
+//                        RVRecord record = new RVRecord(object1);
+//                        records.add(record);
+//                    }
+//                    setFromRecordList(records, RecordArraySource.FROM_DEVICE);
+//                }
+//            }catch (JSONException e) {
+//                Log.e(TAG, e.getMessage());
+//            }
+//        }
     }
 
     public enum RecordArraySource{
@@ -204,47 +231,41 @@ public class RVData {
         FROM_CLOUD
     }
 
-    public void setFromRecordArray(JSONArray jsonArray, RecordArraySource source) {
-        for ( int i = 0 ; i < jsonArray.length() ; i++ ) {
+    public void setFromRecordList(ArrayList<RVRecord> records, RecordArraySource source) {
 
-            try {
-                JSONObject recordObject = jsonArray.getJSONObject(i);
-                RVRecord RVRecord = new RVRecord(recordObject);
-
-                switch (RVRecord.getClassName()) {
-                    case "Place":
-                        placeList.setOrAdd(new Place(RVRecord));
-                        break;
-                    case "Person":
-                        personList.setOrAdd(new Person(RVRecord));
-                        break;
-                    case "Visit":
-                        visitList.setOrAdd(new Visit(RVRecord));
-                        break;
-                    case "Tag":
-                        tagList.setOrAdd(new Tag(RVRecord));
-                        break;
-                    case "NoteCompItem":
-                        noteCompList.setOrAdd(new NoteCompItem(RVRecord));
-                        break;
-                    case "Work":
-                        workList.setOrAdd(new Work(RVRecord));
-                        break;
-                    case "Publication":
-                        publicationList.setOrAdd(new Publication(RVRecord));
-                        break;
-                    case "DeletedData":
-                        if (source == RecordArraySource.FROM_CLOUD) {
-                            inCloudDeletedList.add(RVRecord);
-                        } else if (source == RecordArraySource.FROM_DEVICE) {
-                            inDeviceDeletedList.add(RVRecord);
-                        }
-                        break;
-                }
-            } catch (JSONException e) {
-                Log.e(TAG, e.getMessage());
+        for (RVRecord record : records) {
+            switch (record.getClassName()) {
+                case "Place":
+                    placeList.setOrAdd(mGson.fromJson(record.getDataJSON(), Place.class));
+                    break;
+                case "Person":
+                    personList.setOrAdd(mGson.fromJson(record.getDataJSON(), Person.class));
+                    break;
+                case "Visit":
+                    visitList.setOrAdd(mGson.fromJson(record.getDataJSON(), Visit.class));
+                    break;
+                case "Tag":
+                    tagList.setOrAdd(mGson.fromJson(record.getDataJSON(), Tag.class));
+                    break;
+                case "NoteCompItem":
+                    noteCompList.setOrAdd(mGson.fromJson(record.getDataJSON(), NoteCompItem.class));
+                    break;
+                case "Work":
+                    workList.setOrAdd(mGson.fromJson(record.getDataJSON(), Work.class));
+                    break;
+                case "Publication":
+                    publicationList.setOrAdd(mGson.fromJson(record.getDataJSON(), Publication.class));
+                    break;
+                case "DeletedData":
+                    if (source == RecordArraySource.FROM_CLOUD) {
+                        inCloudDeletedList.add(record);
+                    } else if (source == RecordArraySource.FROM_DEVICE) {
+                        inDeviceDeletedList.add(record);
+                    }
+                    break;
             }
         }
+
     }
 
     public void removeDeletedData() {
@@ -320,7 +341,7 @@ public class RVData {
             isDataSaving = true;
 
             // 書き込み処理
-            saveToFile(jsonToString(jsonObject()));
+            saveToFile(toJsonString());
 
             // 書き込みが終わった
             isDataSaving = false;
@@ -341,63 +362,57 @@ public class RVData {
             return null;
         }
 
-        private JSONObject jsonObject() {
+        private String toJsonString() {
 
-            JSONObject object = new JSONObject();
-            JSONArray array = new JSONArray();
+            List<RVRecord> records = new ArrayList<>();
 
             for (Place place : placeList) {
-                array.put(new RVRecord(place).getFullJSON());
+                records.add(new RVRecord(place));
             }
 
             for (Person person : personList) {
-                array.put(new RVRecord(person).getFullJSON());
+                records.add(new RVRecord(person));
             }
 
             for (Visit visit : visitList) {
-                array.put(new RVRecord(visit).getFullJSON());
+                records.add(new RVRecord(visit));
             }
 
             for (Tag tag : tagList) {
-                array.put(new RVRecord(tag).getFullJSON());
+                records.add(new RVRecord(tag));
             }
 
             for (NoteCompItem note : noteCompList) {
-                array.put(new RVRecord(note).getFullJSON());
+                records.add(new RVRecord(note));
             }
 
             for (Work work : workList) {
-                array.put(new RVRecord(work).getFullJSON());
+                records.add(new RVRecord(work));
             }
 
             for (Publication publication : publicationList) {
-                array.put(new RVRecord(publication).getFullJSON());
+                records.add(new RVRecord(publication));
             }
 
             for (DeletedData deletedData : inDeviceDeletedList) {
-                array.put(new RVRecord(deletedData).getFullJSON());
+                records.add(new RVRecord(deletedData));
             }
 
-            try {
-                object.put(RV_DATA_LIST, array);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            return object;
+            return mGson.toJson(records);
         }
 
-        private String jsonToString(JSONObject object) {
-
-            String s = "";
-
-            try {
-                s = object.toString(2);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            return s;
-        }
+//        private String jsonToString(JSONObject object) {
+//
+//            String s = "";
+//
+//            try {
+//                s = object.toString(2);
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
+//
+//            return s;
+//        }
 
         private void saveToFile(String s) {
 
@@ -489,44 +504,44 @@ public class RVData {
         return visitList.getList().size() > 0 || workList.getList().size() > 0;
     }
 
-    public JSONArray getJSONArrayLaterThanTime(long dateTimeInMills) {
+    public ArrayList<RVRecord> getRecordsLaterThanTime(long dateTimeInMills) {
 
-        JSONArray array = new JSONArray();
+        ArrayList<RVRecord> records = new ArrayList<>();
 
         for (Place place : placeList.getListLaterThanTime(dateTimeInMills)) {
-            array.put(new RVRecord(place).getFullJSON());
+            records.add(new RVRecord(place));
         }
 
         for (Person person : personList.getListLaterThanTime(dateTimeInMills)) {
-            array.put(new RVRecord(person).getFullJSON());
+            records.add(new RVRecord(person));
         }
 
         for (Visit visit : visitList.getListLaterThanTime(dateTimeInMills)) {
-            array.put(new RVRecord(visit).getFullJSON());
+            records.add(new RVRecord(visit));
         }
 
         for (Tag tag : tagList.getListLaterThanTime(dateTimeInMills)) {
-            array.put(new RVRecord(tag).getFullJSON());
+            records.add(new RVRecord(tag));
         }
 
         for (Work work : workList.getListLaterThanTime(dateTimeInMills)) {
-            array.put(new RVRecord(work).getFullJSON());
+            records.add(new RVRecord(work));
         }
 
         for (Publication publication : publicationList.getListLaterThanTime(dateTimeInMills)) {
-            array.put(new RVRecord(publication).getFullJSON());
+            records.add(new RVRecord(publication));
         }
 
         for (DataItem item : noteCompList.getListLaterThanTime(dateTimeInMills)) {
-            array.put(new RVRecord(item).getFullJSON());
+            records.add(new RVRecord(item));
         }
 
         for (DeletedData deletedData : inDeviceDeletedList) {
-            array.put(new RVRecord(deletedData).getFullJSON());
+            records.add(new RVRecord(deletedData));
         }
         inDeviceDeletedList.clear();
 
-        return array;
+        return records;
     }
 
     public interface RVDataCallback {

@@ -80,9 +80,9 @@ public class Publication extends DataItem implements Cloneable{
 
     public static final String PUBLICATION = "Publication";
 
-    public static final String CATEGORY = "category";
-    public static final String MAGAZINE_CATEGORY = "magazine_category";
-    public static final String NUMBER = "number";
+//    public static final String CATEGORY = "category";
+//    public static final String MAGAZINE_CATEGORY = "magazine_category";
+//    public static final String NUMBER = "number";
 
     private Category category;
     private MagazineCategory magCategory;
@@ -107,41 +107,41 @@ public class Publication extends DataItem implements Cloneable{
         this.category = category;
     }
 
-    public Publication(RVRecord RVRecord) {
-        this(RVRecord.getDataJSON());
-    }
-
-    public Publication(JSONObject object) {
-        super(object);
-
-        try {
-            if (object.has(CATEGORY))
-                this.category = Category.valueOf(object.getString(CATEGORY));
-            if (object.has(MAGAZINE_CATEGORY))
-                this.magCategory = MagazineCategory.valueOf(object.getString(MAGAZINE_CATEGORY));
-            if (object.has(NUMBER)) {
-                this.number = Calendar.getInstance();
-                this.number.setTimeInMillis(object.getLong(NUMBER));
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public JSONObject jsonObject() {
-
-        JSONObject object = super.jsonObject();
-
-        try {
-            object.put(CATEGORY, this.category);
-            object.put(MAGAZINE_CATEGORY, this.magCategory);
-            object.put(NUMBER, this.number.getTimeInMillis());
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return object;
-    }
+//    public Publication(RVRecord RVRecord) {
+//        this(RVRecord.getDataJSON());
+//    }
+//
+//    public Publication(JSONObject object) {
+//        super(object);
+//
+//        try {
+//            if (object.has(CATEGORY))
+//                this.category = Category.valueOf(object.getString(CATEGORY));
+//            if (object.has(MAGAZINE_CATEGORY))
+//                this.magCategory = MagazineCategory.valueOf(object.getString(MAGAZINE_CATEGORY));
+//            if (object.has(NUMBER)) {
+//                this.number = Calendar.getInstance();
+//                this.number.setTimeInMillis(object.getLong(NUMBER));
+//            }
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//    }
+//
+//    public JSONObject jsonObject() {
+//
+//        JSONObject object = super.jsonObject();
+//
+//        try {
+//            object.put(CATEGORY, this.category);
+//            object.put(MAGAZINE_CATEGORY, this.magCategory);
+//            object.put(NUMBER, this.number.getTimeInMillis());
+//
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//        return object;
+//    }
 
 //    public Publication(HashMap<String, Object> map) {
 //

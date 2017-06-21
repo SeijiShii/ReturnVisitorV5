@@ -21,7 +21,6 @@ public class Constants {
 
         public static final String PUBLISHER_NAME = "publisher_name";
 
-
         public static final String WEEK_START_DAY = "week_start_day";
 
 
@@ -31,6 +30,8 @@ public class Constants {
 
     public static final String DATA_ARRAY_LATER_THAN_TIME = "data_array_later_than_time";
     public static final String LOADED_DATA_ARRAY = "loaded_data_array";
+    public static final String LATITUDE = "latitude";
+    public static final String LONGITUDE = "longitude";
 //    public static final String FAILED_DATA_ARRAY = "failed_data_array";
 
     public static final int[] buttonRes = {

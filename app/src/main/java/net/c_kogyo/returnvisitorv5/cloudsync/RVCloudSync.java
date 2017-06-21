@@ -2,30 +2,24 @@ package net.c_kogyo.returnvisitorv5.cloudsync;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
+
+import com.google.gson.Gson;
 
 import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.data.RVData;
+import net.c_kogyo.returnvisitorv5.data.RVRecord;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 import net.c_kogyo.returnvisitorv5.util.EncryptUtil;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import static android.content.Context.MODE_PRIVATE;
-import static net.c_kogyo.returnvisitorv5.Constants.DATA_ARRAY_LATER_THAN_TIME;
-import static net.c_kogyo.returnvisitorv5.Constants.LOADED_DATA_ARRAY;
 import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.LAST_DEVICE_SYNC_TIME;
-import static net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync.RVCloudSyncMethod.CREATE_USER;
-import static net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync.RVCloudSyncMethod.LOGIN;
 
 /**
  * Created by SeijiShii on 2017/05/10.
@@ -35,35 +29,6 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback{
 
     public static final String TAG = "RVCloudSync";
 
-    private final String USER_DATA = "user";
-    private final String LOGIN_STATE = "state";
-    private final String USER_NAME = "user_name";
-    private final String PASSWORD = "password";
-
-    private final String METHOD = "method";
-
-    private final String STATE = "state";
-
-    public enum RVCloudSyncMethod {
-        LOGIN,
-        CREATE_USER,
-        SYNC_DATA,
-    }
-
-    public enum ResultStatus {
-
-        STATUS_200_SYNC_OK,
-        STATUS_201_CREATED,
-        STATUS_202_AUTHENTICATED,
-        STATUS_400_DUPLICATE_USER_NAME,
-        STATUS_400_SHORT_USER_NAME,
-        STATUS_400_SHORT_PASSWORD,
-        STATUS_401_UNAUTHORIZED,
-        STATUS_404_NOT_FOUND,
-        REQUEST_TIME_OUT,
-        SERVER_NOT_AVAILABLE
-    }
-
 //    public static final int CREATED         = 201;
 //    public static final int AUTHENTICATED   = 202;
 //    public static final int BAD_REQUEST     = 400;
@@ -71,9 +36,11 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback{
 //    public static final int NOT_FOUND       = 404;
 
     private final String ROOT_URL = "https://c-kogyo.work:1337";
+//    private final String ROOT_URL = "http://192.168.3.4:1337";
 
     private static RVCloudSync instance = new RVCloudSync();
     private RVCloudSyncCallback mCallback;
+    private Gson mGson;
 
     private RVWebSocketClient socketClient;
 //    private UserData userData;
@@ -87,16 +54,29 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback{
     }
 
 //    private WebSocket webSocket;
-    private RVCloudSync() {}
+    private RVCloudSync() {
+        mGson = new Gson();
+    }
 
-    public void login(String userName,
-                           String password,
-                           boolean passAlreadyEncrypted,
-                           Context context) {
+    public void login(final String userName,
+                      String password,
+                      boolean passAlreadyEncrypted,
+                      Context context) {
 
-        final UserData userData = new UserData(userName, password, passAlreadyEncrypted);
-        startSendingUserData(userData, context, LOGIN,
-                new SendUserDataCallback() {
+        String mPass;
+        if (passAlreadyEncrypted) {
+            mPass = password;
+        } else {
+            mPass = EncryptUtil.toEncryptedHashValue("SHA-256", password);
+        }
+        RVRequestBody requestBody = new RVRequestBody(userName, mPass, 0);
+        RVCloudSyncDataFrame dataFrame
+                = new RVCloudSyncDataFrame(RVCloudSyncDataFrame.FrameCategory.LOGIN_REQUEST,
+                                            mGson.toJson(requestBody),
+                                            null);
+
+        startSendingData(context, dataFrame,
+                new SendDataCallback() {
                     @Override
                     public void onStart() {
                         if (mCallback != null) {
@@ -107,21 +87,33 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback{
                     @Override
                     public void onTimedOut() {
                         if (mCallback != null) {
-                            RequestResult result = new RequestResult(userData, ResultStatus.REQUEST_TIME_OUT);
-                            mCallback.onLoginResult(result);
+                            RVResponseBody responseBody
+                                    = new RVResponseBody(RVResponseBody.StatusCode.STATUS_TIMED_OUT, userName, null);
+                            mCallback.onLoginResult(responseBody);
                         }
                     }
                 });
     }
 
-    public void createUser(String userName,
+    public void createUser(final String userName,
                                 String password,
                                 boolean passAlreadyEncrypted,
                                 Context context) {
 
-        final UserData userData = new UserData(userName, password, passAlreadyEncrypted);
-        startSendingUserData(userData, context, CREATE_USER,
-                new SendUserDataCallback() {
+        String mPass;
+        if (passAlreadyEncrypted) {
+            mPass = password;
+        } else {
+            mPass = EncryptUtil.toEncryptedHashValue("SHA-256", password);
+        }
+        RVRequestBody requestBody = new RVRequestBody(userName, mPass, 0);
+        RVCloudSyncDataFrame dataFrame
+                = new RVCloudSyncDataFrame(RVCloudSyncDataFrame.FrameCategory.CREATE_USER_REQUEST,
+                mGson.toJson(requestBody),
+                null);
+
+        startSendingData(context, dataFrame,
+                new SendDataCallback() {
                     @Override
                     public void onStart() {
                         if (mCallback != null) {
@@ -132,17 +124,16 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback{
                     @Override
                     public void onTimedOut() {
                         if (mCallback != null) {
-                            RequestResult result = new RequestResult(userData, ResultStatus.REQUEST_TIME_OUT);
-                            mCallback.onCreateUserResult(result);
-                        }
+                            RVResponseBody responseBody
+                                    = new RVResponseBody(RVResponseBody.StatusCode.STATUS_TIMED_OUT, userName, null);
+                            mCallback.onLoginResult(responseBody);                        }
                     }
                 });
     }
 
-    private void startSendingUserData(final UserData userData,
-                                      Context context,
-                                      final RVCloudSyncMethod method,
-                                      final SendUserDataCallback callback) {
+    private void startSendingData(Context context,
+                                  final RVCloudSyncDataFrame dataFrame,
+                                  final SendDataCallback callback) {
         callback.onStart();
 
         initSocketClient(context);
@@ -151,7 +142,7 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback{
             return;
 
         if (socketClient.isOpen()) {
-            sendUserData(userData, method);
+            socketClient.send(mGson.toJson(dataFrame));
         } else {
             new Thread(new Runnable() {
                 @Override
@@ -169,7 +160,7 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback{
                             Log.e(TAG, e.getMessage());
                         }
                     }
-                    sendUserData(userData, method);
+                    socketClient.send(mGson.toJson(dataFrame));
                 }
             }).start();
             socketClient.connect();
@@ -177,27 +168,19 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback{
         }
     }
 
-    private void sendUserData(UserData userData, RVCloudSyncMethod method) {
-        final JSONObject object = new JSONObject();
-        try {
-            object.put(METHOD, method);
-            object.put(USER_DATA, userData.jsonObject());
-        } catch (JSONException e) {
-            Log.e(TAG, e.getMessage());
-        }
-        socketClient.send(object.toString());
-    }
-
-    private interface SendUserDataCallback{
+    private interface SendDataCallback {
 
         void onStart();
 
         void onTimedOut();
     }
 
-    public void syncDataIfLoggedIn (Context context) {
+    private ArrayList<RVRecord> cloudDataList;
+    private long lastSyncTime;
+    private int cloudDataCount = 0;
+    public void requestDataSyncIfLoggedIn(Context context) {
 
-        LoginState loginState = LoginState.getInstance();
+        final LoginState loginState = LoginState.getInstance();
         if (!loginState.isLoggedIn()) return;
 
         if (mCallback != null) {
@@ -206,66 +189,36 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback{
 
         initSocketClient(context);
 
+        cloudDataList = new ArrayList<>();
+
         SharedPreferences prefs
                 = context.getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
-        long lastSyncTime = prefs.getLong(LAST_DEVICE_SYNC_TIME, 0);
+        lastSyncTime = prefs.getLong(LAST_DEVICE_SYNC_TIME, 0);
 
         Calendar date = Calendar.getInstance();
         date.setTimeInMillis(lastSyncTime);
         Log.d(TAG, "Last sync date: " + DateTimeText.getDateTimeText(date, context));
 
-        final UserData userData = new UserData(loginState.getUserName(), loginState.getPassword(), true);
+        RVRequestBody requestBody = new RVRequestBody(loginState.getUserName(), loginState.getPassword(), lastSyncTime);
+        RVCloudSyncDataFrame dataFrame
+                = new RVCloudSyncDataFrame(RVCloudSyncDataFrame.FrameCategory.SYNC_DATA_REQUEST,
+                                            mGson.toJson(requestBody),
+                                            null);
+        startSendingData(context, dataFrame, new SendDataCallback() {
+            @Override
+            public void onStart() {
 
-        final SyncData syncData
-                = new SyncData(userData,
-                                lastSyncTime,
-                                RVData.getInstance().getJSONArrayLaterThanTime(lastSyncTime));
+            }
 
-        if (socketClient.isOpen()) {
-            socketClient.send(syncData.jsonObject().toString());
-        } else {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    int timeCounter = 0;
-                    while (!socketClient.isOpen()) {
-                        try {
-                            Thread.sleep(50);
-                            timeCounter += 50;
-                            if (timeCounter > 10000) {
-
-                                if (mCallback != null) {
-                                    RequestResult result = new RequestResult(userData, ResultStatus.REQUEST_TIME_OUT);
-                                    mCallback.onSyncDataResult(result);
-                                }
-                                return;
-                            }
-                        } catch (InterruptedException e ) {
-                            Log.e(TAG, e.getMessage());
-                        }
-                    }
-                    socketClient.send(syncData.jsonObject().toString());
-
-                    while (true) {
-                        try {
-                            Thread.sleep(50);
-                            timeCounter += 50;
-                            if (timeCounter > 10000) {
-
-                                if (mCallback != null) {
-                                    RequestResult result = new RequestResult(userData, ResultStatus.REQUEST_TIME_OUT);
-                                    mCallback.onSyncDataResult(result);
-                                }
-                                return;
-                            }
-                        } catch (InterruptedException e ) {
-                            Log.e(TAG, e.getMessage());
-                        }
-                    }
+            @Override
+            public void onTimedOut() {
+                if (mCallback != null) {
+                    RVResponseBody responseBody
+                            = new RVResponseBody(RVResponseBody.StatusCode.STATUS_TIMED_OUT, loginState.getUserName(), null);
+                    mCallback.onSyncDataResult(responseBody);
                 }
-            }).start();
-            socketClient.connect();
-        }
+            }
+        });
     }
 
     private void initSocketClient(final Context context) {
@@ -276,168 +229,105 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback{
         }
     }
 
-//    private void loginWithData(UserData userData) {
-//        final JSONObject object = new JSONObject();
-//        try {
-//            object.put(METHOD, LOGIN);
-//            object.put(USER_DATA, userData.jsonObject());
-//        } catch (JSONException e) {
-//            Log.e(TAG, e.getMessage());
-//        }
-//        socketClient.send(object.toString());
-//    }
-//
-//    private void createUserWithData(UserData userData) {
-//        final JSONObject object = new JSONObject();
-//        try {
-//            object.put(METHOD, CREATE_USER);
-//            object.put(USER_DATA, userData.jsonObject());
-//        } catch (JSONException e) {
-//            Log.e(TAG, e.getMessage());
-//        }
-//        socketClient.send(object.toString());
-//    }
-
-
-    public class UserData {
-        public String userName, password;
-
-        private UserData(@Nullable String userName, @Nullable String password, boolean passAlreadyEncrypted) {
-
-            if (userName == null || password == null) {
-                return;
-            }
-
-            this.userName = userName;
-            if (passAlreadyEncrypted) {
-                this.password = password;
-            } else {
-                this.password = EncryptUtil.toEncryptedHashValue("SHA-256", password);
-            }
-        }
-
-        private UserData(JSONObject object) {
-
-            try {
-                if (object.has(USER_NAME))
-                    this.userName = object.getString(USER_NAME);
-                if (object.has(PASSWORD))
-                    this.password = object.getString(PASSWORD);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-
-        private JSONObject jsonObject() {
-
-            JSONObject object = new JSONObject();
-            try {
-                object.put(USER_NAME, userName);
-                object.put(PASSWORD, password);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            return object;
-        }
-    }
-
-    public class RequestResult {
-        public UserData userData;
-        public ResultStatus statusCode;
-
-        private RequestResult(UserData userData, ResultStatus statusCode) {
-            this.userData = userData;
-            this.statusCode = statusCode;
-        }
-
-    }
-
-    private class SyncData {
-        private UserData userData;
-        private long lastDeviceSyncTime;
-        private JSONArray laterDataArray;
-
-        private SyncData(UserData userData, long lastDeviceSyncTime, JSONArray laterDataArray) {
-            this.userData = userData;
-            this.lastDeviceSyncTime = lastDeviceSyncTime;
-            this.laterDataArray = laterDataArray;
-        }
-
-        public JSONObject jsonObject() {
-            JSONObject object = new JSONObject();
-            try {
-                object.put(USER_DATA, userData.jsonObject());
-                object.put(LAST_DEVICE_SYNC_TIME, lastDeviceSyncTime);
-                object.put(DATA_ARRAY_LATER_THAN_TIME, laterDataArray);
-                object.put(METHOD, RVCloudSyncMethod.SYNC_DATA.toString());
-            } catch (JSONException e) {
-                Log.e(TAG, e.getMessage());
-            }
-            return object;
-        }
-    }
-
     @Override
     public void onWebSocketMessage(String s) {
-        try {
-            JSONObject object = new JSONObject(s);
-            RVCloudSyncMethod method = RVCloudSyncMethod.valueOf(object.getString(METHOD));
-            ResultStatus status = ResultStatus.valueOf(object.getString(STATE));
-            UserData userData = new UserData(object.getJSONObject(USER_DATA));
 
-            JSONArray loadedArray = new JSONArray();
-            if (object.has(LOADED_DATA_ARRAY))
-                loadedArray = object.getJSONArray(Constants.LOADED_DATA_ARRAY);
+        RVCloudSyncDataFrame dataFrame = mGson.fromJson(s, RVCloudSyncDataFrame.class);
+        Log.d(TAG, "FrameCategory: " + dataFrame.getFrameCategory().toString());
 
-            final RequestResult result = new RequestResult(userData, status);
+        switch (dataFrame.getFrameCategory()) {
+            case LOGIN_RESPONSE:
+                if (mCallback != null) {
+                    mCallback.onLoginResult(mGson.fromJson(dataFrame.getDataBody(), RVResponseBody.class));
+                }
+                break;
 
-//            if (status == ResultStatus.STATUS_202_AUTHENTICATED
-//                    || status == ResultStatus.STATUS_201_CREATED
-//                    || status == ResultStatus.STATUS_200_SYNC_OK) {
-//                LoginState.onSuccessLogin(userData.userName, userData.password, context);
-//            } else {
-//                LoginState.onLoggedOut(context);
-//            }
+            case CREATE_USER_RESPONSE:
+                if (mCallback != null) {
+                    mCallback.onCreateUserResult(mGson.fromJson(dataFrame.getDataBody(), RVResponseBody.class));
+                }
+                break;
 
-            switch (method) {
-                case LOGIN:
-                    if (mCallback != null) {
-                        mCallback.onLoginResult(result);
-                    }
-                case CREATE_USER:
-                    if (mCallback != null) {
-                        mCallback.onCreateUserResult(result);
-                    }
-                    break;
+            case SYNC_DATA_RESPONSE:
+                onSyncDataResponse(dataFrame);
+                break;
 
-                case SYNC_DATA:
-                    RVData.getInstance().setFromRecordArray(loadedArray, RVData.RecordArraySource.FROM_CLOUD);
-                    RVData.getInstance().removeDeletedData();
-                    if (mCallback != null) {
-                        mCallback.onSyncDataResult(result);
-                    }
-                    break;
-            }
-            socketClient.close();
+            case CLOUD_DATA_FRAME:
+                Log.d(TAG, "Cloud data count: " + cloudDataCount++ + ", List number: " + cloudDataList.size());
+                onCloudDataFrame(dataFrame);
+                break;
 
-        } catch (JSONException e) {
-            Log.e(TAG, e.getMessage());
+            case CLOUD_DATA_END_FRAME:
+                onCloudDataEndFrame(dataFrame);
+                break;
         }
+    }
+
+    private void onSyncDataResponse(RVCloudSyncDataFrame dataFrame) {
+        RVResponseBody responseBody = mGson.fromJson(dataFrame.getDataBody(), RVResponseBody.class);
+        switch (responseBody.getStatusCode()) {
+            case STATUS_200_SYNC_START_OK:
+                sendDeviceData(dataFrame.getToken());
+                break;
+
+            case STATUS_401_UNAUTHORIZED:
+            case STATUS_404_NOT_FOUND:
+                if (mCallback != null) {
+                    mCallback.onSyncDataResult(responseBody);
+                }
+                break;
+        }
+    }
+
+    private void sendDeviceData(String token) {
+        for (RVRecord record : RVData.getInstance().getRecordsLaterThanTime(lastSyncTime)) {
+            RVCloudSyncDataFrame dataFrame =
+                    new RVCloudSyncDataFrame(RVCloudSyncDataFrame.FrameCategory.DEVICE_DATA_FRAME, mGson.toJson(record), token);
+            socketClient.send(mGson.toJson(dataFrame));
+        }
+        // DONE: 2017/06/19 デバイスに蓄積したデータの伝送
+        RVCloudSyncDataFrame deviceDataEndFrame
+                = new RVCloudSyncDataFrame(RVCloudSyncDataFrame.FrameCategory.DEVICE_DATA_END_FRAME, null, token);
+        socketClient.send(mGson.toJson(deviceDataEndFrame));
+    }
+
+    private void onCloudDataFrame(RVCloudSyncDataFrame dataFrame) {
+        RVRecord record = mGson.fromJson(dataFrame.getDataBody(), RVRecord.class);
+        cloudDataList.add(record);
+
+        if (cloudDataList.size() > 300) {
+            final ArrayList<RVRecord> bufferedList = new ArrayList<>(cloudDataList);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    RVData.getInstance().setFromRecordList(bufferedList, RVData.RecordArraySource.FROM_CLOUD);
+                }
+            }).start();
+            cloudDataList = new ArrayList<>();
+        }
+    }
+
+    private void onCloudDataEndFrame(RVCloudSyncDataFrame dataFrame) {
+        RVData.getInstance().setFromRecordList(cloudDataList, RVData.RecordArraySource.FROM_CLOUD);
+        if (mCallback != null) {
+            mCallback.onSyncDataResult(mGson.fromJson(dataFrame.getDataBody(), RVResponseBody.class));
+        }
+        socketClient.close();
     }
 
     public interface RVCloudSyncCallback {
 
         void onStartLoginRequest();
 
-        void onLoginResult(RequestResult result);
+        void onLoginResult(RVResponseBody responseBody);
 
         void onStartCreateUserRequest();
 
-        void onCreateUserResult(RequestResult result);
+        void onCreateUserResult(RVResponseBody responseBody);
 
         void onStartSyncDataRequest();
 
-        void onSyncDataResult(RequestResult result);
+        void onSyncDataResult(RVResponseBody responseBody);
 
     }
 

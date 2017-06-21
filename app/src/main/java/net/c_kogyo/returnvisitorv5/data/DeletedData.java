@@ -25,26 +25,26 @@ public class DeletedData extends DataItem {
         this.className = data.getClass().getSimpleName();
     }
 
-    public DeletedData(RVRecord RVRecord) {
-        this(RVRecord.getDataJSON());
-    }
+//    public DeletedData(RVRecord RVRecord) {
+//        this(RVRecord.getDataJSON());
+//    }
 
-    public DeletedData(JSONObject object) {
-        super(object);
-        setJSON(this, object);
-    }
+//    public DeletedData(JSONObject object) {
+//        super(object);
+//        setJSON(this, object);
+//    }
 
-    public JSONObject jsonObject() {
-        JSONObject object = super.jsonObject();
-
-        try {
-            object.put(CLASS_NAME, className);
-            object.put(DATA_ID, dataId);
-        }catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return object;
-    }
+//    public JSONObject jsonObject() {
+//        JSONObject object = super.jsonObject();
+//
+//        try {
+//            object.put(CLASS_NAME, className);
+//            object.put(DATA_ID, dataId);
+//        }catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//        return object;
+//    }
 
     public static DeletedData setJSON(DeletedData deletedData, JSONObject object) {
 

@@ -2,10 +2,6 @@ package net.c_kogyo.returnvisitorv5.data;
 
 import android.content.Context;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import static net.c_kogyo.returnvisitorv5.data.Publication.CATEGORY;
 
 /**
  * Created by SeijiShii on 2017/05/24.
@@ -14,8 +10,8 @@ import static net.c_kogyo.returnvisitorv5.data.Publication.CATEGORY;
 public class Placement extends DataItem{
 
     public static final String PLACEMENT = "placement";
-    public static final String PUBLICATION_ID = "publication_id";
-    public static final String PUBLICATION_DATA = "publication_data";
+//    public static final String PUBLICATION_ID = "publication_id";
+//    public static final String PUBLICATION_DATA = "publication_data";
 //    public static final String PLACED_DATE = "placed_date";
 
     private String publicationId;
@@ -32,41 +28,41 @@ public class Placement extends DataItem{
 
     }
 
-    public Placement(JSONObject object) {
-        super(object);
-
-        try {
-
-            if (object.has(PUBLICATION_ID))
-                this.publicationId = object.getString(PUBLICATION_ID);
-
-            if (object.has(PUBLICATION_DATA))
-                this.publicationData = object.getString(PUBLICATION_DATA);
-
-            if (object.has(CATEGORY))
-                this.category = Publication.Category.valueOf(object.getString(CATEGORY));
-
-        } catch (JSONException e) {
-            //
-        }
-    }
-
-    public Placement(RVRecord RVRecord) {
-        this(RVRecord.getDataJSON());
-    }
-
-    public JSONObject jsonObject() {
-        JSONObject object = super.jsonObject();
-
-        try {
-            object.put(PUBLICATION_ID, this.publicationId);
-            object.put(PUBLICATION_DATA, this.publicationData);
-            object.put(CATEGORY, this.category.toString());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return object;
-    }
+//    public Placement(JSONObject object) {
+//        super(object);
+//
+//        try {
+//
+//            if (object.has(PUBLICATION_ID))
+//                this.publicationId = object.getString(PUBLICATION_ID);
+//
+//            if (object.has(PUBLICATION_DATA))
+//                this.publicationData = object.getString(PUBLICATION_DATA);
+//
+//            if (object.has(CATEGORY))
+//                this.category = Publication.Category.valueOf(object.getString(CATEGORY));
+//
+//        } catch (JSONException e) {
+//            //
+//        }
+//    }
+//
+//    public Placement(RVRecord RVRecord) {
+//        this(RVRecord.getDataJSON());
+//    }
+//
+//    public JSONObject jsonObject() {
+//        JSONObject object = super.jsonObject();
+//
+//        try {
+//            object.put(PUBLICATION_ID, this.publicationId);
+//            object.put(PUBLICATION_DATA, this.publicationData);
+//            object.put(CATEGORY, this.category.toString());
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//        return object;
+//    }
 
     public String getPublicationId() {
         return publicationId;

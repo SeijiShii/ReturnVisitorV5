@@ -19,8 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import static net.c_kogyo.returnvisitorv5.data.Place.LATITUDE;
-import static net.c_kogyo.returnvisitorv5.data.Place.LONGITUDE;
+//import static net.c_kogyo.returnvisitorv5.data.Place.LATITUDE;
+//import static net.c_kogyo.returnvisitorv5.data.Place.LONGITUDE;
+import static net.c_kogyo.returnvisitorv5.Constants.LATITUDE;
+import static net.c_kogyo.returnvisitorv5.Constants.LONGITUDE;
 import static net.c_kogyo.returnvisitorv5.data.Place.PLACE;
 
 /**
@@ -35,6 +37,7 @@ public class FetchAddressIntentService extends IntentService {
     public static final String IS_USING_MAP_LOCALE = "is_using_map_locale";
     public static final String SEND_FETCED_ADDRESS_ACTION = "send_fetched_address_action";
     public static final String ADDRESS_FETCHED = "address_fetched";
+
 
     private static final String TAG = "Reverse Geocoder Tag";
 

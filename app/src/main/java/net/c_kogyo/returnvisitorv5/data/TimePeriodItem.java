@@ -10,8 +10,8 @@ import java.util.Calendar;
  */
 public class TimePeriodItem extends DataItem{
 
-    public static final String START = "start";
-    public static final String END = "end";
+//    public static final String START = "start";
+//    public static final String END = "end";
 
     protected Calendar start;
     protected Calendar end;
@@ -24,14 +24,14 @@ public class TimePeriodItem extends DataItem{
         this.end = (Calendar) time.clone();
     }
 
-    public TimePeriodItem(JSONObject object) {
-        initCommon();
-        setJSON(this, object);
-    }
-
-    public TimePeriodItem(RVRecord RVRecord) {
-        this(RVRecord.getDataJSON());
-    }
+//    public TimePeriodItem(JSONObject object) {
+//        initCommon();
+//        setJSON(this, object);
+//    }
+//
+//    public TimePeriodItem(RVRecord RVRecord) {
+//        this(RVRecord.getDataJSON());
+//    }
 
     private void initCommon() {
         this.start  = Calendar.getInstance();
@@ -73,28 +73,28 @@ public class TimePeriodItem extends DataItem{
         return item;
     }
 
-    public JSONObject jsonObject() {
-        JSONObject object = super.jsonObject();
-        try {
-            object.put(START, start.getTimeInMillis());
-            object.put(END, end.getTimeInMillis());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return object;
-    }
-
-    static void setJSON(TimePeriodItem item, JSONObject object) {
-
-        DataItem.setJSON(item, object);
-
-        try {
-            if (object.has(START))
-                item.start.setTimeInMillis(object.getLong(START));
-            if (object.has(END))
-                item.end.setTimeInMillis(object.getLong(END));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
+//    public JSONObject jsonObject() {
+//        JSONObject object = super.jsonObject();
+//        try {
+//            object.put(START, start.getTimeInMillis());
+//            object.put(END, end.getTimeInMillis());
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//        return object;
+//    }
+//
+//    static void setJSON(TimePeriodItem item, JSONObject object) {
+//
+//        DataItem.setJSON(item, object);
+//
+//        try {
+//            if (object.has(START))
+//                item.start.setTimeInMillis(object.getLong(START));
+//            if (object.has(END))
+//                item.end.setTimeInMillis(object.getLong(END));
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//    }
 }

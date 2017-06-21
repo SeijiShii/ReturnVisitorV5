@@ -13,9 +13,9 @@ public class NoteCompItem extends DataItem {
         this.name = name;
     }
 
-    public NoteCompItem(RVRecord RVRecord) {
-        super(RVRecord.getDataJSON());
-    }
+//    public NoteCompItem(RVRecord RVRecord) {
+//        super(RVRecord.getDataJSON());
+//    }
 
 //    public NoteCompItem(JSONObject object) {
 //        super(object);

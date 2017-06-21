@@ -160,7 +160,7 @@ public class DataList<T extends DataItem> implements Iterable<T>{
     synchronized public ArrayList<T> getListLaterThanTime(long dataTimeInMills) {
         ArrayList<T> laterList = new ArrayList<>();
         for ( T data : list ) {
-            if (data.getUpdatedAt().getTimeInMillis() >= dataTimeInMills) {
+            if (data.getUpdatedAt() >= dataTimeInMills) {
                 laterList.add(data);
             }
         }

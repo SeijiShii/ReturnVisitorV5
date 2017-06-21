@@ -1,6 +1,5 @@
 package net.c_kogyo.returnvisitorv5.activity;
 
-import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,11 +12,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.Constants;
@@ -468,7 +464,7 @@ public class CalendarPagerActivity extends AppCompatActivity {
         RVData.getInstance().workList.setOrAdd(work);
         RVData.getInstance().saveData(this);
 
-        RVCloudSync.getInstance().syncDataIfLoggedIn(this);
+        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this);
 
         Intent withNewWorkIntent = new Intent(this, WorkPagerActivity.class);
         withNewWorkIntent.setAction(Constants.WorkPagerActivityActions.START_WITH_NEW_WORK);

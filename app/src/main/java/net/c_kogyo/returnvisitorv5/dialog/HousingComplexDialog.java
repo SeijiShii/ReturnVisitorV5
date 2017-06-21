@@ -10,7 +10,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
@@ -21,8 +20,6 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -40,13 +37,9 @@ import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.service.FetchAddressIntentService;
 import net.c_kogyo.returnvisitorv5.util.ConfirmDialog;
 import net.c_kogyo.returnvisitorv5.util.InputUtil;
-import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import static net.c_kogyo.returnvisitorv5.data.Place.LATITUDE;
-import static net.c_kogyo.returnvisitorv5.data.Place.LONGITUDE;
 
 /**
  * Created by SeijiShii on 2017/03/18.
@@ -91,7 +84,7 @@ public class HousingComplexDialog extends DialogFragment {
             public void onClick(DialogInterface dialog, int which) {
 
                 RVData.getInstance().placeList.setOrAdd(mHousingComplex);
-                RVCloudSync.getInstance().syncDataIfLoggedIn(getActivity());
+                RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getActivity());
 
                 if (mListener != null) {
                     mListener.onOkClick(mHousingComplex);
@@ -195,7 +188,7 @@ public class HousingComplexDialog extends DialogFragment {
             public void onClick(View v) {
 
                 RVData.getInstance().placeList.setOrAdd(mHousingComplex);
-                RVCloudSync.getInstance().syncDataIfLoggedIn(getActivity());
+                RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getActivity());
 
                 InputUtil.hideSoftKeyboard(getActivity());
 
@@ -333,7 +326,7 @@ public class HousingComplexDialog extends DialogFragment {
         RVData.getInstance().placeList.removeList(removedRooms);
         RVData.getInstance().saveData(getActivity());
 
-        RVCloudSync.getInstance().syncDataIfLoggedIn(getActivity());
+        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getActivity());
     }
 
     private class RoomListAdapter extends BaseAdapter{

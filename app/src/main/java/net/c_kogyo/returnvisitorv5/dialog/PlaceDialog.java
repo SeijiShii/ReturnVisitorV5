@@ -202,7 +202,7 @@ public class PlaceDialog extends DialogFragment {
                                 RVData.getInstance().saveData(getActivity());
                                 notifyDataSetChanged();
 
-                                RVCloudSync.getInstance().syncDataIfLoggedIn(getActivity());
+                                RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getActivity());
                                 // TODO: 2017/06/14 訪問削除時の処理
                                 // マーカーを更新するためにMapActivityに知らせる。
                                 if (mListener != null) {
