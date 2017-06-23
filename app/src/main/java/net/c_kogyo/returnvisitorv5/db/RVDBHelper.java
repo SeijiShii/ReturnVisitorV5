@@ -20,6 +20,7 @@ import static net.c_kogyo.returnvisitorv5.db.RVDBContract.AND;
 import static net.c_kogyo.returnvisitorv5.db.RVDBContract.CLASS_NAME;
 import static net.c_kogyo.returnvisitorv5.db.RVDBContract.DATA;
 import static net.c_kogyo.returnvisitorv5.db.RVDBContract.DATA_ID;
+import static net.c_kogyo.returnvisitorv5.db.RVDBContract.ID;
 import static net.c_kogyo.returnvisitorv5.db.RVDBContract.IS_DELETED;
 import static net.c_kogyo.returnvisitorv5.db.RVDBContract.TABLE_NAME;
 import static net.c_kogyo.returnvisitorv5.db.RVDBContract.UPDATED_AT;
@@ -32,14 +33,30 @@ public class RVDBHelper {
 
     public static final String TAG = "RVDBHelper";
 
+    private static RVDBHelper instance;
+
     private SQLiteDatabase mDB;
     private RVDBOpenHelper mOpenHelper;
     private Gson mGson;
+    final private ArrayList<RVRecord> queueList;
 
-    public RVDBHelper(Context context) {
+
+    private RVDBHelper(Context context) {
         this.mOpenHelper = new RVDBOpenHelper(context);
         this.mGson = new Gson();
+        this.queueList = new ArrayList<>();
         initDB();
+
+    }
+
+    public static void initialize(Context context) {
+        if (instance == null) {
+            instance = new RVDBHelper(context);
+        }
+    }
+
+    public static RVDBHelper getInstance() {
+        return instance;
     }
 
     private void initDB() {
@@ -48,23 +65,159 @@ public class RVDBHelper {
         }
     }
 
+    private void showDataCount() {
+
+        Cursor cursor = mDB.query(false,
+                TABLE_NAME,
+                new String[]{"*"},
+                null,
+                new String[]{},
+                null, null, null, null);
+        Log.d(TAG, "Data row count: " + cursor.getColumnCount());
+        cursor.close();
+
+    }
+
     private void deleteAllDataFromDB() {
         mDB.execSQL("DELETE FROM " + TABLE_NAME + ";");
     }
 
-    private void saveRecord(RVRecord record, boolean checkIncludeDeleted) {
+    // Primitive methods
+    private int updateRecord(RVRecord record) {
 
-        if (!hasSameId(record, checkIncludeDeleted)) {
+        ContentValues values = new ContentValues(4);
+        values.put(DATA_ID, record.getDataId());
+        values.put(CLASS_NAME, record.getClassName());
+        values.put(UPDATED_AT, String.valueOf(record.getUpdatedAt()));
+        values.put(DATA, record.getDataJSON());
+        values.put(IS_DELETED, record.isDeleted());
+
+        return mDB.update(TABLE_NAME, values, DATA_ID + "= ?", new String[]{record.getDataId()});
+    }
+
+    private long insertRecord(RVRecord record) {
+
+        ContentValues values = new ContentValues(4);
+        values.put(DATA_ID, record.getDataId());
+        values.put(CLASS_NAME, record.getClassName());
+        values.put(UPDATED_AT, String.valueOf(record.getUpdatedAt()));
+        values.put(DATA, record.getDataJSON());
+        values.put(IS_DELETED, record.isDeleted());
+
+        return mDB.insert(TABLE_NAME, null, values);
+    }
+
+    private boolean hasSameId(RVRecord record, boolean checkIncludeDeleted) {
+        return loadRecord(record.getDataId(), checkIncludeDeleted) != null;
+    }
+
+    private boolean hasLaterOrSameUpdatedRecord(RVRecord record, boolean includesDeleted) {
+
+        if (!hasSameId(record, includesDeleted)) return false;
+        RVRecord recordInDB = loadRecord(record.getDataId(), includesDeleted);
+        return recordInDB != null && record.getUpdatedAt() <= recordInDB.getUpdatedAt();
+    }
+
+    private int deleteRecordFromDB(RVRecord record) {
+        return mDB.delete(TABLE_NAME, DATA_ID + "= ?", new String[]{record.getDataId()});
+    }
+
+    private boolean onSavingNormal;
+    synchronized private void saveIfInQueue() {
+
+        if (queueList.size() <= 0) return;
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (onSavingNormal) {
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        //
+                    }
+                }
+
+                onSavingNormal = true;
+
+                final ArrayList<RVRecord> bufferedList = new ArrayList<>(queueList);
+                queueList.clear();
+                saveRecords(bufferedList);
+
+                onSavingNormal = false;
+
+                Log.d(TAG, "Finished asynchronous saving.");
+                showDataCount();
+                saveIfInQueue();
+            }
+        }).start();
+    }
+
+
+    // Save methods
+    private void saveRecord(RVRecord record) {
+
+        if (!hasSameId(record, false)) {
             insertRecord(record);
-        } else if (!hasLaterOrSameUpdatedRecord(record, checkIncludeDeleted)) {
+        } else if (!hasLaterOrSameUpdatedRecord(record, false)) {
             updateRecord(record);
         }
     }
 
-    private void saveRecord(RVRecord record) {
-        saveRecord(record, false);
+    private void saveRecords(ArrayList<RVRecord> records) {
+        for (RVRecord record : records) {
+            saveRecord(record);
+        }
     }
 
+
+    // Exposed save methods
+
+    public <T extends DataItem> void saveAsynchronous(final T item) {
+        synchronized (queueList) {
+            queueList.add(new RVRecord(item));
+            saveIfInQueue();
+        }
+    }
+
+    public <T extends DataItem> void saveListAsynchronous(final ArrayList<T> list) {
+
+        synchronized (queueList) {
+            for (T item : list) {
+                queueList.add(new RVRecord(item));
+            }
+            saveIfInQueue();
+        }
+    }
+
+    public <T extends DataItem> void saveDeletedAsynchronous(final T item) {
+
+        synchronized (queueList) {
+            queueList.add(new RVRecord(item, true));
+            saveIfInQueue();
+        }
+    }
+
+    public <T extends DataItem> void saveDeletedListAsynchronous(final ArrayList<T> list) {
+
+        synchronized (queueList) {
+            for (T item: list) {
+                queueList.add(new RVRecord(item, true));
+            }
+            saveIfInQueue();
+        }
+    }
+
+    public void saveRecordsAsynchronous(ArrayList<RVRecord> records) {
+        synchronized (queueList) {
+            queueList.addAll(records);
+            saveIfInQueue();
+        }
+    }
+
+
+
+    // Load methods
     @Nullable
     public RVRecord loadRecord(String dataId, boolean loadDeleted) {
 
@@ -112,66 +265,6 @@ public class RVDBHelper {
         return record;
     }
 
-    public ArrayList<RVRecord> loadRecordLaterThanTime(long lastSyncTime) {
-
-        Cursor cursor = mDB.query(false,
-                TABLE_NAME,
-                null,
-                UPDATED_AT + " > ?",
-                new String[]{String.valueOf(lastSyncTime)},
-                null, null, null, null);
-
-        ArrayList<RVRecord> records = new ArrayList<>();
-
-        boolean isEOf = cursor.moveToFirst();
-        while (isEOf) {
-            RVRecord record = generateRecordFromCursor(cursor);
-            records.add(record);
-        }
-        cursor.close();
-        return records;
-
-    }
-
-    private boolean hasSameId(RVRecord record, boolean checkIncludeDeleted) {
-        return loadRecord(record.getDataId(), checkIncludeDeleted) != null;
-    }
-
-    private boolean hasLaterOrSameUpdatedRecord(RVRecord record, boolean includesDeleted) {
-
-        if (!hasSameId(record, includesDeleted)) return false;
-        RVRecord recordInDB = loadRecord(record.getDataId(), includesDeleted);
-        return recordInDB != null && record.getUpdatedAt() <= recordInDB.getUpdatedAt();
-    }
-
-    private int updateRecord(RVRecord record) {
-
-        ContentValues values = new ContentValues(4);
-        values.put(DATA_ID, record.getDataId());
-        values.put(CLASS_NAME, record.getClassName());
-        values.put(UPDATED_AT, String.valueOf(record.getUpdatedAt()));
-        values.put(DATA, record.getDataJSON());
-        values.put(IS_DELETED, record.isDeleted());
-
-        return mDB.update(TABLE_NAME, values, DATA_ID + "= ?", new String[]{record.getDataId()});
-    }
-
-    private long insertRecord(RVRecord record) {
-
-        ContentValues values = new ContentValues(4);
-        values.put(DATA_ID, record.getDataId());
-        values.put(CLASS_NAME, record.getClassName());
-        values.put(UPDATED_AT, String.valueOf(record.getUpdatedAt()));
-        values.put(DATA, record.getDataJSON());
-        values.put(IS_DELETED, record.isDeleted());
-
-        return mDB.insert(TABLE_NAME, null, values);
-    }
-
-    private int deleteRecordFromDB(RVRecord record) {
-        return mDB.delete(TABLE_NAME, DATA_ID + "= ?", new String[]{record.getDataId()});
-    }
-
     private   <T extends DataItem> ArrayList<RVRecord> loadRecords(Class<T> className, boolean loadDeleted) {
         ArrayList<RVRecord> records = new ArrayList<>();
         Cursor cursor;
@@ -214,70 +307,66 @@ public class RVDBHelper {
         return list;
     }
 
-    public ArrayList<RVRecord> loadRecordsByIds(ArrayList<String> ids, boolean deleted) {
+    public ArrayList<RVRecord> loadRecordLaterThanTime(long lastSyncTime) {
+
+        Cursor cursor = mDB.query(false,
+                TABLE_NAME,
+                null,
+                UPDATED_AT + " > ?",
+                new String[]{String.valueOf(lastSyncTime)},
+                null, null, null, null);
+
         ArrayList<RVRecord> records = new ArrayList<>();
 
-        String whereClause;
-        if (deleted) {
-            whereClause = DATA_ID + " = ?";
-        } else {
-            whereClause = DATA_ID + " = ?" + AND + IS_DELETED + " = 0";
+        boolean isEOf = cursor.moveToFirst();
+        while (isEOf) {
+            RVRecord record = generateRecordFromCursor(cursor);
+            records.add(record);
         }
-
-        for (String id : ids) {
-
-            Cursor cursor = mDB.query(false,
-                    TABLE_NAME,
-                    null,
-                    whereClause,
-                    new String[]{id},
-                    null, null, null, null);
-            boolean isEOf = cursor.moveToFirst();
-            while (isEOf) {
-                RVRecord record =generateRecordFromCursor(cursor);
-                records.add(record);
-            }
-        }
+        cursor.close();
         return records;
+
     }
 
-    private ArrayList<RVRecord> loadRecordsByIds(ArrayList<String> ids) {
-        return loadRecordsByIds(ids, false);
-    }
 
-    public <T extends DataItem> ArrayList<T> loadListByIds(Class<T> className, ArrayList<String> ids) {
-        ArrayList<T> list = new ArrayList<>();
-        for (RVRecord record : loadRecordsByIds(ids)) {
-            list.add(mGson.fromJson(record.getDataJSON(), className));
-        }
-        return list;
-    }
+//    public ArrayList<RVRecord> loadRecordsByIds(ArrayList<String> ids, boolean deleted) {
+//        ArrayList<RVRecord> records = new ArrayList<>();
+//
+//        String whereClause;
+//        if (deleted) {
+//            whereClause = DATA_ID + " = ?";
+//        } else {
+//            whereClause = DATA_ID + " = ?" + AND + IS_DELETED + " = 0";
+//        }
+//
+//        for (String id : ids) {
+//
+//            Cursor cursor = mDB.query(false,
+//                    TABLE_NAME,
+//                    null,
+//                    whereClause,
+//                    new String[]{id},
+//                    null, null, null, null);
+//            boolean isEOf = cursor.moveToFirst();
+//            while (isEOf) {
+//                RVRecord record =generateRecordFromCursor(cursor);
+//                records.add(record);
+//            }
+//        }
+//        return records;
+//    }
 
-    public <T extends DataItem> void save(T item) {
-        saveRecord(new RVRecord(item));
-    }
+//    private ArrayList<RVRecord> loadRecordsByIds(ArrayList<String> ids) {
+//        return loadRecordsByIds(ids, false);
+//    }
 
-    public <T extends DataItem> void saveList(ArrayList<T> list) {
-        for (T item : list) {
-            save(item);
-        }
-    }
-
-    public void saveRecords(ArrayList<RVRecord> records) {
-        for (RVRecord record : records) {
-            saveRecord(record);
-        }
-    }
-
-    public <T extends DataItem> void  saveAsDeletedRecord(T item) {
-        saveRecord(new RVRecord(item, true));
-    }
-
-    public <T extends DataItem> void saveAsDeletedRecords(ArrayList<T> list) {
-        for (T item : list) {
-            saveAsDeletedRecord(item);
-        }
-    }
+//    public <T extends DataItem> ArrayList<T> loadListByIds(Class<T> className, ArrayList<String> ids) {
+//        ArrayList<T> list = new ArrayList<>();
+//        for (RVRecord record : loadRecordsByIds(ids)) {
+//            list.add(mGson.fromJson(record.getDataJSON(), className));
+//        }
+//        return list;
+//    }
 
     public <T extends DataItem> ArrayList<T> getSearchedItems(Class<T> className, String searchWord, Context context) {
 
@@ -319,6 +408,9 @@ public class RVDBHelper {
     }
 
 
+
+
+
     // Tests
     private boolean isTestDataSaved;
     private long startSaveTime;
@@ -358,7 +450,7 @@ public class RVDBHelper {
         Log.d(RVDBHelper.TAG, "person1: " + gson.toJson(person1));
 
         deleteAllDataFromDB();
-        save(person1);
+//        save(person1);
         isTestDataSaved = true;
 
         isTestDataLoaded = false;

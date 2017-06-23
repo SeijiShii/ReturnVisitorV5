@@ -5,6 +5,7 @@ import android.content.Context;
 import net.c_kogyo.returnvisitorv5.data.DataItem;
 import net.c_kogyo.returnvisitorv5.data.DeletedData;
 import net.c_kogyo.returnvisitorv5.data.RVData;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -35,6 +36,7 @@ public class DataList<T extends DataItem> implements Iterable<T>{
         } else {
             list.add(data);
         }
+        RVDBHelper.getInstance().saveAsynchronous(data);
     }
 
     synchronized public void addList(ArrayList<T> list) {
@@ -43,8 +45,11 @@ public class DataList<T extends DataItem> implements Iterable<T>{
         }
     }
 
+    // DONE: 2017/06/23 要チェック
     synchronized public void removeList(ArrayList<T> list) {
-        this.list.removeAll(list);
+        for (T item : list) {
+            delete(item);
+        }
     }
 
     synchronized public int indexOf(T data) {
@@ -76,6 +81,7 @@ public class DataList<T extends DataItem> implements Iterable<T>{
 
     synchronized private void delete(T data) {
         list.remove(data);
+        RVDBHelper.getInstance().saveDeletedAsynchronous(data);
         // DONE: 2017/05/10 DeleteListへの追加
         RVData.getInstance().inDeviceDeletedList.add(data);
     }

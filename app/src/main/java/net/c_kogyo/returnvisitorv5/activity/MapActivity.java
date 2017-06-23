@@ -41,7 +41,6 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.gson.Gson;
 
 import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.R;
@@ -56,6 +55,7 @@ import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.Work;
 import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
+import net.c_kogyo.returnvisitorv5.db.RVRecord;
 import net.c_kogyo.returnvisitorv5.dialog.AddWorkDialog;
 import net.c_kogyo.returnvisitorv5.dialog.HousingComplexDialog;
 import net.c_kogyo.returnvisitorv5.dialog.LoginDialog;
@@ -76,6 +76,7 @@ import net.c_kogyo.returnvisitorv5.view.CountTimeFrame;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import static net.c_kogyo.returnvisitorv5.Constants.LATITUDE;
 import static net.c_kogyo.returnvisitorv5.Constants.LONGITUDE;
@@ -110,11 +111,11 @@ public class MapActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        RVDBHelper.initialize(this);
+
         // log
         Intent errorLogIntent = new Intent(this, ErrorLogIntentService.class);
         startService(errorLogIntent);
-
-        new RVDBHelper(this).testSaveAndLoad();
 
         cloudResultHandler = new Handler();
 
@@ -584,6 +585,7 @@ public class MapActivity extends AppCompatActivity
         place.setAddress(null);
 
         RVData.getInstance().saveData(this);
+        RVDBHelper.getInstance().saveAsynchronous(place);
         RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this);
 
     }
@@ -1445,15 +1447,18 @@ public class MapActivity extends AppCompatActivity
         cloudResultHandler.post(new Runnable() {
             @Override
             public void run() {
-                enableWaitScreen(true);
+                fadeProgressFrame(true);
                 switch (frameCategory) {
                     case LOGIN_REQUEST:
+                        enableWaitScreen(true);
                         waitMessageText.setText(R.string.start_login);
                         break;
                     case CREATE_USER_REQUEST:
+                        enableWaitScreen(true);
                         waitMessageText.setText(R.string.creating_user);
                         break;
                     case SYNC_DATA_REQUEST:
+                        enableWaitScreen(false);
                         waitMessageText.setText(R.string.on_sync);
                         break;
                 }
@@ -1502,6 +1507,7 @@ public class MapActivity extends AppCompatActivity
                 }
 
                 enableWaitScreen(false);
+                fadeProgressFrame(false);
                 waitMessageText.setText("");
 
                 refreshLoginButton();

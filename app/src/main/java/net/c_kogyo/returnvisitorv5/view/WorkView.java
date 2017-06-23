@@ -256,6 +256,14 @@ public class WorkView extends BaseAnimateView {
                 endTimeText.setBackground(null);
                 endTimeText.setClickable(false);
                 ViewUtil.setOnClickListener(endTimeText, null);
+            } else {
+                endTimeText.setBackgroundResource(R.drawable.white_trans_circle);
+                ViewUtil.setOnClickListener(endTimeText, new ViewUtil.OnViewClickListener() {
+                    @Override
+                    public void onViewClick(View v) {
+                        showEndTimePickerDialog(mWork.getEnd());
+                    }
+                });
             }
         } else {
             endTimeText.setBackgroundResource(R.drawable.white_trans_circle);

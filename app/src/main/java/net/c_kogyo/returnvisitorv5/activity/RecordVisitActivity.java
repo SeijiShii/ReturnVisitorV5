@@ -33,6 +33,8 @@ import net.c_kogyo.returnvisitorv5.data.Publication;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
+import net.c_kogyo.returnvisitorv5.db.RVRecord;
 import net.c_kogyo.returnvisitorv5.dialog.AddPersonDialog;
 import net.c_kogyo.returnvisitorv5.dialog.HousingComplexDialog;
 import net.c_kogyo.returnvisitorv5.dialog.PersonDialog;
@@ -76,7 +78,6 @@ public class RecordVisitActivity extends AppCompatActivity {
     private ArrayList<Person> mAddedPersons;
     private ArrayList<Person> mRemovedPersons;
 
-    private ArrayList<Publication> mAddedPublications;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -114,7 +115,6 @@ public class RecordVisitActivity extends AppCompatActivity {
 
         mAddedPersons = new ArrayList<>();
         mRemovedPersons = new ArrayList<>();
-        mAddedPublications = new ArrayList<>();
 
         Intent intent = getIntent();
         switch (intent.getAction()) {

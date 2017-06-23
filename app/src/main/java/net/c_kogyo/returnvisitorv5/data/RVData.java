@@ -19,6 +19,7 @@ import net.c_kogyo.returnvisitorv5.data.list.PublicationList;
 import net.c_kogyo.returnvisitorv5.data.list.TagList;
 import net.c_kogyo.returnvisitorv5.data.list.VisitList;
 import net.c_kogyo.returnvisitorv5.data.list.WorkList;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.db.RVRecord;
 import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
 
@@ -132,9 +133,6 @@ public class RVData {
 
             stringToRecordList();
 
-//            personList.setPriorityToPersons();
-//            placeList.deleteRoomsWithoutParent();
-
             if (mCallback != null) {
                 new Thread(new Runnable() {
                     @Override
@@ -148,7 +146,7 @@ public class RVData {
                     }
                 }).start();
             }
-
+            RVDBHelper.getInstance().saveRecordsAsynchronous(toRecordList());
             return null;
         }
 
@@ -252,7 +250,7 @@ public class RVData {
 
     }
 
-    // TODO: 2017/06/21 これの実装がペンディング
+    // DONE: 2017/06/21 これの実装がペンディング
     private void removeDeletedData() {
 
         for (DeletedData deletedData : inCloudDeletedList) {
@@ -347,56 +345,11 @@ public class RVData {
             return null;
         }
 
+
+
         private String toJsonString() {
 
-            List<RVRecord> records = new ArrayList<>();
-
-            for (Place place : placeList) {
-                records.add(new RVRecord(place));
-            }
-
-            for (Person person : personList) {
-                records.add(new RVRecord(person));
-            }
-
-            for (Visit visit : visitList) {
-                records.add(new RVRecord(visit));
-            }
-
-            for (Tag tag : tagList) {
-                records.add(new RVRecord(tag));
-            }
-
-            for (NoteCompItem note : noteCompList) {
-                records.add(new RVRecord(note));
-            }
-
-            for (Work work : workList) {
-                records.add(new RVRecord(work));
-            }
-
-            for (Publication publication : publicationList) {
-                records.add(new RVRecord(publication));
-            }
-
-            for (DeletedData deletedData : inDeviceDeletedList) {
-                records.add(new RVRecord(deletedData));
-            }
-
-            return mGson.toJson(records);
-        }
-
-        private String jsonToString(JSONObject object) {
-
-            String s = "";
-
-            try {
-                s = object.toString(2);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            return s;
+            return mGson.toJson(toRecordList());
         }
 
         private void saveToFile(String s) {
@@ -424,6 +377,44 @@ public class RVData {
                 e.printStackTrace();
             }
         }
+    }
+
+    private ArrayList<RVRecord> toRecordList() {
+
+        ArrayList<RVRecord> records = new ArrayList<>();
+
+        for (Place place : placeList) {
+            records.add(new RVRecord(place));
+        }
+
+        for (Person person : personList) {
+            records.add(new RVRecord(person));
+        }
+
+        for (Visit visit : visitList) {
+            records.add(new RVRecord(visit));
+        }
+
+        for (Tag tag : tagList) {
+            records.add(new RVRecord(tag));
+        }
+
+        for (NoteCompItem note : noteCompList) {
+            records.add(new RVRecord(note));
+        }
+
+        for (Work work : workList) {
+            records.add(new RVRecord(work));
+        }
+
+        for (Publication publication : publicationList) {
+            records.add(new RVRecord(publication));
+        }
+
+        for (DeletedData deletedData : inDeviceDeletedList) {
+            records.add(new RVRecord(deletedData));
+        }
+        return records;
     }
 
     public ArrayList<Calendar> getDatesWithData() {
@@ -534,6 +525,8 @@ public class RVData {
     }
 
     // DONE: 2017/05/22 削除データがうまく飛んでないんだよね。改善した。要検証
+
+
 
 
 
