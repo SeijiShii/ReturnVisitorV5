@@ -23,10 +23,12 @@ public class DataList<T extends DataItem> implements Iterable<T>{
     // DONE: 2017/05/10 削除フラグの撤去に伴う変更
     protected CopyOnWriteArrayList<T> list;
 
-    public DataList() {
-
+    DataList() {
         this.list = new CopyOnWriteArrayList<>();
+    }
 
+    public DataList(Class<T> tClass) {
+        this.list = new CopyOnWriteArrayList<>(RVDBHelper.getInstance().loadList(tClass, false));
     }
 
     synchronized public void setOrAdd(T data) {
