@@ -57,7 +57,7 @@ public class RVData {
 //    public static final String NOTE_COMP_LIST = "note_comp_list";
 //    public static final String PUB_LIST = "pub_list";
 
-    public PlaceList placeList;
+//    public PlaceList placeList;
     public PersonList personList;
     public VisitList visitList;
     public TagList tagList;
@@ -77,7 +77,7 @@ public class RVData {
 
         mGson = new Gson();
 
-        placeList = new PlaceList();
+//        placeList = new PlaceList();
         personList = new PersonList();
         visitList = new VisitList();
 
@@ -146,7 +146,6 @@ public class RVData {
                     }
                 }).start();
             }
-            RVDBHelper.getInstance().saveRecordsAsynchronous(toRecordList());
             return null;
         }
 
@@ -214,9 +213,9 @@ public class RVData {
 
         for (RVRecord record : records) {
             switch (record.getClassName()) {
-                case "Place":
-                    placeList.setOrAdd(mGson.fromJson(record.getDataJSON(), Place.class));
-                    break;
+//                case "Place":
+//                    placeList.setOrAdd(mGson.fromJson(record.getDataJSON(), Place.class));
+//                    break;
                 case "Person":
                     personList.setOrAdd(mGson.fromJson(record.getDataJSON(), Person.class));
                     break;
@@ -256,9 +255,9 @@ public class RVData {
         for (DeletedData deletedData : inCloudDeletedList) {
 
             switch (deletedData.getClassName()) {
-                case "Place":
-                    placeList.deleteByDeletedData(deletedData);
-                    break;
+//                case "Place":
+//                    placeList.deleteByDeletedData(deletedData);
+//                    break;
                 case "Person":
                     personList.deleteByDeletedData(deletedData);
                     break;
@@ -383,9 +382,9 @@ public class RVData {
 
         ArrayList<RVRecord> records = new ArrayList<>();
 
-        for (Place place : placeList) {
-            records.add(new RVRecord(place));
-        }
+//        for (Place place : placeList) {
+//            records.add(new RVRecord(place));
+//        }
 
         for (Person person : personList) {
             records.add(new RVRecord(person));

@@ -34,6 +34,7 @@ import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.RVData;
+import net.c_kogyo.returnvisitorv5.data.list.PlaceList;
 import net.c_kogyo.returnvisitorv5.service.FetchAddressIntentService;
 import net.c_kogyo.returnvisitorv5.util.ConfirmDialog;
 import net.c_kogyo.returnvisitorv5.util.InputUtil;
@@ -83,7 +84,7 @@ public class HousingComplexDialog extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                RVData.getInstance().placeList.setOrAdd(mHousingComplex);
+                PlaceList.getInstance().setOrAdd(mHousingComplex);
                 RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getActivity());
 
                 if (mListener != null) {
@@ -187,7 +188,7 @@ public class HousingComplexDialog extends DialogFragment {
             @Override
             public void onClick(View v) {
 
-                RVData.getInstance().placeList.setOrAdd(mHousingComplex);
+                PlaceList.getInstance().setOrAdd(mHousingComplex);
                 RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getActivity());
 
                 InputUtil.hideSoftKeyboard(getActivity());
@@ -245,7 +246,7 @@ public class HousingComplexDialog extends DialogFragment {
     private RoomListAdapter roomAdapter;
     private void initRoomAdapter() {
 
-        ArrayList<Place> roomList = RVData.getInstance().placeList.getRoomList(mHousingComplex.getId());
+        ArrayList<Place> roomList = PlaceList.getInstance().getRoomList(mHousingComplex.getId());
         roomList.addAll(addedRooms);
         roomList.removeAll(removedRooms);
         roomAdapter = new RoomListAdapter(roomList);
@@ -314,17 +315,16 @@ public class HousingComplexDialog extends DialogFragment {
     private void confirmEdit() {
 
         mHousingComplex.setName(nameText.getText().toString());
-        ArrayList<Place> rooms = RVData.getInstance().placeList.getRoomList(mHousingComplex.getId());
+        ArrayList<Place> rooms = PlaceList.getInstance().getRoomList(mHousingComplex.getId());
         for (Place room : rooms) {
             room.setAddress(mHousingComplex.getName());
         }
         for (Place room : addedRooms) {
             room.setAddress(mHousingComplex.getName());
         }
-        RVData.getInstance().placeList.setOrAdd(mHousingComplex);
-        RVData.getInstance().placeList.addList(addedRooms);
-        RVData.getInstance().placeList.removeList(removedRooms);
-        RVData.getInstance().saveData(getActivity());
+        PlaceList.getInstance().setOrAdd(mHousingComplex);
+        PlaceList.getInstance().addList(addedRooms);
+        PlaceList.getInstance().removeList(removedRooms);
 
         RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getActivity());
     }

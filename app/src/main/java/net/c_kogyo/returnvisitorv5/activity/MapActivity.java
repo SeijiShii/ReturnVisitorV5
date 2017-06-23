@@ -54,6 +54,7 @@ import net.c_kogyo.returnvisitorv5.data.PlaceMarkers;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.Work;
+import net.c_kogyo.returnvisitorv5.data.list.PlaceList;
 import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.db.RVRecord;
 import net.c_kogyo.returnvisitorv5.dialog.AddWorkDialog;
@@ -398,7 +399,7 @@ public class MapActivity extends AppCompatActivity
 
         if (placeId == null) return;
 
-        final Place place = RVData.getInstance().placeList.getById(placeId);
+        final Place place = PlaceList.getInstance().getById(placeId);
 
         if (place == null) return;
 
@@ -602,7 +603,7 @@ public class MapActivity extends AppCompatActivity
                 Visit visit = RVData.getInstance().visitList.getById(visitId);
                 if (visit != null) {
                     String placeId = visit.getPlaceId();
-                    Place place = RVData.getInstance().placeList.getById(placeId);
+                    Place place = PlaceList.getInstance().getById(placeId);
                     if (place != null) {
                         if (resultCode == PLACE_ADDED_RESULT_CODE) {
                             // 新しい場所の追加である
@@ -612,7 +613,7 @@ public class MapActivity extends AppCompatActivity
                             } else if (place.getCategory() == Place.Category.ROOM) {
                                 // 新しい場所だが、部屋なのでアパートを更新
                                 String parentId = place.getParentId();
-                                Place parent = RVData.getInstance().placeList.getById(parentId);
+                                Place parent = PlaceList.getInstance().getById(parentId);
                                 if (parent != null) {
                                     placeMarkers.refreshMarker(parent);
                                 }
@@ -679,7 +680,7 @@ public class MapActivity extends AppCompatActivity
                             public void onDeleteClick(Place place) {
 
                                 placeMarkers.removeByPlace(place);
-                                RVData.getInstance().placeList.deleteById(place.getId());
+                                PlaceList.getInstance().deleteById(place.getId());
                                 RVData.getInstance().saveData(MapActivity.this);
 
                                 RVCloudSync.getInstance().requestDataSyncIfLoggedIn(MapActivity.this);
@@ -766,7 +767,7 @@ public class MapActivity extends AppCompatActivity
                     public void onDeleteHousingComplex(Place housingComplex) {
 
                         placeMarkers.removeByPlace(housingComplex);
-                        RVData.getInstance().placeList.deleteById(housingComplex.getId());
+                        PlaceList.getInstance().deleteById(housingComplex.getId());
                         RVData.getInstance().saveData(MapActivity.this);
 
                         RVCloudSync.getInstance().requestDataSyncIfLoggedIn(MapActivity.this);
@@ -798,7 +799,7 @@ public class MapActivity extends AppCompatActivity
             visit = new Visit(lastVisit);
         }
 
-        RVData.getInstance().placeList.setOrAdd(place);
+        PlaceList.getInstance().setOrAdd(place);
         RVData.getInstance().visitList.setOrAdd(visit);
         RVData.getInstance().saveData(this);
 
@@ -1047,15 +1048,14 @@ public class MapActivity extends AppCompatActivity
                String placeId = intent.getStringExtra(PLACE);
                if (placeId == null) return;
 
-               Place place = RVData.getInstance().placeList.getById(placeId);
+               Place place = PlaceList.getInstance().getById(placeId);
                if (place == null) return;
 
                String address = intent.getStringExtra(FetchAddressIntentService.ADDRESS_FETCHED);
                if (address == null) return;
 
                place.setAddress(address);
-               RVData.getInstance().placeList.setOrAdd(place);
-               RVData.getInstance().saveData(MapActivity.this);
+               PlaceList.getInstance().setOrAdd(place);
                RVCloudSync.getInstance().requestDataSyncIfLoggedIn(MapActivity.this);
            }
         }
@@ -1617,7 +1617,7 @@ public class MapActivity extends AppCompatActivity
             @Override
             public void onClickShowPersonInMap(final Person person) {
 
-                ArrayList<Place> places = RVData.getInstance().placeList.getByPerson(person);
+                ArrayList<Place> places = PlaceList.getInstance().getByPerson(person);
                 if (places.size() > 0) {
                     Place place = places.get(0);
                     showDialogFitToPlace(place);
@@ -1687,7 +1687,7 @@ public class MapActivity extends AppCompatActivity
                 showHousingComplexDialog(place);
                 break;
             case ROOM:
-                Place parent = RVData.getInstance().placeList.getById(place.getParentId());
+                Place parent = PlaceList.getInstance().getById(place.getParentId());
                 if (parent != null) {
                     showHousingComplexDialog(parent);
                 } else {

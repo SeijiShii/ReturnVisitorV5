@@ -21,6 +21,7 @@ import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
+import net.c_kogyo.returnvisitorv5.data.list.PlaceList;
 import net.c_kogyo.returnvisitorv5.util.ConfirmDialog;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
@@ -117,7 +118,7 @@ public abstract class VisitCell extends BaseAnimateView {
     private void refreshHeaderText() {
 
         String text = "";
-        Place place = RVData.getInstance().placeList.getById(mVisit.getPlaceId());
+        Place place = PlaceList.getInstance().getById(mVisit.getPlaceId());
 
         switch (mHeaderContent) {
             case PLACE_DATA:

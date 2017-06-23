@@ -23,7 +23,7 @@ public class PersonList extends DataList<Person> {
 
         ArrayList<Place> places = new ArrayList<>();
         if (place.getCategory() == Place.Category.HOUSING_COMPLEX) {
-            places = new ArrayList<>(RVData.getInstance().placeList.getRoomList(place.getId()));
+            places = new ArrayList<>(PlaceList.getInstance().getRoomList(place.getId()));
         } else {
             places.add(place);
         }

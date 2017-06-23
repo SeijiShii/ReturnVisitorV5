@@ -289,6 +289,7 @@ public class RVDBHelper {
         while (isEOf) {
             RVRecord record = generateRecordFromCursor(cursor);
             records.add(record);
+            isEOf = cursor.moveToNext();
         }
         cursor.close();
         return records;
@@ -322,6 +323,7 @@ public class RVDBHelper {
         while (isEOf) {
             RVRecord record = generateRecordFromCursor(cursor);
             records.add(record);
+            isEOf = cursor.moveToNext();
         }
         cursor.close();
         return records;
@@ -329,32 +331,33 @@ public class RVDBHelper {
     }
 
 
-//    public ArrayList<RVRecord> loadRecordsByIds(ArrayList<String> ids, boolean deleted) {
-//        ArrayList<RVRecord> records = new ArrayList<>();
-//
-//        String whereClause;
-//        if (deleted) {
-//            whereClause = DATA_ID + " = ?";
-//        } else {
-//            whereClause = DATA_ID + " = ?" + AND + IS_DELETED + " = 0";
-//        }
-//
-//        for (String id : ids) {
-//
-//            Cursor cursor = mDB.query(false,
-//                    TABLE_NAME,
-//                    null,
-//                    whereClause,
-//                    new String[]{id},
-//                    null, null, null, null);
-//            boolean isEOf = cursor.moveToFirst();
-//            while (isEOf) {
-//                RVRecord record =generateRecordFromCursor(cursor);
-//                records.add(record);
-//            }
-//        }
-//        return records;
-//    }
+    public ArrayList<RVRecord> loadRecordsByIds(ArrayList<String> ids, boolean deleted) {
+        ArrayList<RVRecord> records = new ArrayList<>();
+
+        String whereClause;
+        if (deleted) {
+            whereClause = DATA_ID + " = ?";
+        } else {
+            whereClause = DATA_ID + " = ?" + AND + IS_DELETED + " = 0";
+        }
+
+        for (String id : ids) {
+
+            Cursor cursor = mDB.query(false,
+                    TABLE_NAME,
+                    null,
+                    whereClause,
+                    new String[]{id},
+                    null, null, null, null);
+            boolean isEOf = cursor.moveToFirst();
+            while (isEOf) {
+                RVRecord record =generateRecordFromCursor(cursor);
+                records.add(record);
+                isEOf = cursor.moveToNext();
+            }
+        }
+        return records;
+    }
 
 //    private ArrayList<RVRecord> loadRecordsByIds(ArrayList<String> ids) {
 //        return loadRecordsByIds(ids, false);

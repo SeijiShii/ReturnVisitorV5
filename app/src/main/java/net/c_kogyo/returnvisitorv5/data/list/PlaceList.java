@@ -22,6 +22,19 @@ public class PlaceList extends DataList<Place> {
 
     private final String TAG = "PlaceList";
 
+    private static PlaceList instance;
+
+    public static PlaceList getInstance() {
+        if (instance == null) {
+            instance = new PlaceList();
+        }
+        return instance;
+    }
+
+    private PlaceList() {
+        super(Place.class);
+    }
+
     public synchronized ArrayList<Place> getListByIds(ArrayList<String> ids) {
         ArrayList<Place> list = new ArrayList<>();
         for (String id : ids) {

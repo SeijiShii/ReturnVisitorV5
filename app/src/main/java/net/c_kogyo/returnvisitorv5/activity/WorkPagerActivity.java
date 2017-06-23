@@ -26,6 +26,7 @@ import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.Work;
+import net.c_kogyo.returnvisitorv5.data.list.PlaceList;
 import net.c_kogyo.returnvisitorv5.dialog.AddWorkDialog;
 import net.c_kogyo.returnvisitorv5.dialog.DayAggregationDialog;
 import net.c_kogyo.returnvisitorv5.fragment.WorkFragment;
@@ -449,7 +450,7 @@ public class WorkPagerActivity extends AppCompatActivity {
 
     private void moveToMapWithPosition(Visit visit) {
         String placeId = visit.getPlaceId();
-        Place place = RVData.getInstance().placeList.getById(placeId);
+        Place place = PlaceList.getInstance().getById(placeId);
         if (place == null) return;
 
         Intent intent = new Intent(WorkPagerActivity.this, MapActivity.class);

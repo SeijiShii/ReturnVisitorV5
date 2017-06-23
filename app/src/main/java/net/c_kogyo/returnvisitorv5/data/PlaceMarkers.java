@@ -8,6 +8,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import net.c_kogyo.returnvisitorv5.Constants;
+import net.c_kogyo.returnvisitorv5.data.list.PlaceList;
 
 import java.util.ArrayList;
 
@@ -49,7 +50,7 @@ public class PlaceMarkers {
 
         this.markers = new ArrayList<>();
 
-        for (Place place : RVData.getInstance().placeList) {
+        for (Place place : PlaceList.getInstance()) {
 
             if (place.getCategory() != Place.Category.ROOM) {
                 addMarker(place);
@@ -102,7 +103,7 @@ public class PlaceMarkers {
 
         for (PlaceMarker placeMarker : markers) {
             if (placeMarker.marker.equals(marker)) {
-                return  RVData.getInstance().placeList.getById(placeMarker.placeId);
+                return  PlaceList.getInstance().getById(placeMarker.placeId);
             }
         }
         return null;

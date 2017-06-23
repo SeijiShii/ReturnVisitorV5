@@ -24,6 +24,7 @@ import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.PlaceMarkers;
 import net.c_kogyo.returnvisitorv5.data.RVData;
+import net.c_kogyo.returnvisitorv5.data.list.PlaceList;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -101,7 +102,7 @@ public class ShowInMapDialog extends DialogFragment
         Bundle arg = getArguments();
 
         String placeId = arg.getString(PLACE_ID);
-        mPlace = RVData.getInstance().placeList.getById(placeId);
+        mPlace = PlaceList.getInstance().getById(placeId);
 
     }
 

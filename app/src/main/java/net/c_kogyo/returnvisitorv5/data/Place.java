@@ -4,6 +4,8 @@ import android.content.Context;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import net.c_kogyo.returnvisitorv5.data.list.PlaceList;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -134,7 +136,7 @@ public class Place extends DataItem {
                 return visit.getPriority();
 
             case HOUSING_COMPLEX:
-                Place room = RVData.getInstance().placeList.getMostPriorRoom(this.id);
+                Place room = PlaceList.getInstance().getMostPriorRoom(this.id);
                 if (room == null) {
                     return Person.Priority.NONE;
                 }
@@ -178,7 +180,7 @@ public class Place extends DataItem {
     public int getChildCount() {
 
         if (category == Category.HOUSING_COMPLEX) {
-            return RVData.getInstance().placeList.getRoomList(id).size();
+            return PlaceList.getInstance().getRoomList(id).size();
         }
 
         return -1;

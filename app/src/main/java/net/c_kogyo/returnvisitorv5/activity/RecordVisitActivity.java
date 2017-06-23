@@ -33,6 +33,7 @@ import net.c_kogyo.returnvisitorv5.data.Publication;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
+import net.c_kogyo.returnvisitorv5.data.list.PlaceList;
 import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.db.RVRecord;
 import net.c_kogyo.returnvisitorv5.dialog.AddPersonDialog;
@@ -133,7 +134,7 @@ public class RecordVisitActivity extends AppCompatActivity {
                 String visitId = intent.getStringExtra(VISIT);
 
                 Visit visit = RVData.getInstance().visitList.getById(visitId);
-                Place place = RVData.getInstance().placeList.getById(visit.getPlaceId());
+                Place place = PlaceList.getInstance().getById(visit.getPlaceId());
 
                 try {
                     mVisit = (Visit) visit.clone();
@@ -149,7 +150,7 @@ public class RecordVisitActivity extends AppCompatActivity {
                 break;
             case NEW_VISIT_ACTION_WITH_PLACE:
                 String placeId = intent.getStringExtra(PLACE);
-                Place place1 = RVData.getInstance().placeList.getById(placeId);
+                Place place1 = PlaceList.getInstance().getById(placeId);
                 try {
                     mPlace = (Place) place1.clone();
                 } catch (CloneNotSupportedException e) {
@@ -508,7 +509,7 @@ public class RecordVisitActivity extends AppCompatActivity {
 
                 if (mPlace != null) {
                     mPlace.setName(placeNameText.getText());
-                    RVData.getInstance().placeList.setOrAdd(mPlace);
+                    PlaceList.getInstance().setOrAdd(mPlace);
                 }
 
                 // PENDING: 2017/03/08 要動作検証 noteがAutoCompListについかされたかどうか
