@@ -1,6 +1,7 @@
 package net.c_kogyo.returnvisitorv5.data;
 
 import net.c_kogyo.returnvisitorv5.data.list.VisitList;
+import net.c_kogyo.returnvisitorv5.data.list.WorkList;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -18,7 +19,7 @@ public class AggregationOfDay {
 
     public static long time(Calendar date) {
         long time = 0;
-        for (Work work : RVData.getInstance().workList.getWorksInDay(date)) {
+        for (Work work : WorkList.getInstance().getWorksInDay(date)) {
             time += work.getDuration();
         }
         return time;
@@ -62,7 +63,7 @@ public class AggregationOfDay {
     }
 
     public static boolean hasWork(Calendar date) {
-        return RVData.getInstance().workList.getWorksInDay(date).size() > 0;
+        return WorkList.getInstance().getWorksInDay(date).size() > 0;
     }
 
     public static boolean hasVisit(Calendar date) {

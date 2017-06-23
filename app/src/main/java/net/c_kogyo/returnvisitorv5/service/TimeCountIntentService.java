@@ -13,8 +13,8 @@ import android.support.v4.content.LocalBroadcastManager;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
-import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Work;
+import net.c_kogyo.returnvisitorv5.data.list.WorkList;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 
 import java.util.Calendar;
@@ -69,8 +69,7 @@ public class TimeCountIntentService extends IntentService {
                     long startTime = intent.getLongExtra(START_TIME, mWork.getStart().getTimeInMillis());
                     mWork.getStart().setTimeInMillis(startTime);
 
-                    RVData.getInstance().workList.setOrAdd(mWork);
-                    RVData.getInstance().saveData(TimeCountIntentService.this);
+                    WorkList.getInstance().setOrAdd(mWork);
 
                     RVCloudSync.getInstance().requestDataSyncIfLoggedIn(TimeCountIntentService.this);
                 }
@@ -92,12 +91,11 @@ public class TimeCountIntentService extends IntentService {
 
             if (intent.getAction().equals(START_COUNTING_ACTION_TO_SERVICE)) {
                 mWork = new Work(Calendar.getInstance());
-                RVData.getInstance().workList.setOrAdd(mWork);
-                RVData.getInstance().saveData(this);
+                WorkList.getInstance().setOrAdd(mWork);
                 RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this);
             } else if (intent.getAction().equals(RESTART_COUNTING_ACTION_TO_SERVICE)) {
                 String workId = intent.getStringExtra(COUNTING_WORK_ID);
-                mWork = RVData.getInstance().workList.getById(workId);
+                mWork = WorkList.getInstance().getById(workId);
                 if (mWork == null) {
                     stopTimeCount();
                     return;
@@ -134,8 +132,7 @@ public class TimeCountIntentService extends IntentService {
 
                     mWork.setEnd(Calendar.getInstance());
 
-                    RVData.getInstance().workList.setOrAdd(mWork);
-                    RVData.getInstance().saveData(this);
+                    WorkList.getInstance().setOrAdd(mWork);
                     RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this);
                     minCounter = 0;
                 }

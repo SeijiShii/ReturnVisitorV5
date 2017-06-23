@@ -28,9 +28,9 @@ import android.widget.TextView;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
-import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Tag;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
+import net.c_kogyo.returnvisitorv5.data.list.TagList;
 import net.c_kogyo.returnvisitorv5.util.InputUtil;
 
 import java.util.ArrayList;
@@ -117,9 +117,9 @@ public class TagDialog extends DialogFragment {
                 s = trimWhitespace(s);
 
                 if (s.length() <= 0) {
-                    mAdapter = new TagListAdapter(RVData.getInstance().tagList.getSortedList());
+                    mAdapter = new TagListAdapter(TagList.getInstance().getSortedList());
                 } else {
-                    mAdapter = new TagListAdapter(RVData.getInstance().tagList.getSearchedItems(s, getActivity()));
+                    mAdapter = new TagListAdapter(TagList.getInstance().getSearchedItems(s, getActivity()));
                 }
                 tagListView.setAdapter(mAdapter);
                 mAdapter.notifyDataSetChanged();
@@ -174,21 +174,19 @@ public class TagDialog extends DialogFragment {
                     return;
                 }
 
-                if (RVData.getInstance().tagList.containsDataWithName(data)){
+                if (TagList.getInstance().containsDataWithName(data)){
                     return;
                 }
 
                 Tag newTag = new Tag(data);
-                RVData.getInstance().tagList.setOrAdd(newTag);
+                TagList.getInstance().setOrAdd(newTag);
 
                 mVisitDetail.getTagIds().add(newTag.getId());
 
-                mAdapter = new TagListAdapter(RVData.getInstance().tagList.getSortedList());
+                mAdapter = new TagListAdapter(TagList.getInstance().getSortedList());
                 tagListView.setAdapter(mAdapter);
                 mAdapter.notifyDataSetChanged();
                 setListViewHeight();
-
-                RVData.getInstance().saveData(getActivity());
 
                 RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getActivity());
             }
@@ -201,7 +199,7 @@ public class TagDialog extends DialogFragment {
 
         tagListView = (ListViewCompat) view.findViewById(R.id.tag_list_view);
         // DONE: 2017/03/06 tag list adapter
-        mAdapter = new TagListAdapter(RVData.getInstance().tagList.getSortedList());
+        mAdapter = new TagListAdapter(TagList.getInstance().getSortedList());
         tagListView.setAdapter(mAdapter);
 
         tagListView.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -287,16 +285,14 @@ public class TagDialog extends DialogFragment {
 
                 @Override
                 public void onDeleteTag(Tag tag) {
-                    RVData.getInstance().tagList.deleteById(tag.getId());
+                    TagList.getInstance().deleteById(tag.getId());
                     mVisitDetail.getTagIds().remove(tag.getId());
 
-                    mAdapter = new TagListAdapter(RVData.getInstance().tagList.getSortedList());
+                    mAdapter = new TagListAdapter(TagList.getInstance().getSortedList());
                     tagListView.setAdapter(mAdapter);
                     mAdapter.notifyDataSetChanged();
 
                     setListViewHeight();
-
-                    RVData.getInstance().saveData(getActivity());
 
                     RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getActivity());
                 }

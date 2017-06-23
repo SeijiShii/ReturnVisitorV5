@@ -23,11 +23,12 @@ import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
 import net.c_kogyo.returnvisitorv5.data.Place;
-import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.Work;
 import net.c_kogyo.returnvisitorv5.data.list.PlaceList;
 import net.c_kogyo.returnvisitorv5.data.list.VisitList;
+import net.c_kogyo.returnvisitorv5.data.list.WorkList;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.dialog.AddWorkDialog;
 import net.c_kogyo.returnvisitorv5.dialog.DayAggregationDialog;
 import net.c_kogyo.returnvisitorv5.fragment.WorkFragment;
@@ -478,8 +479,8 @@ public class WorkPagerActivity extends AppCompatActivity {
     }
 
     private void onAddWork(Work work) {
-        RVData.getInstance().workList.setOrAdd(work);
-        ArrayList<Work> worksRemoved = RVData.getInstance().workList.onChangeTime(work);
+        WorkList.getInstance().setOrAdd(work);
+        ArrayList<Work> worksRemoved = WorkList.getInstance().onChangeTime(work);
         ArrayList<Visit> visitsSwallowed = VisitList.getInstance().getVisitsInWork(work);
 
         int pos = mDatePagerAdapter.getPosition(work.getStart());
@@ -489,8 +490,6 @@ public class WorkPagerActivity extends AppCompatActivity {
         fragment.removeWorkViews(worksRemoved);
         fragment.removeVisitCells(visitsSwallowed);
         fragment.addWorkViewAndExtract(work);
-
-        RVData.getInstance().saveData(WorkPagerActivity.this);
 
         RVCloudSync.getInstance().requestDataSyncIfLoggedIn(WorkPagerActivity.this);
     }
@@ -518,7 +517,7 @@ public class WorkPagerActivity extends AppCompatActivity {
         if (workId == null)
             return;
 
-        addedWork = RVData.getInstance().workList.getById(workId);
+        addedWork = WorkList.getInstance().getById(workId);
     }
 
     @Override
@@ -557,7 +556,7 @@ public class WorkPagerActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
 
 //            Log.d(TAG, "Get Work Fragment, position: " + position);
-            return WorkFragment.newInstance(RVData.getInstance().getDatesWithData().get(position),
+            return WorkFragment.newInstance(RVDBHelper.getInstance().getDatesWithData().get(position),
                     addedWork,
                     toExtractAddedWorkView,
                     new WorkFragment.WorkFragmentListener() {
@@ -569,8 +568,7 @@ public class WorkPagerActivity extends AppCompatActivity {
 
                         @Override
                         public void postRemoveWorkView(Work work) {
-                            RVData.getInstance().workList.deleteById(work.getId());
-                            RVData.getInstance().saveData(WorkPagerActivity.this);
+                            WorkList.getInstance().deleteById(work.getId());
                             notifyDataSetChanged();
 
                             RVCloudSync.getInstance().requestDataSyncIfLoggedIn(WorkPagerActivity.this);
@@ -591,14 +589,14 @@ public class WorkPagerActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return RVData.getInstance().getDatesWithData().size();
+            return RVDBHelper.getInstance().getDatesWithData().size();
         }
 
         public int getPosition(Calendar date) {
 
             for ( int i = 0 ; i < getCount() ; i++ ) {
 
-                Calendar dateWithData = RVData.getInstance().getDatesWithData().get(i);
+                Calendar dateWithData = RVDBHelper.getInstance().getDatesWithData().get(i);
 
                 if (CalendarUtil.isSameDay(date, dateWithData)) {
                     return i;
@@ -609,7 +607,7 @@ public class WorkPagerActivity extends AppCompatActivity {
         }
 
         public Calendar getDayItem(int pos) {
-            return RVData.getInstance().getDatesWithData().get(pos);
+            return RVDBHelper.getInstance().getDatesWithData().get(pos);
         }
 
 

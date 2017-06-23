@@ -4,7 +4,6 @@ import android.util.Log;
 
 import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Place;
-import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
 
@@ -18,6 +17,18 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class PersonList extends DataList<Person> {
 
     private static final String TAG = "PersonList";
+
+    private static PersonList instance;
+    private PersonList() {
+        super(Person.class);
+    }
+
+    public static PersonList getInstance() {
+        if (instance == null) {
+            instance = new PersonList();
+        }
+        return instance;
+    }
 
     public ArrayList<Person> getPersonsInPlace(Place place) {
 

@@ -30,7 +30,6 @@ import net.c_kogyo.returnvisitorv5.data.DismissedSuggestion;
 import net.c_kogyo.returnvisitorv5.data.Filter;
 import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Place;
-import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitSuggestion;
 import net.c_kogyo.returnvisitorv5.data.list.PlaceList;

@@ -8,7 +8,7 @@ import android.util.Log;
 import com.google.gson.Gson;
 
 import net.c_kogyo.returnvisitorv5.Constants;
-import net.c_kogyo.returnvisitorv5.data.RVData;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.db.RVRecord;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 import net.c_kogyo.returnvisitorv5.util.EncryptUtil;
@@ -175,8 +175,7 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback{
         void onTimedOut();
     }
 
-    private ArrayList<RVRecord> cloudDataList;
-    private long lastSyncTime;
+    private ArrayList<RVRecord> cloudDataList, deviceDataList;
     private int cloudDataCount = 0;
     public void requestDataSyncIfLoggedIn(Context context) {
 
@@ -193,11 +192,13 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback{
 
         SharedPreferences prefs
                 = context.getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
-        lastSyncTime = prefs.getLong(LAST_DEVICE_SYNC_TIME, 0);
+        long lastSyncTime = prefs.getLong(LAST_DEVICE_SYNC_TIME, 0);
 
         Calendar date = Calendar.getInstance();
         date.setTimeInMillis(lastSyncTime);
         Log.d(TAG, "Last sync date: " + DateTimeText.getDateTimeText(date, context));
+
+        deviceDataList = RVDBHelper.getInstance().loadRecordsLaterThanTime(lastSyncTime);
 
         RVRequestBody requestBody = new RVRequestBody(loginState.getUserName(), loginState.getPassword(), lastSyncTime);
         RVCloudSyncDataFrame dataFrame
@@ -267,8 +268,7 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback{
         RVResponseBody responseBody = mGson.fromJson(dataFrame.getDataBody(), RVResponseBody.class);
         switch (responseBody.getStatusCode()) {
             case STATUS_200_SYNC_START_OK:
-                // TODO: 2017/06/23 SQLiteの実装が済むまでペンディング
-//                sendDeviceData(dataFrame.getToken());
+                sendDeviceData(dataFrame.getToken());
                 break;
 
             case STATUS_401_UNAUTHORIZED:
@@ -281,11 +281,11 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback{
     }
 
     private void sendDeviceData(String token) {
-//        for (RVRecord record : RVData.getInstance().getRecordsLaterThanTime(lastSyncTime)) {
-//            RVCloudSyncDataFrame dataFrame =
-//                    new RVCloudSyncDataFrame(RVCloudSyncDataFrame.FrameCategory.DEVICE_DATA_FRAME, mGson.toJson(record), token);
-//            socketClient.send(mGson.toJson(dataFrame));
-//        }
+        for (RVRecord record : deviceDataList) {
+            RVCloudSyncDataFrame dataFrame =
+                    new RVCloudSyncDataFrame(RVCloudSyncDataFrame.FrameCategory.DEVICE_DATA_FRAME, mGson.toJson(record), token);
+            socketClient.send(mGson.toJson(dataFrame));
+        }
         // DONE: 2017/06/19 デバイスに蓄積したデータの伝送
         RVCloudSyncDataFrame deviceDataEndFrame
                 = new RVCloudSyncDataFrame(RVCloudSyncDataFrame.FrameCategory.DEVICE_DATA_END_FRAME, null, token);
@@ -301,18 +301,15 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback{
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    RVData.getInstance().setFromRecordList(bufferedList, RVData.RecordArraySource.FROM_CLOUD);
+                    RVDBHelper.getInstance().saveRecordsAsynchronous(bufferedList);
                 }
             }).start();
             cloudDataList = new ArrayList<>();
         }
     }
 
-    private void onCloudDataEndFrame(RVCloudSyncDataFrame dataFrame) {
-        RVData.getInstance().setFromRecordList(cloudDataList, RVData.RecordArraySource.FROM_CLOUD);
-        if (mCallback != null) {
-            mCallback.onSyncDataResult(mGson.fromJson(dataFrame.getDataBody(), RVResponseBody.class));
-        }
+    private void onCloudDataEndFrame(final RVCloudSyncDataFrame dataFrame) {
+        RVDBHelper.getInstance().saveRecordsAsynchronous(cloudDataList);
         socketClient.close();
     }
 

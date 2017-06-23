@@ -3,6 +3,8 @@ package net.c_kogyo.returnvisitorv5.data;
 import android.content.Context;
 
 import net.c_kogyo.returnvisitorv5.R;
+import net.c_kogyo.returnvisitorv5.data.list.PersonList;
+import net.c_kogyo.returnvisitorv5.data.list.TagList;
 import net.c_kogyo.returnvisitorv5.data.list.VisitList;
 
 import org.json.JSONArray;
@@ -70,7 +72,7 @@ public class VisitDetail extends DataItem  implements Cloneable{
 
     public String getPersonData(Context context) {
 
-        Person person = RVData.getInstance().personList.getById(personId);
+        Person person = PersonList.getInstance().getById(personId);
 
         if (person == null) {
             return null;
@@ -146,7 +148,7 @@ public class VisitDetail extends DataItem  implements Cloneable{
 
         StringBuilder builder = new StringBuilder();
 
-        Person person = RVData.getInstance().personList.getById(personId);
+        Person person = PersonList.getInstance().getById(personId);
         if (person != null) {
             builder.append(spaces).append(person.toString(context));
             builder.append("\n").append(spaces).append(context.getResources().getStringArray(R.array.priority_array)[getPriority().num()]);
@@ -172,7 +174,7 @@ public class VisitDetail extends DataItem  implements Cloneable{
             if (tagIds.size() > 0 ) {
                 builder.append("\n").append(context.getString(R.string.tag)).append(":");
                 for (String id : tagIds) {
-                    Tag tag = RVData.getInstance().tagList.getById(id);
+                    Tag tag = TagList.getInstance().getById(id);
                     if (tag != null) {
                         builder.append(" ").append(tag.getName());
                     }

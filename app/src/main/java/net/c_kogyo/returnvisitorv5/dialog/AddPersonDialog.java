@@ -40,7 +40,7 @@ import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.PlaceMarkers;
-import net.c_kogyo.returnvisitorv5.data.RVData;
+import net.c_kogyo.returnvisitorv5.data.list.PersonList;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 import net.c_kogyo.returnvisitorv5.view.BaseAnimateView;
 import net.c_kogyo.returnvisitorv5.view.PersonCell;
@@ -292,7 +292,7 @@ public class AddPersonDialog extends DialogFragment
 
     private PersonListAdapter personListAdapter;
     private void fadeInListFrameByPlace(Place place) {
-        ArrayList<Person> persons = RVData.getInstance().personList.getPersonsInPlace(place);
+        ArrayList<Person> persons = PersonList.getInstance().getPersonsInPlace(place);
         fadeInPersonList(persons);
         fadeInPlaceCell(place);
     }
@@ -337,7 +337,7 @@ public class AddPersonDialog extends DialogFragment
     }
 
     private void fadeInListFrameBySearchWord(String searchWord) {
-        ArrayList<Person> persons = new ArrayList<>(RVData.getInstance().personList.getSearchedItems(searchWord, getActivity()));
+        ArrayList<Person> persons = new ArrayList<>(PersonList.getInstance().getSearchedItems(searchWord, getActivity()));
         fadeInPersonList(persons);
     }
 

@@ -20,7 +20,7 @@ import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
 import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Place;
-import net.c_kogyo.returnvisitorv5.data.RVData;
+import net.c_kogyo.returnvisitorv5.data.list.PersonList;
 import net.c_kogyo.returnvisitorv5.util.ConfirmDialog;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 
@@ -164,10 +164,10 @@ public class PlaceCell extends BaseAnimateView {
         boolean prioritiesChanged = false;
 
         personContainer.removeAllViews();
-        for (Person person : RVData.getInstance().personList.getPersonsInPlace(mPlace)) {
+        for (Person person : PersonList.getInstance().getPersonsInPlace(mPlace)) {
             boolean changed = person.setPriorityFromLatestVisitDetail();
             if (changed) {
-                RVData.getInstance().personList.setOrAdd(person);
+                PersonList.getInstance().setOrAdd(person);
                 prioritiesChanged = true;
             }
             personContainer.addView(generatePersonCell(person));
@@ -175,7 +175,6 @@ public class PlaceCell extends BaseAnimateView {
         // 訪問削除時に人優先度を変更したら保存しなくてはならない。
         // 変更になっていないとき保存が起動すると無駄なのでチェック
         if (prioritiesChanged) {
-            RVData.getInstance().saveData(getContext());
             RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getContext());
         }
     }
@@ -185,8 +184,7 @@ public class PlaceCell extends BaseAnimateView {
             @Override
             public void onClickDelete(Person person) {
                 removePersonCell(person);
-                RVData.getInstance().personList.deleteById(person.getId());
-                RVData.getInstance().saveData(getContext());
+                PersonList.getInstance().deleteById(person.getId());
                 RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getContext());
             }
 

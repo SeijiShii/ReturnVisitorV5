@@ -15,6 +15,18 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class TagList extends DataList<Tag> {
 
+    private static TagList instance;
+    private TagList() {
+        super(Tag.class);
+    }
+
+    public static TagList getInstance() {
+        if (instance == null) {
+            instance = new TagList();
+        }
+        return instance;
+    }
+
     public ArrayList<Tag> getSortedList() {
         ArrayList<Tag> list = new ArrayList<>(super.list);
         Collections.sort(list, new Comparator<Tag>() {

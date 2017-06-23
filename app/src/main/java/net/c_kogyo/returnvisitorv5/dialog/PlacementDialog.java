@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.util.Pair;
 import android.support.v7.widget.AppCompatSpinner;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +23,7 @@ import android.widget.TextView;
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.Placement;
 import net.c_kogyo.returnvisitorv5.data.Publication;
-import net.c_kogyo.returnvisitorv5.data.RVData;
+import net.c_kogyo.returnvisitorv5.data.list.PublicationList;
 import net.c_kogyo.returnvisitorv5.fragment.DefaultPublicationListFragment;
 import net.c_kogyo.returnvisitorv5.fragment.RankedPublicationListFragment;
 import net.c_kogyo.returnvisitorv5.data.FragmentTitlePair;
@@ -47,6 +46,8 @@ public  class  PlacementDialog extends DialogFragment {
     private static PlacementDialogListener mListener;
     private static Publication mPublication;
     private static String mParentId;
+
+    private PublicationList publicationList;
 
     // getChildFragmentManagerをする関係でstaticなinstanceは使いまわせないらしい。
 //    private static PlacementDialog instance;
@@ -79,6 +80,7 @@ public  class  PlacementDialog extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+
         return new Dialog(getActivity(), R.style.DialogNoTitle);
     }
 
@@ -87,6 +89,8 @@ public  class  PlacementDialog extends DialogFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+
+        publicationList = new PublicationList();
 
         view = inflater.inflate(R.layout.placement_dialog, container, false);
         initCommon();
@@ -134,7 +138,7 @@ public  class  PlacementDialog extends DialogFragment {
                 }
                 dismiss();
             }
-        });
+        }, publicationList);
         contents.add(new FragmentTitlePair(rankedPublicationListFragment, getActivity().getString(R.string.history_title)));
 
         contents.add(new FragmentTitlePair(
@@ -193,8 +197,8 @@ public  class  PlacementDialog extends DialogFragment {
             public void onClick(View view) {
                 mPublication.setName(generalNameText.getText().toString());
 
-                RVData.getInstance().publicationList.setOrAdd(mPublication);
-                Publication publication = RVData.getInstance().publicationList.getCorrespondingData(mPublication);
+                publicationList.setOrAdd(mPublication);
+                Publication publication = publicationList.getCorrespondingData(mPublication);
                 Placement placement = new Placement(publication, getActivity());
 
                 if (mListener != null) {
@@ -353,8 +357,8 @@ public  class  PlacementDialog extends DialogFragment {
                 mPublication.setNumber(numbers.get(numberSpinner.getSelectedItemPosition()).first);
                 mPublication.setName(magazineNameText.getText().toString());
 
-                RVData.getInstance().publicationList.setOrAdd(mPublication);
-                Publication publication = RVData.getInstance().publicationList.getCorrespondingData(mPublication);
+                publicationList.setOrAdd(mPublication);
+                Publication publication = publicationList.getCorrespondingData(mPublication);
                 Placement placement = new Placement(publication, getActivity());
 
                 if (mListener != null) {

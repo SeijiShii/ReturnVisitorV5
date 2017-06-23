@@ -89,7 +89,7 @@ public class PlaceMarkers {
         }
     }
 
-    synchronized public PlaceMarker getPlaceMarkerByPlace(Place place) {
+    synchronized private PlaceMarker getPlaceMarkerByPlace(Place place) {
 
         for (PlaceMarker marker : markers) {
             if (marker.placeId.equals(place.getId())) {

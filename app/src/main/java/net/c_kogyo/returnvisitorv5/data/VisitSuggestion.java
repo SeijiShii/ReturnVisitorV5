@@ -3,6 +3,7 @@ package net.c_kogyo.returnvisitorv5.data;
 import android.content.Context;
 import android.support.annotation.Nullable;
 
+import net.c_kogyo.returnvisitorv5.data.list.PersonList;
 import net.c_kogyo.returnvisitorv5.data.list.VisitList;
 import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
 
@@ -123,7 +124,7 @@ public class VisitSuggestion {
         ArrayList<VisitSuggestion> suggestions = new ArrayList<>();
 
         if (priority != Person.Priority.NOT_HOME) {
-            for (Person person : RVData.getInstance().personList) {
+            for (Person person : PersonList.getInstance()) {
 
                 if (person.getPriority() == priority) {
                     Visit latestVisit = VisitList.getInstance().getLatestVisitToPerson(person.getId());

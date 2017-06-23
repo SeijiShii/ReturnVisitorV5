@@ -5,7 +5,6 @@ import android.view.ViewDebug;
 
 import net.c_kogyo.returnvisitorv5.data.Placement;
 import net.c_kogyo.returnvisitorv5.data.Publication;
-import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 
 import java.util.ArrayList;
@@ -33,6 +32,12 @@ public class PublicationList extends DataList<Publication> {
     private final long THREE_MONTH = ONE_MONTH * 3;     // weight: 4
     private final long SIX_MONTH = ONE_MONTH * 6;       // weight: 2
     private final long ONE_YEAR = ONE_MONTH * 12;       // weight: 1
+
+    public PublicationList() {
+        super(Publication.class);
+    }
+
+
     private ArrayList<Publication> getRankedList(Calendar today) {
 
         ArrayList<Publication> weightedList = new ArrayList<>(list);

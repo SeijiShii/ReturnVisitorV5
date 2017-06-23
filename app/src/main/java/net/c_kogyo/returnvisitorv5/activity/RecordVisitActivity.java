@@ -30,9 +30,10 @@ import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.Placement;
 import net.c_kogyo.returnvisitorv5.data.Publication;
-import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
+import net.c_kogyo.returnvisitorv5.data.list.NoteCompList;
+import net.c_kogyo.returnvisitorv5.data.list.PersonList;
 import net.c_kogyo.returnvisitorv5.data.list.PlaceList;
 import net.c_kogyo.returnvisitorv5.data.list.VisitList;
 import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
@@ -80,10 +81,13 @@ public class RecordVisitActivity extends AppCompatActivity {
     private ArrayList<Person> mAddedPersons;
     private ArrayList<Person> mRemovedPersons;
 
+    private NoteCompList noteCompList;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        noteCompList = new NoteCompList();
 
         initData();
         initBroadcastManager();
@@ -371,7 +375,7 @@ public class RecordVisitActivity extends AppCompatActivity {
     private void initVisitDetailFrame() {
         visitDetailFrame = (LinearLayout) findViewById(R.id.visit_detail_frame);
         for (VisitDetail visitDetail : mVisit.getVisitDetails()) {
-            Person person = RVData.getInstance().personList.getById(visitDetail.getPersonId());
+            Person person = PersonList.getInstance().getById(visitDetail.getPersonId());
             if (person != null) {
                 addVisitDetailView(visitDetail,
                         person,
@@ -427,11 +431,10 @@ public class RecordVisitActivity extends AppCompatActivity {
 
                     @Override
                     public void postDeletePerson(Person person) {
-                        RVData.getInstance().personList.deleteById(person.getId());
-                        RVData.getInstance().saveData(RecordVisitActivity.this);
+                        PersonList.getInstance().deleteById(person.getId());
                         RVCloudSync.getInstance().requestDataSyncIfLoggedIn(RecordVisitActivity.this);
                     }
-                });
+                }, noteCompList);
         visitDetailFrame.addView(detailView);
     }
 
@@ -505,8 +508,8 @@ public class RecordVisitActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 VisitList.getInstance().setOrAdd(mVisit);
-                RVData.getInstance().personList.addList(mAddedPersons);
-                RVData.getInstance().personList.removeList(mRemovedPersons);
+                PersonList.getInstance().addList(mAddedPersons);
+                PersonList.getInstance().removeList(mRemovedPersons);
 
                 if (mPlace != null) {
                     mPlace.setName(placeNameText.getText());
@@ -516,7 +519,7 @@ public class RecordVisitActivity extends AppCompatActivity {
                 // PENDING: 2017/03/08 要動作検証 noteがAutoCompListについかされたかどうか
 
                 for (VisitDetail visitDetail : mVisit.getVisitDetails()) {
-                    RVData.getInstance().noteCompList.addIfNoSameName(visitDetail.getNote());
+                    noteCompList.addIfNoSameName(visitDetail.getNote());
                 }
 
                 switch (getIntent().getAction()) {
@@ -546,8 +549,6 @@ public class RecordVisitActivity extends AppCompatActivity {
 
                         break;
                 }
-
-                RVData.getInstance().saveData(getApplicationContext());
 
                 RVCloudSync.getInstance().requestDataSyncIfLoggedIn(RecordVisitActivity.this);
 
@@ -834,7 +835,7 @@ public class RecordVisitActivity extends AppCompatActivity {
             mVisit = new Visit(lastVisit);
 
             for (VisitDetail visitDetail : mVisit.getVisitDetails()) {
-                Person person = RVData.getInstance().personList.getById(visitDetail.getPersonId());
+                Person person = PersonList.getInstance().getById(visitDetail.getPersonId());
                 if (person != null) {
                     addVisitDetailView(visitDetail,
                             person,
@@ -894,8 +895,7 @@ public class RecordVisitActivity extends AppCompatActivity {
             }
         }
 
-        RVData.getInstance().personList.setOrAdd(person);
-        RVData.getInstance().saveData(this);
+        PersonList.getInstance().setOrAdd(person);
         RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this);
     }
 

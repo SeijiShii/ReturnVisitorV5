@@ -3,6 +3,7 @@ package net.c_kogyo.returnvisitorv5.data;
 import android.content.Context;
 
 import net.c_kogyo.returnvisitorv5.R;
+import net.c_kogyo.returnvisitorv5.data.list.TagList;
 import net.c_kogyo.returnvisitorv5.data.list.VisitList;
 
 import org.json.JSONArray;
@@ -209,7 +210,7 @@ public class Person extends DataItem implements Cloneable{
         if (visit != null) {
             VisitDetail visitDetail = visit.getVisitDetail(id);
             if (visitDetail != null) {
-                ArrayList<Tag> tags = RVData.getInstance().tagList.getList(visitDetail.getTagIds());
+                ArrayList<Tag> tags = TagList.getInstance().getList(visitDetail.getTagIds());
                 for (Tag tag : tags) {
                     builder.append(" ").append(tag.getName());
                 }

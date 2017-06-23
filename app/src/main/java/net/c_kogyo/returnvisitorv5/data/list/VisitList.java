@@ -3,7 +3,6 @@ package net.c_kogyo.returnvisitorv5.data.list;
 import android.support.annotation.Nullable;
 
 import net.c_kogyo.returnvisitorv5.data.Person;
-import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
 import net.c_kogyo.returnvisitorv5.data.Work;
@@ -96,7 +95,7 @@ public class VisitList extends DataList<Visit> {
 
     synchronized public ArrayList<Visit> getVisitsInWorkInDay(Calendar date) {
 
-        ArrayList<Work> worksInDay = RVData.getInstance().workList.getWorksInDay(date);
+        ArrayList<Work> worksInDay = WorkList.getInstance().getWorksInDay(date);
         ArrayList<Visit> visitsInWorkInDay = new ArrayList<>();
         for (Work work : worksInDay) {
             visitsInWorkInDay.addAll(getVisitsInWork(work));

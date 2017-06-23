@@ -21,9 +21,9 @@ import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.NoteCompItem;
 import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Placement;
-import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
+import net.c_kogyo.returnvisitorv5.data.list.NoteCompList;
 import net.c_kogyo.returnvisitorv5.util.ConfirmDialog;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 
@@ -40,6 +40,8 @@ public class VisitDetailView extends BaseAnimateView {
     private VisitDetailViewListener mListener;
     private DrawCondition mCondition;
 
+    private NoteCompList mNoteCompList;
+
     private int mCollapseHeight;
 
     public enum DrawCondition{
@@ -52,7 +54,8 @@ public class VisitDetailView extends BaseAnimateView {
                            VisitDetail visitDetail,
                            Person person,
                            DrawCondition condition,
-                           VisitDetailViewListener listener) {
+                           VisitDetailViewListener listener,
+                           NoteCompList noteCompList) {
         super(context,
                 0,
                 R.layout.visit_detail_view);
@@ -60,6 +63,7 @@ public class VisitDetailView extends BaseAnimateView {
         mPerson = person;
         mListener = listener;
         mCondition = condition;
+        mNoteCompList = noteCompList;
 
         initCommon();
         super.setListener(new BaseAnimateViewListener() {
@@ -275,7 +279,7 @@ public class VisitDetailView extends BaseAnimateView {
         // PENDING: 2017/03/08 要動作検証
 
         ArrayList<String> noteCompList = new ArrayList<>();
-        for (NoteCompItem compItem : RVData.getInstance().noteCompList){
+        for (NoteCompItem compItem : mNoteCompList){
             noteCompList.add(compItem.getName());
         }
         String[] compArray = noteCompList.toArray(new String[0]);

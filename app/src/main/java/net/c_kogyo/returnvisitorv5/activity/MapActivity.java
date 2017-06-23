@@ -51,11 +51,12 @@ import net.c_kogyo.returnvisitorv5.cloudsync.RVResponseBody;
 import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.PlaceMarkers;
-import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.Work;
+import net.c_kogyo.returnvisitorv5.data.list.PersonList;
 import net.c_kogyo.returnvisitorv5.data.list.PlaceList;
 import net.c_kogyo.returnvisitorv5.data.list.VisitList;
+import net.c_kogyo.returnvisitorv5.data.list.WorkList;
 import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.db.RVRecord;
 import net.c_kogyo.returnvisitorv5.dialog.AddWorkDialog;
@@ -101,7 +102,6 @@ public class MapActivity extends AppCompatActivity
                                         GoogleMap.OnMapLongClickListener,
                                         GoogleMap.OnMarkerClickListener,
                                         GoogleMap.OnMarkerDragListener,
-                                        RVData.RVDataCallback,
                                         RVCloudSync.RVCloudSyncCallback {
 
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
@@ -134,10 +134,6 @@ public class MapActivity extends AppCompatActivity
 //        loginDialogHandler = new Handler();
         RVCloudSync.getInstance().setCallback(this);
 
-        // 初期化のために一回ゲットする
-        RVData.getInstance().setRVDataCallback(this, new Handler());
-        RVData.getInstance().loadData(this);
-
         initLocalBroadcast();
 
         AdMobHelper.setAdView(this);
@@ -166,7 +162,7 @@ public class MapActivity extends AppCompatActivity
         editor.apply();
     }
 
-    private boolean isDataLoaded = false;
+//    private boolean isDataLoaded = false;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -199,6 +195,8 @@ public class MapActivity extends AppCompatActivity
 
     public static final String MY_LOCATION_TAG = "my_location";
     private GoogleMap mMap;
+    private PlaceMarkers placeMarkers;
+
     @Override
     public void onMapReady(GoogleMap map) {
 
@@ -231,51 +229,25 @@ public class MapActivity extends AppCompatActivity
 
         loadCameraPosition();
 
-        waitForDataLoadedAndRefreshUI();
+        mMap.setOnMapLongClickListener(MapActivity.this);
+        mMap.setOnMarkerClickListener(MapActivity.this);
+        mMap.setOnMarkerDragListener(MapActivity.this);
+
+        // DONE: 2017/03/01 ここにマーカー描画処理を記述する
+        if (placeMarkers == null) {
+            placeMarkers = new PlaceMarkers(mMap);
+        } else {
+            placeMarkers.drawAllMarkers();
+        }
+
+//        refreshLogoButton();
+        refreshWorkButton();
+        refreshCalendarButton();
+        enableWaitScreen(false);
+
+//        waitForDataLoadedAndRefreshUI();
     }
 
-    private PlaceMarkers placeMarkers;
-    private void waitForDataLoadedAndRefreshUI() {
-        
-        final Handler handler = new Handler();
-        
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                
-                while (!isDataLoaded) {
-                    try {
-                        Thread.sleep(50);
-                    } catch (InterruptedException e) {
-                        //
-                    }
-                }
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        mMap.setOnMapLongClickListener(MapActivity.this);
-                        mMap.setOnMarkerClickListener(MapActivity.this);
-                        mMap.setOnMarkerDragListener(MapActivity.this);
-
-                        // DONE: 2017/03/01 ここにマーカー描画処理を記述する
-                        if (placeMarkers == null) {
-                            placeMarkers = new PlaceMarkers(mMap);
-                        } else {
-                            placeMarkers.drawAllMarkers();
-                        }
-
-                        refreshLogoButton();
-                        refreshWorkButton();
-                        refreshCalendarButton();
-                        enableWaitScreen(false);
-                    }
-                });
-                
-            }
-        }).start();
-        
-    }
 
     @Override
     protected void onStart() {
@@ -586,7 +558,6 @@ public class MapActivity extends AppCompatActivity
         place.setLatLng(marker.getPosition());
         place.setAddress(null);
 
-        RVData.getInstance().saveData(this);
         RVDBHelper.getInstance().saveAsynchronous(place);
         RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this);
 
@@ -632,37 +603,12 @@ public class MapActivity extends AppCompatActivity
     private ImageView logoButton;
     private void initLogoButton() {
         logoButton = (ImageView) findViewById(R.id.logo_button);
-        refreshLogoButton();
-    }
-
-    // DONE: 2017/05/06 データ読み込み前は半透明に
-    private void refreshLogoButton() {
-
-        float originAlpha, targetAlpha;
-
-        if (!isDataLoaded) {
-            originAlpha = 1f;
-            targetAlpha = 0.5f;
-            ViewUtil.setOnClickListener(logoButton, null);
-        } else {
-            originAlpha = 0.5f;
-            targetAlpha = 1f;
-            ViewUtil.setOnClickListener(logoButton, new ViewUtil.OnViewClickListener() {
-                @Override
-                public void onViewClick(View v) {
-                    openCloseDrawer();
-                }
-            });
-        }
-        ValueAnimator animator = ValueAnimator.ofFloat(originAlpha, targetAlpha);
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+        ViewUtil.setOnClickListener(logoButton, new ViewUtil.OnViewClickListener() {
             @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                logoButton.setAlpha((float) animation.getAnimatedValue());
+            public void onViewClick(View view) {
+                openCloseDrawer();
             }
         });
-        animator.setDuration(300);
-        animator.start();
     }
 
     private void showPlaceDialog(Place place) {
@@ -682,7 +628,6 @@ public class MapActivity extends AppCompatActivity
 
                                 placeMarkers.removeByPlace(place);
                                 PlaceList.getInstance().deleteById(place.getId());
-                                RVData.getInstance().saveData(MapActivity.this);
 
                                 RVCloudSync.getInstance().requestDataSyncIfLoggedIn(MapActivity.this);
                             }
@@ -769,7 +714,6 @@ public class MapActivity extends AppCompatActivity
 
                         placeMarkers.removeByPlace(housingComplex);
                         PlaceList.getInstance().deleteById(housingComplex.getId());
-                        RVData.getInstance().saveData(MapActivity.this);
 
                         RVCloudSync.getInstance().requestDataSyncIfLoggedIn(MapActivity.this);
                     }
@@ -1092,7 +1036,7 @@ public class MapActivity extends AppCompatActivity
     }
 
     private void refreshWorkButton() {
-        if (RVData.getInstance().hasWorkOrVisit()) {
+        if (RVDBHelper.getInstance().hasWorkOrVisit()) {
             workButton.setAlpha(1f);
             workButton.setClickable(true);
             workButton.setOnClickListener(new View.OnClickListener() {
@@ -1122,7 +1066,7 @@ public class MapActivity extends AppCompatActivity
 
     private void refreshCalendarButton() {
 
-        if (RVData.getInstance().hasWorkOrVisit()) {
+        if (RVDBHelper.getInstance().hasWorkOrVisit()) {
             calendarButton.setAlpha(1f);
             calendarButton.setClickable(true);
             calendarButton.setOnClickListener(new View.OnClickListener() {
@@ -1188,8 +1132,7 @@ public class MapActivity extends AppCompatActivity
 
     private void startWorkPagerActivityWithNewWork(Work work) {
 
-        RVData.getInstance().workList.setOrAdd(work);
-        RVData.getInstance().saveData(this);
+        WorkList.getInstance().setOrAdd(work);
 
         RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this);
 
@@ -1347,33 +1290,33 @@ public class MapActivity extends AppCompatActivity
     // DONE: 2017/05/21 同期結果の表示
 
     // RVDataCallback implementation
-    @Override
-    public void onStartSavingData() {
-        fadeProgressFrame(true);
-        waitMessageText.setText(R.string.saving);
-    }
-
-    @Override
-    public void onFinishSavingData() {
-        fadeProgressFrame(false);
-        waitMessageText.setText("");
-    }
-
-    @Override
-    public void onStartLoadingData() {
-        enableWaitScreen(true);
-        fadeProgressFrame(true);
-        waitMessageText.setText(R.string.loading);
-    }
-
-    @Override
-    public void onFinishLoadingData() {
-        refreshLogoButton();
-        isDataLoaded = true;
-        fadeProgressFrame(false);
-        enableWaitScreen(false);
-        waitMessageText.setText("");
-    }
+//    @Override
+//    public void onStartSavingData() {
+//        fadeProgressFrame(true);
+//        waitMessageText.setText(R.string.saving);
+//    }
+//
+//    @Override
+//    public void onFinishSavingData() {
+//        fadeProgressFrame(false);
+//        waitMessageText.setText("");
+//    }
+//
+//    @Override
+//    public void onStartLoadingData() {
+//        enableWaitScreen(true);
+//        fadeProgressFrame(true);
+//        waitMessageText.setText(R.string.loading);
+//    }
+//
+//    @Override
+//    public void onFinishLoadingData() {
+//        refreshLogoButton();
+//        isDataLoaded = true;
+//        fadeProgressFrame(false);
+//        enableWaitScreen(false);
+//        waitMessageText.setText("");
+//    }
 
     // RVCloudSync Implementation
 
@@ -1476,12 +1419,14 @@ public class MapActivity extends AppCompatActivity
     }
 
     private void onDataSyncSuccess(final RVResponseBody responseBody) {
+
+        PlaceList.getInstance().refreshByDB();
+        saveLastSyncTime();
+
         cloudResultHandler.post(new Runnable() {
             @Override
             public void run() {
 
-                saveLastSyncTime();
-                RVData.getInstance().saveData(MapActivity.this);
                 if (placeMarkers == null) {
                     placeMarkers = new PlaceMarkers(mMap);
                 } else {
@@ -1543,26 +1488,6 @@ public class MapActivity extends AppCompatActivity
             }
         });
 
-//        searchText.addTextChangedListener(new TextWatcher() {
-//            @Override
-//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-//
-//            }
-//
-//            @Override
-//            public void onTextChanged(CharSequence s, int start, int before, int count) {
-//
-//            }
-//
-//            @Override
-//            public void afterTextChanged(Editable s) {
-//                if (s.length() > 0) {
-//                    if (getFragmentManager().findFragmentByTag(SEARCH_DIALOG) == null) {
-//                        showSearchDialog(s.toString());
-//                    }
-//                }
-//            }
-//        });
     }
 
     private View dummyFocusView;
@@ -1643,11 +1568,6 @@ public class MapActivity extends AppCompatActivity
                 mMap.animateCamera(CameraUpdateFactory.newLatLng(place.getLatLng()));
             }
 
-//            @Override
-//            public void onTextChanged(String text) {
-//                searchText.setText(text);
-//            }
-
             @Override
             public void onClickEditPerson(Person person) {
                 showPersonDialogForEdit(person);
@@ -1701,16 +1621,14 @@ public class MapActivity extends AppCompatActivity
         PersonDialog.getInstance(person, new PersonDialog.PersonDialogListener() {
             @Override
             public void onOkClick(Person person) {
-                RVData.getInstance().personList.setOrAdd(person);
-                RVData.getInstance().saveData(MapActivity.this);
+                PersonList.getInstance().setOrAdd(person);
                 RVCloudSync.getInstance().requestDataSyncIfLoggedIn(MapActivity.this);
                 InputUtil.hideSoftKeyboard(MapActivity.this);
             }
 
             @Override
             public void onDeleteClick(Person person) {
-                RVData.getInstance().personList.deleteById(person.getId());
-                RVData.getInstance().saveData(MapActivity.this);
+                PersonList.getInstance().deleteById(person.getId());
                 RVCloudSync.getInstance().requestDataSyncIfLoggedIn(MapActivity.this);
                 InputUtil.hideSoftKeyboard(MapActivity.this);
             }

@@ -1,6 +1,7 @@
 package net.c_kogyo.returnvisitorv5.data;
 
 import net.c_kogyo.returnvisitorv5.data.list.VisitList;
+import net.c_kogyo.returnvisitorv5.data.list.WorkList;
 import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
 
 import java.util.ArrayList;
@@ -57,7 +58,7 @@ public class AggregationOfMonth {
         Calendar nextMonth = (Calendar) month.clone();
         nextMonth.add(Calendar.MONTH, 1);
 
-        for (Work work : RVData.getInstance().workList) {
+        for (Work work : WorkList.getInstance()) {
             if (CalendarUtil.oneIsBeforeTwo(work.getStart(), nextMonth)) {
                 time += work.getDuration();
             }

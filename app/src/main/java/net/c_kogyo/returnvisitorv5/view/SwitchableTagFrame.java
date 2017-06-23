@@ -9,8 +9,8 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
-import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Tag;
+import net.c_kogyo.returnvisitorv5.data.list.TagList;
 
 import java.util.ArrayList;
 
@@ -91,7 +91,7 @@ public class SwitchableTagFrame extends TagLinesFrame {
         mAllTags = new ArrayList<>();
 
         for (String id : mAllTagIds) {
-            Tag tag = RVData.getInstance().tagList.getById(id);
+            Tag tag = TagList.getInstance().getById(id);
             if (tag != null) {
                 mAllTags.add(tag);
             }

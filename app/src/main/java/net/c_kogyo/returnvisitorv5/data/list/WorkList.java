@@ -17,6 +17,18 @@ import java.util.Comparator;
 
 public class WorkList extends DataList<Work> {
 
+    private static WorkList instance;
+    private WorkList() {
+        super(Work.class);
+    }
+
+    public static WorkList getInstance() {
+        if (instance == null) {
+            instance = new WorkList();
+        }
+        return instance;
+    }
+
     synchronized public ArrayList<Work> getWorksInDay(Calendar date) {
 
         ArrayList<Work> works = new ArrayList<>();

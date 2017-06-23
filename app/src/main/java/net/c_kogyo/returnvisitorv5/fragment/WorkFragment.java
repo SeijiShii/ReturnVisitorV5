@@ -18,10 +18,10 @@ import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.activity.RecordVisitActivity;
 import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
-import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.Work;
 import net.c_kogyo.returnvisitorv5.data.list.VisitList;
+import net.c_kogyo.returnvisitorv5.data.list.WorkList;
 import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
@@ -116,7 +116,7 @@ public class WorkFragment extends Fragment {
 
         String workId = intent.getStringExtra(Constants.WorkFragmentConstants.ADDED_WORK_ID);
         if (workId != null) {
-            Work work = RVData.getInstance().workList.getById(workId);
+            Work work = WorkList.getInstance().getById(workId);
             if (work != null) {
                 if (CalendarUtil.isSameDay(work.getStart(), mDate)) {
                     mNewAddedWork = work;
@@ -131,7 +131,7 @@ public class WorkFragment extends Fragment {
     private void initContainer() {
 
         container = (LinearLayout) view.findViewById(R.id.container);
-        ArrayList<Work> worksInDay = RVData.getInstance().workList.getWorksInDay(mDate);
+        ArrayList<Work> worksInDay = WorkList.getInstance().getWorksInDay(mDate);
 
         int visitCounter = 0;
         int workCounter = 0;
@@ -260,15 +260,13 @@ public class WorkFragment extends Fragment {
                     @Override
                     public void onChangeTime(Work work, ArrayList<Visit> visitsAdded, ArrayList<Visit> visitsRemoved) {
                         // DONE: 2017/04/09 Adjust works action
-                        RVData.getInstance().workList.setOrAdd(work);
-                        ArrayList<Work> worksRemoved = RVData.getInstance().workList.onChangeTime(work);
+                        WorkList.getInstance().setOrAdd(work);
+                        ArrayList<Work> worksRemoved = WorkList.getInstance().onChangeTime(work);
                         removeWorkViews(worksRemoved);
-                        RVData.getInstance().workList.removeList(worksRemoved);
+                        WorkList.getInstance().removeList(worksRemoved);
                         // DONE: 2017/04/08 Add or Remove visitCells action
                         removeVisitCells(visitsAdded);
                         addVisitCells(visitsRemoved);
-
-                        RVData.getInstance().saveData(getActivity());
 
                         RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getActivity());
 
@@ -350,7 +348,7 @@ public class WorkFragment extends Fragment {
         VisitCell visitCell = generateVisitCell(visit, true);
         //WorkViewまたはcontainerの適切なほうに挿入する
 
-        Work work = RVData.getInstance().workList.getByVisit(visit);
+        Work work = WorkList.getInstance().getByVisit(visit);
         if (work != null) {
             WorkView workView = getWorkView(work.getId());
             if (workView != null) {
@@ -435,7 +433,7 @@ public class WorkFragment extends Fragment {
                 // 追加されたのはWorkかVisitか
                 String workId = data.getStringExtra(Work.WORK);
                 if (workId != null) {
-                    Work work = RVData.getInstance().workList.getById(workId);
+                    Work work = WorkList.getInstance().getById(workId);
                     if (work != null) {
                         addWorkViewAndExtract(work);
                     }
@@ -653,7 +651,7 @@ public class WorkFragment extends Fragment {
 
     public void insertVisitCell(Visit visit) {
         // DONE: 2017/05/09  insertVisitCell
-        Work work = RVData.getInstance().workList.getByVisit(visit);
+        Work work = WorkList.getInstance().getByVisit(visit);
         if (work != null) {
             WorkView workView = getWorkView(work.getId());
             if (workView != null) {

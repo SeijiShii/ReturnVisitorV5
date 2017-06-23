@@ -10,9 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-
-import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Tag;
+import net.c_kogyo.returnvisitorv5.data.Tag;
+import net.c_kogyo.returnvisitorv5.data.list.TagList;
 
 import java.util.ArrayList;
 
@@ -72,7 +72,7 @@ public class TagFrame extends TagLinesFrame{
         mTags = new ArrayList<>();
 
         for (String id : mTagIds) {
-            Tag tag = RVData.getInstance().tagList.getById(id);
+            Tag tag = TagList.getInstance().getById(id);
             if (tag != null) {
                 mTags.add(tag);
             }

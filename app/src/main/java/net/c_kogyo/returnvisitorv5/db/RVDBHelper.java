@@ -11,9 +11,14 @@ import com.google.gson.Gson;
 
 import net.c_kogyo.returnvisitorv5.data.DataItem;
 import net.c_kogyo.returnvisitorv5.data.Person;
+import net.c_kogyo.returnvisitorv5.data.list.VisitList;
+import net.c_kogyo.returnvisitorv5.data.list.WorkList;
+import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import static net.c_kogyo.returnvisitorv5.db.RVDBContract.AND;
@@ -125,7 +130,9 @@ public class RVDBHelper {
     private boolean onSavingNormal;
     synchronized private void saveIfInQueue() {
 
-        if (queueList.size() <= 0) return;
+        if (queueList.size() <= 0) {
+            return;
+        }
 
         new Thread(new Runnable() {
             @Override
@@ -146,6 +153,9 @@ public class RVDBHelper {
 
                 onSavingNormal = false;
 
+//                if (callback != null) {
+//                    callback.onFinishAsyncSave();
+//                }
                 Log.d(TAG, "Finished asynchronous saving.");
                 showDataCount();
                 saveIfInQueue();
@@ -180,15 +190,15 @@ public class RVDBHelper {
         }
     }
 
-    public <T extends DataItem> void saveListAsynchronous(final ArrayList<T> list) {
-
-        synchronized (queueList) {
-            for (T item : list) {
-                queueList.add(new RVRecord(item));
-            }
-            saveIfInQueue();
-        }
-    }
+//    public <T extends DataItem> void saveListAsynchronous(final ArrayList<T> list) {
+//
+//        synchronized (queueList) {
+//            for (T item : list) {
+//                queueList.add(new RVRecord(item));
+//            }
+//            saveIfInQueue(null);
+//        }
+//    }
 
     public <T extends DataItem> void saveDeletedAsynchronous(final T item) {
 
@@ -198,15 +208,15 @@ public class RVDBHelper {
         }
     }
 
-    public <T extends DataItem> void saveDeletedListAsynchronous(final ArrayList<T> list) {
-
-        synchronized (queueList) {
-            for (T item: list) {
-                queueList.add(new RVRecord(item, true));
-            }
-            saveIfInQueue();
-        }
-    }
+//    public <T extends DataItem> void saveDeletedListAsynchronous(final ArrayList<T> list) {
+//
+//        synchronized (queueList) {
+//            for (T item: list) {
+//                queueList.add(new RVRecord(item, true));
+//            }
+//            saveIfInQueue(null);
+//        }
+//    }
 
     public void saveRecordsAsynchronous(ArrayList<RVRecord> records) {
         synchronized (queueList) {
@@ -214,7 +224,6 @@ public class RVDBHelper {
             saveIfInQueue();
         }
     }
-
 
 
     // Load methods
@@ -308,7 +317,7 @@ public class RVDBHelper {
         return list;
     }
 
-    public ArrayList<RVRecord> loadRecordLaterThanTime(long lastSyncTime) {
+    public ArrayList<RVRecord> loadRecordsLaterThanTime(long lastSyncTime) {
 
         Cursor cursor = mDB.query(false,
                 TABLE_NAME,
@@ -409,6 +418,63 @@ public class RVDBHelper {
         }
         return false;
     }
+
+    public ArrayList<Calendar> getDatesWithData() {
+
+        ArrayList<Calendar> datesOfVisit = VisitList.getInstance().getDates();
+        ArrayList<Calendar> datesOfWork = WorkList.getInstance().getDates();
+        ArrayList<Calendar> datesDoubled = new ArrayList<>();
+
+        for (Calendar date0 : datesOfVisit) {
+            for (Calendar date1 : datesOfWork) {
+
+                if (CalendarUtil.isSameDay(date0, date1)) {
+                    datesDoubled.add(date1);
+                }
+            }
+        }
+
+        datesOfWork.removeAll(datesDoubled);
+        datesOfVisit.addAll(datesOfWork);
+
+        Collections.sort(datesOfVisit, new Comparator<Calendar>() {
+            @Override
+            public int compare(Calendar calendar, Calendar t1) {
+                return calendar.compareTo(t1);
+            }
+        });
+
+        return new ArrayList<>(datesOfVisit);
+    }
+
+    public ArrayList<Calendar> getMonthsWithData() {
+
+        ArrayList<Calendar> monthWithData = new ArrayList<>();
+        ArrayList<Calendar> datesWithData = getDatesWithData();
+
+        if (datesWithData.size() <= 0)
+            return monthWithData;
+
+        monthWithData.add(datesWithData.get(0));
+
+        int dateIndex = 0;
+        int monthIndex = 0;
+
+        while (dateIndex < datesWithData.size() - 1) {
+            dateIndex++;
+            if (!CalendarUtil.isSameMonth(datesWithData.get(dateIndex), monthWithData.get(monthIndex))) {
+                monthWithData.add(datesWithData.get(dateIndex));
+                monthIndex++;
+            }
+        }
+
+        return monthWithData;
+    }
+
+    public boolean hasWorkOrVisit() {
+        return VisitList.getInstance().getList().size() > 0 || WorkList.getInstance().getList().size() > 0;
+    }
+
 
 
 

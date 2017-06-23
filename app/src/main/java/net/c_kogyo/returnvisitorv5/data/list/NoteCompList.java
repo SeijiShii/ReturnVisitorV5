@@ -8,6 +8,10 @@ import net.c_kogyo.returnvisitorv5.data.NoteCompItem;
 
 public class NoteCompList extends DataList<NoteCompItem> {
 
+    public NoteCompList() {
+        super(NoteCompItem.class);
+    }
+
     synchronized public void addIfNoSameName(String name) {
 
         for (NoteCompItem item : this) {

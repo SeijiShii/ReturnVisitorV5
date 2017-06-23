@@ -21,10 +21,10 @@ import android.widget.TimePicker;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
-import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.Work;
 import net.c_kogyo.returnvisitorv5.data.list.VisitList;
+import net.c_kogyo.returnvisitorv5.data.list.WorkList;
 import net.c_kogyo.returnvisitorv5.service.TimeCountIntentService;
 import net.c_kogyo.returnvisitorv5.util.ConfirmDialog;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
@@ -129,8 +129,7 @@ public class WorkView extends BaseAnimateView {
                         start.set(Calendar.HOUR_OF_DAY, hourOfDay);
                         start.set(Calendar.MINUTE, minute);
 
-                        RVData.getInstance().workList.setOrAdd(mWork);
-                        RVData.getInstance().saveData(getContext());
+                        WorkList.getInstance().setOrAdd(mWork);
                         RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getContext());
 
                         updateStartTimeText();
@@ -163,8 +162,7 @@ public class WorkView extends BaseAnimateView {
                         end.set(Calendar.HOUR_OF_DAY, hourOfDay);
                         end.set(Calendar.MINUTE, minute);
 
-                        RVData.getInstance().workList.setOrAdd(mWork);
-                        RVData.getInstance().saveData(getContext());
+                        WorkList.getInstance().setOrAdd(mWork);
                         RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getContext());
 
                         updateStartTimeText();
@@ -414,7 +412,6 @@ public class WorkView extends BaseAnimateView {
             @Override
             public void postCompressVisitCell(VisitCell visitCell) {
                 VisitList.getInstance().deleteById(visitCell.getVisit().getId());
-                RVData.getInstance().saveData(getContext());
                 visitCellContainer.removeView(visitCell);
 
                 RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getContext());

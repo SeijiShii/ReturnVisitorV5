@@ -18,7 +18,7 @@ import android.widget.TextView;
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.Placement;
 import net.c_kogyo.returnvisitorv5.data.Publication;
-import net.c_kogyo.returnvisitorv5.data.RVData;
+import net.c_kogyo.returnvisitorv5.data.list.PublicationList;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -30,10 +30,12 @@ import java.util.Calendar;
 public class RankedPublicationListFragment extends Fragment {
 
     private static RankedPublicationListListener mListener;
+    private static PublicationList mPublicationList;
 
-    public static RankedPublicationListFragment newInstance(RankedPublicationListListener listener) {
+    public static RankedPublicationListFragment newInstance(RankedPublicationListListener listener, PublicationList publicationList) {
 
         mListener = listener;
+        mPublicationList = publicationList;
 
         return new RankedPublicationListFragment();
     }
@@ -84,7 +86,7 @@ public class RankedPublicationListFragment extends Fragment {
 
     public void refreshList(String searchWord) {
         final ArrayList<Publication> rankedList
-                = RVData.getInstance().publicationList.getSearchedAndRankedList(Calendar.getInstance(), searchWord, getActivity());
+                = mPublicationList.getSearchedAndRankedList(Calendar.getInstance(), searchWord, getActivity());
 
         ArrayAdapter<String> rankedListAdapter;
         ArrayList<String> rankedDataList = new ArrayList<>();
