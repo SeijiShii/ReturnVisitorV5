@@ -9,23 +9,11 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 
-import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.data.DataItem;
-import net.c_kogyo.returnvisitorv5.data.NoteCompItem;
 import net.c_kogyo.returnvisitorv5.data.Person;
-import net.c_kogyo.returnvisitorv5.data.Place;
-import net.c_kogyo.returnvisitorv5.data.Tag;
-import net.c_kogyo.returnvisitorv5.data.Visit;
-import net.c_kogyo.returnvisitorv5.data.VisitDetail;
-import net.c_kogyo.returnvisitorv5.data.Work;
-import net.c_kogyo.returnvisitorv5.data.list.VisitList;
-import net.c_kogyo.returnvisitorv5.data.list.WorkList;
-import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import static net.c_kogyo.returnvisitorv5.db.RVDBContract.AND;
@@ -60,17 +48,16 @@ public class RVDBHelper {
         }
     }
 
-    public void deleteAllDataFromDB() {
+    private void deleteAllDataFromDB() {
         mDB.execSQL("DELETE FROM " + TABLE_NAME + ";");
     }
 
     private void saveRecord(RVRecord record, boolean checkIncludeDeleted) {
-        if (hasSameUpdatedRecord(record, checkIncludeDeleted)) {
-            if (isRecordNewer(record, checkIncludeDeleted)) {
-                updateRecord(record);
-            }
-        } else {
+
+        if (!hasSameId(record, checkIncludeDeleted)) {
             insertRecord(record);
+        } else if (!hasLaterOrSameUpdatedRecord(record, checkIncludeDeleted)) {
+            updateRecord(record);
         }
     }
 
@@ -81,37 +68,30 @@ public class RVDBHelper {
     @Nullable
     public RVRecord loadRecord(String dataId, boolean loadDeleted) {
 
-        RVRecord record = new RVRecord();
-        Cursor cursor;
+        RVRecord record = null;
+        String whereClause;
 
         if (loadDeleted) {
-            cursor = mDB.query(false,
-                    TABLE_NAME,
-                    new String[]{},
-                    DATA_ID + "= ?",
-                    new String[]{dataId},
-                    null, null, null, null);
+            whereClause = DATA_ID + "= ?";
         } else {
-            cursor = mDB.query(false,
-                    TABLE_NAME,
-                    new String[]{},
-                    DATA_ID + "= ?" + AND + IS_DELETED + "= 0",
-                    new String[]{dataId},
-                    null, null, null, null);
+            whereClause = DATA_ID + "= ?" + AND + IS_DELETED + "= 0";
         }
+
+        Cursor cursor = mDB.query(false,
+                TABLE_NAME,
+                new String[]{},
+                whereClause,
+                new String[]{dataId},
+                null, null, null, null);
 
         if (cursor.getCount() < 1) {
             cursor.close();
             return null;
         }
 
-//        for (int i = 0 ; i < cursor.getColumnCount() ; i++ ) {
-//            Log.d(TAG, "cursor.column " + i + ": " + cursor.getColumnName(i));
-//        }
-
         boolean isEOf = cursor.moveToFirst();
         while (isEOf) {
-            setDataToRecordFromCursor(record, cursor);
+            record = generateRecordFromCursor(cursor);
             isEOf = cursor.moveToNext();
         }
         cursor.close();
@@ -122,12 +102,14 @@ public class RVDBHelper {
         return loadRecord(dataId, false);
     }
 
-    private void setDataToRecordFromCursor(RVRecord record, Cursor cursor) {
+    private RVRecord generateRecordFromCursor(Cursor cursor) {
+        RVRecord record = new RVRecord();
         record.setDataId(cursor.getString(1));
         record.setClassName(cursor.getString(2));
         record.setUpdatedAt(cursor.getLong(3));
         record.setData(cursor.getString(4));
         record.setDeleted(cursor.getInt(5) == 1);
+        return record;
     }
 
     public ArrayList<RVRecord> loadRecordLaterThanTime(long lastSyncTime) {
@@ -143,8 +125,7 @@ public class RVDBHelper {
 
         boolean isEOf = cursor.moveToFirst();
         while (isEOf) {
-            RVRecord record = new RVRecord();
-            setDataToRecordFromCursor(record, cursor);
+            RVRecord record = generateRecordFromCursor(cursor);
             records.add(record);
         }
         cursor.close();
@@ -152,81 +133,15 @@ public class RVDBHelper {
 
     }
 
-    private boolean hasSameUpdatedRecord(RVRecord record, boolean includesDeleted) {
-
-        boolean result;
-        Cursor cursor;
-
-        if (includesDeleted) {
-            cursor = mDB.query(false,
-                    TABLE_NAME,
-                    new String[]{DATA_ID, UPDATED_AT},
-                    DATA_ID + "= ?" + AND + UPDATED_AT + "= ?",
-                    new String[]{record.getDataId(), String.valueOf(record.getUpdatedAt())},
-                    null, null, null, null);
-        } else {
-            cursor = mDB.query(false,
-                    TABLE_NAME,
-                    new String[]{DATA_ID, UPDATED_AT},
-                    DATA_ID + "= ?" + AND + UPDATED_AT + "= ?" + AND + IS_DELETED + "= 1",
-                    new String[]{record.getDataId(), String.valueOf(record.getUpdatedAt())},
-                    null, null, null, null);
-        }
-
-        result = cursor.getCount() >= 1;
-        cursor.close();
-
-        return result;
+    private boolean hasSameId(RVRecord record, boolean checkIncludeDeleted) {
+        return loadRecord(record.getDataId(), checkIncludeDeleted) != null;
     }
 
-    public boolean containsRecordWithId(String dataId, boolean includesDeleted) {
+    private boolean hasLaterOrSameUpdatedRecord(RVRecord record, boolean includesDeleted) {
 
-        String whereClause;
-        if (includesDeleted) {
-            whereClause = DATA_ID + "= ?";
-        } else {
-            whereClause = DATA_ID + "= ?" + AND + IS_DELETED + "= 1";
-        }
-        Cursor cursor = mDB.query(false,
-                TABLE_NAME,
-                new String[]{DATA_ID},
-                whereClause,
-                new String[]{dataId},
-                null, null, null, null );
-        boolean result = cursor.getCount() > 0;
-        cursor.close();
-        return result;
-    }
-
-    public boolean containsRecordWithId(String dataId) {
-        return containsRecordWithId(dataId, false);
-    }
-
-    private boolean isRecordNewer(RVRecord record, boolean includesDeleted) {
-
-        boolean result;
-        Cursor cursor;
-
-        if (includesDeleted) {
-            cursor = mDB.query(false,
-                    TABLE_NAME,
-                    new String[]{DATA_ID, UPDATED_AT},
-                    DATA_ID + "= ?" + AND + UPDATED_AT + "< ?",
-                    new String[]{record.getDataId(), String.valueOf(record.getUpdatedAt())},
-                    null, null, null, null);
-        } else {
-            cursor = mDB.query(false,
-                    TABLE_NAME,
-                    new String[]{DATA_ID, UPDATED_AT},
-                    DATA_ID + "= ?" + AND + UPDATED_AT + "< ?" + AND + IS_DELETED + "= 1",
-                    new String[]{record.getDataId(), String.valueOf(record.getUpdatedAt())},
-                    null, null, null, null);
-        }
-
-        result = cursor.getCount() >= 1;
-        cursor.close();
-
-        return result;
+        if (!hasSameId(record, includesDeleted)) return false;
+        RVRecord recordInDB = loadRecord(record.getDataId(), includesDeleted);
+        return recordInDB != null && record.getUpdatedAt() <= recordInDB.getUpdatedAt();
     }
 
     private int updateRecord(RVRecord record) {
@@ -279,9 +194,7 @@ public class RVDBHelper {
 
         boolean isEOf = cursor.moveToFirst();
         while (isEOf) {
-            RVRecord record = new RVRecord();
-            setDataToRecordFromCursor(record, cursor);
-
+            RVRecord record = generateRecordFromCursor(cursor);
             records.add(record);
         }
         cursor.close();
@@ -321,8 +234,7 @@ public class RVDBHelper {
                     null, null, null, null);
             boolean isEOf = cursor.moveToFirst();
             while (isEOf) {
-                RVRecord record = new RVRecord();
-                setDataToRecordFromCursor(record, cursor);
+                RVRecord record =generateRecordFromCursor(cursor);
                 records.add(record);
             }
         }
@@ -412,7 +324,9 @@ public class RVDBHelper {
     private long startSaveTime;
     private boolean isTestDataLoaded;
     private long startLoadTime;
-    private void testSaveAndLoad() {
+    public void testSaveAndLoad() {
+
+        deleteAllDataFromDB();
 
         Gson gson = new Gson();
         final Person person1 = new Person();
@@ -473,6 +387,60 @@ public class RVDBHelper {
         Log.d(RVDBHelper.TAG, "person2: " + gson.toJson(person2));
 
     }
+
+    public void testHasLaterOrSameUpdated() {
+
+        deleteAllDataFromDB();
+
+        long updated = 1500000;
+        String id = "test_id_000000098";
+
+        Person personOriginal = new Person("place_hoge");
+        personOriginal.setPriority(Person.Priority.HIGH);
+        personOriginal.setName("HOGE HOGE");
+        personOriginal.setSex(Person.Sex.MALE);
+        personOriginal.setAge(Person.Age.AGE_31_40);
+        personOriginal.setId(id);
+
+        RVRecord originalRecord = new RVRecord(personOriginal);
+        originalRecord.setUpdatedAt(updated);
+        insertRecord(originalRecord);
+
+        Person personSame = new Person("place_fuga");
+        personSame.setPriority(Person.Priority.HIGH);
+        personSame.setName("HOGE HOGE");
+        personSame.setSex(Person.Sex.MALE);
+        personSame.setAge(Person.Age.AGE_31_40);
+        personSame.setId(id);
+
+        RVRecord sameRecord = new RVRecord(personSame);
+        sameRecord.setUpdatedAt(updated);
+        Log.d(TAG, "has SAME update: " + hasLaterOrSameUpdatedRecord(sameRecord, false));
+
+        Person personEarlier = new Person("place_early");
+        personEarlier.setPriority(Person.Priority.HIGH);
+        personEarlier.setName("HOGE HOGE");
+        personEarlier.setSex(Person.Sex.MALE);
+        personEarlier.setAge(Person.Age.AGE_31_40);
+        personEarlier.setId(id);
+
+        RVRecord earlyRecord = new RVRecord(personEarlier);
+        earlyRecord.setUpdatedAt(updated - 5000);
+        Log.d(TAG, "has EARLIER update: " + hasLaterOrSameUpdatedRecord(earlyRecord, false));
+
+        Person personLater = new Person("place_later");
+        personLater.setPriority(Person.Priority.HIGH);
+        personLater.setName("HOGE HOGE");
+        personLater.setSex(Person.Sex.MALE);
+        personLater.setAge(Person.Age.AGE_31_40);
+        personLater.setId(id);
+
+        RVRecord laterRecord = new RVRecord(personLater);
+        laterRecord.setUpdatedAt(updated + 5000);
+        Log.d(TAG, "has LATER update: " + hasLaterOrSameUpdatedRecord(laterRecord, false));
+
+    }
+
 
 //    public ArrayList<Calendar> getDatesWithData() {
 //

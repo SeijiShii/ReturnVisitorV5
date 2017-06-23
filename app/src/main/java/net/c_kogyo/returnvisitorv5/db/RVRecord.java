@@ -18,14 +18,6 @@ import java.util.Calendar;
 
 public class RVRecord {
 
-//    private static final String DATA = "data";
-//    public static final String CLASS_NAME = "class_name";
-//    private static final String CLASS_NAME = "className";
-//    private static final String DOUBLE_QUOTES = "*double_quotes*";
-
-//    private static final String UPDATED_AT = "updatedAt";
-//    private static final String ID = "id";
-
     private String dataId;
     private String data;
     private String className;
@@ -90,6 +82,5 @@ public class RVRecord {
 
     public void setDeleted(boolean deleted) {
         isDeleted = deleted;
-        updatedAt = Calendar.getInstance().getTimeInMillis();
     }
 }

@@ -122,46 +122,13 @@ public class Person extends DataItem implements Cloneable{
 
     }
 
-//    public enum Interest {
-//
-//        NONE(0),
-//        REFUSED(1),
-//        INDIFFERENT(2),
-//        FAIR(3),
-//        KIND(4),
-//        INTERESTED(5),
-//        STRONGLY_INTERESTED(6);
-//
-//        final int num;
-//
-//        Interest(int num) {
-//            this.num = num;
-//        }
-//
-//        public static Interest getEnum(int num) {
-//
-//            Interest[] enumArray = Interest.values();
-//
-//            for (Interest interest : enumArray) {
-//
-//                if (interest.num() == num) return interest;
-//
-//            }
-//
-//            return null;
-//        }
-//
-//        public int num() {return num;}
-//
-//    }
-
     private Sex sex;
     private Age age;
     private Priority priority;
 
     private ArrayList<String> placeIds;
 
-    public Person(){};
+    public Person(){}
 
     public Person(String placeId) {
         super(PERSON);
@@ -177,32 +144,6 @@ public class Person extends DataItem implements Cloneable{
         if (placeId == null) return;
         this.placeIds.add(placeId);
     }
-
-//    public Person(JSONObject object) {
-//        super(object);
-//        initCommon(null);
-//        setJSON(this, object);
-//
-////        try {
-////            if (object.has(SEX))            this.sex         = Sex.valueOf(object.get(SEX).toString());
-////            if (object.has(AGE))            this.age         = Age.valueOf(object.get(AGE).toString());
-////
-////            if (object.has(PLACE_IDS)) {
-////                this.placeIds = new ArrayList<>();
-////                JSONArray array = object.getJSONArray(PLACE_IDS);
-////                for ( int i = 0 ; i < array.length() ; i++ ) {
-////                    this.placeIds.add(array.getString(i));
-////                }
-////            }
-////
-////        } catch (JSONException e) {
-////            e.printStackTrace();
-////        }
-//    }
-
-//    public Person(RVRecord RVRecord) {
-//        this(RVRecord.getDataJSON());
-//    }
 
     public Sex getSex() {
         return sex;
@@ -260,30 +201,6 @@ public class Person extends DataItem implements Cloneable{
         return person;
     }
 
-//    @Override
-//    public JSONObject jsonObject() {
-//
-//        JSONObject object = super.jsonObject();
-//
-//        try {
-//            object.put(SEX, sex);
-//            object.put(AGE, age);
-//
-//            JSONArray array = new JSONArray();
-//            for ( int i = 0 ; i < this.placeIds.size() ; i++ ) {
-//                array.put(this.placeIds.get(i));
-//            }
-//            object.put(PLACE_IDS, array);
-//
-//            object.put(PRIORITY, priority.toString());
-//
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//
-//        return object;
-//    }
-
     @Override
     public String toStringForSearch(Context context) {
 
@@ -333,26 +250,6 @@ public class Person extends DataItem implements Cloneable{
         this.placeIds = placeIds;
         onUpdate();
     }
-
-//    private static Person setJSON(Person person, JSONObject object) {
-//        try {
-//            if (object.has(SEX))            person.sex         = Sex.valueOf(object.get(SEX).toString());
-//            if (object.has(AGE))            person.age         = Age.valueOf(object.get(AGE).toString());
-//            if (object.has(PRIORITY))       person.priority     = Priority.valueOf(object.get(PRIORITY).toString());
-//
-//            if (object.has(PLACE_IDS)) {
-//                person.placeIds = new ArrayList<>();
-//                JSONArray array = object.getJSONArray(PLACE_IDS);
-//                for ( int i = 0 ; i < array.length() ; i++ ) {
-//                    person.placeIds.add(array.getString(i));
-//                }
-//            }
-//
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//        return person;
-//    }
 
     public Priority getPriority() {
 

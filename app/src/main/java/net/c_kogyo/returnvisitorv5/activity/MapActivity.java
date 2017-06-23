@@ -115,6 +115,7 @@ public class MapActivity extends AppCompatActivity
         Intent errorLogIntent = new Intent(this, ErrorLogIntentService.class);
         startService(errorLogIntent);
 
+        new RVDBHelper(this).testSaveAndLoad();
 
         cloudResultHandler = new Handler();
 
