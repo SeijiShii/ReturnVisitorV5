@@ -23,6 +23,7 @@ import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
+import net.c_kogyo.returnvisitorv5.data.list.VisitList;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 import net.c_kogyo.returnvisitorv5.view.BaseAnimateView;
 import net.c_kogyo.returnvisitorv5.view.PlaceCell;
@@ -174,12 +175,12 @@ public class PlaceDialog extends DialogFragment {
 
         @Override
         public int getCount() {
-            return RVData.getInstance().visitList.getVisitsForPlace(mPlace.getId()).size();
+            return VisitList.getInstance().getVisitsForPlace(mPlace.getId()).size();
         }
 
         @Override
         public Object getItem(int i) {
-            return RVData.getInstance().visitList.getVisitsForPlace(mPlace.getId()).get(i);
+            return VisitList.getInstance().getVisitsForPlace(mPlace.getId()).get(i);
         }
 
         @Override
@@ -198,7 +199,7 @@ public class PlaceDialog extends DialogFragment {
                             @Override
                             public void postCompressVisitCell(VisitCell visitCell) {
 
-                                RVData.getInstance().visitList.deleteById(visitCell.getVisit().getId());
+                                VisitList.getInstance().deleteById(visitCell.getVisit().getId());
                                 RVData.getInstance().saveData(getActivity());
                                 notifyDataSetChanged();
 

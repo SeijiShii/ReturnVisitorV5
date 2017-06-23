@@ -21,6 +21,7 @@ import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.Work;
+import net.c_kogyo.returnvisitorv5.data.list.VisitList;
 import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
@@ -134,7 +135,7 @@ public class WorkFragment extends Fragment {
 
         int visitCounter = 0;
         int workCounter = 0;
-        ArrayList<Visit> visitsInDayNotInWork = RVData.getInstance().visitList.getVisitsInDayNotInWork(mDate);
+        ArrayList<Visit> visitsInDayNotInWork = VisitList.getInstance().getVisitsInDayNotInWork(mDate);
 
         while (visitCounter < visitsInDayNotInWork.size() && workCounter < worksInDay.size()) {
 
@@ -195,8 +196,7 @@ public class WorkFragment extends Fragment {
 
                 container.removeView(visitCell1);
 
-                RVData.getInstance().visitList.deleteById(visitCell1.getVisit().getId());
-                RVData.getInstance().saveData(WorkFragment.this.getActivity());
+                VisitList.getInstance().deleteById(visitCell1.getVisit().getId());
                 RVCloudSync.getInstance().requestDataSyncIfLoggedIn(WorkFragment.this.getActivity());
 
                 verifyItemRemains();
@@ -382,7 +382,7 @@ public class WorkFragment extends Fragment {
 
     @Nullable
     private Visit getVisit(String visitId) {
-        for (Visit visit : RVData.getInstance().visitList.getVisitsInDayNotInWork(mDate)) {
+        for (Visit visit : VisitList.getInstance().getVisitsInDayNotInWork(mDate)) {
             if (visit.getId().equals(visitId)) {
                 return visit;
             }
@@ -415,7 +415,7 @@ public class WorkFragment extends Fragment {
                 String visitId = data.getStringExtra(Visit.VISIT);
                 if (visitId == null) return;
 
-                Visit visit = RVData.getInstance().visitList.getById(visitId);
+                Visit visit = VisitList.getInstance().getById(visitId);
                 if (visit == null) return;
 
                 // VisitCellの時間を変化させたときに適正なポジションにあるかどうかをVerifyする必要あり
@@ -443,7 +443,7 @@ public class WorkFragment extends Fragment {
 
                 String visitId = data.getStringExtra(Visit.VISIT);
                 if (visitId != null) {
-                    Visit visit = RVData.getInstance().visitList.getById(visitId);
+                    Visit visit = VisitList.getInstance().getById(visitId);
                     if (visit != null) {
                         insertVisitCellAndExtract(visit);
                     }
@@ -598,7 +598,7 @@ public class WorkFragment extends Fragment {
     private void moveVisitCellsInRemoveWorkView(Work work) {
         // DONE: 2017/04/15  削除したWork内のVisitを付け替える
 
-        addVisitCells(RVData.getInstance().visitList.getVisitsInWork(work));
+        addVisitCells(VisitList.getInstance().getVisitsInWork(work));
     }
 
     public void removeWorkViews(ArrayList<Work> works) {

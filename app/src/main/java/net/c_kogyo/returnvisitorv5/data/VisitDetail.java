@@ -3,6 +3,7 @@ package net.c_kogyo.returnvisitorv5.data;
 import android.content.Context;
 
 import net.c_kogyo.returnvisitorv5.R;
+import net.c_kogyo.returnvisitorv5.data.list.VisitList;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -248,7 +249,7 @@ public class VisitDetail extends DataItem  implements Cloneable{
 
         ArrayList<String> placeIds = new ArrayList<>();
 
-        for (Visit visit : RVData.getInstance().visitList.getList()) {
+        for (Visit visit : VisitList.getInstance().getList()) {
             for (VisitDetail visitDetail : visit.getVisitDetails()) {
                 if (visitDetail.personId.equals(this.personId)) {
                     if (!placeIds.contains(visit.getPlaceId()) && !visit.getPlaceId().equals("")) {

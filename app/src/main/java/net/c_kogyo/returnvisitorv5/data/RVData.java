@@ -59,7 +59,7 @@ public class RVData {
 
 //    public PlaceList placeList;
     public PersonList personList;
-    public VisitList visitList;
+//    public VisitList visitList;
     public TagList tagList;
     public NoteCompList noteCompList;
     public WorkList workList;
@@ -79,7 +79,7 @@ public class RVData {
 
 //        placeList = new PlaceList();
         personList = new PersonList();
-        visitList = new VisitList();
+//        visitList = new VisitList();
 
         tagList = new TagList();
         noteCompList = new NoteCompList();
@@ -219,9 +219,9 @@ public class RVData {
                 case "Person":
                     personList.setOrAdd(mGson.fromJson(record.getDataJSON(), Person.class));
                     break;
-                case "Visit":
-                    visitList.setOrAdd(mGson.fromJson(record.getDataJSON(), Visit.class));
-                    break;
+//                case "Visit":
+//                    visitList.setOrAdd(mGson.fromJson(record.getDataJSON(), Visit.class));
+//                    break;
                 case "Tag":
                     tagList.setOrAdd(mGson.fromJson(record.getDataJSON(), Tag.class));
                     break;
@@ -261,9 +261,9 @@ public class RVData {
                 case "Person":
                     personList.deleteByDeletedData(deletedData);
                     break;
-                case "Visit":
-                    visitList.deleteByDeletedData(deletedData);
-                    break;
+//                case "Visit":
+//                    visitList.deleteByDeletedData(deletedData);
+//                    break;
                 case "Tag":
                     tagList.deleteByDeletedData(deletedData);
                     break;
@@ -390,9 +390,9 @@ public class RVData {
             records.add(new RVRecord(person));
         }
 
-        for (Visit visit : visitList) {
-            records.add(new RVRecord(visit));
-        }
+//        for (Visit visit : visitList) {
+//            records.add(new RVRecord(visit));
+//        }
 
         for (Tag tag : tagList) {
             records.add(new RVRecord(tag));
@@ -418,7 +418,7 @@ public class RVData {
 
     public ArrayList<Calendar> getDatesWithData() {
 
-        ArrayList<Calendar> datesOfVisit = visitList.getDates();
+        ArrayList<Calendar> datesOfVisit = VisitList.getInstance().getDates();
         ArrayList<Calendar> datesOfWork = workList.getDates();
         ArrayList<Calendar> datesDoubled = new ArrayList<>();
 
@@ -469,7 +469,7 @@ public class RVData {
     }
 
     public boolean hasWorkOrVisit() {
-        return visitList.getList().size() > 0 || workList.getList().size() > 0;
+        return VisitList.getInstance().getList().size() > 0 || workList.getList().size() > 0;
     }
 
 //    public ArrayList<RVRecord> getRecordsLaterThanTime(long dateTimeInMills) {

@@ -1,5 +1,7 @@
 package net.c_kogyo.returnvisitorv5.data;
 
+import net.c_kogyo.returnvisitorv5.data.list.VisitList;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -24,7 +26,7 @@ public class AggregationOfDay {
 
     public static int placementCount(Calendar date) {
         int count = 0;
-        for (Visit visit : RVData.getInstance().visitList.getVisitsInDay(date)) {
+        for (Visit visit : VisitList.getInstance().getVisitsInDay(date)) {
             count += visit.getPlacementCount();
         }
         return count;
@@ -32,7 +34,7 @@ public class AggregationOfDay {
 
     public static int rvCount(Calendar date) {
         int count = 0;
-        for (Visit visit : RVData.getInstance().visitList.getVisitsInDay(date)) {
+        for (Visit visit : VisitList.getInstance().getVisitsInDay(date)) {
             count += visit.getRVCount();
         }
         return count;
@@ -40,7 +42,7 @@ public class AggregationOfDay {
 
     public static int showVideoCount(Calendar date) {
         int count = 0;
-        for (Visit visit : RVData.getInstance().visitList.getVisitsInDay(date)) {
+        for (Visit visit : VisitList.getInstance().getVisitsInDay(date)) {
             count += visit.getShowVideoCount();
         }
         return count;
@@ -48,7 +50,7 @@ public class AggregationOfDay {
 
     public static int bsVisitCount(Calendar date) {
         int count = 0;
-        for (Visit visit : RVData.getInstance().visitList.getVisitsInDay(date)) {
+        for (Visit visit : VisitList.getInstance().getVisitsInDay(date)) {
             count += visit.getBSCount();
         }
         return count;
@@ -64,6 +66,6 @@ public class AggregationOfDay {
     }
 
     public static boolean hasVisit(Calendar date) {
-        return RVData.getInstance().visitList.getVisitsInDay(date).size() > 0;
+        return VisitList.getInstance().getVisitsInDay(date).size() > 0;
     }
 }

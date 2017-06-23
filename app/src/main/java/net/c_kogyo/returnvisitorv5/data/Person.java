@@ -3,6 +3,7 @@ package net.c_kogyo.returnvisitorv5.data;
 import android.content.Context;
 
 import net.c_kogyo.returnvisitorv5.R;
+import net.c_kogyo.returnvisitorv5.data.list.VisitList;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -204,7 +205,7 @@ public class Person extends DataItem implements Cloneable{
         builder.append(getPriorityString(context)).append(" ");
 
         // DONE: 2017/05/26 タグも対象とするか
-        Visit visit = RVData.getInstance().visitList.getLatestVisitToPerson(id);
+        Visit visit = VisitList.getInstance().getLatestVisitToPerson(id);
         if (visit != null) {
             VisitDetail visitDetail = visit.getVisitDetail(id);
             if (visitDetail != null) {
@@ -258,7 +259,7 @@ public class Person extends DataItem implements Cloneable{
 
         Priority oldPriority = priority;
 
-        Visit visit = RVData.getInstance().visitList.getLatestVisitToPerson(id);
+        Visit visit = VisitList.getInstance().getLatestVisitToPerson(id);
 
         if (visit != null) {
 

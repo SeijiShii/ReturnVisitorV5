@@ -55,6 +55,7 @@ import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.Work;
 import net.c_kogyo.returnvisitorv5.data.list.PlaceList;
+import net.c_kogyo.returnvisitorv5.data.list.VisitList;
 import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.db.RVRecord;
 import net.c_kogyo.returnvisitorv5.dialog.AddWorkDialog;
@@ -600,7 +601,7 @@ public class MapActivity extends AppCompatActivity
                 || resultCode == VISIT_EDITED_RESULT_CODE) {
             String visitId = data.getStringExtra(VISIT);
             if (visitId != null) {
-                Visit visit = RVData.getInstance().visitList.getById(visitId);
+                Visit visit = VisitList.getInstance().getById(visitId);
                 if (visit != null) {
                     String placeId = visit.getPlaceId();
                     Place place = PlaceList.getInstance().getById(placeId);
@@ -791,7 +792,7 @@ public class MapActivity extends AppCompatActivity
 
         Visit visit;
 
-        Visit lastVisit = RVData.getInstance().visitList.getLatestVisitToPlace(place.getId());
+        Visit lastVisit = VisitList.getInstance().getLatestVisitToPlace(place.getId());
 
         if (lastVisit == null) {
             visit = new Visit(place);
@@ -800,8 +801,7 @@ public class MapActivity extends AppCompatActivity
         }
 
         PlaceList.getInstance().setOrAdd(place);
-        RVData.getInstance().visitList.setOrAdd(visit);
-        RVData.getInstance().saveData(this);
+        VisitList.getInstance().setOrAdd(visit);
 
         RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this);
 

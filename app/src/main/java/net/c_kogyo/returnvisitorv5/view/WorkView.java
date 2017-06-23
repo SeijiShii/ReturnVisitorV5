@@ -24,6 +24,7 @@ import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.Work;
+import net.c_kogyo.returnvisitorv5.data.list.VisitList;
 import net.c_kogyo.returnvisitorv5.service.TimeCountIntentService;
 import net.c_kogyo.returnvisitorv5.util.ConfirmDialog;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
@@ -319,7 +320,7 @@ public class WorkView extends BaseAnimateView {
 
         visitCellContainer = (LinearLayout) getViewById(R.id.visit_cell_container);
 
-        for (Visit visit : RVData.getInstance().visitList.getVisitsInWork(mWork)) {
+        for (Visit visit : VisitList.getInstance().getVisitsInWork(mWork)) {
             visitCellContainer.addView(generateVisitCell(visit, visitCellInitHeight));
         }
     }
@@ -359,7 +360,7 @@ public class WorkView extends BaseAnimateView {
 
     private int getProperPositionOfVisit(Visit visit) {
 
-        ArrayList<Visit> visitsInWork = RVData.getInstance().visitList.getVisitsInWork(mWork);
+        ArrayList<Visit> visitsInWork = VisitList.getInstance().getVisitsInWork(mWork);
 
         Collections.sort(visitsInWork, new Comparator<Visit>() {
             @Override
@@ -412,7 +413,7 @@ public class WorkView extends BaseAnimateView {
         return new VisitCell(getContext(), visit, initHeight, new VisitCell.VisitCellListener() {
             @Override
             public void postCompressVisitCell(VisitCell visitCell) {
-                RVData.getInstance().visitList.deleteById(visitCell.getVisit().getId());
+                VisitList.getInstance().deleteById(visitCell.getVisit().getId());
                 RVData.getInstance().saveData(getContext());
                 visitCellContainer.removeView(visitCell);
 
@@ -487,7 +488,7 @@ public class WorkView extends BaseAnimateView {
 
     private void postChangeWorkTime() {
 
-        ArrayList<Visit> renewedVisits = RVData.getInstance().visitList.getVisitsInWork(mWork);
+        ArrayList<Visit> renewedVisits = VisitList.getInstance().getVisitsInWork(mWork);
 
         ArrayList<Visit> oldVisits = getVisitsInContainer();
 

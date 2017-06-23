@@ -5,6 +5,7 @@ import android.content.Context;
 import com.google.android.gms.maps.model.LatLng;
 
 import net.c_kogyo.returnvisitorv5.data.list.PlaceList;
+import net.c_kogyo.returnvisitorv5.data.list.VisitList;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -129,7 +130,7 @@ public class Place extends DataItem {
         switch (category) {
             case HOUSE:
             case ROOM:
-                Visit visit = RVData.getInstance().visitList.getLatestVisitToPlace(this.id);
+                Visit visit = VisitList.getInstance().getLatestVisitToPlace(this.id);
                 if (visit == null) {
                     return Person.Priority.NONE;
                 }

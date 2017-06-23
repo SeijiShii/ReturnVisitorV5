@@ -34,6 +34,7 @@ import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.VisitDetail;
 import net.c_kogyo.returnvisitorv5.data.list.PlaceList;
+import net.c_kogyo.returnvisitorv5.data.list.VisitList;
 import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.db.RVRecord;
 import net.c_kogyo.returnvisitorv5.dialog.AddPersonDialog;
@@ -133,7 +134,7 @@ public class RecordVisitActivity extends AppCompatActivity {
             case EDIT_VISIT_ACTION:
                 String visitId = intent.getStringExtra(VISIT);
 
-                Visit visit = RVData.getInstance().visitList.getById(visitId);
+                Visit visit = VisitList.getInstance().getById(visitId);
                 Place place = PlaceList.getInstance().getById(visit.getPlaceId());
 
                 try {
@@ -157,7 +158,7 @@ public class RecordVisitActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-                Visit lastVisit = RVData.getInstance().visitList.getLatestVisitToPlace(placeId);
+                Visit lastVisit = VisitList.getInstance().getLatestVisitToPlace(placeId);
                 if (lastVisit != null) {
                     mVisit = new Visit(lastVisit);
                 } else {
@@ -503,7 +504,7 @@ public class RecordVisitActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                RVData.getInstance().visitList.setOrAdd(mVisit);
+                VisitList.getInstance().setOrAdd(mVisit);
                 RVData.getInstance().personList.addList(mAddedPersons);
                 RVData.getInstance().personList.removeList(mRemovedPersons);
 
@@ -571,7 +572,7 @@ public class RecordVisitActivity extends AppCompatActivity {
     private Button deleteButton;
     private void initDeleteButton() {
         deleteButton = (Button) findViewById(R.id.delete_button);
-        if (RVData.getInstance().visitList.contains(mVisit)) {
+        if (VisitList.getInstance().contains(mVisit)) {
             deleteButton.setVisibility(View.VISIBLE);
             deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -828,7 +829,7 @@ public class RecordVisitActivity extends AppCompatActivity {
 
         Calendar oldDateTime = (Calendar) mVisit.getDatetime().clone();
 
-        Visit lastVisit = RVData.getInstance().visitList.getLatestVisitToPlace(place.getId());
+        Visit lastVisit = VisitList.getInstance().getLatestVisitToPlace(place.getId());
         if (lastVisit != null) {
             mVisit = new Visit(lastVisit);
 

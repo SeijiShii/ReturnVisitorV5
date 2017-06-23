@@ -27,6 +27,7 @@ import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.Work;
 import net.c_kogyo.returnvisitorv5.data.list.PlaceList;
+import net.c_kogyo.returnvisitorv5.data.list.VisitList;
 import net.c_kogyo.returnvisitorv5.dialog.AddWorkDialog;
 import net.c_kogyo.returnvisitorv5.dialog.DayAggregationDialog;
 import net.c_kogyo.returnvisitorv5.fragment.WorkFragment;
@@ -479,7 +480,7 @@ public class WorkPagerActivity extends AppCompatActivity {
     private void onAddWork(Work work) {
         RVData.getInstance().workList.setOrAdd(work);
         ArrayList<Work> worksRemoved = RVData.getInstance().workList.onChangeTime(work);
-        ArrayList<Visit> visitsSwallowed = RVData.getInstance().visitList.getVisitsInWork(work);
+        ArrayList<Visit> visitsSwallowed = VisitList.getInstance().getVisitsInWork(work);
 
         int pos = mDatePagerAdapter.getPosition(work.getStart());
         mPager.setCurrentItem(pos);
@@ -528,7 +529,7 @@ public class WorkPagerActivity extends AppCompatActivity {
             if (resultCode == Constants.RecordVisitActions.VISIT_ADDED_RESULT_CODE) {
                 String visitId = data.getStringExtra(Visit.VISIT);
                 if (visitId != null) {
-                    Visit visit = RVData.getInstance().visitList.getById(visitId);
+                    Visit visit = VisitList.getInstance().getById(visitId);
                     if (visit != null) {
                         getCurrentFragment().insertVisitCell(visit);
                     }

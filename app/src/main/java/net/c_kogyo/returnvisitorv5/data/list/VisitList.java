@@ -20,6 +20,18 @@ import java.util.Comparator;
 
 public class VisitList extends DataList<Visit> {
 
+    private static VisitList instance;
+    private VisitList() {
+        super(Visit.class);
+    }
+
+    public static VisitList getInstance() {
+        if (instance == null) {
+            instance = new VisitList();
+        }
+        return instance;
+    }
+
     public synchronized ArrayList<Visit> getVisitsForPlace(String placeId) {
 
         ArrayList<Visit> visits = new ArrayList<>();

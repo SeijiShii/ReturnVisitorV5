@@ -38,7 +38,7 @@ public class PublicationList extends DataList<Publication> {
         ArrayList<Publication> weightedList = new ArrayList<>(list);
 
         // 重みづけをする
-        for (Visit visit : RVData.getInstance().visitList) {
+        for (Visit visit : VisitList.getInstance()) {
             long diff = today.getTimeInMillis() - visit.getDatetime().getTimeInMillis();
 
             for (Placement placement : visit.getAllPlacements()) {

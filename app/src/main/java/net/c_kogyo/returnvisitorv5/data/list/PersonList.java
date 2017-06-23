@@ -30,7 +30,7 @@ public class PersonList extends DataList<Person> {
 
         ArrayList<String> ids = new ArrayList<>();
         for (Place place1 : places) {
-            ArrayList<Visit> visits = RVData.getInstance().visitList.getVisitsForPlace(place1.getId());
+            ArrayList<Visit> visits = VisitList.getInstance().getVisitsForPlace(place1.getId());
             for (Visit visit : visits) {
                 for (VisitDetail visitDetail : visit.getVisitDetails()) {
                     if (!ids.contains(visitDetail.getPersonId())) {
@@ -47,7 +47,7 @@ public class PersonList extends DataList<Person> {
 
         ArrayList<String> validIds = new ArrayList<>();
 
-        for (Visit visit : RVData.getInstance().visitList) {
+        for (Visit visit : VisitList.getInstance()) {
             for (VisitDetail visitDetail : visit.getVisitDetails()) {
                if (!validIds.contains(visitDetail.getPersonId())) {
                    validIds.add(visitDetail.getPersonId());

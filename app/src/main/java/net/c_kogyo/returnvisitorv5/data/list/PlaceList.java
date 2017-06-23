@@ -86,7 +86,7 @@ public class PlaceList extends DataList<Place> {
 
         ArrayList<String> placeIds = new ArrayList<>();
 
-        for (Visit visit : RVData.getInstance().visitList) {
+        for (Visit visit : VisitList.getInstance()) {
             for (VisitDetail visitDetail : visit.getVisitDetails()) {
                 if (visitDetail.getPersonId().equals(person.getId())) {
                     if (!placeIds.contains(visitDetail.getPlaceId())) {
@@ -102,7 +102,7 @@ public class PlaceList extends DataList<Place> {
     public void deleteItemWithoutVisit() {
 
         ArrayList<String> validIds = new ArrayList<>();
-        for (Visit visit : RVData.getInstance().visitList) {
+        for (Visit visit : VisitList.getInstance()) {
             if (!validIds.contains(visit.getPlaceId())) {
                 validIds.add(visit.getPlaceId());
             }

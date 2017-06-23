@@ -1,5 +1,6 @@
 package net.c_kogyo.returnvisitorv5.data;
 
+import net.c_kogyo.returnvisitorv5.data.list.VisitList;
 import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
 
 import java.util.ArrayList;
@@ -111,7 +112,7 @@ public class AggregationOfMonth {
 
     public static int bsCount(Calendar month) {
 
-        ArrayList<VisitDetail> bsVisitDetails = RVData.getInstance().visitList.getBSVisitDetailsInMonth(month);
+        ArrayList<VisitDetail> bsVisitDetails = VisitList.getInstance().getBSVisitDetailsInMonth(month);
         ArrayList<String> personIds = new ArrayList<>();
         for (VisitDetail visitDetail : bsVisitDetails) {
             if (!personIds.contains(visitDetail.getPersonId())) {
