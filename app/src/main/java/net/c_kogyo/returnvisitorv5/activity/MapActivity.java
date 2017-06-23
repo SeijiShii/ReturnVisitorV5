@@ -53,7 +53,6 @@ import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.PlaceMarkers;
 import net.c_kogyo.returnvisitorv5.data.RVData;
-import net.c_kogyo.returnvisitorv5.data.RVRecord;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.Work;
 import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
@@ -584,8 +583,6 @@ public class MapActivity extends AppCompatActivity
         place.setLatLng(marker.getPosition());
         place.setAddress(null);
 
-        place.onUpdate();
-
         RVData.getInstance().saveData(this);
         RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this);
 
@@ -761,7 +758,6 @@ public class MapActivity extends AppCompatActivity
                     public void onOkClick(Place housingComplex) {
 
                         placeMarkers.refreshMarker(housingComplex);
-                        housingComplex.onUpdate();
                     }
 
                     @Override

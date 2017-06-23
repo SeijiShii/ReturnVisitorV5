@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 
 import net.c_kogyo.returnvisitorv5.data.DataItem;
 import net.c_kogyo.returnvisitorv5.data.DeletedData;
-import net.c_kogyo.returnvisitorv5.data.RVRecord;
+import net.c_kogyo.returnvisitorv5.db.RVRecord;
 
 import java.util.ArrayList;
 import java.util.Iterator;

@@ -19,8 +19,6 @@ public class DataItem implements Cloneable{
     protected String name;
     protected String note;
 
-    protected long updatedAt;
-
     protected String idHeader;
 
     public DataItem(){}
@@ -33,7 +31,6 @@ public class DataItem implements Cloneable{
     }
 
     private void initCommon() {
-        this.updatedAt = Calendar.getInstance().getTimeInMillis();
         this.id = generateNewId();
         this.name = "";
         this.note = "";
@@ -60,17 +57,6 @@ public class DataItem implements Cloneable{
         return id;
     }
 
-    public long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    // DONE: 2017/06/02 すべてのデータに反映
-    public void onUpdate() {updatedAt = Calendar.getInstance().getTimeInMillis();};
-
-    public void setUpdatedAt() {
-        updatedAt = Calendar.getInstance().getTimeInMillis();
-    }
-
     public String getName() {
         return name;
     }
@@ -95,7 +81,6 @@ public class DataItem implements Cloneable{
         item.id = this.id;
         item.name = this.name;
         item.note = this.note;
-        item.updatedAt = this.updatedAt;
 
         return item;
     }
@@ -108,10 +93,6 @@ public class DataItem implements Cloneable{
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public void setUpdatedAt(long updatedAt) {
-        this.updatedAt = updatedAt;
     }
 
     public <T extends DataItem> boolean equals(T o) {

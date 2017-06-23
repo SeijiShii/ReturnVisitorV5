@@ -30,7 +30,6 @@ public class DataList<T extends DataItem> implements Iterable<T>{
 
     synchronized public void setOrAdd(T data) {
 
-        data.onUpdate();
         if (contains(data)) {
             list.set(indexOf(data), data);
         } else {
@@ -157,15 +156,15 @@ public class DataList<T extends DataItem> implements Iterable<T>{
         return searchResultItems;
     }
 
-    synchronized public ArrayList<T> getListLaterThanTime(long dataTimeInMills) {
-        ArrayList<T> laterList = new ArrayList<>();
-        for ( T data : list ) {
-            if (data.getUpdatedAt() >= dataTimeInMills) {
-                laterList.add(data);
-            }
-        }
-        return laterList;
-    }
+//    synchronized public ArrayList<T> getListLaterThanTime(long dataTimeInMills) {
+//        ArrayList<T> laterList = new ArrayList<>();
+//        for ( T data : list ) {
+//            if (data.getUpdatedAt() >= dataTimeInMills) {
+//                laterList.add(data);
+//            }
+//        }
+//        return laterList;
+//    }
 
     public ArrayList<T> getList(ArrayList<String> ids) {
         ArrayList<T> items = new ArrayList<>();

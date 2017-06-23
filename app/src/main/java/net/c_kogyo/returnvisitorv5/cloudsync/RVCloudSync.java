@@ -9,7 +9,7 @@ import com.google.gson.Gson;
 
 import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.data.RVData;
-import net.c_kogyo.returnvisitorv5.data.RVRecord;
+import net.c_kogyo.returnvisitorv5.db.RVRecord;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
 import net.c_kogyo.returnvisitorv5.util.EncryptUtil;
 
@@ -267,7 +267,8 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback{
         RVResponseBody responseBody = mGson.fromJson(dataFrame.getDataBody(), RVResponseBody.class);
         switch (responseBody.getStatusCode()) {
             case STATUS_200_SYNC_START_OK:
-                sendDeviceData(dataFrame.getToken());
+                // TODO: 2017/06/23 SQLiteの実装が済むまでペンディング
+//                sendDeviceData(dataFrame.getToken());
                 break;
 
             case STATUS_401_UNAUTHORIZED:
@@ -280,11 +281,11 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback{
     }
 
     private void sendDeviceData(String token) {
-        for (RVRecord record : RVData.getInstance().getRecordsLaterThanTime(lastSyncTime)) {
-            RVCloudSyncDataFrame dataFrame =
-                    new RVCloudSyncDataFrame(RVCloudSyncDataFrame.FrameCategory.DEVICE_DATA_FRAME, mGson.toJson(record), token);
-            socketClient.send(mGson.toJson(dataFrame));
-        }
+//        for (RVRecord record : RVData.getInstance().getRecordsLaterThanTime(lastSyncTime)) {
+//            RVCloudSyncDataFrame dataFrame =
+//                    new RVCloudSyncDataFrame(RVCloudSyncDataFrame.FrameCategory.DEVICE_DATA_FRAME, mGson.toJson(record), token);
+//            socketClient.send(mGson.toJson(dataFrame));
+//        }
         // DONE: 2017/06/19 デバイスに蓄積したデータの伝送
         RVCloudSyncDataFrame deviceDataEndFrame
                 = new RVCloudSyncDataFrame(RVCloudSyncDataFrame.FrameCategory.DEVICE_DATA_END_FRAME, null, token);

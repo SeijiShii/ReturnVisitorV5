@@ -334,7 +334,6 @@ public class RVDBHelper {
         person1.setName("HOGE HOGE");
         person1.setSex(Person.Sex.MALE);
         person1.setAge(Person.Age.AGE_31_40);
-        person1.setUpdatedAt(1233455);
         String id = "test_id_00000005";
         person1.setId(id);
 

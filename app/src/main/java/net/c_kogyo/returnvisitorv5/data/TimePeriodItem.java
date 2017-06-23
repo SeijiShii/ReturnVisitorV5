@@ -44,7 +44,6 @@ public class TimePeriodItem extends DataItem{
 
     public void setStart(Calendar start) {
         this.start = start;
-        onUpdate();
     }
 
     public Calendar getEnd() {
@@ -53,7 +52,6 @@ public class TimePeriodItem extends DataItem{
 
     public void setEnd(Calendar end) {
         this.end = end;
-        onUpdate();
     }
 
     public long getDuration() {

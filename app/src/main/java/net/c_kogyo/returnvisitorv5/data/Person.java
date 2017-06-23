@@ -17,12 +17,6 @@ public class Person extends DataItem implements Cloneable{
 
     public static final String PERSON       = "person";
 
-//    public static final String SEX      = "sex";
-//    public static final String AGE      = "age";
-//    public static final String PLACE_IDS  = "place_ids";
-//    public static final String PRIORITY = "priority";
-
-
     public enum Sex {
         SEX_UNKNOWN(0),
         MALE(1),
@@ -155,12 +149,12 @@ public class Person extends DataItem implements Cloneable{
 
     public void setSex(Sex sex) {
         this.sex = sex;
-        onUpdate();
+        
     }
 
     public void setAge(Age age) {
         this.age = age;
-        onUpdate();
+        
     }
 
     private String getSexString(Context context) {
@@ -185,7 +179,7 @@ public class Person extends DataItem implements Cloneable{
 
     public void setPriority(Priority priority) {
         this.priority = priority;
-        onUpdate();
+        
     }
 
     @Override
@@ -248,7 +242,7 @@ public class Person extends DataItem implements Cloneable{
 
     public void setPlaceIds(ArrayList<String> placeIds) {
         this.placeIds = placeIds;
-        onUpdate();
+        
     }
 
     public Priority getPriority() {

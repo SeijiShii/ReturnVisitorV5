@@ -11,9 +11,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
-//import static net.c_kogyo.returnvisitorv5.data.Person.PRIORITY;
-//import static net.c_kogyo.returnvisitorv5.data.Visit.PLACE_ID;
-
 /**
  * Created by SeijiShii on 2017/02/20.
  */
@@ -21,15 +18,6 @@ import java.util.regex.Pattern;
 public class VisitDetail extends DataItem  implements Cloneable{
 
     public static final String VISIT_DETAIL = "visit_detail";
-//    public static final String PERSON_ID = "person_id";
-//    public static final String VISIT_ID = "visit_id";
-//    public static final String PLACE_ID = "place_id";
-//    public static final String PLACEMENTS = "placements";
-//    public static final String TAG_IDS = "tag_ids";
-//    public static final String SEEN = "seen";
-//    public static final String IS_STUDY = "is_study";
-//    public static final String IS_RV = "is_rv";
-
 
     private String personId, visitId, placeId;
     private boolean seen, isStudy, isRV;
@@ -79,80 +67,6 @@ public class VisitDetail extends DataItem  implements Cloneable{
         this.seen = false;
     }
 
-//    public VisitDetail(JSONObject object) {
-//        super(object);
-//        initCommon();
-//
-//        try {
-//            if (object.has(PERSON_ID))
-//                this.personId = object.getString(PERSON_ID);
-//            if (object.has(VISIT_ID))
-//                this.visitId = object.getString(VISIT_ID);
-//            if (object.has(PLACE_ID))
-//                this.placeId = object.getString(PLACE_ID);
-//            if (object.has(SEEN))
-//                this.seen = object.getBoolean(SEEN);
-//            if (object.has(IS_RV))
-//                this.isRV = object.getBoolean(IS_RV);
-//            if (object.has(IS_STUDY))
-//                this.isStudy = object.getBoolean(IS_STUDY);
-//
-//            if (object.has(PRIORITY))
-//                this.priority = Person.Priority.valueOf(object.getString(PRIORITY));
-//
-//            if (object.has(PLACEMENTS)) {
-//                JSONArray pArray = object.getJSONArray(PLACEMENTS);
-//                for ( int i = 0 ; i < pArray.length() ; i++ ) {
-//                    this.placements.add(new Placement(pArray.getJSONObject(i)));
-//                }
-//            }
-//
-//            if (object.has(TAG_IDS)) {
-//                JSONArray tArray = object.getJSONArray(TAG_IDS);
-//                for ( int i = 0 ; i < tArray.length() ; i++ ) {
-//                    this.tagIds.add(tArray.getString(i));
-//                }
-//            }
-//
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//
-//    }
-//
-//    public JSONObject jsonObject() {
-//        JSONObject object = super.jsonObject();
-//
-//        try {
-//            object.put(PERSON_ID, this.personId);
-//            object.put(VISIT_ID, this.visitId);
-//            object.put(PLACE_ID, this.placeId);
-//
-//            object.put(SEEN, this.seen);
-//            object.put(IS_RV, this.isRV);
-//            object.put(IS_STUDY, this.isStudy);
-//
-//            object.put(PRIORITY, this.priority.toString());
-//
-//            JSONArray pArray = new JSONArray();
-//            for (Placement placement : placements) {
-//                pArray.put(placement.jsonObject());
-//            }
-//            object.put(PLACEMENTS, pArray);
-//
-//            JSONArray tArray = new JSONArray();
-//            for (String tagId : tagIds) {
-//                tArray.put(tagId);
-//            }
-//            object.put(TAG_IDS, tArray);
-//
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//
-//        return object;
-//    }
-
     public String getPersonData(Context context) {
 
         Person person = RVData.getInstance().personList.getById(personId);
@@ -166,22 +80,22 @@ public class VisitDetail extends DataItem  implements Cloneable{
 
     public void setIsRv(boolean isRv) {
         this.isRV = isRv;
-        onUpdate();
+        
     }
 
     public void setIsStudy(boolean isStudy) {
         this.isStudy = isStudy;
-        onUpdate();
+        
     }
 
     public void setSeen(boolean seen) {
         this.seen = seen;
-        onUpdate();
+        
     }
 
     public void setPriority(Person.Priority priority) {
         this.priority = priority;
-        onUpdate();
+        
     }
 
     public Person.Priority getPriority() {
@@ -218,7 +132,7 @@ public class VisitDetail extends DataItem  implements Cloneable{
 
     public void setPlaceId(String placeId) {
         this.placeId = placeId;
-        onUpdate();
+        
     }
 
     public String toString(Context context, int indents, boolean withTags) {

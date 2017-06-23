@@ -15,13 +15,6 @@ public class Place extends DataItem {
 
     public static final String PLACE = "place";
 
-//    public static final String LATITUDE = "latitude";
-//    public static final String LONGITUDE = "longitude";
-//    public static final String ADDRESS = "address";
-//    public static final String CATEGORY = "category";
-//    public static final String PARENT_ID = "parent_id";
-
-
     public enum Category {
         UNDEFINED(0),
         HOUSE(1),
@@ -71,29 +64,6 @@ public class Place extends DataItem {
         this.category = category;
     }
 
-//    public Place(JSONObject object) {
-//        super(object);
-//        initCommon();
-//        setJSON(this, object);
-//
-////        try {
-////            if (object.has(LATITUDE) && object.has(LONGITUDE)) {
-////                double lat = object.getDouble(LATITUDE);
-////                double lng = object.getDouble(LONGITUDE);
-////                this.latLng = new LatLng(lat, lng);
-////            }
-////
-////            if (object.has(ADDRESS)) this.address = object.getString(ADDRESS);
-////
-////        } catch (JSONException e) {
-////            e.printStackTrace();
-////        }
-//    }
-
-//    public Place(RVRecord RVRecord) {
-//        this(RVRecord.getDataJSON());
-//    }
-
     private void initCommon() {
         this.latLng = new LatLng(0, 0);
         this.address = null;
@@ -106,67 +76,13 @@ public class Place extends DataItem {
         return name + " " + address;
     }
 
-//    public String getMarkerId() {
-//        return markerId;
-//    }
-//
-//    public void setMarkerId(String markerId) {
-//        this.markerId = markerId;
-//    }
-
-//    @Override
-//    public JSONObject jsonObject() {
-//
-//        JSONObject object = super.jsonObject();
-//
-//        try {
-//            object.put(LATITUDE, latLng.latitude);
-//            object.put(LONGITUDE, latLng.longitude);
-//            object.put(ADDRESS, address);
-//            object.put(CATEGORY, category.toString());
-//            if (parentId != null) {
-//                object.put(PARENT_ID, parentId);
-//            }
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//
-//        return object;
-//    }
-
-//    @Override
-//    public HashMap<String, Object> toMap() {
-//
-//        HashMap<String, Object> map = super.toMap();
-//
-//        map.put(LATITUDE, latLng.latitude);
-//        map.put(LONGITUDE, latLng.longitude);
-//        map.put(ADDRESS, address);
-//
-//        return map;
-//    }
-
-//    @Override
-//    public void setMap(@NonNull HashMap<String, Object> map) {
-//        super.setMap(map);
-//
-//        double lat = Double.valueOf(map.get(LATITUDE).toString());
-//        double lng = Double.valueOf(map.get(LONGITUDE).toString());
-//
-//        this.latLng = new LatLng(lat, lng);
-//
-//        this.address = map.get(ADDRESS).toString();
-//
-//
-//    }
-
     public String getAddress() {
         return address;
     }
 
     public void setAddress(String address) {
         this.address = address;
-        onUpdate();
+        
     }
 
     public boolean isAddressRequested() {
@@ -179,7 +95,7 @@ public class Place extends DataItem {
 
     public void setLatLng(LatLng latLng) {
         this.latLng = latLng;
-        onUpdate();
+        
     }
 
     @Override
@@ -205,35 +121,6 @@ public class Place extends DataItem {
                 return "";
         }
     }
-
-//    public static Place setJSON(Place place, JSONObject object) {
-//
-//        try {
-//            if (object.has(LATITUDE) && object.has(LONGITUDE)) {
-//                double lat = object.getDouble(LATITUDE);
-//                double lng = object.getDouble(LONGITUDE);
-//                place.latLng = new LatLng(lat, lng);
-//            }
-//
-//            if (object.has(ADDRESS))
-//                place.address = object.getString(ADDRESS);
-//
-//            if (object.has(CATEGORY)) {
-//                place.category = Category.valueOf(object.getString(CATEGORY));
-//                if (place.category == Category.UNDEFINED) {
-//                    place.category = Category.HOUSE;
-//                }
-//            }
-//
-//
-//            if (object.has(PARENT_ID))
-//                place.parentId = object.getString(PARENT_ID);
-//
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//        return place;
-//    }
 
     public Person.Priority getPriority() {
 
@@ -276,7 +163,7 @@ public class Place extends DataItem {
 
     public void setParentId(String parentId) {
         this.parentId = parentId;
-        onUpdate();
+        
     }
 
     public Category getCategory() {
@@ -285,7 +172,7 @@ public class Place extends DataItem {
 
     public void setCategory(Category category) {
         this.category = category;
-        onUpdate();
+        
     }
 
     public int getChildCount() {

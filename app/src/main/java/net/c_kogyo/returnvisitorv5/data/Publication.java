@@ -80,10 +80,6 @@ public class Publication extends DataItem implements Cloneable{
 
     public static final String PUBLICATION = "Publication";
 
-//    public static final String CATEGORY = "category";
-//    public static final String MAGAZINE_CATEGORY = "magazine_category";
-//    public static final String NUMBER = "number";
-
     private Category category;
     private MagazineCategory magCategory;
     private Calendar number;
@@ -106,48 +102,6 @@ public class Publication extends DataItem implements Cloneable{
 
         this.category = category;
     }
-
-//    public Publication(RVRecord RVRecord) {
-//        this(RVRecord.getDataJSON());
-//    }
-//
-//    public Publication(JSONObject object) {
-//        super(object);
-//
-//        try {
-//            if (object.has(CATEGORY))
-//                this.category = Category.valueOf(object.getString(CATEGORY));
-//            if (object.has(MAGAZINE_CATEGORY))
-//                this.magCategory = MagazineCategory.valueOf(object.getString(MAGAZINE_CATEGORY));
-//            if (object.has(NUMBER)) {
-//                this.number = Calendar.getInstance();
-//                this.number.setTimeInMillis(object.getLong(NUMBER));
-//            }
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    public JSONObject jsonObject() {
-//
-//        JSONObject object = super.jsonObject();
-//
-//        try {
-//            object.put(CATEGORY, this.category);
-//            object.put(MAGAZINE_CATEGORY, this.magCategory);
-//            object.put(NUMBER, this.number.getTimeInMillis());
-//
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//        return object;
-//    }
-
-//    public Publication(HashMap<String, Object> map) {
-//
-//        super();
-//        setMap(map);
-//    }
 
     public String toString(Context context) {
 
@@ -185,7 +139,7 @@ public class Publication extends DataItem implements Cloneable{
 
     public void setCategory(Category category) {
         this.category = category;
-        onUpdate();
+        
     }
 
     public MagazineCategory getMagCategory() {
@@ -194,7 +148,7 @@ public class Publication extends DataItem implements Cloneable{
 
     public void setMagCategory(MagazineCategory magCategory) {
         this.magCategory = magCategory;
-        onUpdate();
+        
     }
 
     public Calendar getNumber() {
@@ -205,7 +159,7 @@ public class Publication extends DataItem implements Cloneable{
 
     public void setNumber(Calendar number) {
         this.number = number;
-        onUpdate();
+        
     }
 
     public static String getNumberString(Calendar number, MagazineCategory magCategory, Context context) {
@@ -292,24 +246,7 @@ public class Publication extends DataItem implements Cloneable{
 
     public void setWeight(int weight) {
         this.weight = weight;
-        onUpdate();
+        
     }
-
-    //    public Publication clone (boolean withPlacedDate)  throws CloneNotSupportedException{
-//
-//        Publication clonedPlc = (Publication) super.clone();
-//
-//        clonedPlc.category = this.category;
-//        clonedPlc.magCategory = this.magCategory;
-//        clonedPlc.number = (Calendar) this.number.clone();
-//
-//        if (withPlacedDate) {
-//            clonedPlc.placedDate = (Calendar) this.placedDate.clone();
-//        }else {
-//            clonedPlc.placedDate = Calendar.getInstance();
-//        }
-//
-//        return clonedPlc;
-//    }
 
 }

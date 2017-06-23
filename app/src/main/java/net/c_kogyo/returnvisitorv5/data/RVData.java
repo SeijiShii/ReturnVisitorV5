@@ -19,6 +19,7 @@ import net.c_kogyo.returnvisitorv5.data.list.PublicationList;
 import net.c_kogyo.returnvisitorv5.data.list.TagList;
 import net.c_kogyo.returnvisitorv5.data.list.VisitList;
 import net.c_kogyo.returnvisitorv5.data.list.WorkList;
+import net.c_kogyo.returnvisitorv5.db.RVRecord;
 import net.c_kogyo.returnvisitorv5.util.CalendarUtil;
 
 import org.json.JSONArray;
@@ -385,18 +386,18 @@ public class RVData {
             return mGson.toJson(records);
         }
 
-//        private String jsonToString(JSONObject object) {
-//
-//            String s = "";
-//
-//            try {
-//                s = object.toString(2);
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//
-//            return s;
-//        }
+        private String jsonToString(JSONObject object) {
+
+            String s = "";
+
+            try {
+                s = object.toString(2);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            return s;
+        }
 
         private void saveToFile(String s) {
 
@@ -477,56 +478,49 @@ public class RVData {
         return monthWithData;
     }
 
-//    public interface RVDataStoreCallback{
-//
-//        void onDataSaved();
-//
-//        void onDataLoaded();
-//    }
-
     public boolean hasWorkOrVisit() {
         return visitList.getList().size() > 0 || workList.getList().size() > 0;
     }
 
-    public ArrayList<RVRecord> getRecordsLaterThanTime(long dateTimeInMills) {
-
-        ArrayList<RVRecord> records = new ArrayList<>();
-
-        for (Place place : placeList.getListLaterThanTime(dateTimeInMills)) {
-            records.add(new RVRecord(place));
-        }
-
-        for (Person person : personList.getListLaterThanTime(dateTimeInMills)) {
-            records.add(new RVRecord(person));
-        }
-
-        for (Visit visit : visitList.getListLaterThanTime(dateTimeInMills)) {
-            records.add(new RVRecord(visit));
-        }
-
-        for (Tag tag : tagList.getListLaterThanTime(dateTimeInMills)) {
-            records.add(new RVRecord(tag));
-        }
-
-        for (Work work : workList.getListLaterThanTime(dateTimeInMills)) {
-            records.add(new RVRecord(work));
-        }
-
-        for (Publication publication : publicationList.getListLaterThanTime(dateTimeInMills)) {
-            records.add(new RVRecord(publication));
-        }
-
-        for (DataItem item : noteCompList.getListLaterThanTime(dateTimeInMills)) {
-            records.add(new RVRecord(item));
-        }
-
-        for (DeletedData deletedData : inDeviceDeletedList) {
-            records.add(new RVRecord(deletedData));
-        }
-        inDeviceDeletedList.clear();
-
-        return records;
-    }
+//    public ArrayList<RVRecord> getRecordsLaterThanTime(long dateTimeInMills) {
+//
+//        ArrayList<RVRecord> records = new ArrayList<>();
+//
+//        for (Place place : placeList.getListLaterThanTime(dateTimeInMills)) {
+//            records.add(new RVRecord(place));
+//        }
+//
+//        for (Person person : personList.getListLaterThanTime(dateTimeInMills)) {
+//            records.add(new RVRecord(person));
+//        }
+//
+//        for (Visit visit : visitList.getListLaterThanTime(dateTimeInMills)) {
+//            records.add(new RVRecord(visit));
+//        }
+//
+//        for (Tag tag : tagList.getListLaterThanTime(dateTimeInMills)) {
+//            records.add(new RVRecord(tag));
+//        }
+//
+//        for (Work work : workList.getListLaterThanTime(dateTimeInMills)) {
+//            records.add(new RVRecord(work));
+//        }
+//
+//        for (Publication publication : publicationList.getListLaterThanTime(dateTimeInMills)) {
+//            records.add(new RVRecord(publication));
+//        }
+//
+//        for (DataItem item : noteCompList.getListLaterThanTime(dateTimeInMills)) {
+//            records.add(new RVRecord(item));
+//        }
+//
+//        for (DeletedData deletedData : inDeviceDeletedList) {
+//            records.add(new RVRecord(deletedData));
+//        }
+//        inDeviceDeletedList.clear();
+//
+//        return records;
+//    }
 
     public interface RVDataCallback {
 

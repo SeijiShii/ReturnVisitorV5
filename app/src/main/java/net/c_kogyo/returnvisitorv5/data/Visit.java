@@ -17,10 +17,6 @@ import java.util.Comparator;
 public class Visit extends DataItem implements Cloneable{
 
     public static final String VISIT = "visit";
-//    public static final String PLACE_ID = "place_id";
-//    public static final String PLACEMENTS = "publications";
-//    public static final String VISIT_DETAILS = "visit_details";
-//    public static final String DATE_TIME = "datetime";
 
     private Calendar datetime;
     private String placeId;
@@ -51,18 +47,6 @@ public class Visit extends DataItem implements Cloneable{
         }
     }
 
-//    public Visit(JSONObject object) {
-//
-//        super(object);
-//        initCommon(null);
-//
-//        setJSON(this, object);
-//    }
-
-//    public Visit(RVRecord RVRecord) {
-//        this(RVRecord.getDataJSON());
-//    }
-
     private void initCommon(@Nullable Place place) {
         this.datetime = Calendar.getInstance();
         if (place == null) {
@@ -88,54 +72,21 @@ public class Visit extends DataItem implements Cloneable{
 
     public void setPlaceId(String placeId) {
         this.placeId = placeId;
-        onUpdate();
     }
 
     public ArrayList<Placement> getPlacements() {
-        onUpdate();
+        
         return placements;
     }
-
-//    public void setPlacements(ArrayList<Placement> placements) {
-//        this.placements = placements;
-//        onUpdate();
-//    }
 
     public void addVisitDetail(VisitDetail visitDetail) {
         this.visitDetails.add(visitDetail);
     }
 
-//    @Override
-//    public JSONObject jsonObject() {
-//
-//        // DONE: 2017/03/14 Missing jsonObject Method
-//        JSONObject object = super.jsonObject();
-//        try {
-//            object.put(DATE_TIME, datetime.getTimeInMillis());
-//            object.put(PLACE_ID, placeId);
-//
-//            JSONArray detailArray = new JSONArray();
-//            for (VisitDetail visitDetail : visitDetails) {
-//                detailArray.put(visitDetail.jsonObject());
-//            }
-//            object.put(VISIT_DETAILS, detailArray);
-//
-//            JSONArray plcArray = new JSONArray();
-//            for (Placement placement : placements) {
-//                plcArray.put(placement.jsonObject());
-//            }
-//            object.put(PLACEMENTS, plcArray);
-//
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//        return object;
-//    }
-
     // そう考えると場所無き訪問もあるよね
 
     public ArrayList<Placement> getAllPlacements() {
-        onUpdate();
+        
         ArrayList<Placement> placements = new ArrayList<>(this.placements);
 
         for (VisitDetail visitDetail : visitDetails) {
@@ -146,7 +97,6 @@ public class Visit extends DataItem implements Cloneable{
 
     public int getPlacementCount() {
 
-        onUpdate();
         int count = 0;
 
         for (Placement plc : getAllPlacements()) {
@@ -161,7 +111,7 @@ public class Visit extends DataItem implements Cloneable{
 
     public int getShowVideoCount() {
 
-        onUpdate();
+        
         int count = 0;
         for (Placement plc : getAllPlacements()) {
             if (plc.getCategory() == Publication.Category.SHOW_VIDEO) {
@@ -170,29 +120,6 @@ public class Visit extends DataItem implements Cloneable{
         }
         return count;
     }
-
-//    public static Visit setJSON(Visit visit, JSONObject object) {
-//
-//        try {
-//            if (object.has(PLACE_ID)) visit.placeId = object.getString(PLACE_ID);
-//            if (object.has(DATE_TIME)) visit.datetime.setTimeInMillis(object.getLong(DATE_TIME));
-//            if (object.has(PLACEMENTS)) {
-//                JSONArray array = object.getJSONArray(PLACEMENTS);
-//                for ( int i = 0 ; i < array.length() ; i++ ) {
-//                    visit.placements.add(new Placement(array.getJSONObject(i)));
-//                }
-//            }
-//            if (object.has(VISIT_DETAILS)) {
-//                JSONArray array = object.getJSONArray(VISIT_DETAILS);
-//                for ( int i = 0 ; i < array.length() ; i++ ) {
-//                    visit.visitDetails.add(new VisitDetail(array.getJSONObject(i)));
-//                }
-//            }
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//        return visit;
-//    }
 
     public Calendar getDatetime() {
         return datetime;
@@ -227,30 +154,9 @@ public class Visit extends DataItem implements Cloneable{
     }
 
     public ArrayList<VisitDetail> getVisitDetails() {
-        onUpdate();
+        
         return visitDetails;
     }
-
-//    public String toStringWithLineBreak(Context context, boolean withDetails) {
-//        StringBuilder builder = new StringBuilder();
-//
-//        builder.append(DateTimeText.getDateTimeText(datetime, context));
-//
-//        builder.append("\n").append(context.getResources().getStringArray(R.array.priority_array)[getPriority().num()]);
-//
-//        if (withDetails) {
-//            if (visitDetails.size() >= 0) {
-//                for (VisitDetail visitDetail : visitDetails) {
-//                    builder.append("\n").append(visitDetail.toString(context, 4, false));
-//                    builder.append("\n");
-//                }
-//            }
-//        }
-//
-//        builder.append(getPlacementsString());
-//
-//        return builder.toString();
-//    }
 
     public String getPlacementsString() {
         StringBuilder builder = new StringBuilder();
@@ -308,7 +214,7 @@ public class Visit extends DataItem implements Cloneable{
 
     public void setDatetime(Calendar datetime) {
         this.datetime = datetime;
-        onUpdate();
+        
     }
 
     public boolean hasPerson(String personId) {

@@ -128,7 +128,6 @@ public class WorkView extends BaseAnimateView {
                         start.set(Calendar.HOUR_OF_DAY, hourOfDay);
                         start.set(Calendar.MINUTE, minute);
 
-                        mWork.onUpdate();
                         RVData.getInstance().workList.setOrAdd(mWork);
                         RVData.getInstance().saveData(getContext());
                         RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getContext());
@@ -163,7 +162,6 @@ public class WorkView extends BaseAnimateView {
                         end.set(Calendar.HOUR_OF_DAY, hourOfDay);
                         end.set(Calendar.MINUTE, minute);
 
-                        mWork.onUpdate();
                         RVData.getInstance().workList.setOrAdd(mWork);
                         RVData.getInstance().saveData(getContext());
                         RVCloudSync.getInstance().requestDataSyncIfLoggedIn(getContext());
