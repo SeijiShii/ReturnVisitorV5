@@ -42,7 +42,7 @@ import static net.c_kogyo.returnvisitorv5.db.RVDBContract.UPDATED_AT;
 
 public class RVDBHelper {
 
-    private static final String TAG = "RVDBHelper";
+    public static final String TAG = "RVDBHelper";
 
     private SQLiteDatabase mDB;
     private RVDBOpenHelper mOpenHelper;

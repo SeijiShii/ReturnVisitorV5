@@ -54,6 +54,7 @@ import net.c_kogyo.returnvisitorv5.data.PlaceMarkers;
 import net.c_kogyo.returnvisitorv5.data.RVData;
 import net.c_kogyo.returnvisitorv5.data.Visit;
 import net.c_kogyo.returnvisitorv5.data.Work;
+import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.dialog.AddWorkDialog;
 import net.c_kogyo.returnvisitorv5.dialog.HousingComplexDialog;
 import net.c_kogyo.returnvisitorv5.dialog.LoginDialog;
@@ -1727,6 +1728,21 @@ public class MapActivity extends AppCompatActivity
 
     // DONE: 2017/06/02 ダイアログを閉じるたびにキーボードも閉じるように
     // DONE: Term of Use
+
+    private void dbTest() {
+        RVDBHelper helper = new RVDBHelper(this);
+
+        Person person1 = new Person();
+        person1.setPriority(Person.Priority.HIGH);
+        person1.setName("HOGE HOGE");
+        person1.setSex(Person.Sex.MALE);
+        person1.setAge(Person.Age.AGE_31_40);
+        person1.setUpdatedAt(1233455);
+        person1.setId("test_ud_12345456");
+
+        Log.d()
+
+    }
 
 
 
