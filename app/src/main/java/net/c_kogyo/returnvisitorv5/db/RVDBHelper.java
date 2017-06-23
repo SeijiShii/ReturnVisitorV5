@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.google.gson.Gson;
 
@@ -59,9 +60,13 @@ public class RVDBHelper {
         }
     }
 
-    private void saveRecord(RVRecord record, boolean includeDeleted) {
-        if (hasSameUpdatedRecord(record, includeDeleted)) {
-            if (isRecordNewer(record, includeDeleted)) {
+    public void deleteAllDataFromDB() {
+        mDB.execSQL("DELETE FROM " + TABLE_NAME + ";");
+    }
+
+    private void saveRecord(RVRecord record, boolean checkIncludeDeleted) {
+        if (hasSameUpdatedRecord(record, checkIncludeDeleted)) {
+            if (isRecordNewer(record, checkIncludeDeleted)) {
                 updateRecord(record);
             }
         } else {
@@ -100,16 +105,29 @@ public class RVDBHelper {
             return null;
         }
 
+//        for (int i = 0 ; i < cursor.getColumnCount() ; i++ ) {
+//            Log.d(TAG, "cursor.column " + i + ": " + cursor.getColumnName(i));
+//        }
+
         boolean isEOf = cursor.moveToFirst();
         while (isEOf) {
-            record.setDataId(cursor.getString(0));
-            record.setClassName(cursor.getString(1));
-            record.setUpdatedAt(cursor.getLong(2));
-            record.setData(cursor.getString(3));
-            record.setDeleted(cursor.getInt(4) == 1);
+            setDataToRecordFromCursor(record, cursor);
+            isEOf = cursor.moveToNext();
         }
         cursor.close();
         return record;
+    }
+
+    public RVRecord loadRecord(String dataId) {
+        return loadRecord(dataId, false);
+    }
+
+    private void setDataToRecordFromCursor(RVRecord record, Cursor cursor) {
+        record.setDataId(cursor.getString(1));
+        record.setClassName(cursor.getString(2));
+        record.setUpdatedAt(cursor.getLong(3));
+        record.setData(cursor.getString(4));
+        record.setDeleted(cursor.getInt(5) == 1);
     }
 
     public ArrayList<RVRecord> loadRecordLaterThanTime(long lastSyncTime) {
@@ -126,12 +144,7 @@ public class RVDBHelper {
         boolean isEOf = cursor.moveToFirst();
         while (isEOf) {
             RVRecord record = new RVRecord();
-            record.setDataId(cursor.getString(0));
-            record.setClassName(cursor.getString(1));
-            record.setUpdatedAt(cursor.getLong(2));
-            record.setData(cursor.getString(3));
-            record.setDeleted(cursor.getInt(4) == 1);
-
+            setDataToRecordFromCursor(record, cursor);
             records.add(record);
         }
         cursor.close();
@@ -267,11 +280,7 @@ public class RVDBHelper {
         boolean isEOf = cursor.moveToFirst();
         while (isEOf) {
             RVRecord record = new RVRecord();
-            record.setDataId(cursor.getString(0));
-            record.setClassName(cursor.getString(1));
-            record.setUpdatedAt(cursor.getLong(2));
-            record.setData(cursor.getString(3));
-            record.setDeleted(cursor.getInt(4) == 1);
+            setDataToRecordFromCursor(record, cursor);
 
             records.add(record);
         }
@@ -313,11 +322,7 @@ public class RVDBHelper {
             boolean isEOf = cursor.moveToFirst();
             while (isEOf) {
                 RVRecord record = new RVRecord();
-                record.setDataId(cursor.getString(0));
-                record.setClassName(cursor.getString(1));
-                record.setUpdatedAt(cursor.getLong(2));
-                record.setData(cursor.getString(3));
-                record.setDeleted(cursor.getInt(4) == 1);
+                setDataToRecordFromCursor(record, cursor);
                 records.add(record);
             }
         }
@@ -401,59 +406,127 @@ public class RVDBHelper {
         return false;
     }
 
-    public ArrayList<Calendar> getDatesWithData() {
 
-        ArrayList<Calendar> datesOfVisit = VisitList.getDates(this);
-        ArrayList<Calendar> datesOfWork = WorkList.getDates(this);
-        ArrayList<Calendar> datesDoubled = new ArrayList<>();
+    // Tests
+    private boolean isTestDataSaved;
+    private long startSaveTime;
+    private boolean isTestDataLoaded;
+    private long startLoadTime;
+    private void testSaveAndLoad() {
 
-        for (Calendar date0 : datesOfVisit) {
-            for (Calendar date1 : datesOfWork) {
+        Gson gson = new Gson();
+        final Person person1 = new Person();
+        person1.setPriority(Person.Priority.HIGH);
+        person1.setName("HOGE HOGE");
+        person1.setSex(Person.Sex.MALE);
+        person1.setAge(Person.Age.AGE_31_40);
+        person1.setUpdatedAt(1233455);
+        String id = "test_id_00000005";
+        person1.setId(id);
 
-                if (CalendarUtil.isSameDay(date0, date1)) {
-                    datesDoubled.add(date1);
-                }
-            }
-        }
-
-        datesOfWork.removeAll(datesDoubled);
-        datesOfVisit.addAll(datesOfWork);
-
-        Collections.sort(datesOfVisit, new Comparator<Calendar>() {
+        isTestDataSaved = false;
+        new Thread(new Runnable() {
             @Override
-            public int compare(Calendar calendar, Calendar t1) {
-                return calendar.compareTo(t1);
+            public void run() {
+                while (!isTestDataSaved) {
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                        //
+                    }
+                }
+                long endSaveTime = Calendar.getInstance().getTimeInMillis();
+                long diff = endSaveTime - startSaveTime;
+                Log.d(RVDBHelper.TAG, "Saving data takes time: " + diff + " ms.");
             }
-        });
+        }).start();
 
-        return new ArrayList<>(datesOfVisit);
-    }
+        startSaveTime = Calendar.getInstance().getTimeInMillis();
+        Log.d(RVDBHelper.TAG, "person1: " + gson.toJson(person1));
 
-    public ArrayList<Calendar> getMonthsWithData() {
+        deleteAllDataFromDB();
+        save(person1);
+        isTestDataSaved = true;
 
-        ArrayList<Calendar> monthWithData = new ArrayList<>();
-        ArrayList<Calendar> datesWithData = getDatesWithData();
-
-        if (datesWithData.size() <= 0)
-            return monthWithData;
-
-        monthWithData.add(datesWithData.get(0));
-
-        int dateIndex = 0;
-        int monthIndex = 0;
-
-        while (dateIndex < datesWithData.size() - 1) {
-            dateIndex++;
-            if (!CalendarUtil.isSameMonth(datesWithData.get(dateIndex), monthWithData.get(monthIndex))) {
-                monthWithData.add(datesWithData.get(dateIndex));
-                monthIndex++;
+        isTestDataLoaded = false;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (!isTestDataLoaded) {
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                        //
+                    }
+                }
+                long endLoadTime = Calendar.getInstance().getTimeInMillis();
+                long diff = endLoadTime - startLoadTime;
+                Log.d(RVDBHelper.TAG, "Loading data takes time: " + diff + " ms.");
             }
-        }
+        }).start();
 
-        return monthWithData;
+        startLoadTime = Calendar.getInstance().getTimeInMillis();
+        net.c_kogyo.returnvisitorv5.db.RVRecord record = loadRecord(id);
+        isTestDataLoaded = true;
+
+        Person person2 = gson.fromJson(record.getDataJSON(), Person.class);
+        Log.d(RVDBHelper.TAG, "person2: " + gson.toJson(person2));
+
     }
 
-    public boolean hasWorkOrVisit() {
-        return VisitList.loadList(this).size() + WorkList.loadList(this).size() > 0;
-    }
+//    public ArrayList<Calendar> getDatesWithData() {
+//
+//        ArrayList<Calendar> datesOfVisit = VisitList.getDates(this);
+//        ArrayList<Calendar> datesOfWork = WorkList.getDates(this);
+//        ArrayList<Calendar> datesDoubled = new ArrayList<>();
+//
+//        for (Calendar date0 : datesOfVisit) {
+//            for (Calendar date1 : datesOfWork) {
+//
+//                if (CalendarUtil.isSameDay(date0, date1)) {
+//                    datesDoubled.add(date1);
+//                }
+//            }
+//        }
+//
+//        datesOfWork.removeAll(datesDoubled);
+//        datesOfVisit.addAll(datesOfWork);
+//
+//        Collections.sort(datesOfVisit, new Comparator<Calendar>() {
+//            @Override
+//            public int compare(Calendar calendar, Calendar t1) {
+//                return calendar.compareTo(t1);
+//            }
+//        });
+//
+//        return new ArrayList<>(datesOfVisit);
+//    }
+
+//    public ArrayList<Calendar> getMonthsWithData() {
+//
+//        ArrayList<Calendar> monthWithData = new ArrayList<>();
+//        ArrayList<Calendar> datesWithData = getDatesWithData();
+//
+//        if (datesWithData.size() <= 0)
+//            return monthWithData;
+//
+//        monthWithData.add(datesWithData.get(0));
+//
+//        int dateIndex = 0;
+//        int monthIndex = 0;
+//
+//        while (dateIndex < datesWithData.size() - 1) {
+//            dateIndex++;
+//            if (!CalendarUtil.isSameMonth(datesWithData.get(dateIndex), monthWithData.get(monthIndex))) {
+//                monthWithData.add(datesWithData.get(dateIndex));
+//                monthIndex++;
+//            }
+//        }
+//
+//        return monthWithData;
+//    }
+
+//    public boolean hasWorkOrVisit() {
+//        return VisitList.loadList(this).size() + WorkList.loadList(this).size() > 0;
+//    }
 }
