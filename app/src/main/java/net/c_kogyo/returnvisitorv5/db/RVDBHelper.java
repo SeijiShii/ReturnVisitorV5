@@ -25,7 +25,6 @@ import static net.c_kogyo.returnvisitorv5.db.RVDBContract.AND;
 import static net.c_kogyo.returnvisitorv5.db.RVDBContract.CLASS_NAME;
 import static net.c_kogyo.returnvisitorv5.db.RVDBContract.DATA;
 import static net.c_kogyo.returnvisitorv5.db.RVDBContract.DATA_ID;
-import static net.c_kogyo.returnvisitorv5.db.RVDBContract.ID;
 import static net.c_kogyo.returnvisitorv5.db.RVDBContract.IS_DELETED;
 import static net.c_kogyo.returnvisitorv5.db.RVDBContract.TABLE_NAME;
 import static net.c_kogyo.returnvisitorv5.db.RVDBContract.UPDATED_AT;
@@ -43,13 +42,13 @@ public class RVDBHelper {
     private SQLiteDatabase mDB;
     private RVDBOpenHelper mOpenHelper;
     private Gson mGson;
-    final private ArrayList<RVRecord> queueList;
+//    final private ArrayList<RVRecord> queueList;
 
 
     private RVDBHelper(Context context) {
         this.mOpenHelper = new RVDBOpenHelper(context);
         this.mGson = new Gson();
-        this.queueList = new ArrayList<>();
+//        this.queueList = new ArrayList<>();
         initDB();
 
     }
@@ -70,20 +69,23 @@ public class RVDBHelper {
         }
     }
 
-    private void showDataCount() {
+    private int getDataCount() {
 
+        int count;
         Cursor cursor = mDB.query(false,
                 TABLE_NAME,
                 new String[]{"*"},
                 null,
                 new String[]{},
                 null, null, null, null);
-        Log.d(TAG, "Data row count: " + cursor.getColumnCount());
+        Log.d(TAG, "Data row count: " + cursor.getCount());
+        count = cursor.getCount();
         cursor.close();
 
+        return count;
     }
 
-    private void deleteAllDataFromDB() {
+    public void deleteAllDataFromDB() {
         mDB.execSQL("DELETE FROM " + TABLE_NAME + ";");
     }
 
@@ -127,41 +129,24 @@ public class RVDBHelper {
         return mDB.delete(TABLE_NAME, DATA_ID + "= ?", new String[]{record.getDataId()});
     }
 
-    private boolean onSavingNormal;
-    synchronized private void saveIfInQueue() {
-
-        if (queueList.size() <= 0) {
-            return;
-        }
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (onSavingNormal) {
-                    try {
-                        Thread.sleep(50);
-                    } catch (InterruptedException e) {
-                        //
-                    }
-                }
-
-                onSavingNormal = true;
-
-                final ArrayList<RVRecord> bufferedList = new ArrayList<>(queueList);
-                queueList.clear();
-                saveRecords(bufferedList);
-
-                onSavingNormal = false;
-
-//                if (callback != null) {
-//                    callback.onFinishAsyncSave();
-//                }
-                Log.d(TAG, "Finished asynchronous saving.");
-                showDataCount();
-                saveIfInQueue();
-            }
-        }).start();
-    }
+//    synchronized private void saveIfInQueue() {
+//
+//        if (queueList.size() <= 0) {
+//            return;
+//        }
+//
+//        final ArrayList<RVRecord> bufferedList = new ArrayList<>(queueList);
+//        queueList.clear();
+//
+//        mDB.beginTransaction();
+//        try {
+//            saveRecords(bufferedList);
+//            mDB.setTransactionSuccessful();
+//        } finally {
+//            mDB.endTransaction();
+//        }
+//        saveIfInQueue();
+//    }
 
 
     // Save methods
@@ -174,20 +159,82 @@ public class RVDBHelper {
         }
     }
 
-    private void saveRecords(ArrayList<RVRecord> records) {
-        for (RVRecord record : records) {
-            saveRecord(record);
+
+    // Exposed save methods
+    public <T extends DataItem> void save(final T item) {
+
+        mDB.beginTransaction();
+        try {
+            saveRecord(new RVRecord(item));
+            mDB.setTransactionSuccessful();
+        } finally {
+            mDB.endTransaction();
         }
     }
 
+    private boolean listenerCalled = false;
+    public void saveRecords(ArrayList<RVRecord> records, @Nullable final SaveRecordsListener listener) {
 
-    // Exposed save methods
-
-    public <T extends DataItem> void saveAsynchronous(final T item) {
-        synchronized (queueList) {
-            queueList.add(new RVRecord(item));
-            saveIfInQueue();
+        mDB.beginTransaction();
+        try {
+            for (RVRecord record : records) {
+                saveRecord(record);
+            }
+            mDB.setTransactionSuccessful();
+        }finally {
+            mDB.endTransaction();
         }
+
+        if (listener == null) return;
+
+        // 50msごとに件数カウントクエリを行い3回同じ値が帰ってきたら変更が反映されたと判断する。
+        new Thread(new Runnable() {
+            int count = 0;
+            int oldCount = -1;
+            @Override
+            public void run() {
+                while (count < 3) {
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        //
+                    }
+                    int dataCount = getDataCount();
+                    if (oldCount == dataCount) {
+                        count++;
+                    }
+                    oldCount = dataCount;
+                    Log.d(TAG, "oldCount: " + oldCount + ", count: " + count);
+                }
+                if (!listenerCalled) {
+                    listenerCalled = true;
+                    Log.d(TAG, "Listener called!");
+                    listener.onFinishSave();
+                }
+            }
+        }).start();
+
+        // タイムアウト設定
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                 //
+                }
+                if (!listenerCalled) {
+                    Log.d(TAG, "DB data count Timed out!");
+                    listenerCalled = true;
+                    listener.onFinishSave();
+                }
+            }
+        }).start();
+    }
+
+    public interface SaveRecordsListener {
+
+        void onFinishSave();
     }
 
 //    public <T extends DataItem> void saveListAsynchronous(final ArrayList<T> list) {
@@ -200,11 +247,13 @@ public class RVDBHelper {
 //        }
 //    }
 
-    public <T extends DataItem> void saveDeletedAsynchronous(final T item) {
-
-        synchronized (queueList) {
-            queueList.add(new RVRecord(item, true));
-            saveIfInQueue();
+    public <T extends DataItem> void saveAsDeleted(final T item) {
+        mDB.beginTransaction();
+        try {
+            saveRecord(new RVRecord(item, true));
+            mDB.setTransactionSuccessful();
+        } finally {
+            mDB.endTransaction();
         }
     }
 
@@ -217,13 +266,6 @@ public class RVDBHelper {
 //            saveIfInQueue(null);
 //        }
 //    }
-
-    public void saveRecordsAsynchronous(ArrayList<RVRecord> records) {
-        synchronized (queueList) {
-            queueList.addAll(records);
-            saveIfInQueue();
-        }
-    }
 
 
     // Load methods

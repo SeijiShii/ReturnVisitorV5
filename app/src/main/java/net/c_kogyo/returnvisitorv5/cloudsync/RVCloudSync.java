@@ -25,7 +25,7 @@ import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.LAST_DEVICE_S
  * Created by SeijiShii on 2017/05/10.
  */
 
-public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback{
+public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback, RVDBHelper.SaveRecordsListener{
 
     public static final String TAG = "RVCloudSync";
 
@@ -297,20 +297,29 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback{
         cloudDataList.add(record);
 
         if (cloudDataList.size() > 300) {
-            final ArrayList<RVRecord> bufferedList = new ArrayList<>(cloudDataList);
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    RVDBHelper.getInstance().saveRecordsAsynchronous(bufferedList);
-                }
-            }).start();
-            cloudDataList = new ArrayList<>();
+            Log.d(TAG, "cloudDataList.size: " + cloudDataList.size());
+            ArrayList<RVRecord> bufferedList = new ArrayList<>(cloudDataList);
+            cloudDataList.clear();
+            RVDBHelper.getInstance().saveRecords(bufferedList, null);
         }
     }
 
     private void onCloudDataEndFrame(final RVCloudSyncDataFrame dataFrame) {
-        RVDBHelper.getInstance().saveRecordsAsynchronous(cloudDataList);
+        RVDBHelper.getInstance().saveRecords(cloudDataList, new RVDBHelper.SaveRecordsListener() {
+
+            @Override
+            public void onFinishSave() {
+                if (mCallback != null) {
+                    mCallback.onSyncDataResult(mGson.fromJson(dataFrame.getDataBody(), RVResponseBody.class));
+                }
+            }
+       });
         socketClient.close();
+    }
+
+    @Override
+    public void onFinishSave() {
+
     }
 
     public interface RVCloudSyncCallback {

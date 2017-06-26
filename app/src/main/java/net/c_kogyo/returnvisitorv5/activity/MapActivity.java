@@ -58,7 +58,6 @@ import net.c_kogyo.returnvisitorv5.data.list.PlaceList;
 import net.c_kogyo.returnvisitorv5.data.list.VisitList;
 import net.c_kogyo.returnvisitorv5.data.list.WorkList;
 import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
-import net.c_kogyo.returnvisitorv5.db.RVRecord;
 import net.c_kogyo.returnvisitorv5.dialog.AddWorkDialog;
 import net.c_kogyo.returnvisitorv5.dialog.HousingComplexDialog;
 import net.c_kogyo.returnvisitorv5.dialog.LoginDialog;
@@ -79,7 +78,6 @@ import net.c_kogyo.returnvisitorv5.view.CountTimeFrame;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 
 import static net.c_kogyo.returnvisitorv5.Constants.LATITUDE;
 import static net.c_kogyo.returnvisitorv5.Constants.LONGITUDE;
@@ -114,6 +112,9 @@ public class MapActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
 
         RVDBHelper.initialize(this);
+
+        // TODO for test
+        RVDBHelper.getInstance().deleteAllDataFromDB();
 
         // log
         Intent errorLogIntent = new Intent(this, ErrorLogIntentService.class);
@@ -558,7 +559,7 @@ public class MapActivity extends AppCompatActivity
         place.setLatLng(marker.getPosition());
         place.setAddress(null);
 
-        RVDBHelper.getInstance().saveAsynchronous(place);
+        RVDBHelper.getInstance().save(place);
         RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this);
 
     }

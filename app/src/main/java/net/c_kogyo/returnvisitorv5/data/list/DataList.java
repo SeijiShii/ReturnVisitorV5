@@ -1,6 +1,7 @@
 package net.c_kogyo.returnvisitorv5.data.list;
 
 import android.content.Context;
+import android.util.Log;
 
 import net.c_kogyo.returnvisitorv5.data.DataItem;
 import net.c_kogyo.returnvisitorv5.data.DeletedData;
@@ -18,6 +19,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class DataList<T extends DataItem> implements Iterable<T>{
 
+    private final String TAG = "DataList";
+
     // DONE: 2017/03/16 さくじょしたものが拾われないようにする
     // DONE: 2017/05/10 削除フラグの撤去に伴う変更
     protected CopyOnWriteArrayList<T> list;
@@ -34,6 +37,7 @@ public class DataList<T extends DataItem> implements Iterable<T>{
 
     synchronized public void refreshByDB() {
         this.list = new CopyOnWriteArrayList<>(RVDBHelper.getInstance().loadList(mClass, false));
+        Log.d(TAG, "After refresh list by DB, Data count: " + list.size());
     }
 
     synchronized public void setOrAdd(T data) {
@@ -43,7 +47,7 @@ public class DataList<T extends DataItem> implements Iterable<T>{
         } else {
             list.add(data);
         }
-        RVDBHelper.getInstance().saveAsynchronous(data);
+        RVDBHelper.getInstance().save(data);
     }
 
     synchronized public void addList(ArrayList<T> list) {
@@ -88,7 +92,7 @@ public class DataList<T extends DataItem> implements Iterable<T>{
 
     synchronized private void delete(T data) {
         list.remove(data);
-        RVDBHelper.getInstance().saveDeletedAsynchronous(data);
+        RVDBHelper.getInstance().saveAsDeleted(data);
     }
 
     synchronized public void deleteAll(ArrayList<T> dataList) {
