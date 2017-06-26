@@ -310,6 +310,8 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback,
 
             @Override
             public void onFinishSave() {
+                RVDBHelper.getInstance().deleteDeletedData();
+
                 if (mCallback != null) {
                     mCallback.onSyncDataResult(mGson.fromJson(dataFrame.getDataBody(), RVResponseBody.class));
                 }

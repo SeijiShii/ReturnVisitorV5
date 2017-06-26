@@ -301,7 +301,12 @@ public class RecordVisitActivity extends AppCompatActivity {
 
     private void showPersonDialogForNew() {
 
-        PersonDialog.getInstance(new Person(mPlace.getId()),
+        String placeId = null;
+        if (mPlace != null) {
+            placeId = mPlace.getId();
+        }
+
+        PersonDialog.getInstance(new Person(placeId),
 
                 new PersonDialog.PersonDialogListener() {
                     @Override

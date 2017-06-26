@@ -86,7 +86,7 @@ public class RVDBHelper {
         return count;
     }
 
-    public void deleteAllDataFromDB() {
+    private void deleteAllDataFromDB() {
         mDB.execSQL("DELETE FROM " + TABLE_NAME + ";");
     }
 
@@ -128,6 +128,12 @@ public class RVDBHelper {
 
     private int deleteRecordFromDB(RVRecord record) {
         return mDB.delete(TABLE_NAME, DATA_ID + "= ?", new String[]{record.getDataId()});
+    }
+
+    public int deleteDeletedData() {
+        int count = mDB.delete(TABLE_NAME, IS_DELETED + "= 1", null);
+        Log.d(TAG, "Deleted deleted data, count: " + count);
+        return count;
     }
 
 //    synchronized private void saveIfInQueue() {

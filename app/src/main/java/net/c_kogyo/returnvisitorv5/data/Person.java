@@ -1,6 +1,7 @@
 package net.c_kogyo.returnvisitorv5.data;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.data.list.TagList;
@@ -126,12 +127,12 @@ public class Person extends DataItem implements Cloneable{
 
     public Person(){}
 
-    public Person(String placeId) {
+    public Person(@Nullable String placeId) {
         super(PERSON);
         initCommon(placeId);
     }
 
-    private void initCommon(String placeId) {
+    private void initCommon(@Nullable String placeId) {
         this.sex = Sex.SEX_UNKNOWN;
         this.age = Age.AGE_UNKNOWN;
         this.placeIds = new ArrayList<>();
