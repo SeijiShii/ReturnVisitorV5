@@ -113,9 +113,6 @@ public class MapActivity extends AppCompatActivity
 
         RVDBHelper.initialize(this);
 
-        // TODO for test
-        RVDBHelper.getInstance().deleteAllDataFromDB();
-
         // log
         Intent errorLogIntent = new Intent(this, ErrorLogIntentService.class);
         startService(errorLogIntent);
@@ -1422,6 +1419,11 @@ public class MapActivity extends AppCompatActivity
     private void onDataSyncSuccess(final RVResponseBody responseBody) {
 
         PlaceList.getInstance().refreshByDB();
+        PersonList.getInstance().refreshByDB();
+        VisitList.getInstance().refreshByDB();
+
+        Log.d(RVDBHelper.TAG, "Place data count after refreshing list: " + PlaceList.getInstance().size());
+
         saveLastSyncTime();
 
         cloudResultHandler.post(new Runnable() {

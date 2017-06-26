@@ -201,6 +201,7 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback,
         deviceDataList = RVDBHelper.getInstance().loadRecordsLaterThanTime(lastSyncTime);
 
         RVRequestBody requestBody = new RVRequestBody(loginState.getUserName(), loginState.getPassword(), lastSyncTime);
+
         RVCloudSyncDataFrame dataFrame
                 = new RVCloudSyncDataFrame(RVCloudSyncDataFrame.FrameCategory.SYNC_DATA_REQUEST,
                                             mGson.toJson(requestBody),
@@ -297,7 +298,7 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback,
         cloudDataList.add(record);
 
         if (cloudDataList.size() > 300) {
-            Log.d(TAG, "cloudDataList.size: " + cloudDataList.size());
+//            Log.d(TAG, "cloudDataList.size: " + cloudDataList.size());
             ArrayList<RVRecord> bufferedList = new ArrayList<>(cloudDataList);
             cloudDataList.clear();
             RVDBHelper.getInstance().saveRecords(bufferedList, null);

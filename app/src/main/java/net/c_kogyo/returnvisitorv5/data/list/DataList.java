@@ -37,7 +37,7 @@ public class DataList<T extends DataItem> implements Iterable<T>{
 
     synchronized public void refreshByDB() {
         this.list = new CopyOnWriteArrayList<>(RVDBHelper.getInstance().loadList(mClass, false));
-        Log.d(TAG, "After refresh list by DB, Data count: " + list.size());
+//        Log.d(TAG, "After refresh list by DB, Data count: " + list.size());
     }
 
     synchronized public void setOrAdd(T data) {

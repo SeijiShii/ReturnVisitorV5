@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteTransactionListener;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -78,7 +79,7 @@ public class RVDBHelper {
                 null,
                 new String[]{},
                 null, null, null, null);
-        Log.d(TAG, "Data row count: " + cursor.getCount());
+//        Log.d(TAG, "Data row count: " + cursor.getCount());
         count = cursor.getCount();
         cursor.close();
 
@@ -172,10 +173,28 @@ public class RVDBHelper {
         }
     }
 
-    private boolean listenerCalled = false;
+//    private boolean listenerCalled = false;
     public void saveRecords(ArrayList<RVRecord> records, @Nullable final SaveRecordsListener listener) {
 
-        mDB.beginTransaction();
+        mDB.beginTransactionWithListener(new SQLiteTransactionListener() {
+            @Override
+            public void onBegin() {
+
+            }
+
+            @Override
+            public void onCommit() {
+//                Log.d(TAG, "Data count in onCommit: " + getDataCount());
+                if (listener != null) {
+                    listener.onFinishSave();
+                }
+            }
+
+            @Override
+            public void onRollback() {
+
+            }
+        });
         try {
             for (RVRecord record : records) {
                 saveRecord(record);
@@ -184,68 +203,12 @@ public class RVDBHelper {
         }finally {
             mDB.endTransaction();
         }
-
-        if (listener == null) return;
-
-        // 50msごとに件数カウントクエリを行い3回同じ値が帰ってきたら変更が反映されたと判断する。
-        new Thread(new Runnable() {
-            int count = 0;
-            int oldCount = -1;
-            @Override
-            public void run() {
-                while (count < 3) {
-                    try {
-                        Thread.sleep(50);
-                    } catch (InterruptedException e) {
-                        //
-                    }
-                    int dataCount = getDataCount();
-                    if (oldCount == dataCount) {
-                        count++;
-                    }
-                    oldCount = dataCount;
-                    Log.d(TAG, "oldCount: " + oldCount + ", count: " + count);
-                }
-                if (!listenerCalled) {
-                    listenerCalled = true;
-                    Log.d(TAG, "Listener called!");
-                    listener.onFinishSave();
-                }
-            }
-        }).start();
-
-        // タイムアウト設定
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                 //
-                }
-                if (!listenerCalled) {
-                    Log.d(TAG, "DB data count Timed out!");
-                    listenerCalled = true;
-                    listener.onFinishSave();
-                }
-            }
-        }).start();
     }
 
     public interface SaveRecordsListener {
 
         void onFinishSave();
     }
-
-//    public <T extends DataItem> void saveListAsynchronous(final ArrayList<T> list) {
-//
-//        synchronized (queueList) {
-//            for (T item : list) {
-//                queueList.add(new RVRecord(item));
-//            }
-//            saveIfInQueue(null);
-//        }
-//    }
 
     public <T extends DataItem> void saveAsDeleted(final T item) {
         mDB.beginTransaction();
