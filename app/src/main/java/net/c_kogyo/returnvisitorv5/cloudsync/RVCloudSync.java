@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.facebook.AccessToken;
 import com.google.gson.Gson;
 
 import net.c_kogyo.returnvisitorv5.Constants;
@@ -58,10 +59,10 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback,
         mGson = new Gson();
     }
 
-    public void login(final String userName,
-                      String password,
-                      boolean passAlreadyEncrypted,
-                      Context context) {
+    public void loginWithName(final String userName,
+                              String password,
+                              boolean passAlreadyEncrypted,
+                              Context context) {
 
         String mPass;
         if (passAlreadyEncrypted) {
@@ -69,8 +70,8 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback,
         } else {
             mPass = EncryptUtil.toEncryptedHashValue("SHA-256", password);
         }
-        RVCloudSyncDataFrame dataFrame
-                = new RVCloudSyncDataFrame.Builder(RVCloudSyncDataFrame.FrameCategory.LOGIN_REQUEST)
+        final RVCloudSyncDataFrame dataFrame
+                = new RVCloudSyncDataFrame.Builder(RVCloudSyncDataFrame.FrameCategory.LOGIN_REQUEST_WITH_NAME)
                         .setUserName(userName)
                         .setPassword(mPass)
                             .create();
@@ -79,7 +80,7 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback,
                     @Override
                     public void onStart() {
                         if (mCallback != null) {
-                            mCallback.onStartLoginRequest();
+                            mCallback.onStartRequest(dataFrame.getFrameCategory());
                         }
                     }
 
@@ -91,7 +92,7 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback,
                                         .setStatusCode(RVCloudSyncDataFrame.StatusCode.STATUS_TIMED_OUT)
                                         .setUserName(userName)
                                             .create();
-                            mCallback.onLoginResult(frame);
+                            mCallback.onResponse(frame);
                         }
                     }
                 });
@@ -108,7 +109,7 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback,
         } else {
             mPass = EncryptUtil.toEncryptedHashValue("SHA-256", password);
         }
-        RVCloudSyncDataFrame dataFrame
+        final RVCloudSyncDataFrame dataFrame
                 = new RVCloudSyncDataFrame.Builder(RVCloudSyncDataFrame.FrameCategory.CREATE_USER_REQUEST)
                     .setUserName(userName)
                     .setPassword(mPass)
@@ -119,7 +120,7 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback,
                     @Override
                     public void onStart() {
                         if (mCallback != null) {
-                            mCallback.onStartCreateUserRequest();
+                            mCallback.onStartRequest(dataFrame.getFrameCategory());
                         }
                     }
 
@@ -131,9 +132,35 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback,
                                         .setStatusCode(RVCloudSyncDataFrame.StatusCode.STATUS_TIMED_OUT)
                                         .setUserName(userName)
                                         .create();
-                            mCallback.onLoginResult(frame);                        }
+                            mCallback.onResponse(frame);                        }
                     }
                 });
+    }
+
+    public void loginWithToken(String token, Context context){
+        final RVCloudSyncDataFrame dataFrame
+                = new RVCloudSyncDataFrame.Builder(RVCloudSyncDataFrame.FrameCategory.LOGIN_REQUEST_WITH_TOKEN)
+                    .setAuthToken(token)
+                    .create();
+        startSendingData(context, dataFrame, new SendDataCallback() {
+            @Override
+            public void onStart() {
+                if (mCallback != null) {
+                    mCallback.onStartRequest(dataFrame.getFrameCategory());
+                }
+            }
+
+            @Override
+            public void onTimedOut() {
+                if (mCallback != null) {
+                    RVCloudSyncDataFrame frame
+                            = new RVCloudSyncDataFrame.Builder(RVCloudSyncDataFrame.FrameCategory.LOGIN_RESPONSE)
+                            .setStatusCode(RVCloudSyncDataFrame.StatusCode.STATUS_TIMED_OUT)
+                            .create();
+                    mCallback.onResponse(frame);
+                }
+            }
+        });
     }
 
     private void startSendingData(Context context,
@@ -182,13 +209,12 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback,
 
     private ArrayList<RVRecord> cloudDataList, deviceDataList;
     private int cloudDataCount = 0;
-    public void requestDataSyncIfLoggedIn(Context context) {
+    public void requestDataSyncIfLoggedIn(final Context context) {
 
-        final LoginState loginState = LoginState.getInstance();
-        if (!loginState.isLoggedIn()) return;
+        if (!LoginHelper.isLoggedIn(context)) return;
 
         if (mCallback != null) {
-            mCallback.onStartSyncDataRequest();
+            mCallback.onStartRequest(RVCloudSyncDataFrame.FrameCategory.SYNC_DATA_REQUEST);
         }
 
         initSocketClient(context);
@@ -205,12 +231,28 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback,
 
         deviceDataList = RVDBHelper.getInstance().loadRecordsLaterThanTime(lastSyncTime);
 
-        RVCloudSyncDataFrame dataFrame
-                = new RVCloudSyncDataFrame.Builder(RVCloudSyncDataFrame.FrameCategory.SYNC_DATA_REQUEST)
-                    .setUserName(loginState.getUserName())
-                    .setPassword(loginState.getPassword())
-                    .setLastSyncDate(lastSyncTime)
-                    .create();
+        RVCloudSyncDataFrame dataFrame = null;
+
+        switch (LoginHelper.getLoginProvider(context)) {
+            case USER_NAME:
+                dataFrame = new RVCloudSyncDataFrame.Builder(RVCloudSyncDataFrame.FrameCategory.SYNC_DATA_REQUEST)
+                        .setUserName(LoginHelper.getUserName(context))
+                        .setPassword(LoginHelper.getPassword(context))
+                        .setLastSyncDate(lastSyncTime)
+                        .create();
+                break;
+            case FACEBOOK:
+
+                AccessToken accessToken = AccessToken.getCurrentAccessToken();
+                String token = accessToken.getToken();
+
+                dataFrame = new RVCloudSyncDataFrame.Builder(RVCloudSyncDataFrame.FrameCategory.SYNC_DATA_REQUEST)
+                        .setAuthToken(token)
+                        .setLastSyncDate(lastSyncTime)
+                        .create();
+                break;
+        }
+
         startSendingData(context, dataFrame, new SendDataCallback() {
             @Override
             public void onStart() {
@@ -222,9 +264,9 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback,
                 if (mCallback != null) {
                     RVCloudSyncDataFrame frame
                             = new RVCloudSyncDataFrame.Builder(RVCloudSyncDataFrame.FrameCategory.SYNC_DATA_RESPONSE)
-                                .setUserName(loginState.getUserName())
+                                .setUserName(LoginHelper.getUserName(context))
                                 .create();
-                    mCallback.onSyncDataResult(frame);
+                    mCallback.onResponse(frame);
                 }
             }
         });
@@ -246,14 +288,9 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback,
 
         switch (dataFrame.getFrameCategory()) {
             case LOGIN_RESPONSE:
-                if (mCallback != null) {
-                    mCallback.onLoginResult(dataFrame);
-                }
-                break;
-
             case CREATE_USER_RESPONSE:
                 if (mCallback != null) {
-                    mCallback.onCreateUserResult(dataFrame);
+                    mCallback.onResponse(dataFrame);
                 }
                 break;
 
@@ -281,7 +318,7 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback,
             case STATUS_401_UNAUTHORIZED:
             case STATUS_404_NOT_FOUND:
                 if (mCallback != null) {
-                    mCallback.onSyncDataResult(dataFrame);
+                    mCallback.onResponse(dataFrame);
                 }
                 break;
         }
@@ -324,7 +361,7 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback,
                 RVDBHelper.getInstance().deleteDeletedData();
 
                 if (mCallback != null) {
-                    mCallback.onSyncDataResult(dataFrame);
+                    mCallback.onResponse(dataFrame);
                 }
             }
        });
@@ -338,17 +375,21 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback,
 
     public interface RVCloudSyncCallback {
 
-        void onStartLoginRequest();
+        void onStartRequest(RVCloudSyncDataFrame.FrameCategory frameCategory);
 
-        void onLoginResult(RVCloudSyncDataFrame dataFrame);
+        void onResponse(RVCloudSyncDataFrame dataFrame);
 
-        void onStartCreateUserRequest();
-
-        void onCreateUserResult(RVCloudSyncDataFrame dataFrame);
-
-        void onStartSyncDataRequest();
-
-        void onSyncDataResult(RVCloudSyncDataFrame dataFrame);
+//        void onStartLoginRequest();
+//
+//        void onLoginResult(RVCloudSyncDataFrame dataFrame);
+//
+//        void onStartCreateUserRequest();
+//
+//        void onCreateUserResult(RVCloudSyncDataFrame dataFrame);
+//
+//        void onStartSyncDataRequest();
+//
+//        void onSyncDataResult(RVCloudSyncDataFrame dataFrame);
 
     }
 

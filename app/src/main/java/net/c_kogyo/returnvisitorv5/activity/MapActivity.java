@@ -35,6 +35,12 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.AccessToken;
+import com.facebook.AccessTokenTracker;
+import com.facebook.FacebookSdk;
+import com.facebook.Profile;
+import com.facebook.ProfileTracker;
+import com.facebook.appevents.AppEventsLogger;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -44,7 +50,7 @@ import com.google.android.gms.maps.model.Marker;
 
 import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.R;
-import net.c_kogyo.returnvisitorv5.cloudsync.LoginState;
+import net.c_kogyo.returnvisitorv5.cloudsync.LoginHelper;
 import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
 import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSyncDataFrame;
 import net.c_kogyo.returnvisitorv5.data.Person;
@@ -104,13 +110,45 @@ public class MapActivity extends AppCompatActivity
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
 
     private static boolean isForeground;
+    private static final String TAG = "MapActivity";
 
     private Handler cloudResultHandler;
+    private AccessTokenTracker accessTokenTracker;
+    private ProfileTracker profileTracker;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         RVDBHelper.initialize(this);
+
+        // Facebook
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        AppEventsLogger.activateApp(this);
+
+        accessTokenTracker = new AccessTokenTracker() {
+            @Override
+            protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
+
+            }
+        };
+
+        profileTracker = new ProfileTracker() {
+            @Override
+            protected void onCurrentProfileChanged(Profile oldProfile, Profile currentProfile) {
+                if (currentProfile != null) {
+                    String name = currentProfile.getFirstName();
+                    if (name == null || name.length() <= 0) {
+                        name = currentProfile.getLastName();
+                    }
+                    LoginHelper.onSuccessLogin(LoginHelper.LoginProvider.FACEBOOK,
+                            name,
+                            null,
+                            MapActivity.this);
+                }
+            }
+        };
 
         // log
         Intent errorLogIntent = new Intent(this, ErrorLogIntentService.class);
@@ -139,7 +177,6 @@ public class MapActivity extends AppCompatActivity
 
         initDrawerOverlay();
 
-        LoginState.loadLoginState(this);
         refreshLoginButton();
         refreshWorkButton();
         refreshCalendarButton();
@@ -147,11 +184,15 @@ public class MapActivity extends AppCompatActivity
 
     }
 
-    private void saveLastSyncTime() {
+    private void saveLastSyncTime(boolean resetSyncTime) {
         SharedPreferences prefs
                 = getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putLong(Constants.SharedPrefTags.LAST_DEVICE_SYNC_TIME, Calendar.getInstance().getTimeInMillis());
+        if (resetSyncTime) {
+            editor.putLong(Constants.SharedPrefTags.LAST_DEVICE_SYNC_TIME, 0);
+        } else {
+            editor.putLong(Constants.SharedPrefTags.LAST_DEVICE_SYNC_TIME, Calendar.getInstance().getTimeInMillis());
+        }
 
         // リセット用
         // editor.putLong(Constants.SharedPrefTags.LAST_DEVICE_SYNC_TIME, 0);
@@ -273,6 +314,8 @@ public class MapActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        accessTokenTracker.stopTracking();
+        profileTracker.stopTracking();
 
         try {
             mMap.setMyLocationEnabled(false);
@@ -1201,7 +1244,7 @@ public class MapActivity extends AppCompatActivity
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (LoginState.getInstance().isLoggedIn()) {
+                if (LoginHelper.isLoggedIn(MapActivity.this)) {
                     confirmLogout();
                 } else {
                     openCloseDrawer();
@@ -1213,10 +1256,8 @@ public class MapActivity extends AppCompatActivity
 
     private void refreshLoginButton() {
 
-        LoginState loginState = LoginState.getInstance();
-
-        if (loginState.isLoggedIn()) {
-            String s = getString(R.string.logout_button, loginState.getUserName());
+        if (LoginHelper.isLoggedIn(this)) {
+            String s = getString(R.string.logout_button, LoginHelper.getUserName(this));
             loginButton.setText(s);
         } else {
             loginButton.setText(R.string.login_button);
@@ -1263,7 +1304,7 @@ public class MapActivity extends AppCompatActivity
 
     private void logout() {
 
-        LoginState.onLoggedOut(this);
+        LoginHelper.onLoggedOut(this);
 
         refreshLoginButton();
         if (loginDialog != null) {
@@ -1277,7 +1318,7 @@ public class MapActivity extends AppCompatActivity
     // DONE: 2017/05/08 ログイン画面
     // DONE: 2017/05/08 データ同期まわり
 
-    // DONE: 2017/05/16 save login state
+    // DONE: 2017/05/16 save loginWithName state
 
 
 
@@ -1317,79 +1358,16 @@ public class MapActivity extends AppCompatActivity
 
     // RVCloudSync Implementation
 
-    @Override
-    public void onStartLoginRequest() {
-        onStartRequest(RVCloudSyncDataFrame.FrameCategory.LOGIN_REQUEST);
-    }
 
     @Override
-    public void onLoginResult(RVCloudSyncDataFrame dataFrame) {
-        switch (dataFrame.getStatusCode()) {
-            case STATUS_202_AUTHENTICATED:
-                onSuccessLogin(dataFrame);
-                break;
-            case STATUS_401_UNAUTHORIZED:
-            case STATUS_404_NOT_FOUND:
-                onFailRequest(dataFrame);
-                break;
-            case STATUS_TIMED_OUT:
-            case STATUS_SERVER_NOT_AVAILABLE:
-                postRequestResult(dataFrame);
-                break;
-        }
-
-    }
-
-    @Override
-    public void onStartCreateUserRequest() {
-        onStartRequest(RVCloudSyncDataFrame.FrameCategory.CREATE_USER_REQUEST);
-
-    }
-
-    @Override
-    public void onCreateUserResult(RVCloudSyncDataFrame dataFrame) {
-        switch (dataFrame.getStatusCode()) {
-            case STATUS_201_CREATED_USER:
-                onSuccessLogin(dataFrame);
-                break;
-            case STATUS_400_DUPLICATE_USER_NAME:
-            case STATUS_400_SHORT_USER_NAME:
-            case STATUS_400_SHORT_PASSWORD:
-                onFailRequest(dataFrame);
-                break;
-            case STATUS_TIMED_OUT:
-            case STATUS_SERVER_NOT_AVAILABLE:
-                postRequestResult(dataFrame);
-                break;
-        }
-    }
-
-    @Override
-    public void onStartSyncDataRequest() {
-        onStartRequest(RVCloudSyncDataFrame.FrameCategory.SYNC_DATA_REQUEST);
-    }
-
-    @Override
-    public void onSyncDataResult(RVCloudSyncDataFrame dataFrame) {
-        switch (dataFrame.getStatusCode()) {
-            case STATUS_200_SYNC_END_OK:
-                onDataSyncSuccess(dataFrame);
-                break;
-            case STATUS_TIMED_OUT:
-            case STATUS_SERVER_NOT_AVAILABLE:
-                postRequestResult(dataFrame);
-                break;
-        }
-    }
-
-    private void onStartRequest(final RVCloudSyncDataFrame.FrameCategory frameCategory) {
-
+    public void onStartRequest(final RVCloudSyncDataFrame.FrameCategory frameCategory) {
         cloudResultHandler.post(new Runnable() {
             @Override
             public void run() {
                 fadeProgressFrame(true);
                 switch (frameCategory) {
-                    case LOGIN_REQUEST:
+                    case LOGIN_REQUEST_WITH_NAME:
+                    case LOGIN_REQUEST_WITH_TOKEN:
                         enableWaitScreen(true);
                         waitMessageText.setText(R.string.start_login);
                         break;
@@ -1406,13 +1384,57 @@ public class MapActivity extends AppCompatActivity
         });
     }
 
-    private void onSuccessLogin(RVCloudSyncDataFrame dataFrame) {
+    @Override
+    public void onResponse(RVCloudSyncDataFrame dataFrame) {
+        switch (dataFrame.getStatusCode()) {
+            case STATUS_200_SYNC_END_OK:
+                onDataSyncSuccess(dataFrame);
+                break;
 
-        LoginState.onSuccessLogin(dataFrame.getUserName(), dataFrame.getPassword(), this);
+            case STATUS_201_CREATED_USER_WITH_NAME:
+                saveLastSyncTime(true);
+                onSuccessLoginWithName(dataFrame);
+                break;
+
+            case STATUS_201_CREATED_USER_WITH_TOKEN:
+                saveLastSyncTime(true);
+                onSuccessLoginWithToken(dataFrame);
+
+            case STATUS_202_AUTHENTICATED:
+                onSuccessLoginWithName(dataFrame);
+                break;
+
+            case STATUS_400_DUPLICATE_USER_NAME:
+            case STATUS_400_SHORT_USER_NAME:
+            case STATUS_400_SHORT_PASSWORD:
+            case STATUS_401_UNAUTHORIZED:
+            case STATUS_404_NOT_FOUND:
+                onFailRequest(dataFrame);
+                break;
+
+            case STATUS_TIMED_OUT:
+            case STATUS_SERVER_NOT_AVAILABLE:
+                postRequestResult(dataFrame);
+                break;
+        }
+    }
+
+    private void onSuccessLoginWithName(RVCloudSyncDataFrame dataFrame) {
+
+        LoginHelper.onSuccessLogin(LoginHelper.LoginProvider.USER_NAME,
+                dataFrame.getUserName(),
+                dataFrame.getPassword(),
+                this);
         RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this);
 
         postRequestResult(dataFrame);
 
+    }
+
+    private void onSuccessLoginWithToken(RVCloudSyncDataFrame dataFrame) {
+        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this);
+
+        postRequestResult(dataFrame);
     }
 
     private void onDataSyncSuccess(final RVCloudSyncDataFrame dataFrame) {
@@ -1423,7 +1445,7 @@ public class MapActivity extends AppCompatActivity
 
         Log.d(RVDBHelper.TAG, "Place data count after refreshing list: " + PlaceList.getInstance().size());
 
-        saveLastSyncTime();
+        saveLastSyncTime(false);
 
         cloudResultHandler.post(new Runnable() {
             @Override
@@ -1440,7 +1462,7 @@ public class MapActivity extends AppCompatActivity
     }
 
     private void onFailRequest(RVCloudSyncDataFrame dataFrame) {
-        LoginState.onLoggedOut(this);
+        LoginHelper.onLoggedOut(this);
         postRequestResult(dataFrame);
     }
 

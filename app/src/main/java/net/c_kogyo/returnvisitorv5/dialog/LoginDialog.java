@@ -1,29 +1,29 @@
 package net.c_kogyo.returnvisitorv5.dialog;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.content.Context;
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
-import android.util.AttributeSet;
-import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
+
 import net.c_kogyo.returnvisitorv5.R;
-import net.c_kogyo.returnvisitorv5.activity.MapActivity;
-import net.c_kogyo.returnvisitorv5.cloudsync.LoginState;
+import net.c_kogyo.returnvisitorv5.cloudsync.LoginHelper;
 import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
 import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSyncDataFrame;
 import net.c_kogyo.returnvisitorv5.util.InputUtil;
@@ -33,6 +33,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
+import static net.c_kogyo.returnvisitorv5.cloudsync.LoginHelper.FB_TAG;
 
 /**
  * Created by SeijiShii on 2017/05/10.
@@ -43,6 +44,7 @@ public class LoginDialog extends DialogFragment {
     private static LoginDialogListener mListener;
     private static Handler mHandler;
     private static final int TEXT_LENGTH = 8;
+    private static final String TAG = "LoginDialog";
 
     private static LoginDialog instance;
     
@@ -83,11 +85,13 @@ public class LoginDialog extends DialogFragment {
         initLoginButton();
         initCreateAccountButton();
         initCloseButton();
+        initFacebookLoginButton();
     }
 
     private EditText userNameTextView;
     private void initUserNameText() {
         userNameTextView = (EditText) view.findViewById(R.id.user_name_text);
+        enableUserNameText(!LoginHelper.isLoggedIn(getActivity()));
     }
 
     private void enableUserNameText(boolean enabled) {
@@ -108,6 +112,7 @@ public class LoginDialog extends DialogFragment {
         } else {
             passwordTextView.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         }
+        enablePasswordText(!LoginHelper.isLoggedIn(getActivity()));
     }
 
     private void enablePasswordText(boolean enabled) {
@@ -171,20 +176,23 @@ public class LoginDialog extends DialogFragment {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (LoginState.getInstance().isLoggedIn()) {
+                if (LoginHelper.isLoggedIn(getActivity())) {
                     onClickLogout();
                 } else {
                     onLogInClick();
                 }
             }
         });
+        enableLoginButton(!LoginHelper.isLoggedIn(getActivity()));
     }
 
     private void refreshLoginButton() {
-        if (LoginState.getInstance().isLoggedIn()) {
-            loginButton.setText(R.string.logout_button_small);
-        } else {
-            loginButton.setText(R.string.login_button);
+        if (getActivity() != null) {
+            if (LoginHelper.isLoggedIn(getActivity())) {
+                loginButton.setText(R.string.logout_button_small);
+            } else {
+                loginButton.setText(R.string.login_button);
+            }
         }
     }
 
@@ -208,6 +216,8 @@ public class LoginDialog extends DialogFragment {
                 onClickCreateAccount();
             }
         });
+
+        enableAccountButton(!LoginHelper.isLoggedIn(getActivity()));
     }
 
     private void enableAccountButton(boolean enabled) {
@@ -255,7 +265,7 @@ public class LoginDialog extends DialogFragment {
         String password = passwordTextView.getText().toString();
 
         if (validateTexts(userName, password)) {
-            RVCloudSync.getInstance().login(userName,
+            RVCloudSync.getInstance().loginWithName(userName,
                     password,
                     false,
                     getActivity());
@@ -364,7 +374,7 @@ public class LoginDialog extends DialogFragment {
                 enablePasswordText(true);
                 break;
 
-            case STATUS_201_CREATED_USER:
+            case STATUS_201_CREATED_USER_WITH_NAME:
                 message = context.getString(R.string.create_user_success, dataFrame.getUserName());
                 break;
 
@@ -458,4 +468,43 @@ public class LoginDialog extends DialogFragment {
         isShowing.set(false);
     }
 
+    private CallbackManager callbackManager;
+    private void initFacebookLoginButton() {
+        LoginButton fbLoginButton = (LoginButton) view.findViewById(R.id.facebook_login_button);
+//        fbLoginButton.setReadPermissions("email");
+        fbLoginButton.setFragment(this);
+
+        callbackManager = CallbackManager.Factory.create();
+        fbLoginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                Log.d(FB_TAG, "accessToken: " + loginResult.getAccessToken().getToken());
+                LoginHelper.onSuccessLogin(LoginHelper.LoginProvider.FACEBOOK,
+                        null, null, getActivity());
+                enableAccountButton(false);
+                enableLoginButton(false);
+                enablePasswordText(false);
+                enableUserNameText(false);
+
+                RVCloudSync.getInstance().loginWithToken(loginResult.getAccessToken().getToken(), getActivity());
+            }
+
+            @Override
+            public void onCancel() {
+                Log.d(FB_TAG, "onCancel");
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                Log.d(FB_TAG, "onError: " + error.getMessage());
+            }
+        });
+
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+    }
 }

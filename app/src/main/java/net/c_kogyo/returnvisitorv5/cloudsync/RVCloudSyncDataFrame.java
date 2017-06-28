@@ -11,12 +11,9 @@ import org.json.JSONObject;
 
 public class RVCloudSyncDataFrame {
 
-//    private static final String FRAME_CATEGORY = "frame_category";
-//    private static final String DATA_BODY = "data_body";
-//    private static final String TOKEN = "token";
-
     public enum FrameCategory {
-        LOGIN_REQUEST,
+        LOGIN_REQUEST_WITH_NAME,
+        LOGIN_REQUEST_WITH_TOKEN,
         LOGIN_RESPONSE,
         CREATE_USER_REQUEST,
         CREATE_USER_RESPONSE,
@@ -32,7 +29,8 @@ public class RVCloudSyncDataFrame {
         STATUS_202_AUTHENTICATED,
         STATUS_401_UNAUTHORIZED,
         STATUS_404_NOT_FOUND,
-        STATUS_201_CREATED_USER,
+        STATUS_201_CREATED_USER_WITH_NAME,
+        STATUS_201_CREATED_USER_WITH_TOKEN,
         STATUS_400_DUPLICATE_USER_NAME,
         STATUS_400_SHORT_USER_NAME,
         STATUS_400_SHORT_PASSWORD,
@@ -50,7 +48,7 @@ public class RVCloudSyncDataFrame {
 
     private RVCloudSyncDataFrame(){}
 
-    FrameCategory getFrameCategory() {
+    public FrameCategory getFrameCategory() {
         return frameCategory;
     }
 
@@ -85,32 +83,32 @@ public class RVCloudSyncDataFrame {
             frame.frameCategory = category;
         }
 
-        public Builder setUserName(String userName) {
+        Builder setUserName(String userName) {
             frame.userName = userName;
             return this;
         }
 
-        public Builder setPassword(String password) {
+        Builder setPassword(String password) {
             frame.password = password;
             return this;
         }
 
-        public Builder setDataBody(String dataBody) {
+        Builder setDataBody(String dataBody) {
             frame.dataBody = dataBody;
             return this;
         }
 
-        public Builder setAuthToken (String authToken) {
+        Builder setAuthToken (String authToken) {
             frame.authToken = authToken;
             return this;
         }
 
-        public Builder setLastSyncDate(long lastSyncDate) {
+        Builder setLastSyncDate(long lastSyncDate) {
             frame.lastSyncDate = lastSyncDate;
             return this;
         }
 
-        public Builder setStatusCode(StatusCode statusCode) {
+        Builder setStatusCode(StatusCode statusCode) {
             frame.statusCode = statusCode;
             return this;
         }
@@ -119,7 +117,7 @@ public class RVCloudSyncDataFrame {
             return frame;
         }
 
-
     }
+
 
 }
