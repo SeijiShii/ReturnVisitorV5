@@ -69,12 +69,11 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback,
         } else {
             mPass = EncryptUtil.toEncryptedHashValue("SHA-256", password);
         }
-        RVRequestBody requestBody = new RVRequestBody(userName, mPass, 0);
         RVCloudSyncDataFrame dataFrame
-                = new RVCloudSyncDataFrame(RVCloudSyncDataFrame.FrameCategory.LOGIN_REQUEST,
-                                            mGson.toJson(requestBody),
-                                            null);
-
+                = new RVCloudSyncDataFrame.Builder(RVCloudSyncDataFrame.FrameCategory.LOGIN_REQUEST)
+                        .setUserName(userName)
+                        .setPassword(mPass)
+                            .create();
         startSendingData(context, dataFrame,
                 new SendDataCallback() {
                     @Override
@@ -87,9 +86,12 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback,
                     @Override
                     public void onTimedOut() {
                         if (mCallback != null) {
-                            RVResponseBody responseBody
-                                    = new RVResponseBody(RVResponseBody.StatusCode.STATUS_TIMED_OUT, userName, null);
-                            mCallback.onLoginResult(responseBody);
+                            RVCloudSyncDataFrame frame
+                                    = new RVCloudSyncDataFrame.Builder(RVCloudSyncDataFrame.FrameCategory.LOGIN_RESPONSE)
+                                        .setStatusCode(RVCloudSyncDataFrame.StatusCode.STATUS_TIMED_OUT)
+                                        .setUserName(userName)
+                                            .create();
+                            mCallback.onLoginResult(frame);
                         }
                     }
                 });
@@ -106,11 +108,11 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback,
         } else {
             mPass = EncryptUtil.toEncryptedHashValue("SHA-256", password);
         }
-        RVRequestBody requestBody = new RVRequestBody(userName, mPass, 0);
         RVCloudSyncDataFrame dataFrame
-                = new RVCloudSyncDataFrame(RVCloudSyncDataFrame.FrameCategory.CREATE_USER_REQUEST,
-                mGson.toJson(requestBody),
-                null);
+                = new RVCloudSyncDataFrame.Builder(RVCloudSyncDataFrame.FrameCategory.CREATE_USER_REQUEST)
+                    .setUserName(userName)
+                    .setPassword(mPass)
+                    .create();
 
         startSendingData(context, dataFrame,
                 new SendDataCallback() {
@@ -124,9 +126,12 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback,
                     @Override
                     public void onTimedOut() {
                         if (mCallback != null) {
-                            RVResponseBody responseBody
-                                    = new RVResponseBody(RVResponseBody.StatusCode.STATUS_TIMED_OUT, userName, null);
-                            mCallback.onLoginResult(responseBody);                        }
+                            RVCloudSyncDataFrame frame
+                                    = new RVCloudSyncDataFrame.Builder(RVCloudSyncDataFrame.FrameCategory.CREATE_USER_RESPONSE)
+                                        .setStatusCode(RVCloudSyncDataFrame.StatusCode.STATUS_TIMED_OUT)
+                                        .setUserName(userName)
+                                        .create();
+                            mCallback.onLoginResult(frame);                        }
                     }
                 });
     }
@@ -200,12 +205,12 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback,
 
         deviceDataList = RVDBHelper.getInstance().loadRecordsLaterThanTime(lastSyncTime);
 
-        RVRequestBody requestBody = new RVRequestBody(loginState.getUserName(), loginState.getPassword(), lastSyncTime);
-
         RVCloudSyncDataFrame dataFrame
-                = new RVCloudSyncDataFrame(RVCloudSyncDataFrame.FrameCategory.SYNC_DATA_REQUEST,
-                                            mGson.toJson(requestBody),
-                                            null);
+                = new RVCloudSyncDataFrame.Builder(RVCloudSyncDataFrame.FrameCategory.SYNC_DATA_REQUEST)
+                    .setUserName(loginState.getUserName())
+                    .setPassword(loginState.getPassword())
+                    .setLastSyncDate(lastSyncTime)
+                    .create();
         startSendingData(context, dataFrame, new SendDataCallback() {
             @Override
             public void onStart() {
@@ -215,9 +220,11 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback,
             @Override
             public void onTimedOut() {
                 if (mCallback != null) {
-                    RVResponseBody responseBody
-                            = new RVResponseBody(RVResponseBody.StatusCode.STATUS_TIMED_OUT, loginState.getUserName(), null);
-                    mCallback.onSyncDataResult(responseBody);
+                    RVCloudSyncDataFrame frame
+                            = new RVCloudSyncDataFrame.Builder(RVCloudSyncDataFrame.FrameCategory.SYNC_DATA_RESPONSE)
+                                .setUserName(loginState.getUserName())
+                                .create();
+                    mCallback.onSyncDataResult(frame);
                 }
             }
         });
@@ -240,13 +247,13 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback,
         switch (dataFrame.getFrameCategory()) {
             case LOGIN_RESPONSE:
                 if (mCallback != null) {
-                    mCallback.onLoginResult(mGson.fromJson(dataFrame.getDataBody(), RVResponseBody.class));
+                    mCallback.onLoginResult(dataFrame);
                 }
                 break;
 
             case CREATE_USER_RESPONSE:
                 if (mCallback != null) {
-                    mCallback.onCreateUserResult(mGson.fromJson(dataFrame.getDataBody(), RVResponseBody.class));
+                    mCallback.onCreateUserResult(dataFrame);
                 }
                 break;
 
@@ -266,30 +273,34 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback,
     }
 
     private void onSyncDataResponse(RVCloudSyncDataFrame dataFrame) {
-        RVResponseBody responseBody = mGson.fromJson(dataFrame.getDataBody(), RVResponseBody.class);
-        switch (responseBody.getStatusCode()) {
+        switch (dataFrame.getStatusCode()) {
             case STATUS_200_SYNC_START_OK:
-                sendDeviceData(dataFrame.getToken());
+                sendDeviceData(dataFrame.getAuthToken());
                 break;
 
             case STATUS_401_UNAUTHORIZED:
             case STATUS_404_NOT_FOUND:
                 if (mCallback != null) {
-                    mCallback.onSyncDataResult(responseBody);
+                    mCallback.onSyncDataResult(dataFrame);
                 }
                 break;
         }
     }
 
-    private void sendDeviceData(String token) {
+    private void sendDeviceData(String authToken) {
         for (RVRecord record : deviceDataList) {
             RVCloudSyncDataFrame dataFrame =
-                    new RVCloudSyncDataFrame(RVCloudSyncDataFrame.FrameCategory.DEVICE_DATA_FRAME, mGson.toJson(record), token);
+                    new RVCloudSyncDataFrame.Builder(RVCloudSyncDataFrame.FrameCategory.DEVICE_DATA_FRAME)
+                        .setDataBody(mGson.toJson(record))
+                        .setAuthToken(authToken)
+                        .create();
             socketClient.send(mGson.toJson(dataFrame));
         }
         // DONE: 2017/06/19 デバイスに蓄積したデータの伝送
         RVCloudSyncDataFrame deviceDataEndFrame
-                = new RVCloudSyncDataFrame(RVCloudSyncDataFrame.FrameCategory.DEVICE_DATA_END_FRAME, null, token);
+                = new RVCloudSyncDataFrame.Builder(RVCloudSyncDataFrame.FrameCategory.DEVICE_DATA_END_FRAME)
+                    .setAuthToken(authToken)
+                    .create();
         socketClient.send(mGson.toJson(deviceDataEndFrame));
     }
 
@@ -313,7 +324,7 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback,
                 RVDBHelper.getInstance().deleteDeletedData();
 
                 if (mCallback != null) {
-                    mCallback.onSyncDataResult(mGson.fromJson(dataFrame.getDataBody(), RVResponseBody.class));
+                    mCallback.onSyncDataResult(dataFrame);
                 }
             }
        });
@@ -329,15 +340,15 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback,
 
         void onStartLoginRequest();
 
-        void onLoginResult(RVResponseBody responseBody);
+        void onLoginResult(RVCloudSyncDataFrame dataFrame);
 
         void onStartCreateUserRequest();
 
-        void onCreateUserResult(RVResponseBody responseBody);
+        void onCreateUserResult(RVCloudSyncDataFrame dataFrame);
 
         void onStartSyncDataRequest();
 
-        void onSyncDataResult(RVResponseBody responseBody);
+        void onSyncDataResult(RVCloudSyncDataFrame dataFrame);
 
     }
 

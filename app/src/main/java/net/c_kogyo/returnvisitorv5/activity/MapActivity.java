@@ -47,7 +47,6 @@ import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.cloudsync.LoginState;
 import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
 import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSyncDataFrame;
-import net.c_kogyo.returnvisitorv5.cloudsync.RVResponseBody;
 import net.c_kogyo.returnvisitorv5.data.Person;
 import net.c_kogyo.returnvisitorv5.data.Place;
 import net.c_kogyo.returnvisitorv5.data.PlaceMarkers;
@@ -1324,18 +1323,18 @@ public class MapActivity extends AppCompatActivity
     }
 
     @Override
-    public void onLoginResult(RVResponseBody responseBody) {
-        switch (responseBody.getStatusCode()) {
+    public void onLoginResult(RVCloudSyncDataFrame dataFrame) {
+        switch (dataFrame.getStatusCode()) {
             case STATUS_202_AUTHENTICATED:
-                onSuccessLogin(responseBody);
+                onSuccessLogin(dataFrame);
                 break;
             case STATUS_401_UNAUTHORIZED:
             case STATUS_404_NOT_FOUND:
-                onFailRequest(responseBody);
+                onFailRequest(dataFrame);
                 break;
             case STATUS_TIMED_OUT:
             case STATUS_SERVER_NOT_AVAILABLE:
-                postRequestResult(responseBody);
+                postRequestResult(dataFrame);
                 break;
         }
 
@@ -1348,19 +1347,19 @@ public class MapActivity extends AppCompatActivity
     }
 
     @Override
-    public void onCreateUserResult(RVResponseBody responseBody) {
-        switch (responseBody.getStatusCode()) {
+    public void onCreateUserResult(RVCloudSyncDataFrame dataFrame) {
+        switch (dataFrame.getStatusCode()) {
             case STATUS_201_CREATED_USER:
-                onSuccessLogin(responseBody);
+                onSuccessLogin(dataFrame);
                 break;
             case STATUS_400_DUPLICATE_USER_NAME:
             case STATUS_400_SHORT_USER_NAME:
             case STATUS_400_SHORT_PASSWORD:
-                onFailRequest(responseBody);
+                onFailRequest(dataFrame);
                 break;
             case STATUS_TIMED_OUT:
             case STATUS_SERVER_NOT_AVAILABLE:
-                postRequestResult(responseBody);
+                postRequestResult(dataFrame);
                 break;
         }
     }
@@ -1371,14 +1370,14 @@ public class MapActivity extends AppCompatActivity
     }
 
     @Override
-    public void onSyncDataResult(RVResponseBody responseBody) {
-        switch (responseBody.getStatusCode()) {
+    public void onSyncDataResult(RVCloudSyncDataFrame dataFrame) {
+        switch (dataFrame.getStatusCode()) {
             case STATUS_200_SYNC_END_OK:
-                onDataSyncSuccess(responseBody);
+                onDataSyncSuccess(dataFrame);
                 break;
             case STATUS_TIMED_OUT:
             case STATUS_SERVER_NOT_AVAILABLE:
-                postRequestResult(responseBody);
+                postRequestResult(dataFrame);
                 break;
         }
     }
@@ -1407,16 +1406,16 @@ public class MapActivity extends AppCompatActivity
         });
     }
 
-    private void onSuccessLogin(RVResponseBody responseBody) {
+    private void onSuccessLogin(RVCloudSyncDataFrame dataFrame) {
 
-        LoginState.onSuccessLogin(responseBody.getUserName(), responseBody.getPassword(), this);
+        LoginState.onSuccessLogin(dataFrame.getUserName(), dataFrame.getPassword(), this);
         RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this);
 
-        postRequestResult(responseBody);
+        postRequestResult(dataFrame);
 
     }
 
-    private void onDataSyncSuccess(final RVResponseBody responseBody) {
+    private void onDataSyncSuccess(final RVCloudSyncDataFrame dataFrame) {
 
         PlaceList.getInstance().refreshByDB();
         PersonList.getInstance().refreshByDB();
@@ -1435,23 +1434,23 @@ public class MapActivity extends AppCompatActivity
                 } else {
                     placeMarkers.drawAllMarkers();
                 }
-                postRequestResult(responseBody);
+                postRequestResult(dataFrame);
             }
         });
     }
 
-    private void onFailRequest(RVResponseBody responseBody) {
+    private void onFailRequest(RVCloudSyncDataFrame dataFrame) {
         LoginState.onLoggedOut(this);
-        postRequestResult(responseBody);
+        postRequestResult(dataFrame);
     }
 
-    public void postRequestResult(final RVResponseBody responseBody) {
+    public void postRequestResult(final RVCloudSyncDataFrame dataFrame) {
 
         cloudResultHandler.post(new Runnable() {
             @Override
             public void run() {
                 if (loginDialog != null) {
-                    loginDialog.onLoginResult(responseBody);
+                    loginDialog.onLoginResult(dataFrame);
                 }
 
                 enableWaitScreen(false);

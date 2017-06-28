@@ -25,7 +25,7 @@ import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.activity.MapActivity;
 import net.c_kogyo.returnvisitorv5.cloudsync.LoginState;
 import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSync;
-import net.c_kogyo.returnvisitorv5.cloudsync.RVResponseBody;
+import net.c_kogyo.returnvisitorv5.cloudsync.RVCloudSyncDataFrame;
 import net.c_kogyo.returnvisitorv5.util.InputUtil;
 import net.c_kogyo.returnvisitorv5.view.RightTextSwitch;
 
@@ -331,7 +331,7 @@ public class LoginDialog extends DialogFragment {
 
     }
 
-    public void onLoginResult(RVResponseBody responseBody){
+    public void onLoginResult(RVCloudSyncDataFrame dataFrame){
         // DONE: 2017/05/11  postRequestResult(RVCloudSync.ResultStatus statusCode)
 
         setCancelable(true);
@@ -344,33 +344,33 @@ public class LoginDialog extends DialogFragment {
             return;
 
         String message = "";
-        switch (responseBody.getStatusCode()) {
+        switch (dataFrame.getStatusCode()) {
             case STATUS_202_AUTHENTICATED:
-                message = context.getString(R.string.login_success, responseBody.getUserName());
+                message = context.getString(R.string.login_success, dataFrame.getUserName());
                 break;
 
             case STATUS_401_UNAUTHORIZED:
                 message = context.getString(R.string.login_failed) + "\n"
-                        + context.getString(R.string.wrong_password, responseBody.getUserName());
+                        + context.getString(R.string.wrong_password, dataFrame.getUserName());
                 enableUserNameText(true);
                 enablePasswordText(true);
                 break;
 
             case STATUS_404_NOT_FOUND:
                 message = context.getString(R.string.login_failed) + "\n"
-                        + context.getString(R.string.user_not_found, responseBody.getUserName());
+                        + context.getString(R.string.user_not_found, dataFrame.getUserName());
                 enableAccountButton(true);
                 enableUserNameText(true);
                 enablePasswordText(true);
                 break;
 
             case STATUS_201_CREATED_USER:
-                message = context.getString(R.string.create_user_success, responseBody.getUserName());
+                message = context.getString(R.string.create_user_success, dataFrame.getUserName());
                 break;
 
             case STATUS_400_DUPLICATE_USER_NAME:
                 message = context.getString(R.string.create_user_failed) + "\n"
-                        + context.getString(R.string.duplicate_user, responseBody.getUserName());
+                        + context.getString(R.string.duplicate_user, dataFrame.getUserName());
                 enableAccountButton(true);
                 enableUserNameText(true);
                 enablePasswordText(true);
@@ -386,7 +386,7 @@ public class LoginDialog extends DialogFragment {
 
             case STATUS_400_SHORT_USER_NAME:
                 message = context.getString(R.string.create_user_failed) + "\n"
-                        + context.getString(R.string.short_user_name, responseBody.getUserName());
+                        + context.getString(R.string.short_user_name, dataFrame.getUserName());
                 enableAccountButton(true);
                 enableUserNameText(true);
                 enablePasswordText(true);

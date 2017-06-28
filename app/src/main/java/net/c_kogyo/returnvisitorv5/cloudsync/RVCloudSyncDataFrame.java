@@ -11,9 +11,9 @@ import org.json.JSONObject;
 
 public class RVCloudSyncDataFrame {
 
-    private static final String FRAME_CATEGORY = "frame_category";
-    private static final String DATA_BODY = "data_body";
-    private static final String TOKEN = "token";
+//    private static final String FRAME_CATEGORY = "frame_category";
+//    private static final String DATA_BODY = "data_body";
+//    private static final String TOKEN = "token";
 
     public enum FrameCategory {
         LOGIN_REQUEST,
@@ -28,81 +28,98 @@ public class RVCloudSyncDataFrame {
         CLOUD_DATA_END_FRAME
     }
 
+    public enum StatusCode {
+        STATUS_202_AUTHENTICATED,
+        STATUS_401_UNAUTHORIZED,
+        STATUS_404_NOT_FOUND,
+        STATUS_201_CREATED_USER,
+        STATUS_400_DUPLICATE_USER_NAME,
+        STATUS_400_SHORT_USER_NAME,
+        STATUS_400_SHORT_PASSWORD,
+        STATUS_200_SYNC_START_OK,
+        STATUS_200_SYNC_END_OK,
+        STATUS_TIMED_OUT,
+        STATUS_SERVER_NOT_AVAILABLE
+    }
+
+
     private FrameCategory frameCategory;
-    private String dataBody, token;
+    private String dataBody, authToken, userName, password;
+    private StatusCode statusCode;
+    private long lastSyncDate;
 
-    public RVCloudSyncDataFrame(FrameCategory frameCategory,
-                                @Nullable String dataBody,
-                                @Nullable String token) {
-        this.frameCategory = frameCategory;
-        this.dataBody = dataBody;
-        this.token = token;
-    }
+    private RVCloudSyncDataFrame(){}
 
-    public RVCloudSyncDataFrame() {
-    }
-
-    public FrameCategory getFrameCategory() {
+    FrameCategory getFrameCategory() {
         return frameCategory;
     }
 
-    public String getDataBody() {
+    String getDataBody() {
         return dataBody;
     }
 
-    public String getToken() {
-        return token;
+    public String getAuthToken() {
+        return authToken;
     }
 
-    public void setFrameCategory(FrameCategory frameCategory) {
-        this.frameCategory = frameCategory;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setDataBody(String dataBody) {
-        this.dataBody = dataBody;
+    public String getPassword() {
+        return password;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public StatusCode getStatusCode() {
+        return statusCode;
     }
 
-    //    public RVCloudSyncDataFrame(String jsonString) {
-//        try {
-//            JSONObject object = new JSONObject(jsonString);
-//            setJSON(this, object);
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    private static void setJSON(RVCloudSyncDataFrame frame, JSONObject object) {
-//        try {
-//            if (object.has(FRAME_CATEGORY))
-//                frame.frameCategory = FrameCategory.valueOf(object.getString(FRAME_CATEGORY));
-//            if (object.has(DATA_BODY))
-//                frame.dataBody = object.getString(DATA_BODY);
-//            if (object.has(TOKEN))
-//                frame.token = object.getString(TOKEN);
-//
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    private JSONObject jsonObject() {
-//
-//        JSONObject object = new JSONObject();
-//        try {
-//            object.put(FRAME_CATEGORY, frameCategory.toString());
-//            object.put(DATA_BODY, dataBody);
-//            object.put(TOKEN, token);
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//        return object;
-//    }
-//
-//    public String jsonString() {
-//        return jsonObject().toString();
-//    }
+    public long getLastSyncDate() {
+        return lastSyncDate;
+    }
+
+    public static class Builder {
+        private RVCloudSyncDataFrame frame;
+        public Builder(FrameCategory category) {
+            frame = new RVCloudSyncDataFrame();
+            frame.frameCategory = category;
+        }
+
+        public Builder setUserName(String userName) {
+            frame.userName = userName;
+            return this;
+        }
+
+        public Builder setPassword(String password) {
+            frame.password = password;
+            return this;
+        }
+
+        public Builder setDataBody(String dataBody) {
+            frame.dataBody = dataBody;
+            return this;
+        }
+
+        public Builder setAuthToken (String authToken) {
+            frame.authToken = authToken;
+            return this;
+        }
+
+        public Builder setLastSyncDate(long lastSyncDate) {
+            frame.lastSyncDate = lastSyncDate;
+            return this;
+        }
+
+        public Builder setStatusCode(StatusCode statusCode) {
+            frame.statusCode = statusCode;
+            return this;
+        }
+
+        public RVCloudSyncDataFrame create() {
+            return frame;
+        }
+
+
+    }
+
 }
