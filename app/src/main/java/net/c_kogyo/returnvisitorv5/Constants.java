@@ -23,7 +23,7 @@ public class Constants {
 
         public static final String WEEK_START_DAY = "week_start_day";
 
-        public static final String LAST_DEVICE_SYNC_TIME = "last_device_sync_time";
+
     }
 
     public static final String DATA_ARRAY_LATER_THAN_TIME = "data_array_later_than_time";

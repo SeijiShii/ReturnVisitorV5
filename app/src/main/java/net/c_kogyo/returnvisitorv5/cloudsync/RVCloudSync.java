@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import static android.content.Context.MODE_PRIVATE;
-import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.LAST_DEVICE_SYNC_TIME;
 
 /**
  * Created by SeijiShii on 2017/05/10.
@@ -202,9 +201,7 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback,
 
         cloudDataList = new ArrayList<>();
 
-        SharedPreferences prefs
-                = context.getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, MODE_PRIVATE);
-        long lastSyncTime = prefs.getLong(LAST_DEVICE_SYNC_TIME, 0);
+        long lastSyncTime = LoginHelper.loadLastSyncDate(context);
 
         Calendar date = Calendar.getInstance();
         date.setTimeInMillis(lastSyncTime);

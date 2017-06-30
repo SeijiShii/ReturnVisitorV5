@@ -18,6 +18,7 @@ public class LoginHelper {
     private static final String IS_LOGGED_IN = "is_logged_in";
     private static final String USER_NAME = "user_name";
     private static final String PASSWORD = "password";
+    public static final String LAST_SYNC_TIME = "_last_sync_time";
 
     public static final String FB_TAG = "facebook_login";
 
@@ -108,6 +109,26 @@ public class LoginHelper {
         onUpdate(context);
     }
 
+    public static void saveLastSyncDate(long lastSyncTime, Context context) {
+
+        loadState(context);
+
+        SharedPreferences preferences
+                = context.getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+
+        editor.putLong(mLoginProvider.toString() + LAST_SYNC_TIME, lastSyncTime);
+        editor.apply();
+    }
+
+    static long loadLastSyncDate(Context context) {
+
+        loadState(context);
+
+        SharedPreferences preferences
+                = context.getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, Context.MODE_PRIVATE);
+        return preferences.getLong(mLoginProvider.toString() + LAST_SYNC_TIME, 0);
+    }
 
 
 }

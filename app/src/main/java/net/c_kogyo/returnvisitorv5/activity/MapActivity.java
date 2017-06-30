@@ -194,21 +194,6 @@ public class MapActivity extends AppCompatActivity
 
     }
 
-    private void saveLastSyncTime(boolean resetSyncTime) {
-        SharedPreferences prefs
-                = getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        if (resetSyncTime) {
-            editor.putLong(Constants.SharedPrefTags.LAST_DEVICE_SYNC_TIME, 0);
-        } else {
-            editor.putLong(Constants.SharedPrefTags.LAST_DEVICE_SYNC_TIME, Calendar.getInstance().getTimeInMillis());
-        }
-
-        // リセット用
-        // editor.putLong(Constants.SharedPrefTags.LAST_DEVICE_SYNC_TIME, 0);
-
-        editor.apply();
-    }
 
 //    private boolean isDataLoaded = false;
 
@@ -1491,7 +1476,7 @@ public class MapActivity extends AppCompatActivity
                 break;
 
             case STATUS_201_CREATED_USER:
-                saveLastSyncTime(true);
+                LoginHelper.saveLastSyncDate(0, this);
                 onSuccessLogin(dataFrame);
                 break;
 
@@ -1538,7 +1523,7 @@ public class MapActivity extends AppCompatActivity
 
         Log.d(RVDBHelper.TAG, "Place data count after refreshing list: " + PlaceList.getInstance().size());
 
-        saveLastSyncTime(false);
+        LoginHelper.saveLastSyncDate(Calendar.getInstance().getTimeInMillis(), this);
 
         cloudResultHandler.post(new Runnable() {
             @Override
