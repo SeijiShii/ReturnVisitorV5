@@ -37,10 +37,15 @@ import android.widget.Toast;
 
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.Profile;
 import com.facebook.ProfileTracker;
 import com.facebook.appevents.AppEventsLogger;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -80,6 +85,7 @@ import net.c_kogyo.returnvisitorv5.util.InputUtil;
 import net.c_kogyo.returnvisitorv5.util.SoftKeyboard;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 import net.c_kogyo.returnvisitorv5.view.CountTimeFrame;
+import net.c_kogyo.returnvisitorv5.view.LoginButtonBase;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -97,6 +103,7 @@ import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.VISIT_ADD
 import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.VISIT_EDITED_RESULT_CODE;
 import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS;
 import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.ZOOM_LEVEL;
+import static net.c_kogyo.returnvisitorv5.cloudsync.LoginHelper.FB_TAG;
 import static net.c_kogyo.returnvisitorv5.data.Place.PLACE;
 import static net.c_kogyo.returnvisitorv5.data.Visit.VISIT;
 
@@ -131,22 +138,25 @@ public class MapActivity extends AppCompatActivity
             @Override
             protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
 
+                Log.d(FB_TAG, "onCurrentAccessTokenChanged called.");
+
+                if (currentAccessToken == null) {
+                    // ログアウトしたということ。
+                    LoginHelper.onLoggedOut(MapActivity.this);
+                    refreshLoginButtons(true);
+                } else {
+                    LoginHelper.onLogin(LoginHelper.LoginProvider.FACEBOOK, MapActivity.this);
+                    refreshLoginButtons(true);
+                }
             }
         };
 
         profileTracker = new ProfileTracker() {
             @Override
             protected void onCurrentProfileChanged(Profile oldProfile, Profile currentProfile) {
-                if (currentProfile != null) {
-                    String name = currentProfile.getFirstName();
-                    if (name == null || name.length() <= 0) {
-                        name = currentProfile.getLastName();
-                    }
-                    LoginHelper.onSuccessLogin(LoginHelper.LoginProvider.FACEBOOK,
-                            name,
-                            null,
-                            MapActivity.this);
-                }
+
+                Log.d(FB_TAG, "onCurrentProfileChanged called.");
+
             }
         };
 
@@ -176,8 +186,8 @@ public class MapActivity extends AppCompatActivity
         initMapView(savedInstanceState);
 
         initDrawerOverlay();
+        refreshLoginButtons(false);
 
-        refreshLoginButton();
         refreshWorkButton();
         refreshCalendarButton();
         RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this);
@@ -607,6 +617,8 @@ public class MapActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+
         if (resultCode == VISIT_ADDED_RESULT_CODE
                 || resultCode == PLACE_ADDED_RESULT_CODE
                 || resultCode == VISIT_EDITED_RESULT_CODE) {
@@ -689,7 +701,7 @@ public class MapActivity extends AppCompatActivity
 
                             @Override
                             public void onClickNotHomeButton(Place place) {
-                                // TODO: 2017/06/10 Not home action
+                                // DONE: 2017/06/10 Not home action
                                 recordNotHome(place);
                             }
 
@@ -849,7 +861,11 @@ public class MapActivity extends AppCompatActivity
             }
         });
 
+        initLoginStateText();
         initLoginButton();
+        initFacebookLoginButton();
+        refreshLoginButtons(false);
+
         initCountTimeFrame();
         initWorkButton();
         initCalendarButton();
@@ -936,6 +952,91 @@ public class MapActivity extends AppCompatActivity
         animatorSet.start();
 
         isDrawerOpen = !isDrawerOpen;
+    }
+
+    private LoginButtonBase loginStateTextBase;
+    private TextView loginStateText;
+    private void initLoginStateText() {
+        loginStateTextBase = (LoginButtonBase) findViewById(R.id.login_state_text_base);
+        loginStateText = (TextView) findViewById(R.id.login_state_text);
+
+    }
+
+    private void refreshLoginStateText() {
+        if (LoginHelper.isLoggedIn(this)) {
+            String userName = LoginHelper.getUserName(this);
+            if (userName == null) {
+                userName = "";
+            }
+            String s = getString(R.string.login_state, userName);
+            loginStateText.setText(s);
+        } else {
+            loginStateText.setText("");
+        }
+    }
+
+    private void refreshLoginButtons(boolean animate) {
+
+        int buttonHeight = getResources().getDimensionPixelSize(R.dimen.ui_height_small);
+
+        refreshLoginStateText();
+
+        if (LoginHelper.isLoggedIn(this)) {
+            loginButton.setText(R.string.logout_button);
+        } else {
+            loginButton.setText(R.string.login_button);
+        }
+
+        if (animate) {
+            if (LoginHelper.isLoggedIn(this)) {
+                loginStateTextBase.extract(ViewGroup.LayoutParams.WRAP_CONTENT);
+
+                switch (LoginHelper.getLoginProvider(this)) {
+                    case USER_NAME:
+                        loginButtonBase.extract(buttonHeight);
+                        fbButtonBase.compress();
+                        break;
+
+                    case FACEBOOK:
+                        loginButtonBase.compress();
+                        fbButtonBase.extract(buttonHeight);
+                        break;
+                }
+
+            } else {
+                loginStateTextBase.compress();
+
+                loginButtonBase.extract(buttonHeight);
+                fbButtonBase.extract(buttonHeight);
+            }
+        } else {
+            if (LoginHelper.isLoggedIn(this)) {
+                String s = getString(R.string.login_state, LoginHelper.getUserName(this));
+                loginStateText.setText(s);
+                loginStateTextBase.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
+
+                switch (LoginHelper.getLoginProvider(this)) {
+                    case USER_NAME:
+                        loginButtonBase.getLayoutParams().height = buttonHeight;
+                        fbButtonBase.getLayoutParams().height = 0;
+                        break;
+
+                    case FACEBOOK:
+                        loginButtonBase.getLayoutParams().height = 0;
+                        fbButtonBase.getLayoutParams().height = buttonHeight;
+                        break;
+                }
+
+            } else {
+                loginStateTextBase.getLayoutParams().height = 0;
+                loginStateText.setText("");
+
+                loginButtonBase.getLayoutParams().height = buttonHeight;
+                fbButtonBase.getLayoutParams().height = buttonHeight;
+            }
+        }
+
+
     }
 
     private CountTimeFrame countTimeFrame;
@@ -1236,10 +1337,12 @@ public class MapActivity extends AppCompatActivity
     }
 
     private Button loginButton;
+    private LoginButtonBase loginButtonBase;
     private void initLoginButton() {
-        loginButton = (Button) findViewById(R.id.login_button);
 
-        refreshLoginButton();
+        loginButtonBase = (LoginButtonBase) findViewById(R.id.login_button_base);
+
+        loginButton = (Button) findViewById(R.id.login_button);
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -1254,15 +1357,10 @@ public class MapActivity extends AppCompatActivity
         });
     }
 
-    private void refreshLoginButton() {
-
-        if (LoginHelper.isLoggedIn(this)) {
-            String s = getString(R.string.logout_button, LoginHelper.getUserName(this));
-            loginButton.setText(s);
-        } else {
-            loginButton.setText(R.string.login_button);
-        }
-    }
+//    private void refreshLoginButton() {
+//
+//
+//    }
 
     private void onLoginClicked() {
         showLoginDialog();
@@ -1284,6 +1382,7 @@ public class MapActivity extends AppCompatActivity
             public void onCloseDialog() {
                 InputUtil.hideSoftKeyboard(MapActivity.this);
             }
+
         }, new Handler());
         loginDialog.show(getFragmentManager(), null);
     }
@@ -1306,7 +1405,7 @@ public class MapActivity extends AppCompatActivity
 
         LoginHelper.onLoggedOut(this);
 
-        refreshLoginButton();
+        refreshLoginButtons(true);
         if (loginDialog != null) {
             loginDialog.postLogout();
         }
@@ -1366,8 +1465,7 @@ public class MapActivity extends AppCompatActivity
             public void run() {
                 fadeProgressFrame(true);
                 switch (frameCategory) {
-                    case LOGIN_REQUEST_WITH_NAME:
-                    case LOGIN_REQUEST_WITH_TOKEN:
+                    case LOGIN_REQUEST:
                         enableWaitScreen(true);
                         waitMessageText.setText(R.string.start_login);
                         break;
@@ -1375,7 +1473,8 @@ public class MapActivity extends AppCompatActivity
                         enableWaitScreen(true);
                         waitMessageText.setText(R.string.creating_user);
                         break;
-                    case SYNC_DATA_REQUEST:
+                    case SYNC_DATA_REQUEST_WITH_NAME:
+                    case SYNC_DATA_REQUEST_WITH_FACEBOOK:
                         enableWaitScreen(false);
                         waitMessageText.setText(R.string.on_sync);
                         break;
@@ -1391,17 +1490,17 @@ public class MapActivity extends AppCompatActivity
                 onDataSyncSuccess(dataFrame);
                 break;
 
-            case STATUS_201_CREATED_USER_WITH_NAME:
+            case STATUS_201_CREATED_USER:
                 saveLastSyncTime(true);
-                onSuccessLoginWithName(dataFrame);
+                onSuccessLogin(dataFrame);
                 break;
 
-            case STATUS_201_CREATED_USER_WITH_TOKEN:
-                saveLastSyncTime(true);
-                onSuccessLoginWithToken(dataFrame);
-
             case STATUS_202_AUTHENTICATED:
-                onSuccessLoginWithName(dataFrame);
+                onSuccessLogin(dataFrame);
+                break;
+
+            case STATUS_200_SYNC_START_OK:
+                postRequestResult(dataFrame);
                 break;
 
             case STATUS_400_DUPLICATE_USER_NAME:
@@ -1419,9 +1518,9 @@ public class MapActivity extends AppCompatActivity
         }
     }
 
-    private void onSuccessLoginWithName(RVCloudSyncDataFrame dataFrame) {
+    private void onSuccessLogin(RVCloudSyncDataFrame dataFrame) {
 
-        LoginHelper.onSuccessLogin(LoginHelper.LoginProvider.USER_NAME,
+        LoginHelper.onLogin(LoginHelper.LoginProvider.USER_NAME,
                 dataFrame.getUserName(),
                 dataFrame.getPassword(),
                 this);
@@ -1429,12 +1528,6 @@ public class MapActivity extends AppCompatActivity
 
         postRequestResult(dataFrame);
 
-    }
-
-    private void onSuccessLoginWithToken(RVCloudSyncDataFrame dataFrame) {
-        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this);
-
-        postRequestResult(dataFrame);
     }
 
     private void onDataSyncSuccess(final RVCloudSyncDataFrame dataFrame) {
@@ -1468,6 +1561,11 @@ public class MapActivity extends AppCompatActivity
 
     public void postRequestResult(final RVCloudSyncDataFrame dataFrame) {
 
+        String userName = dataFrame.getUserName();
+        if (userName != null) {
+            LoginHelper.setUserName(userName, this);
+        }
+
         cloudResultHandler.post(new Runnable() {
             @Override
             public void run() {
@@ -1479,9 +1577,10 @@ public class MapActivity extends AppCompatActivity
                 fadeProgressFrame(false);
                 waitMessageText.setText("");
 
-                refreshLoginButton();
+                refreshLoginButtons(true);
                 refreshWorkButton();
                 refreshCalendarButton();
+
             }
         });
     }
@@ -1672,6 +1771,40 @@ public class MapActivity extends AppCompatActivity
                 TermOfUseDialog.getInstance().show(getFragmentManager(), null);
             }
         });
+    }
+
+    private CallbackManager callbackManager;
+    private LoginButtonBase fbButtonBase;
+    private void initFacebookLoginButton() {
+
+        fbButtonBase = (LoginButtonBase) findViewById(R.id.fb_button_base);
+
+        LoginButton fbLoginButton = (LoginButton) findViewById(R.id.fb_button);
+        fbLoginButton.setReadPermissions("email");
+
+        callbackManager = CallbackManager.Factory.create();
+        fbLoginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                Log.d(FB_TAG, "onSuccess in callback called.");
+                Log.d(FB_TAG, "accessToken: " + loginResult.getAccessToken().getToken());
+                LoginHelper.onLogin(LoginHelper.LoginProvider.FACEBOOK, MapActivity.this);
+                refreshLoginButtons(true);
+
+                RVCloudSync.getInstance().requestDataSyncIfLoggedIn(MapActivity.this);
+            }
+
+            @Override
+            public void onCancel() {
+                Log.d(FB_TAG, "onCancel");
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                Log.d(FB_TAG, "onError: " + error.getMessage());
+            }
+        });
+
     }
 
     // DONE: 2017/06/02 ダイアログを閉じるたびにキーボードも閉じるように

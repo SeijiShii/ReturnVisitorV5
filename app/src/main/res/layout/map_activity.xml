@@ -128,10 +128,27 @@
                     android:layout_marginRight="5dp"
                     android:layout_marginLeft="5dp"/>
 
-                <!-- Login Button -->
-                <RelativeLayout
+                <!-- Login state text -->
+                <net.c_kogyo.returnvisitorv5.view.LoginButtonBase
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/ui_height_small">
+                    android:layout_height="wrap_content"
+                    android:id="@+id/login_state_text_base">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="20dp"
+                        android:id="@+id/login_state_text"
+                        android:textColor="@color/textColorGray"
+                        android:textSize="@dimen/text_size_small"
+                        android:gravity="center"/>
+
+                </net.c_kogyo.returnvisitorv5.view.LoginButtonBase>
+
+                <!-- Login Button -->
+                <net.c_kogyo.returnvisitorv5.view.LoginButtonBase
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/ui_height_small"
+                    android:id="@+id/login_button_base">
 
                     <Button
                         android:layout_width="match_parent"
@@ -144,7 +161,21 @@
                         android:paddingRight="5dp"
                         android:layout_centerInParent="true"/>
 
-                </RelativeLayout>
+                </net.c_kogyo.returnvisitorv5.view.LoginButtonBase>
+
+                <!-- FB Login button -->
+                <net.c_kogyo.returnvisitorv5.view.LoginButtonBase
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/ui_height_small"
+                    android:id="@+id/fb_button_base">
+
+                    <com.facebook.login.widget.LoginButton
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/fb_button"
+                        android:layout_centerInParent="true"/>
+
+                </net.c_kogyo.returnvisitorv5.view.LoginButtonBase>
 
                 <View
                     android:layout_width="match_parent"

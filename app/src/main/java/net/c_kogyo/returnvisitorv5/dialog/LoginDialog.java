@@ -4,23 +4,15 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
 
 import net.c_kogyo.returnvisitorv5.R;
 import net.c_kogyo.returnvisitorv5.cloudsync.LoginHelper;
@@ -33,7 +25,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
-import static net.c_kogyo.returnvisitorv5.cloudsync.LoginHelper.FB_TAG;
 
 /**
  * Created by SeijiShii on 2017/05/10.
@@ -85,7 +76,6 @@ public class LoginDialog extends DialogFragment {
         initLoginButton();
         initCreateAccountButton();
         initCloseButton();
-        initFacebookLoginButton();
     }
 
     private EditText userNameTextView;
@@ -271,17 +261,15 @@ public class LoginDialog extends DialogFragment {
                     getActivity());
             messageTextView.setText(R.string.start_login);
 
-            if (mListener != null) {
-                progressBar.setVisibility(VISIBLE);
+            progressBar.setVisibility(VISIBLE);
 
-                enableLoginButton(false);
-                enableAccountButton(false);
-                enableCloseButton(false);
+            enableLoginButton(false);
+            enableAccountButton(false);
+            enableCloseButton(false);
 
-                enableUserNameText(false);
-                enablePasswordText(false);
+            enableUserNameText(false);
+            enablePasswordText(false);
 
-            }
         }
     }
 
@@ -374,7 +362,7 @@ public class LoginDialog extends DialogFragment {
                 enablePasswordText(true);
                 break;
 
-            case STATUS_201_CREATED_USER_WITH_NAME:
+            case STATUS_201_CREATED_USER:
                 message = context.getString(R.string.create_user_success, dataFrame.getUserName());
                 break;
 
@@ -468,43 +456,4 @@ public class LoginDialog extends DialogFragment {
         isShowing.set(false);
     }
 
-    private CallbackManager callbackManager;
-    private void initFacebookLoginButton() {
-        LoginButton fbLoginButton = (LoginButton) view.findViewById(R.id.facebook_login_button);
-//        fbLoginButton.setReadPermissions("email");
-        fbLoginButton.setFragment(this);
-
-        callbackManager = CallbackManager.Factory.create();
-        fbLoginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                Log.d(FB_TAG, "accessToken: " + loginResult.getAccessToken().getToken());
-                LoginHelper.onSuccessLogin(LoginHelper.LoginProvider.FACEBOOK,
-                        null, null, getActivity());
-                enableAccountButton(false);
-                enableLoginButton(false);
-                enablePasswordText(false);
-                enableUserNameText(false);
-
-                RVCloudSync.getInstance().loginWithToken(loginResult.getAccessToken().getToken(), getActivity());
-            }
-
-            @Override
-            public void onCancel() {
-                Log.d(FB_TAG, "onCancel");
-            }
-
-            @Override
-            public void onError(FacebookException error) {
-                Log.d(FB_TAG, "onError: " + error.getMessage());
-            }
-        });
-
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        callbackManager.onActivityResult(requestCode, resultCode, data);
-    }
 }

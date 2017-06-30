@@ -12,37 +12,36 @@ import org.json.JSONObject;
 public class RVCloudSyncDataFrame {
 
     public enum FrameCategory {
-        LOGIN_REQUEST_WITH_NAME,
-        LOGIN_REQUEST_WITH_TOKEN,
+        LOGIN_REQUEST,
         LOGIN_RESPONSE,
         CREATE_USER_REQUEST,
         CREATE_USER_RESPONSE,
-        SYNC_DATA_REQUEST,
+        SYNC_DATA_REQUEST_WITH_NAME,
+        SYNC_DATA_REQUEST_WITH_FACEBOOK,
         SYNC_DATA_RESPONSE,
         DEVICE_DATA_FRAME,
         DEVICE_DATA_END_FRAME,
         CLOUD_DATA_FRAME,
-        CLOUD_DATA_END_FRAME
+        CLOUD_DATA_END_FRAME,
     }
 
     public enum StatusCode {
+        STATUS_200_SYNC_START_OK,
+        STATUS_200_SYNC_END_OK,
+        STATUS_201_CREATED_USER,
         STATUS_202_AUTHENTICATED,
-        STATUS_401_UNAUTHORIZED,
-        STATUS_404_NOT_FOUND,
-        STATUS_201_CREATED_USER_WITH_NAME,
-        STATUS_201_CREATED_USER_WITH_TOKEN,
         STATUS_400_DUPLICATE_USER_NAME,
         STATUS_400_SHORT_USER_NAME,
         STATUS_400_SHORT_PASSWORD,
-        STATUS_200_SYNC_START_OK,
-        STATUS_200_SYNC_END_OK,
+        STATUS_401_UNAUTHORIZED,
+        STATUS_404_NOT_FOUND,
         STATUS_TIMED_OUT,
         STATUS_SERVER_NOT_AVAILABLE
     }
 
 
     private FrameCategory frameCategory;
-    private String dataBody, authToken, userName, password;
+    private String dataBody, authToken, userName, password, serverToken;
     private StatusCode statusCode;
     private long lastSyncDate;
 
@@ -70,6 +69,10 @@ public class RVCloudSyncDataFrame {
 
     public StatusCode getStatusCode() {
         return statusCode;
+    }
+
+    public String getServerToken() {
+        return serverToken;
     }
 
     public long getLastSyncDate() {
@@ -110,6 +113,11 @@ public class RVCloudSyncDataFrame {
 
         Builder setStatusCode(StatusCode statusCode) {
             frame.statusCode = statusCode;
+            return this;
+        }
+
+        Builder setServerToken(String serverToken) {
+            frame.serverToken = serverToken;
             return this;
         }
 

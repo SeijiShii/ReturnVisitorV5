@@ -11,6 +11,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 
 import net.c_kogyo.returnvisitorv5.R;
 
@@ -18,7 +19,7 @@ import net.c_kogyo.returnvisitorv5.R;
  * Created by SeijiShii on 2017/02/18.
  */
 
-public abstract class BaseAnimateView extends FrameLayout {
+public abstract class BaseAnimateView extends RelativeLayout {
 
     int mResId;
     int mInitialHeight;
@@ -178,6 +179,14 @@ public abstract class BaseAnimateView extends FrameLayout {
 
     public void compress(PostAnimationListener postAnimationListener) {
         changeViewHeight(0, true, false, postAnimationListener);
+    }
+
+    public void compress() {
+        compress(null);
+    }
+
+    public void extract(int targetHeight) {
+        changeViewHeight(targetHeight, true, false, null);
     }
 
     public abstract void setLayoutParams(BaseAnimateView view);

@@ -54,7 +54,8 @@
     <string name="login_failed">ログイン失敗。</string>
     <string name="login_success">ログインしました。: %s</string>
     <string name="login_title">ログイン</string>
-    <string name="logout_button">ログイン中: %s ログアウトする</string>
+    <string name="login_state">ログイン中: %s</string>
+    <string name="logout_button">ログアウト</string>
     <string name="logout_button_small">ログアウト</string>
     <string name="logout_message">ログアウトしますか。</string>
     <string name="logout_title">ログアウト</string>
