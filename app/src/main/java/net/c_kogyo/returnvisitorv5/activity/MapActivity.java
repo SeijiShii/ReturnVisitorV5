@@ -72,6 +72,7 @@ import net.c_kogyo.returnvisitorv5.data.list.PlaceList;
 import net.c_kogyo.returnvisitorv5.data.list.VisitList;
 import net.c_kogyo.returnvisitorv5.data.list.WorkList;
 import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
+import net.c_kogyo.returnvisitorv5.dialog.AccountDialog;
 import net.c_kogyo.returnvisitorv5.dialog.AddWorkDialog;
 import net.c_kogyo.returnvisitorv5.dialog.HousingComplexDialog;
 import net.c_kogyo.returnvisitorv5.dialog.LoginDialog;
@@ -114,6 +115,7 @@ import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.ZOOM_LEVEL;
 import static net.c_kogyo.returnvisitorv5.cloudsync.LoginHelper.FB_TAG;
 import static net.c_kogyo.returnvisitorv5.data.Place.PLACE;
 import static net.c_kogyo.returnvisitorv5.data.Visit.VISIT;
+import static net.c_kogyo.returnvisitorv5.dialog.AccountDialog.ACCOUNT_TEST_TAG;
 
 public class MapActivity extends AppCompatActivity
                             implements OnMapReadyCallback,
@@ -137,7 +139,6 @@ public class MapActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        initAccountDialog();
         RVDBHelper.initialize(this);
 
         // Facebook
@@ -861,6 +862,8 @@ public class MapActivity extends AppCompatActivity
         initFacebookLoginButton();
         refreshLoginButtons(false);
 
+        initSyncDataButton();
+
         initCountTimeFrame();
         initWorkButton();
         initCalendarButton();
@@ -1032,6 +1035,17 @@ public class MapActivity extends AppCompatActivity
         }
 
 
+    }
+
+    private void initSyncDataButton() {
+        Button syncDataButton = (Button) findViewById(R.id.sync_data_button);
+        syncDataButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openCloseDrawer();
+                showAccountDialog();
+            }
+        });
     }
 
     private CountTimeFrame countTimeFrame;
@@ -1806,8 +1820,14 @@ public class MapActivity extends AppCompatActivity
     // DONE: 2017/06/02 ダイアログを閉じるたびにキーボードも閉じるように
     // DONE: Term of Use
 
-    private void initAccountDialog() {
-
+    private void showAccountDialog() {
+        AccountDialog accountDialog = AccountDialog.newInstance(new AccountDialog.AccountDialogListener() {
+            @Override
+            public void onClickAccount(Account account) {
+                Log.d(ACCOUNT_TEST_TAG, "Chosen account: " + account.name);
+            }
+        });
+        accountDialog.show(getFragmentManager(), null);
     }
 
 

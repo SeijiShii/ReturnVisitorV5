@@ -6,6 +6,7 @@ import android.accounts.AuthenticatorDescription;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -29,7 +30,9 @@ import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static net.c_kogyo.returnvisitorv5.Constants.AccountType.FACEBOOK_ACCOUNT_NAME;
 import static net.c_kogyo.returnvisitorv5.Constants.AccountType.FACEBOOK_ACCOUNT_TYPE;
+import static net.c_kogyo.returnvisitorv5.Constants.AccountType.GOOGLE_ACCOUNT_NAME;
 import static net.c_kogyo.returnvisitorv5.Constants.AccountType.GOOGLE_ACCOUNT_TYPE;
 
 /**
@@ -38,7 +41,7 @@ import static net.c_kogyo.returnvisitorv5.Constants.AccountType.GOOGLE_ACCOUNT_T
 
 public class AccountDialog extends DialogFragment {
 
-    private static final String ACCOUNT_TEST_TAG = "Account Test";
+    public static final String ACCOUNT_TEST_TAG = "AccountTest";
 
     private ArrayList<Account> mAccounts;
     private static AccountDialogListener mListener;
@@ -84,15 +87,6 @@ public class AccountDialog extends DialogFragment {
         AccountListAdapter accountListAdapter = new AccountListAdapter();
         accountListView.setAdapter(accountListAdapter);
 
-        accountListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (mListener != null) {
-                    mListener.onClickAccount(mAccounts.get(position));
-                }
-            }
-        });
-
         return accountListView;
     }
 
@@ -105,6 +99,26 @@ public class AccountDialog extends DialogFragment {
             }
         }
         return null;
+    }
+
+    private void confirmAccount(final Account account) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+        builder.setMessage(R.string.account_confirm);
+        builder.setView(new AccountCell(getActivity(), account));
+
+        builder.setNegativeButton(R.string.cancel, null);
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                AccountDialog.this.dismiss();
+                if (mListener != null) {
+                    mListener.onClickAccount(account);
+                }
+            }
+        });
+        builder.create().show();
     }
 
     public interface AccountDialogListener {
@@ -143,7 +157,7 @@ public class AccountDialog extends DialogFragment {
 
         private Account mAccount;
 
-        public AccountCell(@NonNull Context context, Account account) {
+        public AccountCell(@NonNull Context context, final Account account) {
             super(context);
 
             mAccount = account;
@@ -152,7 +166,9 @@ public class AccountDialog extends DialogFragment {
             ViewUtil.setOnClickListener(this, new ViewUtil.OnViewClickListener() {
                 @Override
                 public void onViewClick(View view) {
-
+                    if (mListener != null) {
+                        confirmAccount(account);
+                    }
                 }
             });
         }

@@ -140,6 +140,9 @@ public class Constants {
     public class AccountType {
         public static final String GOOGLE_ACCOUNT_TYPE = "com.google";
         public static final String FACEBOOK_ACCOUNT_TYPE = "com.facebook.auth.login";
+
+        public static final String GOOGLE_ACCOUNT_NAME = "Google";
+        public static final String FACEBOOK_ACCOUNT_NAME = "Facebook";
     }
 
 }
