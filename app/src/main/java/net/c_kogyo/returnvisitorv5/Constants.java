@@ -124,14 +124,8 @@ public class Constants {
 
     }
 
-//    public class CalendarActions {
-//
-//        public static final String START_CALENDAR_FROM_WORK_ACTION = "start_calendar_from_work_action";
-//        public static final String START_CALENDAR_FROM_MAP_ACTION = "start_calendar_from_map_action";
-//        public static final int START_CALENDAR_REQUEST_CODE = 5000;
-//        public static final int PRESS_DATE_RESULT_CODE = 5010;
-//    }
-//
+    public static final int CHOOSE_ACCOUNT_REQUEST_CODE = 5001;
+
     public class WorkPagerActivityActions {
 
         public static final String START_WITH_NEW_WORK = "start_with_new_work";
@@ -139,10 +133,8 @@ public class Constants {
 
     public class AccountType {
         public static final String GOOGLE_ACCOUNT_TYPE = "com.google";
-        public static final String FACEBOOK_ACCOUNT_TYPE = "com.facebook.auth.login";
 
         public static final String GOOGLE_ACCOUNT_NAME = "Google";
-        public static final String FACEBOOK_ACCOUNT_NAME = "Facebook";
     }
 
 }

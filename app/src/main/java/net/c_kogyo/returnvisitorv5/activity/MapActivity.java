@@ -3,9 +3,14 @@ package net.c_kogyo.returnvisitorv5.activity;
 import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.accounts.AccountManagerCallback;
+import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorDescription;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
+import android.app.Activity;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -72,7 +77,6 @@ import net.c_kogyo.returnvisitorv5.data.list.PlaceList;
 import net.c_kogyo.returnvisitorv5.data.list.VisitList;
 import net.c_kogyo.returnvisitorv5.data.list.WorkList;
 import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
-import net.c_kogyo.returnvisitorv5.dialog.AccountDialog;
 import net.c_kogyo.returnvisitorv5.dialog.AddWorkDialog;
 import net.c_kogyo.returnvisitorv5.dialog.HousingComplexDialog;
 import net.c_kogyo.returnvisitorv5.dialog.LoginDialog;
@@ -92,13 +96,14 @@ import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 import net.c_kogyo.returnvisitorv5.view.CountTimeFrame;
 import net.c_kogyo.returnvisitorv5.view.LoginButtonBase;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 
-import static net.c_kogyo.returnvisitorv5.Constants.AccountType.FACEBOOK_ACCOUNT_TYPE;
 import static net.c_kogyo.returnvisitorv5.Constants.AccountType.GOOGLE_ACCOUNT_TYPE;
+import static net.c_kogyo.returnvisitorv5.Constants.CHOOSE_ACCOUNT_REQUEST_CODE;
 import static net.c_kogyo.returnvisitorv5.Constants.LATITUDE;
 import static net.c_kogyo.returnvisitorv5.Constants.LONGITUDE;
 import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.EDIT_VISIT_ACTION;
@@ -115,7 +120,6 @@ import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.ZOOM_LEVEL;
 import static net.c_kogyo.returnvisitorv5.cloudsync.LoginHelper.FB_TAG;
 import static net.c_kogyo.returnvisitorv5.data.Place.PLACE;
 import static net.c_kogyo.returnvisitorv5.data.Visit.VISIT;
-import static net.c_kogyo.returnvisitorv5.dialog.AccountDialog.ACCOUNT_TEST_TAG;
 
 public class MapActivity extends AppCompatActivity
                             implements OnMapReadyCallback,
@@ -644,6 +648,13 @@ public class MapActivity extends AppCompatActivity
                         }
                     }
                 }
+            }
+        } else if (requestCode == CHOOSE_ACCOUNT_REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                Log.d(ACCOUNT_TEST_TAG, data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME));
+                String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+                Account account = new Account(accountName, GOOGLE_ACCOUNT_TYPE);
+                onChooseAccount(account);
             }
         }
     }
@@ -1820,14 +1831,50 @@ public class MapActivity extends AppCompatActivity
     // DONE: 2017/06/02 ダイアログを閉じるたびにキーボードも閉じるように
     // DONE: Term of Use
 
+    public static final String ACCOUNT_TEST_TAG = "AccountTest";
     private void showAccountDialog() {
-        AccountDialog accountDialog = AccountDialog.newInstance(new AccountDialog.AccountDialogListener() {
-            @Override
-            public void onClickAccount(Account account) {
-                Log.d(ACCOUNT_TEST_TAG, "Chosen account: " + account.name);
+
+        Intent accountIntent = AccountManager.get(this).newChooseAccountIntent(null,
+                null,
+                new String[]{GOOGLE_ACCOUNT_TYPE},
+                false,
+                null, null, null, null);
+        startActivityForResult(accountIntent, CHOOSE_ACCOUNT_REQUEST_CODE);
+    }
+
+    private void onChooseAccount(Account account) {
+
+        AccountManager accountManager = AccountManager.get(this);
+        Bundle options = new Bundle();
+
+        accountManager.getAuthToken(
+                account,
+                "mail",
+                options,
+                this,
+                new OnTokenAcquired(),
+                null
+        );
+
+
+    }
+
+    private class OnTokenAcquired implements AccountManagerCallback<Bundle> {
+        @Override
+        public void run(AccountManagerFuture<Bundle> result) {
+            // Get the result of the operation from the AccountManagerFuture.
+
+            try {
+                Bundle bundle = result.getResult();
+                // The token is a named value in the bundle. The name of the value
+                // is stored in the constant AccountManager.KEY_AUTHTOKEN.
+                Log.d(ACCOUNT_TEST_TAG, bundle.getString(AccountManager.KEY_AUTHTOKEN));
+            } catch (IOException | OperationCanceledException | AuthenticatorException e) {
+                e.printStackTrace();
             }
-        });
-        accountDialog.show(getFragmentManager(), null);
+
+
+        }
     }
 
 
