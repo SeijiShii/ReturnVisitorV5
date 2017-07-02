@@ -1470,6 +1470,7 @@ public class MapActivity extends AppCompatActivity
 
     @Override
     public void onResponse(RVCloudSyncDataFrame dataFrame) {
+
         switch (dataFrame.getStatusCode()) {
             case STATUS_200_SYNC_END_OK:
                 onDataSyncSuccess(dataFrame);

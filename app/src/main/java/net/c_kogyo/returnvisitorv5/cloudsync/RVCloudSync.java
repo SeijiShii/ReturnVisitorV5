@@ -244,6 +244,7 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback,
                     RVCloudSyncDataFrame frame
                             = new RVCloudSyncDataFrame.Builder(RVCloudSyncDataFrame.FrameCategory.SYNC_DATA_RESPONSE)
                                 .setUserName(LoginHelper.getUserName(context))
+                                .setStatusCode(RVCloudSyncDataFrame.StatusCode.STATUS_TIMED_OUT)
                                 .create();
                     mCallback.onResponse(frame);
                 }
