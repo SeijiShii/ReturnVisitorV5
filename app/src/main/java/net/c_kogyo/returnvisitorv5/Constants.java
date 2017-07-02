@@ -22,8 +22,6 @@ public class Constants {
         public static final String PUBLISHER_NAME = "publisher_name";
 
         public static final String WEEK_START_DAY = "week_start_day";
-
-
     }
 
     public static final String DATA_ARRAY_LATER_THAN_TIME = "data_array_later_than_time";
@@ -137,6 +135,11 @@ public class Constants {
     public class WorkPagerActivityActions {
 
         public static final String START_WITH_NEW_WORK = "start_with_new_work";
+    }
+
+    public class AccountType {
+        public static final String GOOGLE_ACCOUNT_TYPE = "com.google";
+        public static final String FACEBOOK_ACCOUNT_TYPE = "com.facebook.auth.login";
     }
 
 }

@@ -1,6 +1,9 @@
 package net.c_kogyo.returnvisitorv5.activity;
 
 import android.Manifest;
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.accounts.AuthenticatorDescription;
 import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
 import android.app.Service;
@@ -11,6 +14,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
@@ -88,8 +92,12 @@ import net.c_kogyo.returnvisitorv5.view.CountTimeFrame;
 import net.c_kogyo.returnvisitorv5.view.LoginButtonBase;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 
+import static net.c_kogyo.returnvisitorv5.Constants.AccountType.FACEBOOK_ACCOUNT_TYPE;
+import static net.c_kogyo.returnvisitorv5.Constants.AccountType.GOOGLE_ACCOUNT_TYPE;
 import static net.c_kogyo.returnvisitorv5.Constants.LATITUDE;
 import static net.c_kogyo.returnvisitorv5.Constants.LONGITUDE;
 import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.EDIT_VISIT_ACTION;
@@ -119,6 +127,7 @@ public class MapActivity extends AppCompatActivity
     private static boolean isForeground;
     private static final String TAG = "MapActivity";
 
+
     private Handler cloudResultHandler;
     private AccessTokenTracker accessTokenTracker;
     private ProfileTracker profileTracker;
@@ -128,6 +137,7 @@ public class MapActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        initAccountDialog();
         RVDBHelper.initialize(this);
 
         // Facebook
@@ -1795,6 +1805,11 @@ public class MapActivity extends AppCompatActivity
 
     // DONE: 2017/06/02 ダイアログを閉じるたびにキーボードも閉じるように
     // DONE: Term of Use
+
+    private void initAccountDialog() {
+
+    }
+
 
 
 
