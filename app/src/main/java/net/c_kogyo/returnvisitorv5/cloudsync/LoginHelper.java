@@ -67,6 +67,8 @@ public class LoginHelper {
                 = context.getSharedPreferences(Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
 
+        editor.putLong(LAST_SYNC_TIME, lastSyncTime);
+
         editor.apply();
     }
 

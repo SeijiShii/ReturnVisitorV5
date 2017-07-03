@@ -155,7 +155,6 @@ public class MapActivity extends AppCompatActivity
 
         refreshWorkButton();
         refreshCalendarButton();
-        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this);
 
     }
 
@@ -930,6 +929,7 @@ public class MapActivity extends AppCompatActivity
         mApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .addConnectionCallbacks(this)
                 .build();
         mApiClient.connect();
     }
@@ -994,8 +994,11 @@ public class MapActivity extends AppCompatActivity
             public void onResult(@NonNull Status status) {
                 if (status.isSuccess()) {
                     LoginHelper.onLogOut(MapActivity.this);
-                    refreshSignInButton();
+
+                } else {
+                    Toast.makeText(MapActivity.this, R.string.sign_out_fail, Toast.LENGTH_SHORT).show();
                 }
+                refreshSignInButton();
             }
         });
 
@@ -1025,7 +1028,6 @@ public class MapActivity extends AppCompatActivity
     private void handleSignInResult(GoogleSignInResult result) {
         Log.d(TAG, "handleSignInResult:" + result.isSuccess());
         if (result.isSuccess()) {
-            // サインインが成功したら、サインインボタンを消して、ユーザー名を表示する
             GoogleSignInAccount mAccount = result.getSignInAccount();
             if (mAccount != null) {
                 String token = mAccount.getIdToken();
@@ -1444,21 +1446,10 @@ public class MapActivity extends AppCompatActivity
         cloudResultHandler.post(new Runnable() {
             @Override
             public void run() {
-                fadeProgressFrame(true);
-                switch (frameCategory) {
-                    case LOGIN_REQUEST:
-                        enableWaitScreen(true);
-                        waitMessageText.setText(R.string.start_login);
-                        break;
-                    case CREATE_USER_REQUEST:
-                        enableWaitScreen(true);
-                        waitMessageText.setText(R.string.creating_user);
-                        break;
-                    case SYNC_DATA_REQUEST_WITH_NAME:
-                    case SYNC_DATA_REQUEST_WITH_FACEBOOK:
-                        enableWaitScreen(false);
-                        waitMessageText.setText(R.string.on_sync);
-                        break;
+                if (frameCategory == RVCloudSyncDataFrame.FrameCategory.SYNC_DATA_REQUEST_WITH_GOOGLE) {
+                    fadeProgressFrame(true);
+                    enableWaitScreen(false);
+                    waitMessageText.setText(R.string.on_sync);
                 }
             }
         });
@@ -1472,20 +1463,10 @@ public class MapActivity extends AppCompatActivity
                 onDataSyncSuccess(dataFrame);
                 break;
 
-            case STATUS_201_CREATED_USER:
-                LoginHelper.saveLastSyncDate(0, this);
-                break;
-
-            case STATUS_202_AUTHENTICATED:
-                break;
-
             case STATUS_200_SYNC_START_OK:
                 postRequestResult(dataFrame);
                 break;
 
-            case STATUS_400_DUPLICATE_USER_NAME:
-            case STATUS_400_SHORT_USER_NAME:
-            case STATUS_400_SHORT_PASSWORD:
             case STATUS_401_UNAUTHORIZED:
             case STATUS_404_NOT_FOUND:
                 onFailRequest(dataFrame);
@@ -1516,7 +1497,7 @@ public class MapActivity extends AppCompatActivity
         PersonList.getInstance().refreshByDB();
         VisitList.getInstance().refreshByDB();
 
-        Log.d(RVDBHelper.TAG, "Place data count after refreshing list: " + PlaceList.getInstance().size());
+//        Log.d(RVDBHelper.TAG, "Place data count after refreshing list: " + PlaceList.getInstance().size());
 
         LoginHelper.saveLastSyncDate(Calendar.getInstance().getTimeInMillis(), this);
 
