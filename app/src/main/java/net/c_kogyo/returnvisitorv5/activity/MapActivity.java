@@ -158,9 +158,6 @@ public class MapActivity extends AppCompatActivity
 
     }
 
-
-//    private boolean isDataLoaded = false;
-
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -901,24 +898,6 @@ public class MapActivity extends AppCompatActivity
         isDrawerOpen = !isDrawerOpen;
     }
 
-//    private TextView loginStateText;
-//    private void initLoginStateText() {
-//        loginStateText = (TextView) findViewById(R.id.login_state_text);
-//    }
-
-//    private void refreshLoginStateText() {
-//        if (LoginHelper.isLoggedIn(this)) {
-//            String userName = LoginHelper.getAccountName(this);
-//            if (userName == null) {
-//                userName = "";
-//            }
-//            String s = getString(R.string.login_state, userName);
-//            loginStateText.setText(s);
-//        } else {
-//            loginStateText.setText(R.string.sync_data);
-//        }
-//    }
-
     private GoogleApiClient mApiClient;
     private void initGoogleApiClient() {
         GoogleSignInOptions gso = new GoogleSignInOptions
@@ -1341,58 +1320,6 @@ public class MapActivity extends AppCompatActivity
         startActivity(intent);
     }
 
-//    private void refreshLoginButton() {
-//
-//
-//    }
-
-//    private void onLoginClicked() {
-//        showLoginDialog();
-//    }
-
-////    private static String LOGIN_DIALOG = "login_dialog";
-//    private LoginDialog loginDialog;
-//    private void showLoginDialog() {
-//
-//        loginDialog = LoginDialog.getInstance(new LoginDialog.LoginDialogListener() {
-//
-//            @Override
-//            public void onLogoutClick() {
-//                // DONE: 2017/05/13 onLogoutClick
-//                confirmLogout();
-//            }
-//
-//            @Override
-//            public void onCloseDialog() {
-//                InputUtil.hideSoftKeyboard(MapActivity.this);
-//            }
-//
-//        }, new Handler());
-//        loginDialog.show(getFragmentManager(), null);
-//    }
-
-//    private void confirmLogout() {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setTitle(R.string.logout_title);
-//        builder.setMessage(R.string.logout_message);
-//        builder.setPositiveButton(R.string.logout_button_small, new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                logout();
-//            }
-//        });
-//        builder.setNegativeButton(R.string.cancel, null);
-//        builder.create().show();
-//    }
-
-//    private void logout() {
-//
-//        LoginHelper.onLoggedOut(this);
-//
-//        if (loginDialog != null) {
-//            loginDialog.postLogout();
-//        }
-//    }
 
     // DONE: 2017/05/05 データがないときにWORKやカレンダーに遷移しないようにする(実装済み、要検証)
     // DONE: 2017/05/06 AdView to Real
@@ -1403,40 +1330,8 @@ public class MapActivity extends AppCompatActivity
     // DONE: 2017/05/16 save loginWithName state
 
 
-
-
-
     // DONE: 2017/05/21 データロード中、同期中の表示
     // DONE: 2017/05/21 同期結果の表示
-
-    // RVDataCallback implementation
-//    @Override
-//    public void onStartSavingData() {
-//        fadeProgressFrame(true);
-//        waitMessageText.setText(R.string.saving);
-//    }
-//
-//    @Override
-//    public void onFinishSavingData() {
-//        fadeProgressFrame(false);
-//        waitMessageText.setText("");
-//    }
-//
-//    @Override
-//    public void onStartLoadingData() {
-//        enableWaitScreen(true);
-//        fadeProgressFrame(true);
-//        waitMessageText.setText(R.string.loading);
-//    }
-//
-//    @Override
-//    public void onFinishLoadingData() {
-//        refreshLogoButton();
-//        isDataLoaded = true;
-//        fadeProgressFrame(false);
-//        enableWaitScreen(false);
-//        waitMessageText.setText("");
-//    }
 
     // RVCloudSync Implementation
 
@@ -1479,25 +1374,11 @@ public class MapActivity extends AppCompatActivity
         }
     }
 
-//    private void onSuccessLogin(RVCloudSyncDataFrame dataFrame) {
-//
-//        LoginHelper.onLogin(LoginHelper.LoginProvider.USER_NAME,
-//                dataFrame.getUserName(),
-//                dataFrame.getPassword(),
-//                this);
-//        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this);
-//
-//        postRequestResult(dataFrame);
-//
-//    }
-
     private void onDataSyncSuccess(final RVCloudSyncDataFrame dataFrame) {
 
         PlaceList.getInstance().refreshByDB();
         PersonList.getInstance().refreshByDB();
         VisitList.getInstance().refreshByDB();
-
-//        Log.d(RVDBHelper.TAG, "Place data count after refreshing list: " + PlaceList.getInstance().size());
 
         LoginHelper.saveLastSyncDate(Calendar.getInstance().getTimeInMillis(), this);
 
@@ -1723,60 +1604,6 @@ public class MapActivity extends AppCompatActivity
             }
         });
     }
-
-
     public static final String ACCOUNT_TEST_TAG = "AccountTest";
-//    private void showAccountDialog() {
-//
-//        Intent accountIntent = AccountManager.get(this).newChooseAccountIntent(null,
-//                null,
-//                new String[]{GOOGLE_ACCOUNT_TYPE},
-//                false,
-//                null, null, null, null);
-//        startActivityForResult(accountIntent, CHOOSE_ACCOUNT_REQUEST_CODE);
-//    }
-//
-//    Account mAccount;
-//    private void onChooseAccount() {
-//
-//        AccountManager accountManager = AccountManager.get(this);
-//        Bundle options = new Bundle();
-//
-//        accountManager.getAuthToken(
-//                mAccount,
-//                "mail",
-//                options,
-//                this,
-//                new OnTokenAcquired(),
-//                null
-//        );
-//
-//
-//    }
-//
-//    private class OnTokenAcquired implements AccountManagerCallback<Bundle> {
-//        @Override
-//        public void run(AccountManagerFuture<Bundle> result) {
-//            // Get the result of the operation from the AccountManagerFuture.
-//
-//            try {
-//                Bundle bundle = result.getResult();
-//                // The token is a named value in the bundle. The name of the value
-//                // is stored in the constant AccountManager.KEY_AUTHTOKEN.
-//                String authToken = bundle.getString(AccountManager.KEY_AUTHTOKEN);
-//                Log.d(ACCOUNT_TEST_TAG, authToken);
-//
-//
-//                RVCloudSync.getInstance().requestDataSyncIfLoggedIn(MapActivity.this, authToken);
-//
-//
-//            } catch (IOException | OperationCanceledException | AuthenticatorException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
-
-
-
 
 }
