@@ -124,8 +124,6 @@ public class Constants {
 
     }
 
-    public static final int CHOOSE_ACCOUNT_REQUEST_CODE = 5001;
-
     public class WorkPagerActivityActions {
 
         public static final String START_WITH_NEW_WORK = "start_with_new_work";

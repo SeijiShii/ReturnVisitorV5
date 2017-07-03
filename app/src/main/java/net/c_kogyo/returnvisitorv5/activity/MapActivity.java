@@ -22,6 +22,7 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -55,6 +56,12 @@ import com.facebook.ProfileTracker;
 import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -96,14 +103,24 @@ import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 import net.c_kogyo.returnvisitorv5.view.CountTimeFrame;
 import net.c_kogyo.returnvisitorv5.view.LoginButtonBase;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 
+import javax.net.ssl.HttpsURLConnection;
+
 import static net.c_kogyo.returnvisitorv5.Constants.AccountType.GOOGLE_ACCOUNT_TYPE;
-import static net.c_kogyo.returnvisitorv5.Constants.CHOOSE_ACCOUNT_REQUEST_CODE;
 import static net.c_kogyo.returnvisitorv5.Constants.LATITUDE;
 import static net.c_kogyo.returnvisitorv5.Constants.LONGITUDE;
 import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.EDIT_VISIT_ACTION;
@@ -126,7 +143,8 @@ public class MapActivity extends AppCompatActivity
                                         GoogleMap.OnMapLongClickListener,
                                         GoogleMap.OnMarkerClickListener,
                                         GoogleMap.OnMarkerDragListener,
-                                        RVCloudSync.RVCloudSyncCallback {
+                                        RVCloudSync.RVCloudSyncCallback,
+                                        GoogleApiClient.OnConnectionFailedListener{
 
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
 
@@ -649,13 +667,10 @@ public class MapActivity extends AppCompatActivity
                     }
                 }
             }
-        } else if (requestCode == CHOOSE_ACCOUNT_REQUEST_CODE) {
-            if (resultCode == Activity.RESULT_OK) {
-                Log.d(ACCOUNT_TEST_TAG, data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME));
-                String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-                Account account = new Account(accountName, GOOGLE_ACCOUNT_TYPE);
-                onChooseAccount(account);
-            }
+        }
+        else if (requestCode == GOOGLE_SIGN_IN_REQUEST_CODE) {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            handleSignInResult(result);
         }
     }
 
@@ -1054,9 +1069,49 @@ public class MapActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 openCloseDrawer();
-                showAccountDialog();
+                onClickSyncData();
             }
         });
+    }
+
+    private GoogleApiClient mApiClient;
+    private static final int GOOGLE_SIGN_IN_REQUEST_CODE = 5001;
+    private void onClickSyncData() {
+        GoogleSignInOptions gso = new GoogleSignInOptions
+                .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .requestIdToken(getString(R.string.web_client_id))
+                .build();
+        mApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mApiClient);
+        startActivityForResult(signInIntent, GOOGLE_SIGN_IN_REQUEST_CODE);
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    private GoogleSignInAccount mAccount;
+    private void handleSignInResult(GoogleSignInResult result) {
+        Log.d(TAG, "handleSignInResult:" + result.isSuccess());
+        if (result.isSuccess()) {
+            // サインインが成功したら、サインインボタンを消して、ユーザー名を表示する
+            mAccount = result.getSignInAccount();
+            if (mAccount != null) {
+                String token = mAccount.getIdToken();
+                Log.d(ACCOUNT_TEST_TAG, "token: " + token);
+                RVCloudSync.getInstance().requestDataSyncWithGoogle(this, token);
+            }
+
+        } else {
+            // Signed out, show unauthenticated UI.
+
+        }
     }
 
     private CountTimeFrame countTimeFrame;
@@ -1832,52 +1887,55 @@ public class MapActivity extends AppCompatActivity
     // DONE: Term of Use
 
     public static final String ACCOUNT_TEST_TAG = "AccountTest";
-    private void showAccountDialog() {
-
-        Intent accountIntent = AccountManager.get(this).newChooseAccountIntent(null,
-                null,
-                new String[]{GOOGLE_ACCOUNT_TYPE},
-                false,
-                null, null, null, null);
-        startActivityForResult(accountIntent, CHOOSE_ACCOUNT_REQUEST_CODE);
-    }
-
-    private void onChooseAccount(Account account) {
-
-        AccountManager accountManager = AccountManager.get(this);
-        Bundle options = new Bundle();
-
-        accountManager.getAuthToken(
-                account,
-                "mail",
-                options,
-                this,
-                new OnTokenAcquired(),
-                null
-        );
-
-
-    }
-
-    private class OnTokenAcquired implements AccountManagerCallback<Bundle> {
-        @Override
-        public void run(AccountManagerFuture<Bundle> result) {
-            // Get the result of the operation from the AccountManagerFuture.
-
-            try {
-                Bundle bundle = result.getResult();
-                // The token is a named value in the bundle. The name of the value
-                // is stored in the constant AccountManager.KEY_AUTHTOKEN.
-                Log.d(ACCOUNT_TEST_TAG, bundle.getString(AccountManager.KEY_AUTHTOKEN));
-            } catch (IOException | OperationCanceledException | AuthenticatorException e) {
-                e.printStackTrace();
-            }
-
-
-        }
-    }
-
-
+//    private void showAccountDialog() {
+//
+//        Intent accountIntent = AccountManager.get(this).newChooseAccountIntent(null,
+//                null,
+//                new String[]{GOOGLE_ACCOUNT_TYPE},
+//                false,
+//                null, null, null, null);
+//        startActivityForResult(accountIntent, CHOOSE_ACCOUNT_REQUEST_CODE);
+//    }
+//
+//    Account mAccount;
+//    private void onChooseAccount() {
+//
+//        AccountManager accountManager = AccountManager.get(this);
+//        Bundle options = new Bundle();
+//
+//        accountManager.getAuthToken(
+//                mAccount,
+//                "mail",
+//                options,
+//                this,
+//                new OnTokenAcquired(),
+//                null
+//        );
+//
+//
+//    }
+//
+//    private class OnTokenAcquired implements AccountManagerCallback<Bundle> {
+//        @Override
+//        public void run(AccountManagerFuture<Bundle> result) {
+//            // Get the result of the operation from the AccountManagerFuture.
+//
+//            try {
+//                Bundle bundle = result.getResult();
+//                // The token is a named value in the bundle. The name of the value
+//                // is stored in the constant AccountManager.KEY_AUTHTOKEN.
+//                String authToken = bundle.getString(AccountManager.KEY_AUTHTOKEN);
+//                Log.d(ACCOUNT_TEST_TAG, authToken);
+//
+//
+//                RVCloudSync.getInstance().requestDataSyncWithGoogle(MapActivity.this, authToken);
+//
+//
+//            } catch (IOException | OperationCanceledException | AuthenticatorException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
 
 
 

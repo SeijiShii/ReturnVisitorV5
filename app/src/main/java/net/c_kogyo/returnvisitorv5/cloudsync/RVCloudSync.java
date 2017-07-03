@@ -1,14 +1,12 @@
 package net.c_kogyo.returnvisitorv5.cloudsync;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.facebook.AccessToken;
 import com.google.gson.Gson;
 
-import net.c_kogyo.returnvisitorv5.Constants;
 import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.db.RVRecord;
 import net.c_kogyo.returnvisitorv5.util.DateTimeText;
@@ -18,8 +16,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Calendar;
-
-import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Created by SeijiShii on 2017/05/10.
@@ -246,6 +242,49 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback,
                                 .setUserName(LoginHelper.getUserName(context))
                                 .setStatusCode(RVCloudSyncDataFrame.StatusCode.STATUS_TIMED_OUT)
                                 .create();
+                    mCallback.onResponse(frame);
+                }
+            }
+        });
+    }
+
+    public void requestDataSyncWithGoogle(final Context context, String authToken) {
+
+        if (mCallback != null) {
+            mCallback.onStartRequest(RVCloudSyncDataFrame.FrameCategory.SYNC_DATA_REQUEST_WITH_NAME);
+        }
+
+        initSocketClient(context);
+
+        cloudDataList = new ArrayList<>();
+
+        long lastSyncTime = LoginHelper.loadLastSyncDate(context);
+
+        Calendar date = Calendar.getInstance();
+        date.setTimeInMillis(lastSyncTime);
+        Log.d(TAG, "Last sync date: " + DateTimeText.getDateTimeText(date, context));
+
+        deviceDataList = RVDBHelper.getInstance().loadRecordsLaterThanTime(lastSyncTime);
+
+        RVCloudSyncDataFrame dataFrame
+                = new RVCloudSyncDataFrame.Builder(RVCloudSyncDataFrame.FrameCategory.SYNC_DATA_REQUEST_WITH_GOOGLE)
+                    .setAuthToken(authToken)
+                    .create();
+        startSendingData(context, dataFrame, new SendDataCallback() {
+            @Override
+            public void onStart() {
+
+            }
+
+            @Override
+            public void onTimedOut() {
+                if (mCallback != null) {
+
+                    RVCloudSyncDataFrame frame
+                            = new RVCloudSyncDataFrame.Builder(RVCloudSyncDataFrame.FrameCategory.SYNC_DATA_RESPONSE)
+                            .setUserName(LoginHelper.getUserName(context))
+                            .setStatusCode(RVCloudSyncDataFrame.StatusCode.STATUS_TIMED_OUT)
+                            .create();
                     mCallback.onResponse(frame);
                 }
             }
