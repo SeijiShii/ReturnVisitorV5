@@ -121,7 +121,6 @@ public class Constants {
         public static final int VISIT_ADDED_RESULT_CODE = 4030;
         public static final int PLACE_ADDED_RESULT_CODE = 4040;
 
-
     }
 
     public class WorkPagerActivityActions {
@@ -129,10 +128,6 @@ public class Constants {
         public static final String START_WITH_NEW_WORK = "start_with_new_work";
     }
 
-    public class AccountType {
-        public static final String GOOGLE_ACCOUNT_TYPE = "com.google";
 
-        public static final String GOOGLE_ACCOUNT_NAME = "Google";
-    }
 
 }

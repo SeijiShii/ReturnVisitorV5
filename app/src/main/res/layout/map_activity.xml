@@ -128,79 +128,36 @@
                     android:layout_marginRight="5dp"
                     android:layout_marginLeft="5dp"/>
 
-                <!-- Login state text -->
-                <net.c_kogyo.returnvisitorv5.view.LoginButtonBase
+                <!-- Data sync button -->
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/login_state_text_base">
+                    android:layout_height="60dp"
+                    android:orientation="horizontal"
+                    android:padding="5dp"
+                    android:id="@+id/sign_in_button">
+
+                    <RelativeLayout
+                        android:layout_width="40dp"
+                        android:layout_height="match_parent">
+
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:background="@drawable/google_logo_30"
+                            android:layout_centerInParent="true"/>
+
+                    </RelativeLayout>
 
                     <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="20dp"
-                        android:id="@+id/login_state_text"
-                        android:textColor="@color/textColorGray"
-                        android:textSize="@dimen/text_size_small"
-                        android:gravity="center"/>
-
-                </net.c_kogyo.returnvisitorv5.view.LoginButtonBase>
-
-                <!-- Login Button -->
-                <net.c_kogyo.returnvisitorv5.view.LoginButtonBase
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/ui_height_small"
-                    android:id="@+id/login_button_base">
-
-                    <Button
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:id="@+id/login_button"
-                        android:textColor="@color/colorPrimaryDark"
-                        android:background="@drawable/trans_blue_selector"
-                        android:text="@string/login_button"
-                        android:paddingLeft="5dp"
-                        android:paddingRight="5dp"
-                        android:layout_centerInParent="true"/>
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="@string/sign_in"
+                        android:id="@+id/sign_in_text"
+                        android:textColor="@color/textColorGray"/>
 
-                </net.c_kogyo.returnvisitorv5.view.LoginButtonBase>
-
-                <!-- FB Login button -->
-                <net.c_kogyo.returnvisitorv5.view.LoginButtonBase
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/ui_height_small"
-                    android:id="@+id/fb_button_base">
-
-                    <com.facebook.login.widget.LoginButton
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/fb_button"
-                        android:layout_centerInParent="true"/>
-
-                </net.c_kogyo.returnvisitorv5.view.LoginButtonBase>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/textColorGray"
-                    android:layout_marginRight="5dp"
-                    android:layout_marginLeft="5dp"/>
-
-                <!-- Data sync button -->
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/ui_height_small">
-
-                    <Button
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:id="@+id/sync_data_button"
-                        android:textColor="@color/colorPrimaryDark"
-                        android:background="@drawable/trans_blue_selector"
-                        android:text="@string/sync_data"
-                        android:paddingLeft="5dp"
-                        android:paddingRight="5dp"
-                        android:layout_centerInParent="true"/>
-
-                </RelativeLayout>
+                </LinearLayout>
 
                 <View
                     android:layout_width="match_parent"

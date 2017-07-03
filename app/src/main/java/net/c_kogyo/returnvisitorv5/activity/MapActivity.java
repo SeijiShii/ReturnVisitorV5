@@ -1,16 +1,8 @@
 package net.c_kogyo.returnvisitorv5.activity;
 
 import android.Manifest;
-import android.accounts.Account;
-import android.accounts.AccountManager;
-import android.accounts.AccountManagerCallback;
-import android.accounts.AccountManagerFuture;
-import android.accounts.AuthenticatorDescription;
-import android.accounts.AuthenticatorException;
-import android.accounts.OperationCanceledException;
 import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
-import android.app.Activity;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -19,10 +11,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -45,23 +37,15 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.facebook.AccessToken;
-import com.facebook.AccessTokenTracker;
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.FacebookSdk;
-import com.facebook.Profile;
-import com.facebook.ProfileTracker;
-import com.facebook.appevents.AppEventsLogger;
-import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.OptionalPendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -86,7 +70,6 @@ import net.c_kogyo.returnvisitorv5.data.list.WorkList;
 import net.c_kogyo.returnvisitorv5.db.RVDBHelper;
 import net.c_kogyo.returnvisitorv5.dialog.AddWorkDialog;
 import net.c_kogyo.returnvisitorv5.dialog.HousingComplexDialog;
-import net.c_kogyo.returnvisitorv5.dialog.LoginDialog;
 import net.c_kogyo.returnvisitorv5.dialog.MapLongClickDialog;
 import net.c_kogyo.returnvisitorv5.dialog.PersonDialog;
 import net.c_kogyo.returnvisitorv5.dialog.PlaceDialog;
@@ -101,26 +84,10 @@ import net.c_kogyo.returnvisitorv5.util.InputUtil;
 import net.c_kogyo.returnvisitorv5.util.SoftKeyboard;
 import net.c_kogyo.returnvisitorv5.util.ViewUtil;
 import net.c_kogyo.returnvisitorv5.view.CountTimeFrame;
-import net.c_kogyo.returnvisitorv5.view.LoginButtonBase;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 
-import javax.net.ssl.HttpsURLConnection;
-
-import static net.c_kogyo.returnvisitorv5.Constants.AccountType.GOOGLE_ACCOUNT_TYPE;
 import static net.c_kogyo.returnvisitorv5.Constants.LATITUDE;
 import static net.c_kogyo.returnvisitorv5.Constants.LONGITUDE;
 import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.EDIT_VISIT_ACTION;
@@ -134,7 +101,6 @@ import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.VISIT_ADD
 import static net.c_kogyo.returnvisitorv5.Constants.RecordVisitActions.VISIT_EDITED_RESULT_CODE;
 import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.RETURN_VISITOR_SHARED_PREFS;
 import static net.c_kogyo.returnvisitorv5.Constants.SharedPrefTags.ZOOM_LEVEL;
-import static net.c_kogyo.returnvisitorv5.cloudsync.LoginHelper.FB_TAG;
 import static net.c_kogyo.returnvisitorv5.data.Place.PLACE;
 import static net.c_kogyo.returnvisitorv5.data.Visit.VISIT;
 
@@ -144,7 +110,8 @@ public class MapActivity extends AppCompatActivity
                                         GoogleMap.OnMarkerClickListener,
                                         GoogleMap.OnMarkerDragListener,
                                         RVCloudSync.RVCloudSyncCallback,
-                                        GoogleApiClient.OnConnectionFailedListener{
+                                        GoogleApiClient.OnConnectionFailedListener,
+                                        GoogleApiClient.ConnectionCallbacks{
 
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
 
@@ -153,45 +120,12 @@ public class MapActivity extends AppCompatActivity
 
 
     private Handler cloudResultHandler;
-    private AccessTokenTracker accessTokenTracker;
-    private ProfileTracker profileTracker;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         RVDBHelper.initialize(this);
-
-        // Facebook
-        FacebookSdk.sdkInitialize(getApplicationContext());
-        AppEventsLogger.activateApp(this);
-
-        accessTokenTracker = new AccessTokenTracker() {
-            @Override
-            protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
-
-                Log.d(FB_TAG, "onCurrentAccessTokenChanged called.");
-
-                if (currentAccessToken == null) {
-                    // ログアウトしたということ。
-                    LoginHelper.onLoggedOut(MapActivity.this);
-                    refreshLoginButtons(true);
-                } else {
-                    LoginHelper.onLogin(LoginHelper.LoginProvider.FACEBOOK, MapActivity.this);
-                    refreshLoginButtons(true);
-                }
-            }
-        };
-
-        profileTracker = new ProfileTracker() {
-            @Override
-            protected void onCurrentProfileChanged(Profile oldProfile, Profile currentProfile) {
-
-                Log.d(FB_TAG, "onCurrentProfileChanged called.");
-
-            }
-        };
 
         // log
         Intent errorLogIntent = new Intent(this, ErrorLogIntentService.class);
@@ -209,7 +143,6 @@ public class MapActivity extends AppCompatActivity
         initSoftKeyboard();
         initSearchText();
 
-//        loginDialogHandler = new Handler();
         RVCloudSync.getInstance().setCallback(this);
 
         initLocalBroadcast();
@@ -219,7 +152,6 @@ public class MapActivity extends AppCompatActivity
         initMapView(savedInstanceState);
 
         initDrawerOverlay();
-        refreshLoginButtons(false);
 
         refreshWorkButton();
         refreshCalendarButton();
@@ -342,8 +274,6 @@ public class MapActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        accessTokenTracker.stopTracking();
-        profileTracker.stopTracking();
 
         try {
             mMap.setMyLocationEnabled(false);
@@ -635,8 +565,6 @@ public class MapActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        callbackManager.onActivityResult(requestCode, resultCode, data);
-
         if (resultCode == VISIT_ADDED_RESULT_CODE
                 || resultCode == PLACE_ADDED_RESULT_CODE
                 || resultCode == VISIT_EDITED_RESULT_CODE) {
@@ -883,12 +811,8 @@ public class MapActivity extends AppCompatActivity
             }
         });
 
-        initLoginStateText();
-        initLoginButton();
-        initFacebookLoginButton();
-        refreshLoginButtons(false);
-
-        initSyncDataButton();
+        initSignInButton();
+        initGoogleApiClient();
 
         initCountTimeFrame();
         initWorkButton();
@@ -948,7 +872,7 @@ public class MapActivity extends AppCompatActivity
             public void onAnimationUpdate(ValueAnimator animation) {
                 drawerOverlay.setAlpha((float) animation.getAnimatedValue());
                 drawerOverlay.requestLayout();
-                          }
+            }
         });
 
         int originMargin, targetMargin;
@@ -978,117 +902,103 @@ public class MapActivity extends AppCompatActivity
         isDrawerOpen = !isDrawerOpen;
     }
 
-    private LoginButtonBase loginStateTextBase;
-    private TextView loginStateText;
-    private void initLoginStateText() {
-        loginStateTextBase = (LoginButtonBase) findViewById(R.id.login_state_text_base);
-        loginStateText = (TextView) findViewById(R.id.login_state_text);
+//    private TextView loginStateText;
+//    private void initLoginStateText() {
+//        loginStateText = (TextView) findViewById(R.id.login_state_text);
+//    }
 
-    }
-
-    private void refreshLoginStateText() {
-        if (LoginHelper.isLoggedIn(this)) {
-            String userName = LoginHelper.getUserName(this);
-            if (userName == null) {
-                userName = "";
-            }
-            String s = getString(R.string.login_state, userName);
-            loginStateText.setText(s);
-        } else {
-            loginStateText.setText("");
-        }
-    }
-
-    private void refreshLoginButtons(boolean animate) {
-
-        int buttonHeight = getResources().getDimensionPixelSize(R.dimen.ui_height_small);
-
-        refreshLoginStateText();
-
-        if (LoginHelper.isLoggedIn(this)) {
-            loginButton.setText(R.string.logout_button);
-        } else {
-            loginButton.setText(R.string.login_button);
-        }
-
-        if (animate) {
-            if (LoginHelper.isLoggedIn(this)) {
-                loginStateTextBase.extract(ViewGroup.LayoutParams.WRAP_CONTENT);
-
-                switch (LoginHelper.getLoginProvider(this)) {
-                    case USER_NAME:
-                        loginButtonBase.extract(buttonHeight);
-                        fbButtonBase.compress();
-                        break;
-
-                    case FACEBOOK:
-                        loginButtonBase.compress();
-                        fbButtonBase.extract(buttonHeight);
-                        break;
-                }
-
-            } else {
-                loginStateTextBase.compress();
-
-                loginButtonBase.extract(buttonHeight);
-                fbButtonBase.extract(buttonHeight);
-            }
-        } else {
-            if (LoginHelper.isLoggedIn(this)) {
-                String s = getString(R.string.login_state, LoginHelper.getUserName(this));
-                loginStateText.setText(s);
-                loginStateTextBase.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
-
-                switch (LoginHelper.getLoginProvider(this)) {
-                    case USER_NAME:
-                        loginButtonBase.getLayoutParams().height = buttonHeight;
-                        fbButtonBase.getLayoutParams().height = 0;
-                        break;
-
-                    case FACEBOOK:
-                        loginButtonBase.getLayoutParams().height = 0;
-                        fbButtonBase.getLayoutParams().height = buttonHeight;
-                        break;
-                }
-
-            } else {
-                loginStateTextBase.getLayoutParams().height = 0;
-                loginStateText.setText("");
-
-                loginButtonBase.getLayoutParams().height = buttonHeight;
-                fbButtonBase.getLayoutParams().height = buttonHeight;
-            }
-        }
-
-
-    }
-
-    private void initSyncDataButton() {
-        Button syncDataButton = (Button) findViewById(R.id.sync_data_button);
-        syncDataButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openCloseDrawer();
-                onClickSyncData();
-            }
-        });
-    }
+//    private void refreshLoginStateText() {
+//        if (LoginHelper.isLoggedIn(this)) {
+//            String userName = LoginHelper.getAccountName(this);
+//            if (userName == null) {
+//                userName = "";
+//            }
+//            String s = getString(R.string.login_state, userName);
+//            loginStateText.setText(s);
+//        } else {
+//            loginStateText.setText(R.string.sync_data);
+//        }
+//    }
 
     private GoogleApiClient mApiClient;
-    private static final int GOOGLE_SIGN_IN_REQUEST_CODE = 5001;
-    private void onClickSyncData() {
+    private void initGoogleApiClient() {
         GoogleSignInOptions gso = new GoogleSignInOptions
                 .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .requestIdToken(getString(R.string.web_client_id))
                 .build();
         mApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                .enableAutoManage(this, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
+        mApiClient.connect();
+    }
+
+    private LinearLayout signInButton;
+    private TextView signInText;
+    private void initSignInButton() {
+
+        signInButton = (LinearLayout) findViewById(R.id.sign_in_button);
+        signInText = (TextView) findViewById(R.id.sign_in_text);
+        refreshSignInButton();
+
+    }
+
+    private void refreshSignInButton() {
+        if (LoginHelper.isLoggedIn(this)) {
+            String s = getString(R.string.sign_out, LoginHelper.getAccountName(this));
+            signInText.setText(s);
+            ViewUtil.setOnClickListener(signInButton, new ViewUtil.OnViewClickListener() {
+                @Override
+                public void onViewClick(View view) {
+                    confirmSignOut();
+                }
+            });
+        } else {
+            signInText.setText(R.string.sign_in);
+            ViewUtil.setOnClickListener(signInButton, new ViewUtil.OnViewClickListener() {
+                @Override
+                public void onViewClick(View view) {
+                    openCloseDrawer();
+                    onClickSignIn();
+                }
+            });
+        }
+    }
+
+    private static final int GOOGLE_SIGN_IN_REQUEST_CODE = 5001;
+    private void onClickSignIn() {
 
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mApiClient);
         startActivityForResult(signInIntent, GOOGLE_SIGN_IN_REQUEST_CODE);
+    }
+
+    private void confirmSignOut() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.sign_out_title);
+        builder.setMessage(R.string.sign_out_message);
+        builder.setNegativeButton(R.string.cancel, null);
+        builder.setPositiveButton(R.string.sign_out_title, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                signOut();
+                openCloseDrawer();
+            }
+        });
+        builder.create().show();
+    }
+
+    private void signOut() {
+        Auth.GoogleSignInApi.signOut(mApiClient).setResultCallback(new ResultCallback<Status>() {
+            @Override
+            public void onResult(@NonNull Status status) {
+                if (status.isSuccess()) {
+                    LoginHelper.onLogOut(MapActivity.this);
+                    refreshSignInButton();
+                }
+            }
+        });
+
     }
 
     @Override
@@ -1096,22 +1006,40 @@ public class MapActivity extends AppCompatActivity
 
     }
 
-    private GoogleSignInAccount mAccount;
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        OptionalPendingResult<GoogleSignInResult> pendingResult = Auth.GoogleSignInApi.silentSignIn(mApiClient);
+        if (pendingResult.isDone()) {
+            GoogleSignInResult result = pendingResult.get();
+            handleSignInResult(result);
+        } else {
+
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
     private void handleSignInResult(GoogleSignInResult result) {
         Log.d(TAG, "handleSignInResult:" + result.isSuccess());
         if (result.isSuccess()) {
             // サインインが成功したら、サインインボタンを消して、ユーザー名を表示する
-            mAccount = result.getSignInAccount();
+            GoogleSignInAccount mAccount = result.getSignInAccount();
             if (mAccount != null) {
                 String token = mAccount.getIdToken();
                 Log.d(ACCOUNT_TEST_TAG, "token: " + token);
-                RVCloudSync.getInstance().requestDataSyncWithGoogle(this, token);
+                LoginHelper.onLogin(this, mAccount.getEmail(), token);
+                RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this);
+
             }
 
         } else {
             // Signed out, show unauthenticated UI.
-
+            LoginHelper.onLogOut(this);
         }
+        refreshSignInButton();
     }
 
     private CountTimeFrame countTimeFrame;
@@ -1411,80 +1339,58 @@ public class MapActivity extends AppCompatActivity
         startActivity(intent);
     }
 
-    private Button loginButton;
-    private LoginButtonBase loginButtonBase;
-    private void initLoginButton() {
-
-        loginButtonBase = (LoginButtonBase) findViewById(R.id.login_button_base);
-
-        loginButton = (Button) findViewById(R.id.login_button);
-
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (LoginHelper.isLoggedIn(MapActivity.this)) {
-                    confirmLogout();
-                } else {
-                    openCloseDrawer();
-                    onLoginClicked();
-                }
-            }
-        });
-    }
-
 //    private void refreshLoginButton() {
 //
 //
 //    }
 
-    private void onLoginClicked() {
-        showLoginDialog();
-    }
+//    private void onLoginClicked() {
+//        showLoginDialog();
+//    }
 
-//    private static String LOGIN_DIALOG = "login_dialog";
-    private LoginDialog loginDialog;
-    private void showLoginDialog() {
+////    private static String LOGIN_DIALOG = "login_dialog";
+//    private LoginDialog loginDialog;
+//    private void showLoginDialog() {
+//
+//        loginDialog = LoginDialog.getInstance(new LoginDialog.LoginDialogListener() {
+//
+//            @Override
+//            public void onLogoutClick() {
+//                // DONE: 2017/05/13 onLogoutClick
+//                confirmLogout();
+//            }
+//
+//            @Override
+//            public void onCloseDialog() {
+//                InputUtil.hideSoftKeyboard(MapActivity.this);
+//            }
+//
+//        }, new Handler());
+//        loginDialog.show(getFragmentManager(), null);
+//    }
 
-        loginDialog = LoginDialog.getInstance(new LoginDialog.LoginDialogListener() {
+//    private void confirmLogout() {
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        builder.setTitle(R.string.logout_title);
+//        builder.setMessage(R.string.logout_message);
+//        builder.setPositiveButton(R.string.logout_button_small, new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                logout();
+//            }
+//        });
+//        builder.setNegativeButton(R.string.cancel, null);
+//        builder.create().show();
+//    }
 
-            @Override
-            public void onLogoutClick() {
-                // DONE: 2017/05/13 onLogoutClick
-                confirmLogout();
-            }
-
-            @Override
-            public void onCloseDialog() {
-                InputUtil.hideSoftKeyboard(MapActivity.this);
-            }
-
-        }, new Handler());
-        loginDialog.show(getFragmentManager(), null);
-    }
-
-    private void confirmLogout() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(R.string.logout_title);
-        builder.setMessage(R.string.logout_message);
-        builder.setPositiveButton(R.string.logout_button_small, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                logout();
-            }
-        });
-        builder.setNegativeButton(R.string.cancel, null);
-        builder.create().show();
-    }
-
-    private void logout() {
-
-        LoginHelper.onLoggedOut(this);
-
-        refreshLoginButtons(true);
-        if (loginDialog != null) {
-            loginDialog.postLogout();
-        }
-    }
+//    private void logout() {
+//
+//        LoginHelper.onLoggedOut(this);
+//
+//        if (loginDialog != null) {
+//            loginDialog.postLogout();
+//        }
+//    }
 
     // DONE: 2017/05/05 データがないときにWORKやカレンダーに遷移しないようにする(実装済み、要検証)
     // DONE: 2017/05/06 AdView to Real
@@ -1568,11 +1474,9 @@ public class MapActivity extends AppCompatActivity
 
             case STATUS_201_CREATED_USER:
                 LoginHelper.saveLastSyncDate(0, this);
-                onSuccessLogin(dataFrame);
                 break;
 
             case STATUS_202_AUTHENTICATED:
-                onSuccessLogin(dataFrame);
                 break;
 
             case STATUS_200_SYNC_START_OK:
@@ -1594,17 +1498,17 @@ public class MapActivity extends AppCompatActivity
         }
     }
 
-    private void onSuccessLogin(RVCloudSyncDataFrame dataFrame) {
-
-        LoginHelper.onLogin(LoginHelper.LoginProvider.USER_NAME,
-                dataFrame.getUserName(),
-                dataFrame.getPassword(),
-                this);
-        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this);
-
-        postRequestResult(dataFrame);
-
-    }
+//    private void onSuccessLogin(RVCloudSyncDataFrame dataFrame) {
+//
+//        LoginHelper.onLogin(LoginHelper.LoginProvider.USER_NAME,
+//                dataFrame.getUserName(),
+//                dataFrame.getPassword(),
+//                this);
+//        RVCloudSync.getInstance().requestDataSyncIfLoggedIn(this);
+//
+//        postRequestResult(dataFrame);
+//
+//    }
 
     private void onDataSyncSuccess(final RVCloudSyncDataFrame dataFrame) {
 
@@ -1631,29 +1535,19 @@ public class MapActivity extends AppCompatActivity
     }
 
     private void onFailRequest(RVCloudSyncDataFrame dataFrame) {
-        LoginHelper.onLoggedOut(this);
         postRequestResult(dataFrame);
     }
 
     public void postRequestResult(final RVCloudSyncDataFrame dataFrame) {
 
-        String userName = dataFrame.getUserName();
-        if (userName != null) {
-            LoginHelper.setUserName(userName, this);
-        }
-
         cloudResultHandler.post(new Runnable() {
             @Override
             public void run() {
-                if (loginDialog != null) {
-                    loginDialog.onLoginResult(dataFrame);
-                }
 
                 enableWaitScreen(false);
                 fadeProgressFrame(false);
                 waitMessageText.setText("");
 
-                refreshLoginButtons(true);
                 refreshWorkButton();
                 refreshCalendarButton();
 
@@ -1849,42 +1743,6 @@ public class MapActivity extends AppCompatActivity
         });
     }
 
-    private CallbackManager callbackManager;
-    private LoginButtonBase fbButtonBase;
-    private void initFacebookLoginButton() {
-
-        fbButtonBase = (LoginButtonBase) findViewById(R.id.fb_button_base);
-
-        LoginButton fbLoginButton = (LoginButton) findViewById(R.id.fb_button);
-        fbLoginButton.setReadPermissions("email");
-
-        callbackManager = CallbackManager.Factory.create();
-        fbLoginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                Log.d(FB_TAG, "onSuccess in callback called.");
-                Log.d(FB_TAG, "accessToken: " + loginResult.getAccessToken().getToken());
-                LoginHelper.onLogin(LoginHelper.LoginProvider.FACEBOOK, MapActivity.this);
-                refreshLoginButtons(true);
-
-                RVCloudSync.getInstance().requestDataSyncIfLoggedIn(MapActivity.this);
-            }
-
-            @Override
-            public void onCancel() {
-                Log.d(FB_TAG, "onCancel");
-            }
-
-            @Override
-            public void onError(FacebookException error) {
-                Log.d(FB_TAG, "onError: " + error.getMessage());
-            }
-        });
-
-    }
-
-    // DONE: 2017/06/02 ダイアログを閉じるたびにキーボードも閉じるように
-    // DONE: Term of Use
 
     public static final String ACCOUNT_TEST_TAG = "AccountTest";
 //    private void showAccountDialog() {
@@ -1928,7 +1786,7 @@ public class MapActivity extends AppCompatActivity
 //                Log.d(ACCOUNT_TEST_TAG, authToken);
 //
 //
-//                RVCloudSync.getInstance().requestDataSyncWithGoogle(MapActivity.this, authToken);
+//                RVCloudSync.getInstance().requestDataSyncIfLoggedIn(MapActivity.this, authToken);
 //
 //
 //            } catch (IOException | OperationCanceledException | AuthenticatorException e) {

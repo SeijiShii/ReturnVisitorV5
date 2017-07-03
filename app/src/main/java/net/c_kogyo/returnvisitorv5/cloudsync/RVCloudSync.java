@@ -176,82 +176,76 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback,
 
     private ArrayList<RVRecord> cloudDataList, deviceDataList;
     private int cloudDataCount = 0;
+//    public void requestDataSyncIfLoggedIn(final Context context) {
+//
+//        if (mCallback != null) {
+//            mCallback.onStartRequest(RVCloudSyncDataFrame.FrameCategory.SYNC_DATA_REQUEST_WITH_NAME);
+//        }
+//
+//        initSocketClient(context);
+//
+//        cloudDataList = new ArrayList<>();
+//
+//        long lastSyncTime = LoginHelper.loadLastSyncDate(context);
+//
+//        Calendar date = Calendar.getInstance();
+//        date.setTimeInMillis(lastSyncTime);
+//        Log.d(TAG, "Last sync date: " + DateTimeText.getDateTimeText(date, context));
+//
+//        deviceDataList = RVDBHelper.getInstance().loadRecordsLaterThanTime(lastSyncTime);
+//
+//        RVCloudSyncDataFrame dataFrame = null;
+//
+//        switch (LoginHelper.getLoginProvider(context)) {
+//            case USER_NAME:
+//                dataFrame = new RVCloudSyncDataFrame.Builder(RVCloudSyncDataFrame.FrameCategory.SYNC_DATA_REQUEST_WITH_NAME)
+//                        .setUserName(LoginHelper.getUserName(context))
+//                        .setPassword(LoginHelper.getPassword(context))
+//                        .setLastSyncDate(lastSyncTime)
+//                        .create();
+//                break;
+//            case FACEBOOK:
+//
+//                AccessToken accessToken = AccessToken.getCurrentAccessToken();
+//                String token = accessToken.getToken();
+//
+//                dataFrame = new RVCloudSyncDataFrame.Builder(RVCloudSyncDataFrame.FrameCategory.SYNC_DATA_REQUEST_WITH_FACEBOOK)
+//                        .setAuthToken(token)
+//                        .setLastSyncDate(lastSyncTime)
+//                        .create();
+//                break;
+//        }
+//
+//        startSendingData(context, dataFrame, new SendDataCallback() {
+//            @Override
+//            public void onStart() {
+//
+//            }
+//
+//            @Override
+//            public void onTimedOut() {
+//                if (mCallback != null) {
+//
+//                    RVCloudSyncDataFrame frame
+//                            = new RVCloudSyncDataFrame.Builder(RVCloudSyncDataFrame.FrameCategory.SYNC_DATA_RESPONSE)
+//                                .setUserName(LoginHelper.getUserName(context))
+//                                .setStatusCode(RVCloudSyncDataFrame.StatusCode.STATUS_TIMED_OUT)
+//                                .create();
+//                    mCallback.onResponse(frame);
+//                }
+//            }
+//        });
+//    }
+
     public void requestDataSyncIfLoggedIn(final Context context) {
 
-        switch (LoginHelper.getLoginProvider(context)) {
-            case USER_NAME:
-                if (!LoginHelper.isLoggedIn(context)) return;
-                break;
-            case FACEBOOK:
-                if (AccessToken.getCurrentAccessToken() == null) {
-                    return;
-                }
-                break;
-        }
-
         if (mCallback != null) {
             mCallback.onStartRequest(RVCloudSyncDataFrame.FrameCategory.SYNC_DATA_REQUEST_WITH_NAME);
         }
 
-        initSocketClient(context);
-
-        cloudDataList = new ArrayList<>();
-
-        long lastSyncTime = LoginHelper.loadLastSyncDate(context);
-
-        Calendar date = Calendar.getInstance();
-        date.setTimeInMillis(lastSyncTime);
-        Log.d(TAG, "Last sync date: " + DateTimeText.getDateTimeText(date, context));
-
-        deviceDataList = RVDBHelper.getInstance().loadRecordsLaterThanTime(lastSyncTime);
-
-        RVCloudSyncDataFrame dataFrame = null;
-
-        switch (LoginHelper.getLoginProvider(context)) {
-            case USER_NAME:
-                dataFrame = new RVCloudSyncDataFrame.Builder(RVCloudSyncDataFrame.FrameCategory.SYNC_DATA_REQUEST_WITH_NAME)
-                        .setUserName(LoginHelper.getUserName(context))
-                        .setPassword(LoginHelper.getPassword(context))
-                        .setLastSyncDate(lastSyncTime)
-                        .create();
-                break;
-            case FACEBOOK:
-
-                AccessToken accessToken = AccessToken.getCurrentAccessToken();
-                String token = accessToken.getToken();
-
-                dataFrame = new RVCloudSyncDataFrame.Builder(RVCloudSyncDataFrame.FrameCategory.SYNC_DATA_REQUEST_WITH_FACEBOOK)
-                        .setAuthToken(token)
-                        .setLastSyncDate(lastSyncTime)
-                        .create();
-                break;
-        }
-
-        startSendingData(context, dataFrame, new SendDataCallback() {
-            @Override
-            public void onStart() {
-
-            }
-
-            @Override
-            public void onTimedOut() {
-                if (mCallback != null) {
-
-                    RVCloudSyncDataFrame frame
-                            = new RVCloudSyncDataFrame.Builder(RVCloudSyncDataFrame.FrameCategory.SYNC_DATA_RESPONSE)
-                                .setUserName(LoginHelper.getUserName(context))
-                                .setStatusCode(RVCloudSyncDataFrame.StatusCode.STATUS_TIMED_OUT)
-                                .create();
-                    mCallback.onResponse(frame);
-                }
-            }
-        });
-    }
-
-    public void requestDataSyncWithGoogle(final Context context, String authToken) {
-
-        if (mCallback != null) {
-            mCallback.onStartRequest(RVCloudSyncDataFrame.FrameCategory.SYNC_DATA_REQUEST_WITH_NAME);
+        String authToken = LoginHelper.getAuthToken(context);
+        if (authToken == null) {
+            return;
         }
 
         initSocketClient(context);
@@ -282,7 +276,6 @@ public class RVCloudSync implements RVWebSocketClient.RVWebSocketClientCallback,
 
                     RVCloudSyncDataFrame frame
                             = new RVCloudSyncDataFrame.Builder(RVCloudSyncDataFrame.FrameCategory.SYNC_DATA_RESPONSE)
-                            .setUserName(LoginHelper.getUserName(context))
                             .setStatusCode(RVCloudSyncDataFrame.StatusCode.STATUS_TIMED_OUT)
                             .create();
                     mCallback.onResponse(frame);
